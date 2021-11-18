@@ -1,4 +1,6 @@
-# SeqAn3 App Template [![build status][1]][2] [![codecov][3]][4]
+# <img src="https://user-images.githubusercontent.com/7955878/144013376-6fc96860-b30b-4c8d-8203-b5f98571a1ba.png" alt="drawing" style="width:80px;"/> Sharg -- hungrily eating away your arguments 
+[![build status][1]][2] [![codecov][3]][4]
+
 <!--
     Above uses reference-style links with numbers.
     See also https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#links.
@@ -49,22 +51,7 @@
 -->
 [4]: https://codecov.io/gh/seqan/app-template
 
-This is a template for app developers with SeqAn3.
-You can easily clone this repository and modify the existing code to your needs.
-It provides the elementary set-up for all SeqAn3 applications.
+you can add this library to your application or include the [seqan3 library](https://github.com/seqan/seqan3)
+with even more bio c++ features.
 
-The example application is a FastQ to FastA file format converter.
-It demonstrates exemplarily the set-up of test cases, documentation, and build infrastructure.
-Probably you want to name your app differently — simply replace `app-template` with your app name in the following.
-Please note that the command line interface tests fail if you use an individual project name without adapting the
-name in the test file.
-
-Instructions:
-1. clone this repository: `git clone --recurse-submodules https://github.com/seqan/app-template.git app-template`
-2. edit the project name in the *project* command of `app-template/CMakeLists.txt`
-3. create a build directory and visit it: `mkdir build && cd build`
-4. run cmake: `cmake ../app-template`
-5. build the application: `make`
-6. optional: build and run the tests: `make test`
-7. optional: build the api documentation: `make doc`
-8. execute the app: `./bin/app-template`
+More information and highlights will folllow soon.

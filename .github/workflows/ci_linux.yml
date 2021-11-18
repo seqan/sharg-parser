@@ -1,4 +1,4 @@
-name: CI on Linux
+name: SARG CI on Linux
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   pull_request:
 
 env:
-  CMAKE_VERSION: 3.8.2
+  CMAKE_VERSION: 3.10.3
   SEQAN3_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -25,54 +25,38 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: "Coverage gcc11"
+          - name: "Unit gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
-            build: coverage
-            build_type: Coverage
-
-          - name: "gcc11"
-            cxx: "g++-11"
-            cc: "gcc-11"
+            build: unit
             build_type: Release
+            build_threads: 2
+            test_threads: 2
 
-          - name: "gcc10"
+          - name: "Unit gcc10"
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
             build_type: Release
-
-          - name: "gcc9 (c++2a)"
-            cxx: "g++-9"
-            cc: "gcc-9"
-            build_type: Release
-            cxx_flags: "-std=c++2a"
-
-          - name: "gcc8"
-            cxx: "g++-8"
-            cc: "gcc-8"
-            build_type: Release
-
-          - name: "gcc7"
-            cxx: "g++-7"
-            cc: "gcc-7"
-            build_type: Release
+            build_threads: 2
+            test_threads: 2
 
     steps:
-      - name: Set repository name
-        run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-
-      - name: Checkout
+      - name: Checkout SARG
         uses: actions/checkout@v2
         with:
-          path: ${{ env.REPOSITORY_NAME }}
-          fetch-depth: 2
+          path: sarg
+          fetch-depth: 3
           submodules: recursive
 
       - name: Add package source
-        run: bash ./${{ env.REPOSITORY_NAME }}/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+        run: |
+          sudo add-apt-repository --no-update --yes ppa:ubuntu-toolchain-r/ppa
+          sudo add-apt-repository --no-update --yes ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
 
       - name: Install CMake
-        run: bash ./${{ env.REPOSITORY_NAME }}/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+        run: bash ./sarg/.github/workflows/scripts/install_cmake.sh
 
       - name: Install ccache
         run: sudo apt-get install --yes ccache
@@ -82,11 +66,9 @@ jobs:
 
       - name: Install lcov
         if: matrix.build == 'coverage'
-        env:
-          CC: ${{ matrix.cc }}
         run: |
           sudo apt-get install --yes lcov
-          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-7 100
 
       - name: Load ccache
         uses: actions/cache@v2
@@ -109,23 +91,10 @@ jobs:
           CXX: ${{ matrix.cxx }}
           CC: ${{ matrix.cc }}
         run: |
-          mkdir build
-          cd build
-          cmake ../${{ env.REPOSITORY_NAME }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                              -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-
-      - name: Build application
-        env:
-          CCACHE_BASEDIR: ${{ github.workspace }}
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
-          CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 6
-          CCACHE_MAXSIZE: 500M
-        run: |
-          ccache -p || true
-          cd build
-          make -k -j2
-          ccache -s || true
+          mkdir sarg-build
+          cd sarg-build
+          cmake ../sarg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" -DSARG_VERBOSE_TESTS=OFF -DSARG_BENCHMARK_MIN_TIME=0.01
+          make gtest_build
 
       - name: Build tests
         env:
@@ -133,39 +102,22 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 6
-          CCACHE_MAXSIZE: 500M
+          CCACHE_MAXSIZE: 1G
         run: |
           ccache -p || true
-          cd build
-          make -k -j2 api_test cli_test
+          cd sarg-build
+          make -k -j${{ matrix.build_threads }}
           ccache -s || true
 
-      - name: Generate coverage baseline
-        if: matrix.build == 'coverage'
-        run: |
-          lcov --directory ./build/ --zerocounters
-          lcov --directory ./build/ --capture --initial --output-file ./build/coverage_report.baseline
-
       - name: Run tests
+        if: matrix.build != 'coverage'
         run: |
-          cd build
-          ctest . -j2 --output-on-failure
+          cd sarg-build
+          ctest . -j${{ matrix.test_threads }} --output-on-failure
 
-      - name: Generate coverage report
+      - name: Submit coverage build
         if: matrix.build == 'coverage'
-        run: |
-          lcov --directory ./build/ --capture --output-file ./build/coverage_report.captured
-          lcov -a ./build/coverage_report.baseline -a ./build/coverage_report.captured --output-file ./build/coverage_report.total
-          lcov --remove ./build/coverage_report.total \
-                        '/usr/*' \
-                        '${{ github.workspace }}/${{ env.REPOSITORY_NAME }}/lib/*' \
-                        '${{ github.workspace }}/${{ env.REPOSITORY_NAME }}/test/*' \
-                        '${{ github.workspace }}/build/vendor/*' \
-               --output-file ./build/coverage_report
-
-      - name: Submit coverage report
-        if: matrix.build == 'coverage'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v1
         with:
-          files: ${{ github.workspace }}/build/coverage_report
-          root_dir: ${{ github.workspace }}/${{ env.REPOSITORY_NAME }}
+          files: ${{ github.workspace }}/sarg-build/sarg_coverage
+          root_dir: ${{ github.workspace }}/sarg
