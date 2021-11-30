@@ -6,9 +6,9 @@
 # -----------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10)
-project (sarg_test_unit CXX)
+project (sharg_test_unit CXX)
 
-find_package (SARG REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../../build_system)
+find_package (SHARG REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../../build_system)
 
 include (${CMAKE_CURRENT_LIST_DIR}/../../lib/seqan3/test/seqan3-test.cmake)
 include (GoogleTest OPTIONAL)
@@ -17,21 +17,21 @@ include (diagnostics/list_missing_unit_tests)
 include (diagnostics/list_unused_unit_tests)
 include (include_dependencies/add_include_dependencies)
 
-option (SARG_VERBOSE_TESTS "Run each test case individually" ON)
-option (SARG_USE_INCLUDE_DEPENDENCIES "Build tests in an hierarchical order (by an include graph, i.e. tests with less dependencies are build first)" OFF)
+option (SHARG_VERBOSE_TESTS "Run each test case individually" ON)
+option (SHARG_USE_INCLUDE_DEPENDENCIES "Build tests in an hierarchical order (by an include graph, i.e. tests with less dependencies are build first)" OFF)
 
-macro (sarg_test unit_test_cpp)
-    cmake_parse_arguments(SARG_TEST "" "" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
+macro (sharg_test unit_test_cpp)
+    cmake_parse_arguments(SHARG_TEST "" "" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
 
     file (RELATIVE_PATH unit_test "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_LIST_DIR}/${unit_test_cpp}")
     seqan3_test_component (target "${unit_test}" TARGET_NAME)
     seqan3_test_component (test_name "${unit_test}" TEST_NAME)
 
     add_executable (${target} ${unit_test_cpp})
-    target_link_libraries (${target} seqan3::test::unit sarg::sarg)
-    add_include_dependencies (${target} "${SARG_TEST_CYCLIC_DEPENDING_INCLUDES}")
+    target_link_libraries (${target} seqan3::test::unit sharg::sharg)
+    add_include_dependencies (${target} "${SHARG_TEST_CYCLIC_DEPENDING_INCLUDES}")
     collect_used_test (${target})
-    if (SARG_VERBOSE_TESTS)
+    if (SHARG_VERBOSE_TESTS)
         gtest_discover_tests(${target} TEST_PREFIX "${test_name}::" PROPERTIES TIMEOUT "30")
     else ()
         add_test (NAME "${test_name}" COMMAND ${target})
@@ -54,6 +54,6 @@ list_missing_unit_tests()
 
 add_subdirectories ()
 
-sarg_test(format_parse_test.cpp)
-sarg_test(format_parse_validators_test.cpp)
-sarg_test(argument_parser_design_error_test.cpp)
+sharg_test(format_parse_test.cpp)
+sharg_test(format_parse_validators_test.cpp)
+sharg_test(argument_parser_design_error_test.cpp)

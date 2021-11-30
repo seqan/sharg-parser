@@ -12,50 +12,50 @@
 #include <cstdint>
 
 /*!\file
- * \brief Provides SARG version macros and global variables.
+ * \brief Provides SHARG version macros and global variables.
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
 //!\brief The major version as MACRO.
-#define SARG_VERSION_MAJOR 0
+#define SHARG_VERSION_MAJOR 0
 //!\brief The minor version as MACRO.
-#define SARG_VERSION_MINOR 1
+#define SHARG_VERSION_MINOR 1
 //!\brief The patch version as MACRO.
-#define SARG_VERSION_PATCH 0
+#define SHARG_VERSION_PATCH 0
 
 //!\brief The full version as MACRO (number).
-#define SARG_VERSION (SARG_VERSION_MAJOR * 10000 + SARG_VERSION_MINOR * 100 + SARG_VERSION_PATCH)
+#define SHARG_VERSION (SHARG_VERSION_MAJOR * 10000 + SHARG_VERSION_MINOR * 100 + SHARG_VERSION_PATCH)
 
 /*!\brief Converts a number to a string. Preprocessor needs this indirection to
  * properly expand the values to strings.
  */
-#define SARG_VERSION_CSTRING_HELPER_STR(str) #str
+#define SHARG_VERSION_CSTRING_HELPER_STR(str) #str
 
 //!\brief Converts version numbers to string.
-#define SARG_VERSION_CSTRING_HELPER_FUNC(MAJOR, MINOR, PATCH)                                                           \
-    SARG_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                              \
-    "." SARG_VERSION_CSTRING_HELPER_STR(MINOR) "." SARG_VERSION_CSTRING_HELPER_STR(PATCH)
+#define SHARG_VERSION_CSTRING_HELPER_FUNC(MAJOR, MINOR, PATCH)                                                           \
+    SHARG_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                              \
+    "." SHARG_VERSION_CSTRING_HELPER_STR(MINOR) "." SHARG_VERSION_CSTRING_HELPER_STR(PATCH)
 
 //!\brief The full version as null terminated string.
-#define SARG_VERSION_CSTRING SARG_VERSION_CSTRING_HELPER_FUNC(SARG_VERSION_MAJOR, SARG_VERSION_MINOR, SARG_VERSION_PATCH)
+#define SHARG_VERSION_CSTRING SHARG_VERSION_CSTRING_HELPER_FUNC(SHARG_VERSION_MAJOR, SHARG_VERSION_MINOR, SHARG_VERSION_PATCH)
 
-namespace sarg
+namespace sharg
 {
 
 //!\brief The major version.
-constexpr uint8_t sarg_version_major = SARG_VERSION_MAJOR;
+constexpr uint8_t sharg_version_major = SHARG_VERSION_MAJOR;
 //!\brief The minor version.
-constexpr uint8_t sarg_version_minor = SARG_VERSION_MINOR;
+constexpr uint8_t sharg_version_minor = SHARG_VERSION_MINOR;
 //!\brief The patch version.
-constexpr uint8_t sarg_version_patch = SARG_VERSION_PATCH;
+constexpr uint8_t sharg_version_patch = SHARG_VERSION_PATCH;
 
 //!\brief The full version as `std::size_t`.
-constexpr std::size_t sarg_version = SARG_VERSION;
+constexpr std::size_t sharg_version = SHARG_VERSION;
 
 //!\brief The full version as null terminated string.
-constexpr char const * sarg_version_cstring = SARG_VERSION_CSTRING;
+constexpr char const * sharg_version_cstring = SHARG_VERSION_CSTRING;
 
-} // namespace sarg
+} // namespace sharg
 
-#undef SARG_VERSION_CSTRING_HELPER_STR
-#undef SARG_VERSION_CSTRING_HELPER_FUNC
+#undef SHARG_VERSION_CSTRING_HELPER_STR
+#undef SHARG_VERSION_CSTRING_HELPER_FUNC

@@ -1,4 +1,4 @@
-name: SARG CI on Linux
+name: CI on Linux
 
 on:
   push:
@@ -42,10 +42,10 @@ jobs:
             test_threads: 2
 
     steps:
-      - name: Checkout SARG
+      - name: Checkout Sharg
         uses: actions/checkout@v2
         with:
-          path: sarg
+          path: sharg
           fetch-depth: 3
           submodules: recursive
 
@@ -56,7 +56,7 @@ jobs:
           sudo apt-get update
 
       - name: Install CMake
-        run: bash ./sarg/.github/workflows/scripts/install_cmake.sh
+        run: bash ./sharg/.github/workflows/scripts/install_cmake.sh
 
       - name: Install ccache
         run: sudo apt-get install --yes ccache
@@ -91,9 +91,9 @@ jobs:
           CXX: ${{ matrix.cxx }}
           CC: ${{ matrix.cc }}
         run: |
-          mkdir sarg-build
-          cd sarg-build
-          cmake ../sarg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" -DSARG_VERBOSE_TESTS=OFF -DSARG_BENCHMARK_MIN_TIME=0.01
+          mkdir sharg-build
+          cd sharg-build
+          cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" -DSHARG_VERBOSE_TESTS=OFF -DSHARG_BENCHMARK_MIN_TIME=0.01
           make gtest_build
 
       - name: Build tests
@@ -105,19 +105,19 @@ jobs:
           CCACHE_MAXSIZE: 1G
         run: |
           ccache -p || true
-          cd sarg-build
+          cd sharg-build
           make -k -j${{ matrix.build_threads }}
           ccache -s || true
 
       - name: Run tests
         if: matrix.build != 'coverage'
         run: |
-          cd sarg-build
+          cd sharg-build
           ctest . -j${{ matrix.test_threads }} --output-on-failure
 
       - name: Submit coverage build
         if: matrix.build == 'coverage'
         uses: codecov/codecov-action@v1
         with:
-          files: ${{ github.workspace }}/sarg-build/sarg_coverage
-          root_dir: ${{ github.workspace }}/sarg
+          files: ${{ github.workspace }}/sharg-build/sharg_coverage
+          root_dir: ${{ github.workspace }}/sharg
