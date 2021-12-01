@@ -24,6 +24,7 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
 
     add_executable (${target} "${snippet_base_path}/${snippet}")
     target_link_libraries (${target} PUBLIC snippet_main sharg::sharg)
+    target_include_directories (${target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../../include)
     set_target_properties(${target}
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${snippet_target_path}"

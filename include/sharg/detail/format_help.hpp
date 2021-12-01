@@ -17,8 +17,8 @@
 #include <cassert>
 #include <iostream>
 
-#include <seqan3/argument_parser/detail/format_base.hpp>
-#include <seqan3/argument_parser/detail/terminal.hpp>
+#include <sharg/detail/format_base.hpp>
+#include <sharg/detail/terminal.hpp>
 #include <seqan3/core/detail/test_accessor.hpp>
 
 namespace seqan3::detail
@@ -453,7 +453,7 @@ public:
  * meta information (e.g. long_copyright) on construction of the parser. Thus the meta information is collected
  * and only evaluated when calling seqan3::detail::format_version::parse.
  *
- * \remark For a complete overview, take a look at \ref argument_parser 
+ * \remark For a complete overview, take a look at \ref argument_parser
  */
 class format_copyright : public format_help
 {

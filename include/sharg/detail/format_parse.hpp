@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include <seqan3/argument_parser/detail/format_base.hpp>
+#include <sharg/detail/format_base.hpp>
 #include <seqan3/utility/char_operations/predicate.hpp>
 
 namespace seqan3::detail

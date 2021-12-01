@@ -29,6 +29,7 @@ macro (sharg_test unit_test_cpp)
 
     add_executable (${target} ${unit_test_cpp})
     target_link_libraries (${target} seqan3::test::unit sharg::sharg)
+    target_include_directories (${target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../../include)
     add_include_dependencies (${target} "${SHARG_TEST_CYCLIC_DEPENDING_INCLUDES}")
     collect_used_test (${target})
     if (SHARG_VERBOSE_TESTS)

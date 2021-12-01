@@ -1,6 +1,6 @@
 #include <system_error>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
 #include <seqan3/std/ranges>
 
 namespace seqan3::custom

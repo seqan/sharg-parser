@@ -21,8 +21,8 @@
 #include <optional>
 #include <regex>
 
-#include <seqan3/argument_parser/auxiliary.hpp>
-#include <seqan3/argument_parser/detail/terminal.hpp>
+#include <sharg/auxiliary.hpp>
+#include <sharg/detail/terminal.hpp>
 #include <seqan3/io/detail/misc.hpp>
 #include <seqan3/io/detail/safe_filesystem_entry.hpp>
 #include <seqan3/std/charconv>

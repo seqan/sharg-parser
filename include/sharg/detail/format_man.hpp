@@ -14,8 +14,8 @@
 
 #include <iostream>
 
-#include <seqan3/argument_parser/detail/format_base.hpp>
-#include <seqan3/argument_parser/detail/terminal.hpp>
+#include <sharg/detail/format_base.hpp>
+#include <sharg/detail/terminal.hpp>
 #include <seqan3/version.hpp>
 
 namespace seqan3::detail

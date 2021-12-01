@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 
-#include <seqan3/argument_parser/argument_parser.hpp>
-#include <seqan3/argument_parser/detail/format_help.hpp>
+#include <sharg/argument_parser.hpp>
+#include <sharg/detail/format_help.hpp>
 
 // reused global variables
 std::string std_cout;
