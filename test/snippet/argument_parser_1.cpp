@@ -3,7 +3,7 @@
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser myparser{"Grade-Average", argc, argv}; // initialize
+    sharg::argument_parser myparser{"Grade-Average", argc, argv}; // initialize
 
     std::string name{"Max Muster"}; // define default values directly in the variable.
     bool bonus{false};
@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::argument_parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << '\n'; // customize your error message
         return -1;

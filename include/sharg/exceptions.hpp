@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -14,9 +14,9 @@
 
 #include <stdexcept>
 
-#include <seqan3/core/platform.hpp>
+#include <sharg/platform.hpp>
 
-namespace seqan3
+namespace sharg
 {
 /*!\brief Argument parser exception that is thrown whenever there is an error
  * while parsing the command line arguments.
@@ -148,4 +148,4 @@ public:
     design_error(std::string const & s) : argument_parser_error(s) {}
 };
 
-} // namespace seqan3
+} // namespace sharg

@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
@@ -14,7 +14,7 @@ TEST(parse_type_test, add_option_short_id)
     std::string option_value;
 
     const char * argv[] = {"./argument_parser_test", "-s", "option_string"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_section("My options");       // no-op for code coverage
     parser.add_subsection("My suboptions"); // no-op for code coverage
     parser.add_line("line");                // no-op for code coverage
@@ -28,7 +28,7 @@ TEST(parse_type_test, add_option_short_id)
 
     // add with no space
     const char * argv2[] = {"./argument_parser_test", "-Soption_string"};
-    seqan3::argument_parser parser2{"test_parser", 2, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 2, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'S', "string-option", "this is a string option.");
 
     testing::internal::CaptureStderr();
@@ -38,7 +38,7 @@ TEST(parse_type_test, add_option_short_id)
 
     // ad with = sign
     const char * argv3[] = {"./argument_parser_test", "-s=option_string"};
-    seqan3::argument_parser parser3{"test_parser", 2, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     parser3.add_option(option_value, 's', "string-option", "this is a string option.");
 
     testing::internal::CaptureStderr();
@@ -52,7 +52,7 @@ TEST(parse_type_test, add_option_long_id)
     std::string option_value;
 
     const char * argv[] = {"./argument_parser_test", "--string-option", "option_string"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 's', "string-option", "this is a string option.");
 
     testing::internal::CaptureStderr();
@@ -61,7 +61,7 @@ TEST(parse_type_test, add_option_long_id)
     EXPECT_EQ(option_value, "option_string");
 
     const char * argv3[] = {"./argument_parser_test", "--string-option=option_string"};
-    seqan3::argument_parser parser3{"test_parser", 2, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     parser3.add_option(option_value, 's', "string-option", "this is a string option.");
 
     testing::internal::CaptureStderr();
@@ -76,7 +76,7 @@ TEST(parse_type_test, add_flag_short_id_single)
     bool option_value2{true};
 
     const char * argv[] = {"./argument_parser_test", "-t"};
-    seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_flag(option_value1, 't', "true-flag", "this is a flag.");
     parser.add_flag(option_value2, 'f', "false-flag", "this is a flag.");
 
@@ -95,7 +95,7 @@ TEST(parse_type_test, add_flag_short_id_multiple)
     bool option_value4{false};
 
     const char * argv[] = {"./argument_parser_test", "-tab"};
-    seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_flag(option_value1, 't', "true-flag", "this is a flag.");
     parser.add_flag(option_value2, 'f', "false-flag", "this is a flag.");
     parser.add_flag(option_value3, 'a', "additional-flag", "this is a flag.");
@@ -116,7 +116,7 @@ TEST(parse_type_test, add_flag_long_id)
     bool option_value2{true};
 
     const char * argv[] = {"./argument_parser_test", "--true-flag"};
-    seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_flag(option_value1, 't', "true-flag", "this is a flag.");
     parser.add_flag(option_value2, 'f', "false-flag", "this is a flag.");
 
@@ -132,7 +132,7 @@ TEST(parse_type_test, add_positional_option)
     std::string positional_value;
 
     const char * argv[] = {"./argument_parser_test", "positional_string"};
-    seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_positional_option(positional_value, "this is a string positional.");
 
     testing::internal::CaptureStderr();
@@ -151,7 +151,7 @@ TEST(parse_type_test, independent_add_order)
 
     // Order 1: option, flag, positional
     const char * argv[] = {"./argument_parser_test", "-i", "2", "-b", "arg"};
-    seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser.add_positional_option(positional_value, "this is a string positional.");
@@ -164,7 +164,7 @@ TEST(parse_type_test, independent_add_order)
     EXPECT_EQ(flag_value, true);
 
     // Order 1: flag, option, positional
-    seqan3::argument_parser parser2{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 5, argv, sharg::update_notifications::off};
     parser2.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser2.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser2.add_positional_option(positional_value, "this is a string positional.");
@@ -177,7 +177,7 @@ TEST(parse_type_test, independent_add_order)
     EXPECT_EQ(flag_value, true);
 
     // Order 1: option, positional, flag
-    seqan3::argument_parser parser3{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 5, argv, sharg::update_notifications::off};
     parser3.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser3.add_positional_option(positional_value, "this is a string positional.");
     parser3.add_flag(flag_value, 'b', "flag", "this is a flag.");
@@ -190,7 +190,7 @@ TEST(parse_type_test, independent_add_order)
     EXPECT_EQ(flag_value, true);
 
     // Order 1: flag, positional, option
-    seqan3::argument_parser parser4{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser4{"test_parser", 5, argv, sharg::update_notifications::off};
     parser4.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser4.add_positional_option(positional_value, "this is a string positional.");
     parser4.add_option(option_value, 'i', "int-option", "this is a int option.");
@@ -203,7 +203,7 @@ TEST(parse_type_test, independent_add_order)
     EXPECT_EQ(flag_value, true);
 
     // Order 1: positional, flag, option
-    seqan3::argument_parser parser5{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser5{"test_parser", 5, argv, sharg::update_notifications::off};
     parser5.add_positional_option(positional_value, "this is a string positional.");
     parser5.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser5.add_option(option_value, 'i', "int-option", "this is a int option.");
@@ -216,7 +216,7 @@ TEST(parse_type_test, independent_add_order)
     EXPECT_EQ(flag_value, true);
 
     // Order 1: positional, option, flag
-    seqan3::argument_parser parser6{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser6{"test_parser", 5, argv, sharg::update_notifications::off};
     parser6.add_positional_option(positional_value, "this is a string positional.");
     parser6.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser6.add_flag(flag_value, 'b', "flag", "this is a flag.");
@@ -239,7 +239,7 @@ TEST(parse_type_test, independent_cmd_order)
 
     // Order 1: option, flag, positional (POSIX conform)
     const char * argv[] = {"./argument_parser_test", "-i", "2", "-b", "arg"};
-    seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser.add_positional_option(positional_value, "this is a string positional.");
@@ -253,7 +253,7 @@ TEST(parse_type_test, independent_cmd_order)
 
     // Order 1: flag, option, positional (POSIX conform)
     const char * argv2[] = {"./argument_parser_test", "-b", "-i", "2", "arg"};
-    seqan3::argument_parser parser2{"test_parser", 5, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 5, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser2.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser2.add_positional_option(positional_value, "this is a string positional.");
@@ -267,7 +267,7 @@ TEST(parse_type_test, independent_cmd_order)
 
     // Order 1: option, positional, flag
     const char * argv3[] = {"./argument_parser_test", "-i", "2", "arg", "-b"};
-    seqan3::argument_parser parser3{"test_parser", 5, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 5, argv3, sharg::update_notifications::off};
     parser3.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser3.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser3.add_positional_option(positional_value, "this is a string positional.");
@@ -281,7 +281,7 @@ TEST(parse_type_test, independent_cmd_order)
 
     // Order 1: flag, positional, option
     const char * argv4[] = {"./argument_parser_test", "-b", "arg", "-i", "2"};
-    seqan3::argument_parser parser4{"test_parser", 5, argv4, seqan3::update_notifications::off};
+    sharg::argument_parser parser4{"test_parser", 5, argv4, sharg::update_notifications::off};
     parser4.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser4.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser4.add_positional_option(positional_value, "this is a string positional.");
@@ -295,7 +295,7 @@ TEST(parse_type_test, independent_cmd_order)
 
     // Order 1: positional, flag, option
     const char * argv5[] = {"./argument_parser_test", "arg", "-b", "-i", "2"};
-    seqan3::argument_parser parser5{"test_parser", 5, argv5, seqan3::update_notifications::off};
+    sharg::argument_parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     parser5.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser5.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser5.add_positional_option(positional_value, "this is a string positional.");
@@ -309,7 +309,7 @@ TEST(parse_type_test, independent_cmd_order)
 
     // Order 1: positional, option, flag
     const char * argv6[] = {"./argument_parser_test", "arg", "-i", "2", "-b"};
-    seqan3::argument_parser parser6{"test_parser", 5, argv6, seqan3::update_notifications::off};
+    sharg::argument_parser parser6{"test_parser", 5, argv6, sharg::update_notifications::off};
     parser6.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser6.add_flag(flag_value, 'b', "flag", "this is a flag.");
     parser6.add_positional_option(positional_value, "this is a string positional.");
@@ -328,7 +328,7 @@ TEST(parse_test, double_dash_separation_success)
 
     // string option with dash
     const char * argv[] = {"./argument_parser_test", "--", "-strange"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_positional_option(option_value, "this is a string option.");
 
     testing::internal::CaptureStderr();
@@ -339,7 +339,7 @@ TEST(parse_test, double_dash_separation_success)
     // negative integer option
     int option_value_int;
     const char * argv2[] = {"./argument_parser_test", "--", "-120"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     parser2.add_positional_option(option_value_int, "this is a int option.");
 
     testing::internal::CaptureStderr();
@@ -355,7 +355,7 @@ TEST(parse_test, special_characters_as_value_success)
     // weird option value. But since r/regex option is parsed and with it's
     // value should work correct
     const char * argv[] = {"./argument_parser_test", "--regex", "-i=/45*&//--"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'r', "regex", "strange option value.");
 
     testing::internal::CaptureStderr();
@@ -370,31 +370,31 @@ TEST(parse_test, empty_value_error)
 
     // short option
     const char * argv[] = {"./argument_parser_test", "-i"};
-    seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "long", "this is a int option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser.parse(), sharg::argument_parser_error);
 
     // long option
     const char * argv2[] = {"./argument_parser_test", "--long"};
-    seqan3::argument_parser parser2{"test_parser", 2, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 2, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'i', "long", "this is an int option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser2.parse(), sharg::argument_parser_error);
 
     // short option
     const char * argv3[] = {"./argument_parser_test", "-i="};
-    seqan3::argument_parser parser3{"test_parser", 2, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     parser3.add_option(option_value, 'i', "long", "this is an int option.");
 
-    EXPECT_THROW(parser3.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser3.parse(), sharg::argument_parser_error);
 
     // short option
     const char * argv4[] = {"./argument_parser_test", "--long="};
-    seqan3::argument_parser parser4{"test_parser", 2, argv4, seqan3::update_notifications::off};
+    sharg::argument_parser parser4{"test_parser", 2, argv4, sharg::update_notifications::off};
     parser4.add_option(option_value, 'i', "long", "this is an int option.");
 
-    EXPECT_THROW(parser4.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser4.parse(), sharg::argument_parser_error);
 }
 
 TEST(parse_type_test, parse_success_bool_option)
@@ -405,7 +405,7 @@ TEST(parse_type_test, parse_success_bool_option)
     // numbers 0 and 1
     {
         const char * argv[] = {"./argument_parser_test", "-b", "1", "0"};
-        seqan3::argument_parser parser{"test_parser", 4, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'b', "bool-option", "this is a bool option.");
         parser.add_positional_option(positional_value, "this is a bool positional.");
 
@@ -420,7 +420,7 @@ TEST(parse_type_test, parse_success_bool_option)
     // true and false
     {
         const char * argv[] = {"./argument_parser_test", "-b", "true", "false"};
-        seqan3::argument_parser parser{"test_parser", 4, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'b', "bool-option", "this is a bool option.");
         parser.add_positional_option(positional_value, "this is a bool positional.");
 
@@ -439,7 +439,7 @@ TEST(parse_type_test, parse_success_int_option)
     size_t positional_value;
 
     const char * argv[] = {"./argument_parser_test", "-i", "-2", "278"};
-    seqan3::argument_parser parser{"test_parser", 4, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "int-option", "this is a int option.");
     parser.add_positional_option(positional_value, "this is a int positional.");
 
@@ -457,7 +457,7 @@ TEST(parse_type_test, parse_success_double_option)
     double positional_value;
 
     const char * argv[] = {"./argument_parser_test", "-d", "12.457", "0.123"};
-    seqan3::argument_parser parser{"test_parser", 4, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'd', "double-option", "this is a double option.");
     parser.add_positional_option(positional_value, "this is a double positional.");
 
@@ -470,7 +470,7 @@ TEST(parse_type_test, parse_success_double_option)
 
     // double expression with e
     const char * argv2[] = {"./argument_parser_test", "-d", "6.0221418e23"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'd', "double-option", "this is a double option.");
 
     testing::internal::CaptureStderr();
@@ -488,17 +488,17 @@ TEST(parse_type_test, parse_error_bool_option)
 
     // fail on character input
     const char * argv[] = {"./argument_parser_test", "-b", "a"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'b', "bool-option", "this is a bool option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser.parse(), sharg::argument_parser_error);
 
     // fail on number input expect 0 and 1
     const char * argv2[] = {"./argument_parser_test", "-b", "124"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'b', "bool-option", "this is a bool option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser2.parse(), sharg::argument_parser_error);
 }
 
 TEST(parse_type_test, parse_error_int_option)
@@ -507,47 +507,47 @@ TEST(parse_type_test, parse_error_int_option)
 
     // fail on character
     const char * argv[] = {"./argument_parser_test", "-i", "abc"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "int-option", "this is a int option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser.parse(), sharg::argument_parser_error);
 
     // fail on number followed by character
     const char * argv2[] = {"./argument_parser_test", "-i", "2abc"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'i', "int-option", "this is a int option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser2.parse(), sharg::argument_parser_error);
 
     // fail on double
     const char * argv3[] = {"./argument_parser_test", "-i", "3.12"};
-    seqan3::argument_parser parser3{"test_parser", 3, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 3, argv3, sharg::update_notifications::off};
     parser3.add_option(option_value, 'i', "int-option", "this is a int option.");
 
-    EXPECT_THROW(parser3.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser3.parse(), sharg::argument_parser_error);
 
     // fail on negative number for unsigned
     unsigned option_value_u;
     const char * argv4[] = {"./argument_parser_test", "-i", "-1"};
-    seqan3::argument_parser parser4{"test_parser", 3, argv4, seqan3::update_notifications::off};
+    sharg::argument_parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     parser4.add_option(option_value_u, 'i', "int-option", "this is a int option.");
 
-    EXPECT_THROW(parser4.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser4.parse(), sharg::argument_parser_error);
 
     // fail on overflow
     int8_t option_value_int8;
     const char * argv5[] = {"./argument_parser_test", "-i", "129"};
-    seqan3::argument_parser parser5{"test_parser", 3, argv5, seqan3::update_notifications::off};
+    sharg::argument_parser parser5{"test_parser", 3, argv5, sharg::update_notifications::off};
     parser5.add_option(option_value_int8, 'i', "int-option", "this is a int option.");
 
-    EXPECT_THROW(parser5.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser5.parse(), sharg::argument_parser_error);
 
     uint8_t option_value_uint8;
     const char * argv6[] = {"./argument_parser_test", "-i", "267"};
-    seqan3::argument_parser parser6{"test_parser", 3, argv6, seqan3::update_notifications::off};
+    sharg::argument_parser parser6{"test_parser", 3, argv6, sharg::update_notifications::off};
     parser6.add_option(option_value_uint8, 'i', "int-option", "this is a int option.");
 
-    EXPECT_THROW(parser6.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser6.parse(), sharg::argument_parser_error);
 }
 
 TEST(parse_type_test, parse_error_double_option)
@@ -556,17 +556,17 @@ TEST(parse_type_test, parse_error_double_option)
 
     // fail on character
     const char * argv[] = {"./argument_parser_test", "-i", "abc"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'd', "double-option", "this is a double option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser.parse(), sharg::argument_parser_error);
 
     // fail on number followed by character
     const char * argv2[] = {"./argument_parser_test", "-d", "12.457a"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'd', "double-option", "this is a double option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::argument_parser_error);
+    EXPECT_THROW(parser2.parse(), sharg::argument_parser_error);
 }
 
 TEST(parse_test, too_many_arguments_error)
@@ -574,18 +574,18 @@ TEST(parse_test, too_many_arguments_error)
     int option_value;
 
     const char * argv[] = {"./argument_parser_test", "5", "15"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_positional_option(option_value, "this is an int option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::too_many_arguments);
+    EXPECT_THROW(parser.parse(), sharg::too_many_arguments);
 
     // since -- indicates -i as a positional argument, this causes a too many args error
     const char * argv2[] = {"./argument_parser_test", "2", "--", "-i"};
-    seqan3::argument_parser parser2{"test_parser", 4, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 4, argv2, sharg::update_notifications::off};
     parser2.add_positional_option(option_value, "normal int positional argument.");
     parser2.add_option(option_value, 'i', "int-option", "this is an int option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::too_many_arguments);
+    EXPECT_THROW(parser2.parse(), sharg::too_many_arguments);
 }
 
 TEST(parse_test, too_few_arguments_error)
@@ -593,64 +593,64 @@ TEST(parse_test, too_few_arguments_error)
     int option_value;
 
     const char * argv[] = {"./argument_parser_test", "15"};
-    seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_positional_option(option_value, "this is an int option.");
     parser.add_positional_option(option_value, "this is another option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::too_few_arguments);
+    EXPECT_THROW(parser.parse(), sharg::too_few_arguments);
 
     // since -- indicates -i as a positional argument, this causes a too many args error
     const char * argv2[] = {"./argument_parser_test", "-i", "2"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     parser2.add_positional_option(option_value, "normal int positional argument.");
     parser2.add_option(option_value, 'i', "int-option", "this is an int option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::too_few_arguments);
+    EXPECT_THROW(parser2.parse(), sharg::too_few_arguments);
 }
 
 TEST(parse_test, unknown_option_error)
 {
     // unknown short option
     const char * argv[] = {"./argument_parser_test", "-i", "15"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
 
-    EXPECT_THROW(parser.parse(), seqan3::unknown_option);
+    EXPECT_THROW(parser.parse(), sharg::unknown_option);
 
     // unknown long option
     const char * argv2[] = {"./argument_parser_test", "--arg", "8"};
-    seqan3::argument_parser parser2{"test_parser", 3, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
 
-    EXPECT_THROW(parser2.parse(), seqan3::unknown_option);
+    EXPECT_THROW(parser2.parse(), sharg::unknown_option);
 
     // unknown short flag
     const char * argv3[] = {"./argument_parser_test", "-a"};
-    seqan3::argument_parser parser3{"test_parser", 2, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
 
-    EXPECT_THROW(parser3.parse(), seqan3::unknown_option);
+    EXPECT_THROW(parser3.parse(), sharg::unknown_option);
 
     // unknown long flag
     const char * argv4[] = {"./argument_parser_test", "--arg"};
-    seqan3::argument_parser parser4{"test_parser", 2, argv4, seqan3::update_notifications::off};
+    sharg::argument_parser parser4{"test_parser", 2, argv4, sharg::update_notifications::off};
 
-    EXPECT_THROW(parser4.parse(), seqan3::unknown_option);
+    EXPECT_THROW(parser4.parse(), sharg::unknown_option);
 
     // negative numbers are seen as options
     const char * argv5[] = {"./argument_parser_test", "-5"};
-    seqan3::argument_parser parser5{"test_parser", 2, argv5, seqan3::update_notifications::off};
+    sharg::argument_parser parser5{"test_parser", 2, argv5, sharg::update_notifications::off};
 
-    EXPECT_THROW(parser5.parse(), seqan3::unknown_option);
+    EXPECT_THROW(parser5.parse(), sharg::unknown_option);
 
     // unknown short option in more complex command line
     int option_value_i;
     std::string option_value_a;
     std::string positional_option;
     const char * argv6[] = {"./argument_parser_test", "-i", "129", "arg1", "-b", "bcd", "-a", "abc"};
-    seqan3::argument_parser parser6{"test_parser", 8, argv6, seqan3::update_notifications::off};
+    sharg::argument_parser parser6{"test_parser", 8, argv6, sharg::update_notifications::off};
     parser6.add_option(option_value_i, 'i', "int-option", "this is a int option.");
     parser6.add_option(option_value_a, 'a', "string-option", "this is a string option.");
     parser6.add_positional_option(positional_option, "normal int positional argument.");
 
-    EXPECT_THROW(parser6.parse(), seqan3::unknown_option);
+    EXPECT_THROW(parser6.parse(), sharg::unknown_option);
 }
 
 TEST(parse_test, option_declared_multiple_times_error)
@@ -659,24 +659,24 @@ TEST(parse_test, option_declared_multiple_times_error)
 
     // short option
     const char * argv[] = {"./argument_parser_test", "-i", "15", "-i", "3"};
-    seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "long", "this is a int option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::option_declared_multiple_times);
+    EXPECT_THROW(parser.parse(), sharg::option_declared_multiple_times);
 
     // since -- indicates -i as a positional argument, this causes a too many args error
     const char * argv2[] = {"./argument_parser_test", "--long", "5", "--long", "6"};
-    seqan3::argument_parser parser2{"test_parser", 5, argv2, seqan3::update_notifications::off};
+    sharg::argument_parser parser2{"test_parser", 5, argv2, sharg::update_notifications::off};
     parser2.add_option(option_value, 'i', "long", "this is an int option.");
 
-    EXPECT_THROW(parser2.parse(), seqan3::option_declared_multiple_times);
+    EXPECT_THROW(parser2.parse(), sharg::option_declared_multiple_times);
 
     // since -- indicates -i as a positional argument, this causes a too many args error
     const char * argv3[] = {"./argument_parser_test", "-i", "5", "--long", "6"};
-    seqan3::argument_parser parser3{"test_parser", 5, argv3, seqan3::update_notifications::off};
+    sharg::argument_parser parser3{"test_parser", 5, argv3, sharg::update_notifications::off};
     parser3.add_option(option_value, 'i', "long", "this is an int option.");
 
-    EXPECT_THROW(parser3.parse(), seqan3::option_declared_multiple_times);
+    EXPECT_THROW(parser3.parse(), sharg::option_declared_multiple_times);
 }
 
 TEST(parse_test, required_option_missing)
@@ -685,12 +685,12 @@ TEST(parse_test, required_option_missing)
 
     // option is required
     const char * argv[] = {"./argument_parser_test", "5", "-i", "15"};
-    seqan3::argument_parser parser{"test_parser", 4, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'i', "int-option", "this is an int option.");
-    parser.add_option(option_value, 'a', "req-option", "I am required.", seqan3::option_spec::required);
+    parser.add_option(option_value, 'a', "req-option", "I am required.", sharg::option_spec::required);
     parser.add_positional_option(option_value, "this is an int option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::required_option_missing);
+    EXPECT_THROW(parser.parse(), sharg::required_option_missing);
 }
 
 TEST(parse_test, argv_const_combinations)
@@ -703,7 +703,7 @@ TEST(parse_test, argv_const_combinations)
 
     // all const*
     char const * const * const argv_all_const{argv};
-    seqan3::argument_parser parser{"test_parser", 2, argv_all_const, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 2, argv_all_const, sharg::update_notifications::off};
     parser.add_flag(flag_value, 'f', "flag", "this is a flag.");
 
     EXPECT_NO_THROW(parser.parse());
@@ -711,7 +711,7 @@ TEST(parse_test, argv_const_combinations)
 
     // none const
     flag_value = false;
-    parser = seqan3::argument_parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+    parser = sharg::argument_parser{"test_parser", 2, argv, sharg::update_notifications::off};
     parser.add_flag(flag_value, 'f', "flag", "this is a flag.");
 
     EXPECT_NO_THROW(parser.parse());
@@ -720,7 +720,7 @@ TEST(parse_test, argv_const_combinations)
     // const 1
     flag_value = false;
     char const * argv_const1[] = {"./argument_parser_test", "-f"};
-    parser = seqan3::argument_parser{"test_parser", 2, argv_const1, seqan3::update_notifications::off};
+    parser = sharg::argument_parser{"test_parser", 2, argv_const1, sharg::update_notifications::off};
     parser.add_flag(flag_value, 'f', "flag", "this is a flag.");
 
     EXPECT_NO_THROW(parser.parse());
@@ -729,7 +729,7 @@ TEST(parse_test, argv_const_combinations)
     // const 2
     flag_value = false;
     char * const argv_const2[] = {arg1, arg2};
-    parser = seqan3::argument_parser{"test_parser", 2, argv_const2, seqan3::update_notifications::off};
+    parser = sharg::argument_parser{"test_parser", 2, argv_const2, sharg::update_notifications::off};
     parser.add_flag(flag_value, 'f', "flag", "this is a flag.");
 
     EXPECT_NO_THROW(parser.parse());
@@ -738,7 +738,7 @@ TEST(parse_test, argv_const_combinations)
     // const 12
     flag_value = false;
     char const * const argv_const12[] = {arg1, arg2};
-    parser = seqan3::argument_parser{"test_parser", 2, argv_const12, seqan3::update_notifications::off};
+    parser = sharg::argument_parser{"test_parser", 2, argv_const12, sharg::update_notifications::off};
     parser.add_flag(flag_value, 'f', "flag", "this is a flag.");
 
     EXPECT_NO_THROW(parser.parse());
@@ -751,7 +751,7 @@ TEST(parse_test, multiple_empty_options)
 
     {
         const char * argv[]{"./empty_long", "-s=1"};
-        seqan3::argument_parser parser{"empty_long", 2, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"empty_long", 2, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'i', "", "no long");
         parser.add_option(option_value, 's', "", "no long");
 
@@ -761,16 +761,16 @@ TEST(parse_test, multiple_empty_options)
 
     {
         const char * argv[]{"./empty_long", "-s=1", "--unknown"};
-        seqan3::argument_parser parser{"empty_long", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"empty_long", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'i', "", "no long");
         parser.add_option(option_value, 's', "", "no long");
 
-        EXPECT_THROW(parser.parse(), seqan3::unknown_option);
+        EXPECT_THROW(parser.parse(), sharg::unknown_option);
     }
 
     {
         const char * argv[]{"./empty_short", "--long=2"};
-        seqan3::argument_parser parser{"empty_short", 2, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"empty_short", 2, argv, sharg::update_notifications::off};
         parser.add_option(option_value, '\0', "longi", "no short");
         parser.add_option(option_value, '\0', "long", "no short");
 
@@ -783,12 +783,12 @@ TEST(parse_test, version_check_option_error)
 {
     {   // version-check must be followed by a value
         const char * argv[] = {"./argument_parser_test", "--version-check"};
-        EXPECT_THROW((seqan3::argument_parser{"test_parser", 2, argv}), seqan3::argument_parser_error);
+        EXPECT_THROW((sharg::argument_parser{"test_parser", 2, argv}), sharg::argument_parser_error);
     }
 
     {   // version-check value must be 0 or 1
         const char * argv[] = {"./argument_parser_test", "--version-check", "foo"};
-        EXPECT_THROW((seqan3::argument_parser{"test_parser", 3, argv}), seqan3::argument_parser_error);
+        EXPECT_THROW((sharg::argument_parser{"test_parser", 3, argv}), sharg::argument_parser_error);
     }
 }
 
@@ -800,17 +800,17 @@ TEST(parse_test, subcommand_argument_parser_success)
     // parsing
     {
         const char * argv[]{"./top_level", "-f", "sub1", "foo"};
-        seqan3::argument_parser top_level_parser{"top_level",
+        sharg::argument_parser top_level_parser{"top_level",
                                                  4,
                                                  argv,
-                                                 seqan3::update_notifications::off,
+                                                 sharg::update_notifications::off,
                                                  {"sub1", "sub2"}};
         top_level_parser.add_flag(flag_value, 'f', "foo", "foo bar");
 
         EXPECT_NO_THROW(top_level_parser.parse());
         EXPECT_EQ(true, flag_value);
 
-        seqan3::argument_parser & sub_parser = top_level_parser.get_sub_parser();
+        sharg::argument_parser & sub_parser = top_level_parser.get_sub_parser();
 
         EXPECT_EQ(sub_parser.info.app_name, "top_level-sub1");
 
@@ -823,10 +823,10 @@ TEST(parse_test, subcommand_argument_parser_success)
     // top-level help page
     {
         const char * argv[]{"./top_level", "-h", "-f", "sub1", "foo"};
-        seqan3::argument_parser top_level_parser{"top_level",
+        sharg::argument_parser top_level_parser{"top_level",
                                           5,
                                           argv,
-                                          seqan3::update_notifications::off,
+                                          sharg::update_notifications::off,
                                           {"sub1", "sub2"}};
         top_level_parser.add_flag(flag_value, 'f', "foo", "foo bar");
 
@@ -838,17 +838,17 @@ TEST(parse_test, subcommand_argument_parser_success)
     // sub-parser help page
     {
         const char * argv[]{"./top_level", "-f", "sub1", "-h"};
-        seqan3::argument_parser top_level_parser{"top_level",
+        sharg::argument_parser top_level_parser{"top_level",
                                                  4,
                                                  argv,
-                                                 seqan3::update_notifications::off,
+                                                 sharg::update_notifications::off,
                                                  {"sub1", "sub2"}};
         top_level_parser.add_flag(flag_value, 'f', "foo", "foo bar");
 
         EXPECT_NO_THROW(top_level_parser.parse());
         EXPECT_EQ(true, flag_value);
 
-        seqan3::argument_parser & sub_parser = top_level_parser.get_sub_parser();
+        sharg::argument_parser & sub_parser = top_level_parser.get_sub_parser();
 
         EXPECT_EQ(sub_parser.info.app_name, "top_level-sub1");
 
@@ -862,21 +862,21 @@ TEST(parse_test, subcommand_argument_parser_success)
     // incorrect sub command
     const char * argv[]{"./top_level", "subiddysub", "-f"};
     { // see issue https://github.com/seqan/seqan3/issues/2172
-        seqan3::argument_parser top_level_parser{"top_level",
+        sharg::argument_parser top_level_parser{"top_level",
                                                  3,
                                                  argv,
-                                                 seqan3::update_notifications::off,
+                                                 sharg::update_notifications::off,
                                                  {"sub1", "sub2"}};
 
-        EXPECT_THROW(top_level_parser.parse(), seqan3::argument_parser_error);
+        EXPECT_THROW(top_level_parser.parse(), sharg::argument_parser_error);
     }
 
     // sub command can contain dash, see https://github.com/seqan/product_backlog/issues/234
     {
-        EXPECT_NO_THROW((seqan3::argument_parser{"top_level",
+        EXPECT_NO_THROW((sharg::argument_parser{"top_level",
                                                  2,
                                                  argv,
-                                                 seqan3::update_notifications::off,
+                                                 sharg::update_notifications::off,
                                                  {"-dash"}}));
     }
 }
@@ -886,35 +886,35 @@ TEST(parse_test, issue1544)
     {   // wrong separation of long value:
         std::string option_value;
         const char * argv[] = {"./argument_parser_test", "--foohallo"};
-        seqan3::argument_parser parser{"test_parser", 2, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'f', "foo", "this is a string option.");
 
-        EXPECT_THROW(parser.parse(), seqan3::unknown_option);
+        EXPECT_THROW(parser.parse(), sharg::unknown_option);
     }
 
     {   // unknown option (`--foo-bar`) that has a prefix of a known option (`--foo`)
         std::string option_value;
         const char * argv[] = {"./argument_parser_test", "--foo", "hallo", "--foo-bar", "ballo"};
-        seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'f', "foo", "this is a string option.");
 
-        EXPECT_THROW(parser.parse(), seqan3::unknown_option);
+        EXPECT_THROW(parser.parse(), sharg::unknown_option);
     }
 
     {   // known option (`--foo-bar`) that has a prefix of a unknown option (`--foo`)
         std::string option_value;
         const char * argv[] = {"./argument_parser_test", "--foo", "hallo", "--foo-bar", "ballo"};
-        seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'f', "foo-bar", "this is a string option.");
 
-        EXPECT_THROW(parser.parse(), seqan3::unknown_option);
+        EXPECT_THROW(parser.parse(), sharg::unknown_option);
     }
 
     {   // known option (`--foo`) is a prefix of another known option (`--foo-bar`)
         std::string foo_option_value;
         std::string foobar_option_value;
         const char * argv[] = {"./argument_parser_test", "--foo", "hallo", "--foo-bar", "ballo"};
-        seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
         parser.add_option(foo_option_value, 'f', "foo", "this is a prefix of foobar.");
         parser.add_option(foobar_option_value, 'b', "foo-bar", "this has prefix foo.");
 
@@ -928,11 +928,11 @@ TEST(parse_test, is_option_set)
 {
     std::string option_value{};
     const char * argv[] = {"./argument_parser_test", "-l", "hallo", "--foobar", "ballo", "--", "--loo"};
-    seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'l', "loo", "this is a option.");
     parser.add_option(option_value, 'f', "foobar", "this is a option.");
 
-    EXPECT_THROW(parser.is_option_set("foo"), seqan3::design_error); // you cannot call option_is_set before parse()
+    EXPECT_THROW(parser.is_option_set("foo"), sharg::design_error); // you cannot call option_is_set before parse()
 
     EXPECT_NO_THROW(parser.parse());
 
@@ -943,17 +943,17 @@ TEST(parse_test, is_option_set)
     EXPECT_FALSE(parser.is_option_set("loo")); // --loo is behind the `--` which signals the end of options!
 
     // errors:
-    EXPECT_THROW(parser.is_option_set("l"), seqan3::design_error); // short identifiers are passed as chars not strings
-    EXPECT_THROW(parser.is_option_set("f"), seqan3::design_error); // short identifiers are passed as chars not strings
+    EXPECT_THROW(parser.is_option_set("l"), sharg::design_error); // short identifiers are passed as chars not strings
+    EXPECT_THROW(parser.is_option_set("f"), sharg::design_error); // short identifiers are passed as chars not strings
 
-    EXPECT_THROW(parser.is_option_set("foo"), seqan3::design_error);
-    EXPECT_THROW(parser.is_option_set("--"), seqan3::design_error);
-    EXPECT_THROW(parser.is_option_set(""), seqan3::design_error);
+    EXPECT_THROW(parser.is_option_set("foo"), sharg::design_error);
+    EXPECT_THROW(parser.is_option_set("--"), sharg::design_error);
+    EXPECT_THROW(parser.is_option_set(""), sharg::design_error);
 
-    EXPECT_THROW(parser.is_option_set('!'), seqan3::design_error);
-    EXPECT_THROW(parser.is_option_set('-'), seqan3::design_error);
-    EXPECT_THROW(parser.is_option_set('_'), seqan3::design_error);
-    EXPECT_THROW(parser.is_option_set('\0'), seqan3::design_error);
+    EXPECT_THROW(parser.is_option_set('!'), sharg::design_error);
+    EXPECT_THROW(parser.is_option_set('-'), sharg::design_error);
+    EXPECT_THROW(parser.is_option_set('_'), sharg::design_error);
+    EXPECT_THROW(parser.is_option_set('\0'), sharg::design_error);
 }
 
 namespace foo
@@ -980,7 +980,7 @@ enum class bar
 };
 } // namespace Other
 
-namespace seqan3::custom
+namespace sharg::custom
 {
 template <>
 struct argument_parsing<Other::bar>
@@ -990,7 +990,7 @@ struct argument_parsing<Other::bar>
         {"one", Other::bar::one}, {"1", Other::bar::one}, {"two", Other::bar::two}, {"2", Other::bar::two}
     };
 };
-} // namespace seqan3::custom
+} // namespace sharg::custom
 
 TEST(parse_type_test, parse_success_enum_option)
 {
@@ -998,7 +998,7 @@ TEST(parse_type_test, parse_success_enum_option)
         foo::bar option_value{};
 
         const char * argv[] = {"./argument_parser_test", "-e", "two"};
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
         EXPECT_NO_THROW(parser.parse());
@@ -1009,7 +1009,7 @@ TEST(parse_type_test, parse_success_enum_option)
         Other::bar option_value{};
 
         const char * argv[] = {"./argument_parser_test", "-e", "two"};
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
         EXPECT_NO_THROW(parser.parse());
@@ -1022,10 +1022,10 @@ TEST(parse_type_test, parse_error_enum_option)
     foo::bar option_value{};
 
     const char * argv[] = {"./argument_parser_test", "-e", "four"};
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
-    EXPECT_THROW(parser.parse(), seqan3::user_input_error);
+    EXPECT_THROW(parser.parse(), sharg::user_input_error);
 }
 
 // https://github.com/seqan/seqan3/issues/2464
@@ -1038,43 +1038,43 @@ TEST(parse_test, issue2464)
 
         option_t option_value{};
 
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
-        EXPECT_THROW(parser.parse(), seqan3::user_input_error);
+        EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
     {
         const char * argv[] = {"./argument_parser_test", "-e", "one", "-e", "nine"};
 
         std::vector<option_t> option_values{};
 
-        seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'e', "enum-option", "this is an enum option.");
-        EXPECT_THROW(parser.parse(), seqan3::user_input_error);
+        EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
 
     // Invalid inputs for enums are handled before any validator is evaluated.
-    // Thus the exception will be seqan3::user_input_error and not seqan3::validation_error.
+    // Thus the exception will be sharg::user_input_error and not sharg::validation_error.
     {
         const char * argv[] = {"./argument_parser_test", "-e", "nine"};
 
-        seqan3::value_list_validator enum_validator{(seqan3::enumeration_names<option_t> | std::views::values)};
+        sharg::value_list_validator enum_validator{(sharg::enumeration_names<option_t> | std::views::values)};
         option_t option_value{};
 
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
-        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.", seqan3::option_spec::advanced,
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.", sharg::option_spec::advanced,
                           enum_validator);
-        EXPECT_THROW(parser.parse(), seqan3::user_input_error);
+        EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
     {
         const char * argv[] = {"./argument_parser_test", "-e", "one", "-e", "nine"};
 
-        seqan3::value_list_validator enum_validator{(seqan3::enumeration_names<option_t> | std::views::values)};
+        sharg::value_list_validator enum_validator{(sharg::enumeration_names<option_t> | std::views::values)};
         std::vector<option_t> option_values{};
 
-        seqan3::argument_parser parser{"test_parser", 5, argv, seqan3::update_notifications::off};
-        parser.add_option(option_values, 'e', "enum-option", "this is an enum option.", seqan3::option_spec::advanced,
+        sharg::argument_parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
+        parser.add_option(option_values, 'e', "enum-option", "this is an enum option.", sharg::option_spec::advanced,
                           enum_validator);
-        EXPECT_THROW(parser.parse(), seqan3::user_input_error);
+        EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
 }
 
@@ -1086,7 +1086,7 @@ TEST(parse_test, enum_error_message)
 
         foo::bar option_value{};
 
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
         std::string expected_message{"You have chosen an invalid input value: nine. "
@@ -1097,7 +1097,7 @@ TEST(parse_test, enum_error_message)
             parser.parse();
             FAIL();
         }
-        catch (seqan3::user_input_error const & exception)
+        catch (sharg::user_input_error const & exception)
         {
             EXPECT_EQ(expected_message, exception.what());
         }
@@ -1112,7 +1112,7 @@ TEST(parse_test, enum_error_message)
 
         Other::bar option_value{};
 
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
         std::string expected_message{"You have chosen an invalid input value: nine. "
@@ -1123,7 +1123,7 @@ TEST(parse_test, enum_error_message)
             parser.parse();
             FAIL();
         }
-        catch (seqan3::user_input_error const & exception)
+        catch (sharg::user_input_error const & exception)
         {
             EXPECT_EQ(expected_message, exception.what());
         }
@@ -1141,7 +1141,7 @@ TEST(parse_test, error_message_parsing)
 
     uint64_t option_value{};
 
-    seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+    sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     parser.add_option(option_value, '\0', "value", "Please specify a value.");
 
     std::string expected_message{"Value parse failed for --value: Argument -30 could not be parsed as type "
@@ -1152,7 +1152,7 @@ TEST(parse_test, error_message_parsing)
         parser.parse();
         FAIL();
     }
-    catch (seqan3::user_input_error const & exception)
+    catch (sharg::user_input_error const & exception)
     {
         EXPECT_EQ(expected_message, exception.what());
     }
@@ -1169,7 +1169,7 @@ TEST(parse_test, container_options)
         std::vector<foo::bar> option_values{};
 
         const char * argv[] = {"./argument_parser_test", "-e", "two", "-e", "one", "-e", "three"};
-        seqan3::argument_parser parser{"test_parser", 7, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 7, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'e', "enum-option", "this is an enum option.");
 
         EXPECT_NO_THROW(parser.parse());
@@ -1181,7 +1181,7 @@ TEST(parse_test, container_options)
         std::vector<int> option_values{};
 
         const char * argv[] = {"./argument_parser_test", "-i", "2", "-i", "1", "-i", "3"};
-        seqan3::argument_parser parser{"test_parser", 7, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 7, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'i', "int-option", "this is an int option.");
 
         EXPECT_NO_THROW(parser.parse());
@@ -1193,7 +1193,7 @@ TEST(parse_test, container_options)
         std::vector<bool> option_values{};
 
         const char * argv[] = {"./argument_parser_test", "-b", "true", "-b", "false", "-b", "true"};
-        seqan3::argument_parser parser{"test_parser", 7, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 7, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'b', "bool-option", "this is a bool option.");
 
         EXPECT_NO_THROW(parser.parse());
@@ -1210,7 +1210,7 @@ TEST(parse_test, container_default)
         std::vector<int> option_values{1, 2, 3};
 
         const char * argv[] = {"./argument_parser_test", "-i", "2", "-i", "1", "-i", "3"};
-        seqan3::argument_parser parser{"test_parser", 7, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 7, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'i', "int-option", "this is an int option.");
 
         EXPECT_NO_THROW(parser.parse());
@@ -1223,7 +1223,7 @@ TEST(parse_test, container_default)
         bool bool_opt{false};
 
         const char * argv[] = {"./argument_parser_test", "-i", "2", "-b", "true", "-i", "1", "-i", "3"};
-        seqan3::argument_parser parser{"test_parser", 9, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 9, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'i', "int-option", "this is an int option.");
         parser.add_option(bool_opt, 'b', "bool-option", "this is a bool option.");
 
@@ -1237,7 +1237,7 @@ TEST(parse_test, container_default)
         bool bool_opt{false};
 
         const char * argv[] = {"./argument_parser_test", "-b", "true"};
-        seqan3::argument_parser parser{"test_parser", 3, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         parser.add_option(option_values, 'i', "int-option", "this is an int option.");
         parser.add_option(bool_opt, 'b', "bool-option", "this is a bool option.");
 
@@ -1250,7 +1250,7 @@ TEST(parse_test, container_default)
         std::vector<int> option_values{1, 2, 3};
 
         const char * argv[] = {"./argument_parser_test", "2", "1", "3"};
-        seqan3::argument_parser parser{"test_parser", 4, argv, seqan3::update_notifications::off};
+        sharg::argument_parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
         parser.add_positional_option(option_values, "this is an int option.");
 
         EXPECT_NO_THROW(parser.parse());

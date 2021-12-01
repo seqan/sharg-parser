@@ -3,16 +3,16 @@
 
 int main(int argc, const char ** argv)
 {
-    seqan3::argument_parser myparser{"Test", argc, argv}; // initialize
+    sharg::argument_parser myparser{"Test", argc, argv}; // initialize
 
     //![validator_call]
     std::string file_name;
 
-    seqan3::regex_validator absolute_path_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"};
-    seqan3::input_file_validator my_file_ext_validator{{"sa", "so"}};
+    sharg::regex_validator absolute_path_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"};
+    sharg::input_file_validator my_file_ext_validator{{"sa", "so"}};
 
     myparser.add_option(file_name, 'f', "file","Give me a file name with an absolute path.",
-                        seqan3::option_spec::standard, absolute_path_validator | my_file_ext_validator);
+                        sharg::option_spec::standard, absolute_path_validator | my_file_ext_validator);
     //![validator_call]
 
     // an exception will be thrown if the user specifies a file name
@@ -21,7 +21,7 @@ int main(int argc, const char ** argv)
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::argument_parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << "\n"; // customize your error message
         return -1;

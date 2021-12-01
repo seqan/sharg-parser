@@ -61,3 +61,12 @@ static_assert(seqan3::seqan3_version_minor >= 1, "SeqAn >= 3.1 is required by SH
 #ifndef SHARG_DOXYGEN_ONLY
 #    define SHARG_DOXYGEN_ONLY(x)
 #endif
+
+//!\brief Same as writing `{expression} -> concept_name<type1[, ...]>` in a concept definition.
+#if defined(__GNUC__) && (__GNUC__ < 10)
+#   define SHARG_RETURN_TYPE_CONSTRAINT(expression, concept_name, ...) \
+       {expression}; requires concept_name<decltype(expression), __VA_ARGS__>
+#else
+#   define SHARG_RETURN_TYPE_CONSTRAINT(expression, concept_name, ...) \
+       {expression} -> concept_name<__VA_ARGS__>
+#endif

@@ -3,7 +3,7 @@
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser myparser{"awesome-app", argc, argv}; // initialize
+    sharg::argument_parser myparser{"awesome-app", argc, argv}; // initialize
 
     int a{3};
     myparser.add_option(a, 'a', "awesome-parameter", "Please specify an integer.");
@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::argument_parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << '\n'; // customize your error message
         return -1;
@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
         seqan3::debug_stream << "The user set option --awesome-parameter on the command line.\n";
 
     // Asking for an option identifier that was not used before throws an error:
-    // myparser.is_option_set("foo"); // throws seqan3::design_error
+    // myparser.is_option_set("foo"); // throws sharg::design_error
 
     return 0;
 }

@@ -2,7 +2,7 @@
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser myparser{"Penguin_Parade", argc, argv}; // initialize
+    sharg::argument_parser myparser{"Penguin_Parade", argc, argv}; // initialize
 
     myparser.info.version = "2.0.0";
     myparser.info.date = "12.01.2017";
@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::argument_parser_error const & ext) // the user did something wrong
     {
         std::cerr << ext.what() << "\n";
         return -1;

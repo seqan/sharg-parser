@@ -2,7 +2,7 @@
 # Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10)
@@ -35,7 +35,7 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
     add_test (NAME "${snippet_test_target}" COMMAND ${target})
 
     # disable version checker, as it interferes with comparing the snippet output
-    set_tests_properties ("${snippet_test_target}" PROPERTIES ENVIRONMENT SEQAN3_NO_VERSION_CHECK=0)
+    set_tests_properties ("${snippet_test_target}" PROPERTIES ENVIRONMENT SHARG_NO_VERSION_CHECK=0)
 
     set (snippet_compare_test_target "${test_name_prefix}/${snippet_test_name}_snippet_cmp_output")
 
@@ -46,7 +46,7 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
                       -P "${CMAKE_SOURCE_DIR}/../../lib/seqan3/test/snippet/compare_snippet_output.cmake")
 
     # disable version checker, as it interferes with comparing the snippet output
-    set_tests_properties ("${snippet_compare_test_target}" PROPERTIES ENVIRONMENT SEQAN3_NO_VERSION_CHECK=0)
+    set_tests_properties ("${snippet_compare_test_target}" PROPERTIES ENVIRONMENT SHARG_NO_VERSION_CHECK=0)
 
     unset (snippet_target_name)
     unset (snippet_test_name)

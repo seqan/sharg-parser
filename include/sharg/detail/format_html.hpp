@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -18,7 +18,7 @@
 #include <sharg/detail/terminal.hpp>
 #include <seqan3/version.hpp>
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 
 /*!\brief The format that prints the help page as html to std::cout.
@@ -250,4 +250,4 @@ private:
     bool is_p{false};
 };
 
-} // namespace seqan3
+} // namespace sharg

@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -22,10 +22,10 @@
 #include <seqan3/core/detail/customisation_point.hpp>
 #include <seqan3/io/stream/concept.hpp>
 
-namespace seqan3::custom
+namespace sharg::custom
 {
 
-/*!\brief A type that can be specialised to provide customisation point implementations for the seqan3::argument_parser
+/*!\brief A type that can be specialised to provide customisation point implementations for the sharg::argument_parser
  *        such that third party types may be adapted.
  * \tparam t The type you wish to specialise for.
  * \ingroup argument_parser
@@ -34,8 +34,8 @@ namespace seqan3::custom
  *
  * ### Named Enumerations
  *
- * In order to use a third party type within the seqan3::argument_parser::add_option or
- * seqan3::argument_parser::add_positional_option call, you can specialise this struct in the following way:
+ * In order to use a third party type within the sharg::argument_parser::add_option or
+ * sharg::argument_parser::add_positional_option call, you can specialise this struct in the following way:
  *
  * \include test/snippet/argument_parser/custom_argument_parsing_enumeration.cpp
  *
@@ -65,23 +65,23 @@ struct argument_parsing<t const &> : argument_parsing<t>
 {};
 //!\endcond
 
-} // seqan3::custom
+} // sharg::custom
 
-namespace seqan3::detail::adl_only
+namespace sharg::detail::adl_only
 {
 
 //!\brief Poison-pill overload to prevent non-ADL forms of unqualified lookup.
 template <typename t>
 std::unordered_map<std::string_view, t> enumeration_names(t) = delete;
 
-//!\brief seqan3::detail::customisation_point_object (CPO) definition for seqan3::enumeration_names.
+//!\brief seqan3::detail::customisation_point_object (CPO) definition for sharg::enumeration_names.
 //!\ingroup argument_parser
 //!\remark For a complete overview, take a look at \ref argument_parser
 template <typename option_t>
-struct enumeration_names_cpo : public detail::customisation_point_object<enumeration_names_cpo<option_t>, 1>
+struct enumeration_names_cpo : public seqan3::detail::customisation_point_object<enumeration_names_cpo<option_t>, 1>
 {
     //!\brief CRTP base class seqan3::detail::customisation_point_object.
-    using base_t = detail::customisation_point_object<enumeration_names_cpo<option_t>, 1>;
+    using base_t = seqan3::detail::customisation_point_object<enumeration_names_cpo<option_t>, 1>;
     //!\brief Only this class is allowed to import the constructors from #base_t. (CRTP safety idiom)
     using base_t::base_t;
 
@@ -94,13 +94,13 @@ struct enumeration_names_cpo : public detail::customisation_point_object<enumera
                              std::remove_cvref_t<option_type>,
                              std::type_identity<option_type>>;
 
-    /*!\brief CPO overload (check 1 out of 2): explicit customisation via `seqan3::custom::argument_parsing`
+    /*!\brief CPO overload (check 1 out of 2): explicit customisation via `sharg::custom::argument_parsing`
      * \tparam option_type The type of the option. (Needed to defer instantiation for incomplete types.)
      */
     template <typename option_type = option_t>
-    static constexpr auto SEQAN3_CPO_OVERLOAD(priority_tag<1>)
+    static constexpr auto SEQAN3_CPO_OVERLOAD(seqan3::detail::priority_tag<1>)
     (
-        /*return*/ seqan3::custom::argument_parsing<option_type>::enumeration_names /*;*/
+        /*return*/ sharg::custom::argument_parsing<option_type>::enumeration_names /*;*/
     );
 
     /*!\brief CPO overload (check 1 out of 2): argument dependent lookup (ADL), i.e.
@@ -113,15 +113,15 @@ struct enumeration_names_cpo : public detail::customisation_point_object<enumera
      * `enumeration_names(std::type_identity<option_t>{})` will be called.
      */
     template <typename option_type = option_t>
-    static constexpr auto SEQAN3_CPO_OVERLOAD(priority_tag<0>)
+    static constexpr auto SEQAN3_CPO_OVERLOAD(seqan3::detail::priority_tag<0>)
     (
         /*return*/ enumeration_names(option_or_type_identity<option_type>{}) /*;*/
     );
 };
 
-} // namespace seqan3::detail::adl_only
+} // namespace sharg::detail::adl_only
 
-namespace seqan3
+namespace sharg
 {
 
 /*!\name Customisation Points
@@ -139,7 +139,7 @@ namespace seqan3
  *
  * It acts as a wrapper and looks for two possible implementations (in this order):
  *
- *   1. A static member `enumeration_names` in `seqan3::custom::argument_parsing<your_type>` that is of type
+ *   1. A static member `enumeration_names` in `sharg::custom::argument_parsing<your_type>` that is of type
  *      `std::unordered_map<std::string_view, your_type>>`.
  *   2. A free function `enumeration_names(your_type const a)` in the namespace of your type (or as `friend`) which
  *      returns a `std::unordered_map<std::string_view, your_type>>`.
@@ -151,7 +151,7 @@ namespace seqan3
  * \include test/snippet/argument_parser/custom_enumeration.cpp
  *
  * **Only if you cannot access the namespace of your type to customize** you may specialize
- * the seqan3::custom::argument_parsing struct like this:
+ * the sharg::custom::argument_parsing struct like this:
  *
  * \include test/snippet/argument_parser/custom_argument_parsing_enumeration.cpp
  *
@@ -169,27 +169,25 @@ template <typename option_type>
 inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<option_type>{}();
 //!\}
 
-/*!\interface seqan3::named_enumeration <>
- * \brief Checks whether the free function seqan3::enumeration_names can be called on the type.
+/*!\concept sharg::named_enumeration
+ * \brief Checks whether the free function sharg::enumeration_names can be called on the type.
  * \ingroup argument_parser
  * \tparam option_type The type to check.
  *
  * ### Requirements
  *
- * * A instance of seqan3::enumeration_names<option_type> must exist and be of type
+ * * A instance of sharg::enumeration_names<option_type> must exist and be of type
  *   `std::unordered_map<std::string, option_type>`.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-//!\cond
 template <typename option_type>
 concept named_enumeration = requires
 {
-    { seqan3::enumeration_names<option_type> };
+    { sharg::enumeration_names<option_type> };
 };
-//!\endcond
 
-/*!\interface seqan3::argument_parser_compatible_option <>
+/*!\concept sharg::argument_parser_compatible_option
  * \brief Checks whether the the type can be used in an add_(positional_)option call on the argument parser.
  * \ingroup argument_parser
  * \tparam option_type The type to check.
@@ -197,45 +195,15 @@ concept named_enumeration = requires
  * ### Requirements
  *
  * In order to model this concept, the type must either be streamable to std::istringstream or
- * model seqan3::named_enumeration<option_type>.
+ * model sharg::named_enumeration<option_type>.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-//!\cond
 template <typename option_type>
-concept argument_parser_compatible_option = input_stream_over<std::istringstream, option_type> ||
+concept argument_parser_compatible_option = seqan3::input_stream_over<std::istringstream, option_type> ||
                                             named_enumeration<option_type>;
-//!\endcond
 
-/*!\name Formatted output overloads
- * \{
- */
-/*!\brief A type (e.g. an enum) can be made debug streamable by customizing the seqan3::enumeration_names.
- * \tparam option_type Type of the enum to be printed.
- * \param s  The seqan3::debug_stream.
- * \param op The value to print.
- * \relates seqan3::debug_stream_type
- *
- * \details
- *
- * This searches the seqan3::enumeration_names of the respective type for the value \p op and prints the
- * respective string if found or '\<UNKNOWN_VALUE\>' if the value cannot be found in the map.
- */
-template <typename char_t, typename option_type>
-//!\cond
-    requires named_enumeration<std::remove_cvref_t<option_type>>
-//!\endcond
-inline debug_stream_type<char_t> & operator<<(debug_stream_type<char_t> & s, option_type && op)
-{
-    for (auto & [key, value] : enumeration_names<option_type>)
-    {
-        if (op == value)
-            return s << key;
-    }
 
-    return s << "<UNKNOWN_VALUE>";
-}
-//!\}
 
 /*!\brief Used to further specify argument_parser options/flags.
  * \ingroup argument_parser
@@ -267,14 +235,14 @@ enum option_spec
                    */
 };
 
-//!\brief Indicates whether application allows automatic update notifications by the seqan3::argument_parser.
+//!\brief Indicates whether application allows automatic update notifications by the sharg::argument_parser.
 enum class update_notifications
 {
     on, //!< Automatic update notifications should be enabled.
     off //!< Automatic update notifications should be disabled.
 };
 
-/*!\brief Stores all parser related meta information of the seqan3::argument_parser.
+/*!\brief Stores all parser related meta information of the sharg::argument_parser.
  * \ingroup argument_parser
  *
  * \attention You should supply as much information as possible to help the users
@@ -340,4 +308,22 @@ struct argument_parser_meta_data // holds all meta information
     std::vector<std::string> examples;
 };
 
-} // namespace seqan3
+} // namespace sharg
+
+//!\cond
+namespace seqan3
+{
+template <typename char_t, typename option_type>
+    requires sharg::named_enumeration<std::remove_cvref_t<option_type>>
+inline debug_stream_type<char_t> & operator<<(debug_stream_type<char_t> & s, option_type && op)
+{
+    for (auto & [key, value] : sharg::enumeration_names<option_type>)
+    {
+        if (op == value)
+            return s << key;
+    }
+
+    return s << "<UNKNOWN_VALUE>";
+}
+}
+//!\endcond

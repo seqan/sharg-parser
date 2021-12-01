@@ -2,12 +2,12 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
- * \brief Provides seqan3::argument_parser class.
+ * \brief Provides sharg::argument_parser class.
  */
 
 #pragma once
@@ -31,7 +31,7 @@
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/detail/test_accessor.hpp>
 
-namespace seqan3
+namespace sharg
 {
 
 /*!\brief The SeqAn command line parser.
@@ -39,7 +39,7 @@ namespace seqan3
  *
  * \details
  *
- * The seqan3::argument_parser is a general purpose argument parser that provides
+ * The sharg::argument_parser is a general purpose argument parser that provides
  * convenient access to the command line arguments passed to the program.
  * It automatically generates a help page and can export manual-pages as well
  * as HTML documentation.
@@ -71,7 +71,7 @@ namespace seqan3
  * need to provide a predeclared variable and some additional information like
  * the identifier, description or advanced restrictions. To actually retrieve
  * the value from the command line and enable every other mechanism you need
- * to call the seqan3::argument_parser::parse function in the end.
+ * to call the sharg::argument_parser::parse function in the end.
  *
  * \include test/snippet/argument_parser/argument_parser_1.cpp
  *
@@ -109,13 +109,13 @@ namespace seqan3
  *
  * There are two different kinds of errors: Developer errors and user errors.
  *
- * Developer errors are those that violate the seqan3::argument_parser design
- * (e.g. calling the seqan3::argument_parser::parse function twice or specifying
+ * Developer errors are those that violate the sharg::argument_parser design
+ * (e.g. calling the sharg::argument_parser::parse function twice or specifying
  * two different options with the same identifier.)
- * In this case, a seqan3::design_error is thrown.
+ * In this case, a sharg::design_error is thrown.
  *
  * The second kind are user errors, due to invalid command line calls. In this
- * case a seqan3::argument_parser_error is thrown.
+ * case a sharg::argument_parser_error is thrown.
  *
  * For example:
  *
@@ -124,12 +124,12 @@ namespace seqan3
  * [PARSER ERROR] Value cast failed for positional option 2: Argument abc could not be casted to type DOUBLE.
  * ```
  *
- * See the seqan3::argument_parser::parse documentation for a detailed list of
+ * See the sharg::argument_parser::parse documentation for a detailed list of
  * which exceptions are caught.
  *
  * ### Update Notifications
  *
- * SeqAn applications that are using the seqan3::argument_parser can check SeqAn servers for version updates.
+ * SeqAn applications that are using the sharg::argument_parser can check SeqAn servers for version updates.
  * The functionality helps getting new versions out to users faster.
  * It is also used to inform application developers of new versions of the SeqAn library
  * which means that applications ship with less bugs.
@@ -142,7 +142,7 @@ namespace seqan3
  * Users of applications that have this feature activated can opt-out, by either:
  *
  *  * disabling it for a specific application simply by setting the option `--version-check false/0` or
- *  * disabling it for all applications by setting the `SEQAN3_NO_VERSION_CHECK` environment variable.
+ *  * disabling it for all applications by setting the `SHARG_NO_VERSION_CHECK` environment variable.
  *
  * Note that in case there is no `--version-check` option (display available options with `-h/--help)`,
  * then the developer already disabled the version check functionality.
@@ -160,15 +160,15 @@ public:
     argument_parser(argument_parser &&) = default;                  //!< Defaulted.
     argument_parser & operator=(argument_parser &&) = default;      //!< Defaulted.
 
-    /*!\brief Initializes an seqan3::argument_parser object from the command line arguments.
+    /*!\brief Initializes an sharg::argument_parser object from the command line arguments.
      *
      * \param[in] app_name The name of the app that is displayed on the help page.
      * \param[in] argc The number of command line arguments.
      * \param[in] argv The command line arguments to parse.
-     * \param[in] version_updates Notify users about version updates (default seqan3::update_notifications::on).
+     * \param[in] version_updates Notify users about version updates (default sharg::update_notifications::on).
      * \param[in] subcommands A list of subcommands (see \link subcommand_arg_parse subcommand parsing \endlink).
      *
-     * \throws seqan3::design_error if the application name contains illegal characters.
+     * \throws sharg::design_error if the application name contains illegal characters.
      *
      * The application name must only contain alpha-numeric characters, '_' or '-',
      * i.e. the following regex must evaluate to true: `\"^[a-zA-Z0-9_-]+$\"`.
@@ -217,7 +217,7 @@ public:
      * \brief Add (positional) options and flags to the parser.
      * \{
      */
-    /*!\brief Adds an option to the seqan3::argument_parser.
+    /*!\brief Adds an option to the sharg::argument_parser.
      *
      * \tparam option_type Must have a formatted input function (stream >> value).
      *                     If option_type is a container, its value type must have the
@@ -225,16 +225,16 @@ public:
      *                     regarded as a container).
      *                     See <a href="https://en.cppreference.com/w/cpp/named_req/FormattedInputFunction"> FormattedInputFunction </a>.
      * \tparam validator_type The type of validator to be applied to the option
-     *                        value. Must model seqan3::validator.
+     *                        value. Must model sharg::validator.
      *
      * \param[in, out] value The variable in which to store the given command line argument.
      * \param[in] short_id The short identifier for the option (e.g. 'a').
      * \param[in] long_id The long identifier for the option (e.g. "age").
      * \param[in] desc The description of the option to be shown in the help page.
-     * \param[in] spec Advanced option specification, see seqan3::option_spec.
-     * \param[in] option_validator A seqan3::validator that verifies the value after parsing (callable).
+     * \param[in] spec Advanced option specification, see sharg::option_spec.
+     * \param[in] option_validator A sharg::validator that verifies the value after parsing (callable).
      *
-     * \throws seqan3::design_error
+     * \throws sharg::design_error
      */
     template <typename option_type, validator validator_type = detail::default_validator<option_type>>
     //!\cond
@@ -259,13 +259,13 @@ public:
                    format);
     }
 
-    /*!\brief Adds a flag to the seqan3::argument_parser.
+    /*!\brief Adds a flag to the sharg::argument_parser.
      *
      * \param[in, out] value     The variable in which to store the given command line argument.
      * \param[in]      short_id  The short identifier for the flag (e.g. 'i').
      * \param[in]      long_id   The long identifier for the flag (e.g. "integer").
      * \param[in]      desc      The description of the flag to be shown in the help page.
-     * \param[in]      spec      Advanced flag specification, see seqan3::option_spec.
+     * \param[in]      spec      Advanced flag specification, see sharg::option_spec.
      */
     void add_flag(bool & value,
                   char const short_id,
@@ -279,7 +279,7 @@ public:
         std::visit([=, &value] (auto & f) { f.add_flag(value, short_id, long_id, desc, spec); }, format);
     }
 
-    /*!\brief Adds a positional option to the seqan3::argument_parser.
+    /*!\brief Adds a positional option to the sharg::argument_parser.
      *
      * \tparam option_type Must have a formatted input function (stream >> value).
      *                     If option_type is a container, its value type must have the
@@ -287,13 +287,13 @@ public:
      *                     regarded as a container).
      *                     See <a href="https://en.cppreference.com/w/cpp/named_req/FormattedInputFunction"> FormattedInputFunction </a>.
      * \tparam validator_type The type of validator to be applied to the option
-     *                        value. Must model seqan3::validator.
+     *                        value. Must model sharg::validator.
      *
      * \param[in, out] value The variable in which to store the given command line argument.
      * \param[in] desc The description of the positional option to be shown in the help page.
-     * \param[in] option_validator A seqan3::validator that verifies the value after parsing (callable).
+     * \param[in] option_validator A sharg::validator that verifies the value after parsing (callable).
      *
-     * \throws seqan3::design_error
+     * \throws sharg::design_error
      *
      * \details
      *
@@ -330,18 +330,18 @@ public:
      * \attention The function must be called at the very end of all parser
      * related code and should be enclosed in a try catch block as the argument parser may throw.
      *
-     * \throws seqan3::design_error if this function was already called before.
+     * \throws sharg::design_error if this function was already called before.
      *
-     * \throws seqan3::option_declared_multiple_times if an option that is not a list was declared multiple times.
-     * \throws seqan3::user_input_error if an incorrect argument is given as (positional) option value.
-     * \throws seqan3::required_option_missing if the user did not provide a required option.
-     * \throws seqan3::too_many_arguments if the command line call contained more arguments than expected.
-     * \throws seqan3::too_few_arguments if the command line call contained less arguments than expected.
-     * \throws seqan3::validation_error if the argument was not excepted by the provided validator.
+     * \throws sharg::option_declared_multiple_times if an option that is not a list was declared multiple times.
+     * \throws sharg::user_input_error if an incorrect argument is given as (positional) option value.
+     * \throws sharg::required_option_missing if the user did not provide a required option.
+     * \throws sharg::too_many_arguments if the command line call contained more arguments than expected.
+     * \throws sharg::too_few_arguments if the command line call contained less arguments than expected.
+     * \throws sharg::validation_error if the argument was not excepted by the provided validator.
      *
      * \details
      *
-     * When no specific key words are supplied, the seqan3::argument_parser
+     * When no specific key words are supplied, the sharg::argument_parser
      * starts to process the command line for specified options, flags and
      * positional options.
      *
@@ -399,7 +399,7 @@ public:
 
         if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
         {
-            throw too_few_arguments{detail::to_string("You either forgot or misspelled the subcommand! Please specify"
+            throw too_few_arguments{seqan3::detail::to_string("You either forgot or misspelled the subcommand! Please specify"
                                                       " which sub-program you want to use: one of ", subcommands,
                                                       ". Use -h/--help for more information.")};
         }
@@ -432,13 +432,13 @@ public:
      * \tparam id_type Either type `char` or a type that a `std::string` is constructible from.
      * \param[in] id The short (`char`) or long (`std::string`) option identifier to search for.
      * \returns `true` if option identifier `id` was set on the command line by the user.
-     * \throws seqan3::design_error if the function is used incorrectly (see details below).
+     * \throws sharg::design_error if the function is used incorrectly (see details below).
      *
      * \details
      *
      * You can only ask for option identifiers that were added to the parser beforehand via
-     * `seqan3::argument_parser::add_option`.
-     * As in the `seqan3::argument_parser::add_option` call, pass short identifiers as a `char` and long identifiers
+     * `sharg::argument_parser::add_option`.
+     * As in the `sharg::argument_parser::add_option` call, pass short identifiers as a `char` and long identifiers
      * as a `std::string` or a type that a `std::string` is constructible from (e.g. a `const char *`).
      *
      * ### Example
@@ -447,12 +447,12 @@ public:
      *
      * ### Exceptions
      *
-     * This function throws a seqan3::design_error if
-     * * `seqan3::argument_parser::parse()` was not called before.
+     * This function throws a sharg::design_error if
+     * * `sharg::argument_parser::parse()` was not called before.
      * * a long identifier was passed (e.g. a `std::string`) that only consists of a single character. If you mean to
      *   pass a short identifier, please pass it as a `char` not a `std::string`.
      * * the option identifier cannot be found in the list of valid option identifiers that were added to the parser
-     *   via `seqan3::argument_parser::add_option()` calls beforehand.
+     *   via `sharg::argument_parser::add_option()` calls beforehand.
      */
     template <typename id_type>
     //!\cond
@@ -489,10 +489,10 @@ public:
     //!\name Structuring the Help Page
     //!\{
 
-    /*!\brief Adds an help page section to the seqan3::argument_parser.
+    /*!\brief Adds an help page section to the sharg::argument_parser.
      * \param[in] title The title of the section.
-     * \param[in] spec Whether to always display this section title (seqan3::option_spec::standard), only when showing
-     *                 the advanced help page (seqan3::option_spec::advanced) or never (seqan3::option_spec::hidden).
+     * \param[in] spec Whether to always display this section title (sharg::option_spec::standard), only when showing
+     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
      * \details This only affects the help page and other output formats.
      */
     void add_section(std::string const & title, option_spec const spec = option_spec::standard)
@@ -500,10 +500,10 @@ public:
         std::visit([&] (auto & f) { f.add_section(title, spec); }, format);
     }
 
-    /*!\brief Adds an help page subsection to the seqan3::argument_parser.
+    /*!\brief Adds an help page subsection to the sharg::argument_parser.
      * \param[in] title The title of the subsection.
-     * \param[in] spec Whether to always display this subsection title (seqan3::option_spec::standard), only when showing
-     *                 the advanced help page (seqan3::option_spec::advanced) or never (seqan3::option_spec::hidden).
+     * \param[in] spec Whether to always display this subsection title (sharg::option_spec::standard), only when showing
+     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
      * \details This only affects the help page and other output formats.
      */
     void add_subsection(std::string const & title, option_spec const spec = option_spec::standard)
@@ -511,11 +511,11 @@ public:
         std::visit([&] (auto & f) { f.add_subsection(title, spec); }, format);
     }
 
-    /*!\brief Adds an help page text line to the seqan3::argument_parser.
+    /*!\brief Adds an help page text line to the sharg::argument_parser.
      * \param[in] text The text to print.
      * \param[in] is_paragraph Whether to insert as paragraph or just a line (Default: false).
-     * \param[in] spec Whether to always display this line (seqan3::option_spec::standard), only when showing
-     *                 the advanced help page (seqan3::option_spec::advanced) or never (seqan3::option_spec::hidden).
+     * \param[in] spec Whether to always display this line (sharg::option_spec::standard), only when showing
+     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
      * \details
      * If the line is not a paragraph (false), only one line break is appended, otherwise two line breaks are appended.
      * This only affects the help page and other output formats.
@@ -525,11 +525,11 @@ public:
         std::visit([&] (auto & f) { f.add_line(text, is_paragraph, spec); }, format);
     }
 
-    /*!\brief Adds an help page list item (key-value) to the seqan3::argument_parser.
+    /*!\brief Adds an help page list item (key-value) to the sharg::argument_parser.
      * \param[in] key  The key of the key-value pair of the list item.
      * \param[in] desc The value of the key-value pair of the list item.
-     * \param[in] spec Whether to always display this list item (seqan3::option_spec::standard), only when showing
-     *                 the advanced help page (seqan3::option_spec::advanced) or never (seqan3::option_spec::hidden).
+     * \param[in] spec Whether to always display this list item (sharg::option_spec::standard), only when showing
+     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
      *
      * \details
      *
@@ -551,7 +551,7 @@ public:
     }
     //!\}
 
-    /*!\brief Aggregates all parser related meta data (see seqan3::argument_parser_meta_data struct).
+    /*!\brief Aggregates all parser related meta data (see sharg::argument_parser_meta_data struct).
      *
      * \attention You should supply as much information as possible to help users
      * of the application.
@@ -562,7 +562,7 @@ public:
      * point that can be easily extended.
      *
      * You can access the members directly:
-     * (see seqan3::argument_parser_meta_data for a list of the info members)
+     * (see sharg::argument_parser_meta_data for a list of the info members)
      *
      * \include test/snippet/argument_parser/argument_parser_3.cpp
      *
@@ -633,7 +633,7 @@ private:
     std::vector<std::string> subcommands{};
 
     /*!\brief The format of the argument parser that decides the behavior when
-     *        calling the seqan3::argument_parser::parse function.
+     *        calling the sharg::argument_parser::parse function.
      *
      * \details
      *
@@ -654,16 +654,16 @@ private:
     //!\brief The command line arguments.
     std::vector<std::string> cmd_arguments{};
 
-    /*!\brief Initializes the seqan3::argument_parser class on construction.
+    /*!\brief Initializes the sharg::argument_parser class on construction.
      *
      * \param[in] argc        The number of command line arguments.
      * \param[in] argv        The command line arguments.
      *
-     * \throws seqan3::too_few_arguments if option --export-help was specified without a value
-     * \throws seqan3::too_few_arguments if option --version-check was specified without a value
-     * \throws seqan3::validation_error if the value passed to option --export-help was invalid.
-     * \throws seqan3::validation_error if the value passed to option --version-check was invalid.
-     * \throws seqan3::too_few_arguments if a sub parser was configured at construction but a subcommand is missing.
+     * \throws sharg::too_few_arguments if option --export-help was specified without a value
+     * \throws sharg::too_few_arguments if option --version-check was specified without a value
+     * \throws sharg::validation_error if the value passed to option --export-help was invalid.
+     * \throws sharg::validation_error if the value passed to option --version-check was invalid.
+     * \throws sharg::too_few_arguments if a sub parser was configured at construction but a subcommand is missing.
      *
      * \details
      *
@@ -673,18 +673,18 @@ private:
      * by the user:
      *
      * - **no arguments** If no arguments are provided on the commandline, the
-     *                    seqan3::detail::format_short_help is set.
-     * - **-h/\--help** sets the format to seqan3::detail::format_help
-     * - **-hh/\--advanced-help** sets the format to seqan3::detail::format_help
+     *                    sharg::detail::format_short_help is set.
+     * - **-h/\--help** sets the format to sharg::detail::format_help
+     * - **-hh/\--advanced-help** sets the format to sharg::detail::format_help
      *                           and show_advanced_options to `true`.
-     * - <b>\--version</b> sets the format to seqan3::detail::format_version.
-     * - <b>\--export-help html</b> sets the format to seqan3::detail::format_html.
-     * - <b>\--export-help man</b> sets the format to seqan3::detail::format_man.
-     * - <b>\--export-help ctd</b> sets the format to seqan3::detail::format_ctd.
-     * - else the format is that to seqan3::detail::format_parse
+     * - <b>\--version</b> sets the format to sharg::detail::format_version.
+     * - <b>\--export-help html</b> sets the format to sharg::detail::format_html.
+     * - <b>\--export-help man</b> sets the format to sharg::detail::format_man.
+     * - <b>\--export-help ctd</b> sets the format to sharg::detail::format_ctd.
+     * - else the format is that to sharg::detail::format_parse
      *
      * If `--export-help` is specified with a value other than html/man or ctd
-     * an seqan3::argument_parser_error is thrown.
+     * an sharg::argument_parser_error is thrown.
      */
     void init(int argc, char const * const * const argv)
     {
@@ -818,7 +818,7 @@ private:
     /*!\brief Verifies that the short and the long identifiers are correctly formatted.
      * \param[in] short_id The short identifier of the command line option/flag.
      * \param[in] long_id  The long identifier of the command line option/flag.
-     * \throws seqan3::design_error
+     * \throws sharg::design_error
      * \details Specifically, checks that identifiers haven't been used before,
      *          the length of long IDs is either empty or longer than one char,
      *          the characters used in the identifiers are all valid,
@@ -826,7 +826,7 @@ private:
      */
     void verify_identifiers(char const short_id, std::string const & long_id)
     {
-        auto constexpr allowed = is_alnum || is_char<'_'> || is_char<'@'>;
+        auto constexpr allowed = seqan3::is_alnum || seqan3::is_char<'_'> || seqan3::is_char<'@'>;
 
         if (id_exists(short_id))
             throw design_error("Option Identifier '" + std::string(1, short_id) + "' was already used before.");
@@ -834,14 +834,14 @@ private:
             throw design_error("Option Identifier '" + long_id + "' was already used before.");
         if (long_id.length() == 1)
             throw design_error("Long IDs must be either empty, or longer than one character.");
-        if (!allowed(short_id) && !is_char<'\0'>(short_id))
+        if (!allowed(short_id) && !seqan3::is_char<'\0'>(short_id))
             throw design_error("Option identifiers may only contain alphanumeric characters, '_', or '@'.");
-        if (long_id.size() > 0 && is_char<'-'>(long_id[0]))
+        if (long_id.size() > 0 && seqan3::is_char<'-'>(long_id[0]))
             throw design_error("First character of long ID cannot be '-'.");
 
         std::for_each(long_id.begin(), long_id.end(), [&allowed] (char c)
                       {
-                          if (!(allowed(c) || is_char<'-'>(c)))
+                          if (!(allowed(c) || seqan3::is_char<'-'>(c)))
                               throw design_error("Long identifiers may only contain alphanumeric characters, '_', '-', or '@'.");
                       });
         if (detail::format_parse::is_empty_id(short_id) && detail::format_parse::is_empty_id(long_id))
@@ -849,4 +849,4 @@ private:
     }
 };
 
-} // namespace seqan3
+} // namespace sharg

@@ -4,13 +4,13 @@
 
 int main(int argc, const char ** argv)
 {
-    seqan3::argument_parser myparser{"Test", argc, argv}; // initialize
+    sharg::argument_parser myparser{"Test", argc, argv}; // initialize
 
     //![validator_call]
     std::filesystem::path myfile;
 
     myparser.add_option(myfile,'f',"file","Give me a filename.",
-                        seqan3::option_spec::standard, seqan3::input_file_validator{{"fa","fasta"}});
+                        sharg::option_spec::standard, sharg::input_file_validator{{"fa","fasta"}});
     //![validator_call]
 
     // an exception will be thrown if the user specifies a filename
@@ -20,7 +20,7 @@ int main(int argc, const char ** argv)
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::argument_parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << "\n"; // customize your error message
         return -1;
