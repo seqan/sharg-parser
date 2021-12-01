@@ -77,7 +77,7 @@ jobs:
           fetch-depth: 3
           submodules: recursive
 
-      # to reuse scripts
+      # To reuse scripts
       - name: Checkout SeqAn3
         uses: actions/checkout@v2
         with:
@@ -140,9 +140,8 @@ jobs:
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSEQAN3_VERBOSE_TESTS=OFF \
-                                                  -DSEQAN3_BENCHMARK_MIN_TIME=0.01 \
-                                                  -DSEQAN3_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
+                                                  -DSHARG_VERBOSE_TESTS=OFF \
+                                                  -DSHARG_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
           case "${{ matrix.build }}" in
             snippet) make -j${{ matrix.build_threads }} gtest_build;;
             header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build;;
