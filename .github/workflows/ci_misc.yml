@@ -41,40 +41,24 @@ jobs:
             requires_ccache: true
             skip_build_tests: false
             skip_run_tests: false
-            use_include_dependencies: "OFF"
 
-          # - name: "Header gcc11"
-          #   cxx: "g++-11"
-          #   cc: "gcc-11"
-          #   build: header
-          #   build_type: Release
-          #   build_threads: 2
-          #   test_threads: 2
-          #   cmake: 3.10.3
-          #   requires_toolchain: true
-          #   requires_ccache: true
-          #   skip_build_tests: false
-          #   skip_run_tests: false
-          #   use_include_dependencies: "OFF"
-
-          # - name: "Documentation"
-          #   build: documentation
-          #   build_threads: 2
-          #   test_threads: 2
-          #   cmake: 3.10.3
-          #   doxygen: 1.9.2
-          #   requires_toolchain: false
-          #   requires_ccache: false
-          #   skip_build_tests: true
-          #   skip_run_tests: false
-          #   use_include_dependencies: "OFF"
+          - name: "Documentation"
+            build: documentation
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.10.3
+            doxygen: 1.9.2
+            requires_toolchain: false
+            requires_ccache: false
+            skip_build_tests: true
+            skip_run_tests: false
 
     steps:
-      - name: Checkout Sharg
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           path: sharg
-          fetch-depth: 3
+          fetch-depth: 2
           submodules: recursive
 
       # To reuse scripts
@@ -140,11 +124,9 @@ jobs:
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF \
-                                                  -DSHARG_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
+                                                  -DSHARG_VERBOSE_TESTS=OFF
           case "${{ matrix.build }}" in
             snippet) make -j${{ matrix.build_threads }} gtest_build;;
-            header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build;;
             documentation) make -j${{ matrix.build_threads }} download-cppreference-doxygen-web-tag;;
           esac
 

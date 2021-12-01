@@ -1,0 +1,108 @@
+PROJECT_NAME           = "sharg"
+PROJECT_BRIEF          = "THE argument parser for bio-c++ tools."
+PROJECT_LOGO           = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_logo.png
+PROJECT_NUMBER         = ${SHARG_VERSION}
+LAYOUT_FILE            = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/DoxygenLayout.xml
+
+## PATHS
+OUTPUT_DIRECTORY       = ${SHARG_DOXYGEN_OUTPUT_DIR}
+INCLUDE_PATH           = ${SHARG_DOXYGEN_SOURCE_DIR}/include
+INPUT                  = ${SHARG_DOXYGEN_SOURCE_DIR}/include               \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/doc                   \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/LICENSE.md            \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/CHANGELOG.md          \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/CODE_OF_CONDUCT.md    \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/CONTRIBUTING.md
+STRIP_FROM_PATH        = ${SHARG_DOXYGEN_SOURCE_DIR}/include
+STRIP_FROM_INC_PATH    = ${SHARG_DOXYGEN_SOURCE_DIR}/include
+EXAMPLE_PATH           = ${SHARG_DOXYGEN_SOURCE_DIR}
+IMAGE_PATH             = ${SHARG_DOXYGEN_SOURCE_DIR}/doc \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation
+
+## DOT SUPPORT
+HAVE_DOT               = ${SHARG_DOXYGEN_HAVE_DOT}
+DOT_NUM_THREADS        = ${SHARG_DOXYGEN_DOT_NUM_THREADS}
+DOT_IMAGE_FORMAT       = svg
+DOT_GRAPH_MAX_NODES    = 500
+INTERACTIVE_SVG        = ${SHARG_DOXYGEN_HAVE_DOT}
+
+## MISC OPTIONS
+GENERATE_LATEX         = NO
+USE_MATHJAX            = ${SHARG_DOXYGEN_USE_MATHJAX}
+HTML_TIMESTAMP         = YES
+EXT_LINKS_IN_WINDOW    = YES
+RECURSIVE              = YES
+DISABLE_INDEX          = YES
+GENERATE_TREEVIEW      = YES
+INLINE_INHERITED_MEMB  = NO
+COLLABORATION_GRAPH    = NO
+TEMPLATE_RELATIONS     = YES
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+SKIP_FUNCTION_MACROS   = NO
+SORT_BRIEF_DOCS        = YES
+TOC_INCLUDE_HEADINGS   = 2
+HTML_EXTRA_STYLESHEET  = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg.css
+HTML_FOOTER            = ${SHARG_DOXYGEN_OUTPUT_DIR}/sharg_footer.html
+INPUT_ENCODING         = UTF-8
+EXTRA_PACKAGES         = {amsfonts}
+
+PREDEFINED             = "CEREAL_SERIALIZE_FUNCTION_NAME=serialize" \
+                         "CEREAL_LOAD_FUNCTION_NAME=load" \
+                         "CEREAL_SAVE_FUNCTION_NAME=save" \
+                         "CEREAL_LOAD_MINIMAL_FUNCTION_NAME=load_minimal" \
+                         "CEREAL_SAVE_MINIMAL_FUNCTION_NAME=save_minimal" \
+                         "SHARG_DOXYGEN_ONLY(x)= x" \
+                         "SHARG_RETURN_TYPE_CONSTRAINT(expression,concept_name,...)={expression} -> concept_name<__VA_ARGS__>" \
+                         "${SHARG_DOXYGEN_PREDEFINED_NDEBUG}"
+
+TAGFILES               += "${SHARG_DOXYGEN_STD_TAGFILE}=https://en.cppreference.com/w/"
+
+FORMULA_FONTSIZE       = 14
+HTML_DYNAMIC_SECTIONS  = YES
+
+## detect headers without extensions (in std module)
+EXTENSION_MAPPING      = .no_extension=C++
+FILE_PATTERNS          = *
+EXCLUDE_PATTERNS       = */doc/*.cpp
+
+## Developer VS user mode
+EXTRACT_PRIVATE        = ${SHARG_DOXYGEN_EXTRACT_PRIVATE}
+ENABLED_SECTIONS       = ${SHARG_DOXYGEN_ENABLED_SECTIONS}
+EXCLUDE_SYMBOLS        += ${SHARG_DOXYGEN_EXCLUDE_SYMBOLS}
+
+## Custom doxygen commands
+ALIASES += tutorial_head{4}="<table><tr><th>Difficulty</th><td>\1</td></tr><tr><th>Duration</th><td>\2</td></tr><tr><th>Prerequisite tutorials</th><td>\3</td></tr><tr><th>Recommended reading</th><td>\4</td></tr></table>"
+
+ALIASES += assignment{1}="\htmlonly <div class=\"assignment\"><h4>\1</h4><div class=\"assignment_content\">\endhtmlonly"
+ALIASES += endassignment="\htmlonly</div></div>\endhtmlonly"
+
+ALIASES += solution="\htmlonly <div class=\"solution\"> <details><summary><b>Solution</b></summary> \endhtmlonly"
+ALIASES += endsolution="\htmlonly </details> </div> \endhtmlonly"
+
+ALIASES += hint="\htmlonly <div class=\"assignment\"> <details><summary><b>Hint</b></summary> \endhtmlonly"
+ALIASES += endhint="\htmlonly </details> </div> \endhtmlonly"
+
+ALIASES += strike{1}="\htmlonly<div style='color:red;text-decoration:line-through'>\1</div>\endhtmlonly"
+
+ALIASES += noapi{1}="\htmlonly<dl class=\"no-api\">This entity is not part of the SeqAn API. Do not rely on it in your applications. \1</dl>\endhtmlonly"
+ALIASES += noapi="\noapi{ }"
+
+ALIASES += experimentalapi{1}="\htmlonly<dl class=\"experimental-api\">This entity is experimental and subject to change in the future. \1</dl>\endhtmlonly"
+ALIASES += experimentalapi="\experimentalapi{ }"
+
+ALIASES += stableapi{1}="\htmlonly<dl class=\"stable-api\">This entity is stable. \1</dl>\endhtmlonly"
+ALIASES += stableapi="\stableapi{ }"
+
+ALIASES += startcollapsible{1}="\htmlonly<details class=\"sharg\"><summary class = \"sharg\">\1</summary>\endhtmlonly"
+ALIASES += endcollapsible="\htmlonly</details>\endhtmlonly"
+
+ALIASES += header_file{1}="\htmlonly<b>Header File</b><br><div style='text-indent:3em;'><code>#include\endhtmlonly <\1>\htmlonly</code></div>\endhtmlonly"
+
+### Extra files that we can link to
+
+HTML_EXTRA_FILES       += ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.js
+HTML_EXTRA_FILES       += ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.php
+HTML_EXTRA_FILES       += ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/api-stability.js
+${SHARG_DOXYFILE_OPTION_POWERED_BY_VERCEL}
