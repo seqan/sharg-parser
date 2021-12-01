@@ -356,13 +356,13 @@ TEST_F(version_check, option_off)
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-// case: the current argument parser has a smaller seqan version than is present in the version file
+// case: the current argument parser has a smaller Sharg version than is present in the version file
 #if !defined(NDEBUG)
-TEST_F(version_check, smaller_seqan3_version)
+TEST_F(version_check, smaller_sharg_version)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
-    // create version file with euqal app version and a greater seqan version than the current
+    // create version file with euqal app version and a greater Sharg version than the current
     create_file(app_version_filename(), std::string{"2.3.4\n20.5.9"});
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
@@ -372,7 +372,7 @@ TEST_F(version_check, smaller_seqan3_version)
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
-    EXPECT_EQ(err, sharg::detail::version_checker::message_seqan3_update);
+    EXPECT_EQ(err, sharg::detail::version_checker::message_sharg_update);
 
     EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
 
@@ -384,7 +384,7 @@ TEST_F(version_check, greater_app_version)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
-    // create version file with equal seqan version and a smaller app version than the current
+    // create version file with equal Sharg version and a smaller app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"1.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message
@@ -405,7 +405,7 @@ TEST_F(version_check, unregistered_app)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
-    // create version file with equal seqan version and a smaller app version than the current
+    // create version file with equal Sharg version and a smaller app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"UNREGISTERED_APP\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message
@@ -429,7 +429,7 @@ TEST_F(version_check, smaller_app_version)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
-    // create version file with equal seqan version and a greater app version than the current
+    // create version file with equal Sharg version and a greater app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
@@ -457,7 +457,7 @@ TEST_F(version_check, smaller_app_version_custom_url)
 
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
-    // create version file with equal seqan version and a greater app version than the current
+    // create version file with equal Sharg version and a greater app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)

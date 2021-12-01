@@ -420,7 +420,7 @@ protected:
         derived_t().print_section("Version");
         derived_t().print_line(derived_t().in_bold("Last update: ") + meta.date, false);
         derived_t().print_line(derived_t().in_bold(meta.app_name + " version: ") + meta.version, false);
-        derived_t().print_line(derived_t().in_bold("SeqAn version: ") + version_str, false);
+        derived_t().print_line(derived_t().in_bold("Sharg version: ") + version_str, false);
 
         if (!empty(meta.url))
         {
