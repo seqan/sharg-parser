@@ -16,7 +16,7 @@
 #include <string>
 #include <seqan3/std/type_traits>
 
-#include <seqan3/core/platform.hpp>
+#include <sharg/platform.hpp>
 
 namespace sharg::detail
 {
