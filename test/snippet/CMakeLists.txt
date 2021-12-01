@@ -64,11 +64,6 @@ seqan3_require_ccache ()
 seqan3_require_test ()
 
 sharg_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
-#sharg_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
-
-# Skip tests, e.g. because of non-deterministic output
-# set_tests_properties ("example/test" PROPERTIES SKIP_RETURN_CODE 1)
 
 list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}")
-#list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
 
