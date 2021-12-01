@@ -1,4 +1,4 @@
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
 #include <seqan3/core/debug_stream.hpp>
 #include <seqan3/std/filesystem>
 

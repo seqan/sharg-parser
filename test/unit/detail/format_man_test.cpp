@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 
-#include <seqan3/argument_parser/argument_parser.hpp>
-#include <seqan3/argument_parser/detail/format_man.hpp>
+#include <sharg/argument_parser.hpp>
+#include <sharg/detail/format_man.hpp>
 
 // Reused global variables
 struct format_man_test : public ::testing::Test

@@ -1,4 +1,4 @@
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
 
 int main(int argc, char ** argv)
 {

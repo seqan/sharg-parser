@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
-#include <seqan3/argument_parser/auxiliary.hpp>
-#include <seqan3/argument_parser/exceptions.hpp>
-#include <seqan3/argument_parser/validators.hpp>
+#include <sharg/argument_parser.hpp>
+#include <sharg/auxiliary.hpp>
+#include <sharg/exceptions.hpp>
+#include <sharg/validators.hpp>

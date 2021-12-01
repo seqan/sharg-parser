@@ -20,7 +20,7 @@
 #include <regex>
 #include <sstream>
 
-#include <seqan3/argument_parser/exceptions.hpp>
+#include <sharg/exceptions.hpp>
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/debug_stream/range.hpp>
 #include <seqan3/io/detail/misc.hpp>
