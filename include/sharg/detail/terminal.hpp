@@ -23,7 +23,7 @@
 
 #include <cstdio>
 
-#include <seqan3/core/platform.hpp>
+#include <sharg/platform.hpp>
 
 namespace sharg::detail
 {
