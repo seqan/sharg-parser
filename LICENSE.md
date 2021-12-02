@@ -11,7 +11,7 @@
 # Source code license
 
 The contents of this repository/directory, in particular the library
-source code of SeqAn3, are licensed under the following terms:
+source code of Sharg, are licensed under the following terms:
 
 ```
 Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
@@ -62,6 +62,6 @@ This includes:
 # Submodules
 
 This repository/directory may contain other projects' content in the
-`submodules`-subfolder. We try to ensure that all dependencies are
+`lib`-subfolder. We try to ensure that all dependencies are
 permissively licensed (BSD/MIT/X11/ISC/Boost…), but please verify the
 respective license files yourself.
