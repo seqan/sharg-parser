@@ -19,7 +19,7 @@
 -->
 
 <!-- Use the Sharg logo within the repository. --->
-[1]: ./test/documentation/sharg_logo.png "Open documentation"
+[1]: ./test/documentation/sharg_logo.svg "Open documentation"
 <!-- Link the logo to the documentation website. --->
 [2]: https://sharg.vercel.app/
 

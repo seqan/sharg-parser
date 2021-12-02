@@ -278,7 +278,7 @@ div.solution {
 }
 
 /* add Concept and Class suffix */
-#nav-tree .label a[class^="interface"][class$="html"]::after {
+#nav-tree .label a[class^="concept"][class$="html"]::after {
     content: " Concept";
     color: grey;
 }

@@ -1,6 +1,6 @@
 PROJECT_NAME           = "sharg"
 PROJECT_BRIEF          = "THE argument parser for bio-c++ tools."
-PROJECT_LOGO           = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_logo.png
+PROJECT_LOGO           = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_logo.svg
 PROJECT_NUMBER         = ${SHARG_VERSION}
 LAYOUT_FILE            = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/DoxygenLayout.xml
 
