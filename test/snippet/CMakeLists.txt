@@ -67,8 +67,8 @@ seqan3_require_ccache ()
 seqan3_require_test ()
 
 sharg_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
-# sharg_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
+sharg_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
 
 list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}")
-# list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
+list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
 
