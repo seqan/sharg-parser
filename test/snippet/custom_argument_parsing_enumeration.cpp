@@ -3,9 +3,9 @@
 #include <sharg/all.hpp>
 #include <seqan3/std/ranges>
 
-namespace seqan3::custom
+namespace sharg::custom
 {
-// Specialise the seqan3::custom::argument_parsing data structure to enable parsing of std::errc.
+// Specialise the sharg::custom::argument_parsing data structure to enable parsing of std::errc.
 template <>
 struct argument_parsing<std::errc>
 {
@@ -19,25 +19,25 @@ struct argument_parsing<std::errc>
     };
 };
 
-} // namespace seqan3::custom
+} // namespace sharg::custom
 
 int main(int argc, char const * argv[])
 {
     std::errc value{};
 
-    seqan3::argument_parser parser{"my_program", argc, argv};
+    sharg::argument_parser parser{"my_program", argc, argv};
 
     // Because of the argument_parsing struct and
     // the static member function enumeration_names
     // you can now add an option that takes a value of type std::errc:
-    parser.add_option(value, 'e', "errc", "Give me a std::errc value.", seqan3::option_spec::standard,
-                      seqan3::value_list_validator{(seqan3::enumeration_names<std::errc> | std::views::values)});
+    parser.add_option(value, 'e', "errc", "Give me a std::errc value.", sharg::option_spec::standard,
+                      sharg::value_list_validator{(sharg::enumeration_names<std::errc> | std::views::values)});
 
     try
     {
         parser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::argument_parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << "\n"; // customize your error message
         return -1;

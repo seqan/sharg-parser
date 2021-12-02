@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -16,26 +16,26 @@
  *
  * # The Argument Parser Class
  *
- * \copydetails seqan3::argument_parser
+ * \copydetails sharg::argument_parser
  *
  * # Parsing Command Line Arguments
  *
- * \copydetails seqan3::argument_parser::parse
+ * \copydetails sharg::argument_parser::parse
  *
  * # Argument Validation
  *
  * The SeqAn 3 Argument Parser offers a validation mechanism for (positional_)options
- * via callables. You can pass any functor that fulfils the seqan3::validator
+ * via callables. You can pass any functor that fulfils the sharg::validator
  * and takes the value passed to the add_(positional_)option function call as
  * a parameter. We provide some commonly used functor that might come in handy:
  *
- * - seqan3::regex_validator
- * - seqan3::value_list_validator
- * - seqan3::arithmetic_range_validator
- * - seqan3::input_file_validator
- * - seqan3::output_file_validator
- * - seqan3::input_directory_validator
- * - seqan3::output_directory_validator
+ * - sharg::regex_validator
+ * - sharg::value_list_validator
+ * - sharg::arithmetic_range_validator
+ * - sharg::input_file_validator
+ * - sharg::output_file_validator
+ * - sharg::input_directory_validator
+ * - sharg::output_directory_validator
  */
 
 #pragma once

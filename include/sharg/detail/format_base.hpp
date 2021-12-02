@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -26,7 +26,7 @@
 #include <seqan3/utility/detail/type_name_as_string.hpp>
 #include <seqan3/version.hpp>
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 
 /*!\brief The format that contains all helper functions needed in all formats.
@@ -44,20 +44,20 @@ protected:
     static std::string get_type_name_as_string(value_type const & /**/)
     {
         using type = std::decay_t<value_type>;
-        using types = type_list<int8_t,
-                                uint8_t,
-                                int16_t,
-                                uint16_t,
-                                int32_t,
-                                uint32_t,
-                                int64_t,
-                                uint64_t,
-                                double,
-                                float,
-                                bool,
-                                char,
-                                std::string,
-                                std::filesystem::path>;
+        using types = seqan3::type_list<int8_t,
+                                        uint8_t,
+                                        int16_t,
+                                        uint16_t,
+                                        int32_t,
+                                        uint32_t,
+                                        int64_t,
+                                        uint64_t,
+                                        double,
+                                        float,
+                                        bool,
+                                        char,
+                                        std::string,
+                                        std::filesystem::path>;
         std::vector<std::string> names{"signed 8 bit integer",
                                        "unsigned 8 bit integer",
                                        "signed 16 bit integer",
@@ -73,10 +73,10 @@ protected:
                                        "std::string",
                                        "std::filesystem::path"};
 
-        if constexpr (list_traits::contains<type, types>)
-            return names[list_traits::find<type, types>];
+        if constexpr (seqan3::list_traits::contains<type, types>)
+            return names[seqan3::list_traits::find<type, types>];
         else
-            return detail::type_name_as_string<value_type>;
+            return seqan3::detail::type_name_as_string<value_type>;
     }
 
     /*!\brief Returns the `value_type` of the input container as a string (reflection).
@@ -102,7 +102,7 @@ protected:
     }
 
     /*!\brief Formats the container and its value_type for the help page printing.
-     * \tparam container_type A type that must satisfy the seqan3::detail::is_container_option.
+     * \tparam container_type A type that must satisfy the sharg::detail::is_container_option.
      * \param[in] container The container to deduct the type from.
      *
      * \returns The type of the container value type as a string, encapsulated in "List of".
@@ -219,8 +219,8 @@ private:
     //!\}
 
 public:
-    /*!\brief Adds a seqan3::print_list_item call to be evaluated later on.
-     * \copydetails seqan3::argument_parser::add_option
+    /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
+     * \copydetails sharg::argument_parser::add_option
      */
     template <typename option_type, typename validator_type>
     void add_option(option_type & value,
@@ -232,15 +232,15 @@ public:
     {
         std::string id = prep_id_for_help(short_id, long_id) + " " + option_type_and_list_info(value);
         std::string info{desc};
-        info += ((spec & option_spec::required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
+        info += ((spec & option_spec::required) ? std::string{" "} : seqan3::detail::to_string(" Default: ", value, ". "));
         info += option_validator.get_help_page_message();
         store_help_page_element([this, id, info] () { derived_t().print_list_item(id, info); }, spec);
     }
 
-    /*!\brief Adds a seqan3::print_list_item call to be evaluated later on.
-     * \copydetails seqan3::argument_parser::add_flag
+    /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
+     * \copydetails sharg::argument_parser::add_flag
      */
-    void add_flag(bool & SEQAN3_DOXYGEN_ONLY(value),
+    void add_flag(bool & SHARG_DOXYGEN_ONLY(value),
                   char const short_id,
                   std::string const & long_id,
                   std::string const & desc,
@@ -250,8 +250,8 @@ public:
         store_help_page_element([this, id, desc] () { derived_t().print_list_item(id, desc); }, spec);
     }
 
-    /*!\brief Adds a seqan3::print_list_item call to be evaluated later on.
-     * \copydetails seqan3::argument_parser::add_positional_option
+    /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
+     * \copydetails sharg::argument_parser::add_positional_option
      */
     template <typename option_type, typename validator_type>
     void add_positional_option(option_type & value,
@@ -263,12 +263,12 @@ public:
         positional_option_calls.push_back([this, &value, desc, msg] ()
         {
             ++positional_option_count;
-            derived_t().print_list_item(detail::to_string("\\fBARGUMENT-", positional_option_count, "\\fP ",
+            derived_t().print_list_item(seqan3::detail::to_string("\\fBARGUMENT-", positional_option_count, "\\fP ",
                                                           option_type_and_list_info(value)),
                                         desc +
                                         // a list at the end may be empty and thus have a default value
                                         ((detail::is_container_option<option_type>)
-                                            ? detail::to_string(" Default: ", value, ". ")
+                                            ? seqan3::detail::to_string(" Default: ", value, ". ")
                                             : std::string{" "}) +
                                         msg);
         });
@@ -342,7 +342,7 @@ public:
     }
 
     /*!\brief Adds a print_section call to parser_set_up_calls.
-     * \copydetails seqan3::argument_parser::add_section
+     * \copydetails sharg::argument_parser::add_section
      */
     void add_section(std::string const & title, option_spec const spec)
     {
@@ -350,7 +350,7 @@ public:
     }
 
     /*!\brief Adds a print_subsection call to parser_set_up_calls.
-     * \copydetails seqan3::argument_parser::add_subsection
+     * \copydetails sharg::argument_parser::add_subsection
      */
     void add_subsection(std::string const & title, option_spec const spec)
     {
@@ -358,15 +358,15 @@ public:
     }
 
     /*!\brief Adds a print_line call to parser_set_up_calls.
-     * \copydetails seqan3::argument_parser::add_line
+     * \copydetails sharg::argument_parser::add_line
      */
     void add_line(std::string const & text, bool is_paragraph, option_spec const spec)
     {
         store_help_page_element([this, text, is_paragraph] () { derived_t().print_line(text, is_paragraph); }, spec);
     }
 
-    /*!\brief Adds a seqan3::print_list_item call to parser_set_up_calls.
-     * \copydetails seqan3::argument_parser::add_list_item
+    /*!\brief Adds a sharg::print_list_item call to parser_set_up_calls.
+     * \copydetails sharg::argument_parser::add_list_item
      */
     void add_list_item(std::string const & key, std::string const & desc, option_spec const spec)
     {
@@ -412,7 +412,7 @@ protected:
         }
     }
 
-    /*!\brief Delegates to seqan3::print_line(std::string const & text, true) of each format.
+    /*!\brief Delegates to sharg::print_line(std::string const & text, true) of each format.
      * \param[in] text The text to print.
      */
     void print_line(std::string const & text)
@@ -423,7 +423,7 @@ protected:
     //!\brief Prints the version information.
     void print_version()
     {
-        std::string const version_str{seqan3_version_cstring};
+        std::string const version_str{sharg::sharg_version_cstring};
 
         // Print version, date and url.
         derived_t().print_section("Version");
@@ -502,8 +502,8 @@ private:
      *
      * \details
      *
-     * If `spec` equals `seqan3::option_spec::hidden`, the information is never added to the help page.
-     * If `spec` equals `seqan3::option_spec::advanced`, the information is only added to the help page if
+     * If `spec` equals `sharg::option_spec::hidden`, the information is never added to the help page.
+     * If `spec` equals `sharg::option_spec::advanced`, the information is only added to the help page if
      * the advanced help page has been queried on the command line (`show_advanced_options == true`).
      */
     void store_help_page_element(std::function<void()> printer, option_spec const spec)
@@ -513,4 +513,4 @@ private:
     }
 };
 
-} // namespace seqan3::detail
+} // namespace sharg::detail

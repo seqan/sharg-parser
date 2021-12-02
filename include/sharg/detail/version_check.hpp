@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -28,7 +28,7 @@
 #include <seqan3/std/charconv>
 #include <seqan3/version.hpp>
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ namespace seqan3::detail
 // ---------------------------------------------------------------------------------------------------------------------
 
 /*!\brief Writes a timestamp file and performs the server call to get the newest version information.
- * \param[in] command  The system command as a string. See seqan3::detail::version_checker::command for details.
+ * \param[in] command  The system command as a string. See sharg::detail::version_checker::command for details.
  * \param[in] prom     A promise object used to track the detached thread which executes this command.
  *
  * This function performs a https server request by executing a hard coded command (string) as a system call.
@@ -102,7 +102,7 @@ public:
     //!\}
 
     /*!\brief Initialises the version_checker with the application name and version.
-     * \param[in] prom The promise to track the state of the detached thread which calls seqan3::detail::call_server.
+     * \param[in] prom The promise to track the state of the detached thread which calls sharg::detail::call_server.
      *
      * The operator performs the following steps:
      *
@@ -117,12 +117,12 @@ public:
      *    **Debug mode** (directed at the developer of the application)
      *    * If the app is unregistered (no version information is available at the server) the developer will be
      *      notified that he has the possibility of registering his application with us
-     *      (see seqan3::version_checker::message_unregistered_app).
+     *      (see sharg::version_checker::message_unregistered_app).
      *    * If the current seqan version is smaller then the one returned by the server call, the developer is notified
-     *      that he may update to the newest seqan3 version (see seqan3::version_checker::message_seqan3_update).
+     *      that he may update to the newest seqan3 version (see sharg::version_checker::message_seqan3_update).
      *    * If the current app version is greater than the one returned by the server call, we assume that the
      *      developer has released a new version and is notified to send us the new version
-     *      (see seqan3::version_checker::message_registered_app_update).
+     *      (see sharg::version_checker::message_registered_app_update).
      *    **Release mode** (directed at the user of the application):
      *    * If the current app version is lower than the one returned by the server call, the user is notified that
      *      a newer version exists.
@@ -254,7 +254,7 @@ public:
         // check if files can be written inside dir
         path dummy = tmp_path / "dummy.txt";
         std::ofstream file{dummy};
-        detail::safe_filesystem_entry file_guard{dummy};
+        seqan3::detail::safe_filesystem_entry file_guard{dummy};
 
         bool is_open = file.is_open();
         bool is_good = file.good();
@@ -279,7 +279,7 @@ public:
      * If the developer says no, it rules out all following decisions (even if the user specified --version-check true).
      * No cookie is ever written.
      *
-     * If the environment variable SEQAN3_NO_VERSION_CHECK is set no version check is done (rules out all following).
+     * If the environment variable SHARG_NO_VERSION_CHECK is set no version check is done (rules out all following).
      * No cookie is written.
      *
      * If the user explicitly uses the --version-check option (user_approval is set) it rules out all following
@@ -291,7 +291,7 @@ public:
      * * ASK: Ask the user or default the decision once a day.
      *
      * If the cookie content is "ASK" and the timestamp is older than a day we ask the user,
-     * if possible (seqan3::detail::is_terminal()), what he wants to do, set the according cookie for the next time
+     * if possible (sharg::detail::is_terminal()), what he wants to do, set the according cookie for the next time
      * and continue. If we cannot ask the user, the default kicks in (do the check).
      */
     bool decide_if_check_is_performed(update_notifications developer_approval, std::optional<bool> user_approval)
@@ -299,7 +299,7 @@ public:
         if (developer_approval == update_notifications::off)
             return false;
 
-        if (std::getenv("SEQAN3_NO_VERSION_CHECK") != nullptr) // environment variable was set
+        if (std::getenv("SHARG_NO_VERSION_CHECK") != nullptr) // environment variable was set
             return false;
 
         if (user_approval.has_value())
@@ -485,7 +485,7 @@ private:
     }
 
     /*!\brief Parses a version string into an array of length 3.
-     * \param[in] str The version string that must match seqan3::detail::version_regex.
+     * \param[in] str The version string that must match sharg::detail::version_regex.
      */
     std::array<int, 3> get_numbers_from_version_string(std::string const & str) const
     {
@@ -522,4 +522,4 @@ private:
     }
 };
 
-} // namespace seqan3
+} // namespace sharg

@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -31,68 +31,27 @@
 #include <seqan3/utility/type_traits/basic.hpp>
 #include <seqan3/utility/views/join_with.hpp>
 
-namespace seqan3
+namespace sharg
 {
 
-/*!\interface seqan3::validator <>
+/*!\concept sharg::validator
  * \brief The concept for option validators passed to add_option/positional_option.
  * \ingroup argument_parser
  *
  * \details
  *
- * When adding (positional) options to the seqan3::argument_parser you may pass a
+ * When adding (positional) options to the sharg::argument_parser you may pass a
  * [function object](https://en.cppreference.com/w/cpp/named_req/FunctionObject) that models
- * seqan3::validator which checks the option value provided by the user for some constraint.
+ * sharg::validator which checks the option value provided by the user for some constraint.
  *
- * SeqAn provides several common-use-case validators, e.g. the seqan3::arithmetic_range_validator.
+ * SeqAn provides several common-use-case validators, e.g. the sharg::arithmetic_range_validator.
  *
  * \include test/snippet/argument_parser/validators_2.cpp
  *
  * You can learn more about SeqAn validators in our tutorial \ref section_validation.
  *
  * To implement your own validator please refer to the detailed concept description below.
- *
- * ### Concepts and doxygen
- *
- * The requirements for this concept are given as related functions and type traits.
- * Types that satisfy this concept are shown as "implementing this interface".
  */
-/*!\name Requirements for seqan3::validator
- * \brief You can expect these (meta-)functions on all types that implement seqan3::validator.
- * \{
- */
-/*!\typedef     using option_value_type
- * \brief       The type of value on which the validator is called on.
- * \relates     seqan3::validator
- *
- * \details
- * \attention This is a concept requirement, not an actual typedef (however types satisfying this concept
- * will provide an implementation).
- */
-/*!\fn              void operator()(option_value_type const & cmp) const
- * \brief           Validates the value 'cmp' and throws a seqan3::validation_error on failure.
- * \tparam          option_value_type The type of the value to be validated.
- * \param[in,out]   cmp The value to be validated.
- * \relates         seqan3::validator
- * \throws          seqan3::validation_error if value 'cmp' does not pass validation.
- *
- * \details
- * \attention This is a concept requirement, not an actual function (however types satisfying this concept
- * will provide an implementation).
- */
-/*!\fn              std::string get_help_page_message() const
- * \brief           Returns a message that can be appended to the (positional) options help page info.
- * \relates         seqan3::validator
- * \returns         A string that contains information on the performed validation.
- *
- * \details
- * \attention This is a concept requirement, not an actual function (however types satisfying this concept
- * will provide an implementation).
- *
- * \remark For a complete overview, take a look at \ref argument_parser
- */
-//!\}
-//!\cond
 template <typename validator_type>
 concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
                     requires(validator_type validator,
@@ -100,27 +59,26 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
 {
     typename std::remove_reference_t<validator_type>::option_value_type;
 
-    SEQAN3_RETURN_TYPE_CONSTRAINT(validator(value), std::same_as, void);
-    SEQAN3_RETURN_TYPE_CONSTRAINT(validator.get_help_page_message(), std::same_as, std::string);
+    SHARG_RETURN_TYPE_CONSTRAINT(validator(value), std::same_as, void);
+    SHARG_RETURN_TYPE_CONSTRAINT(validator.get_help_page_message(), std::same_as, std::string);
 };
-//!\endcond
 
 /*!\brief A validator that checks whether a number is inside a given range.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  * \tparam option_value_t The value type of the range; must model seqan3::arithmetic .
  *
  * \details
  *
  * On construction, the validator must receive a maximum and a minimum number.
- * The class than acts as a functor, that throws a seqan3::validation_error
+ * The class than acts as a functor, that throws a sharg::validation_error
  * exception whenever a given value does not lie inside the given min/max range.
  *
  * \include test/snippet/argument_parser/validators_1.cpp
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-template <arithmetic option_value_t>
+template <seqan3::arithmetic option_value_t>
 class arithmetic_range_validator
 {
 public:
@@ -137,23 +95,23 @@ public:
 
     /*!\brief Tests whether cmp lies inside [`min`, `max`].
      * \param cmp The input value to check.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     void operator()(option_value_type const & cmp) const
     {
         if (!((cmp <= max) && (cmp >= min)))
-            throw validation_error{detail::to_string("Value ", cmp, " is not in range [", min, ",", max, "].")};
+            throw validation_error{seqan3::detail::to_string("Value ", cmp, " is not in range [", min, ",", max, "].")};
     }
 
     /*!\brief Tests whether every element in \p range lies inside [`min`, `max`].
      * \tparam range_type The type of range to check; must model std::ranges::forward_range. The value type must model
      *                    seqan3::arithmetic.
      * \param  range      The input range to iterate over and check every element.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
     //!\cond
-        requires arithmetic<std::ranges::range_value_t<range_type>>
+        requires seqan3::arithmetic<std::ranges::range_value_t<range_type>>
     //!\endcond
     void operator()(range_type const & range) const
     {
@@ -163,7 +121,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return detail::to_string("Value must be in range [", min, ",", max, "].");
+        return seqan3::detail::to_string("Value must be in range [", min, ",", max, "].");
     }
 
 private:
@@ -176,13 +134,13 @@ private:
 
 /*!\brief A validator that checks whether a value is inside a list of valid values.
  * \ingroup argument_parser
- * \implements seqan3::validator
- * \tparam option_value_t \copybrief seqan3::value_list_validator::option_value_type
+ * \implements sharg::validator
+ * \tparam option_value_t \copybrief sharg::value_list_validator::option_value_type
  *
  * \details
  *
  * On construction, the validator must receive a range or parameter pack of valid values.
- * The class than acts as a functor, that throws a seqan3::validation_error
+ * The class than acts as a functor, that throws a sharg::validation_error
  * exception whenever a given value is not in the given list.
  *
  * \note In order to simplify the chaining of validators, the option value type is deduced to `std::string` if the
@@ -242,18 +200,18 @@ public:
 
     /*!\brief Tests whether cmp lies inside values.
      * \param cmp The input value to check.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     void operator()(option_value_type const & cmp) const
     {
         if (!(std::find(values.begin(), values.end(), cmp) != values.end()))
-            throw validation_error{detail::to_string("Value ", cmp, " is not one of ", std::views::all(values), ".")};
+            throw validation_error{seqan3::detail::to_string("Value ", cmp, " is not one of ", std::views::all(values), ".")};
     }
 
     /*!\brief Tests whether every element in \p range lies inside values.
      * \tparam range_type The type of range to check; must model std::ranges::forward_range.
      * \param  range      The input range to iterate over and check every element.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
     //!\cond
@@ -267,7 +225,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return detail::to_string("Value must be one of ", std::views::all(values), ".");
+        return seqan3::detail::to_string("Value must be one of ", std::views::all(values), ".");
     }
 
 private:
@@ -277,7 +235,7 @@ private:
 };
 
 /*!\brief Type deduction guides
- * \relates seqan3::value_list_validator
+ * \relates sharg::value_list_validator
  * \{
  */
 //!\brief Given a parameter pack of types that are convertible to std::string, delegate to value type std::string.
@@ -314,10 +272,10 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
  *
  * \details
  *
- * This class provides a common interface for seqan3::input_file_validator and the seqan3::output_file_validator as
- * well as the seqan3::input_directory_validator and seqan3::output_directory_validator.
+ * This class provides a common interface for sharg::input_file_validator and the sharg::output_file_validator as
+ * well as the sharg::input_directory_validator and sharg::output_directory_validator.
  *
- * The type can be further specialised for the seqan3::input_file_validator and the seqan3::output_file_validator
+ * The type can be further specialised for the sharg::input_file_validator and the sharg::output_file_validator
  * using the template argument to determine the valid extensions from the given file type.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
@@ -354,7 +312,7 @@ public:
      * \tparam range_type The type of range to check; must model std::ranges::forward_range and the value type must
      *                    be convertible to std::filesystem::path.
      * \param  v          The input range to iterate over and check every element.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
     //!\cond
@@ -369,7 +327,7 @@ public:
 protected:
     /*!\brief Validates the given filename path based on the specified extensions.
      * \param path The filename path.
-     * \throws seqan3::validation_error if the specified extensions don't match the given path, or
+     * \throws sharg::validation_error if the specified extensions don't match the given path, or
      *         std::filesystem::filesystem_error on underlying OS API errors.
      */
     void validate_filename(std::filesystem::path const & path) const
@@ -380,7 +338,7 @@ protected:
 
         // Check if extension is available.
         if (!path.has_extension())
-            throw validation_error{detail::to_string("The given filename ", path.string(), " has no extension. Expected"
+            throw validation_error{seqan3::detail::to_string("The given filename ", path.string(), " has no extension. Expected"
                                                      " one of the following valid extensions:", extensions, "!")};
 
         std::string file_path{path.filename().string()};
@@ -401,7 +359,7 @@ protected:
         // Check if requested extension is present.
         if (std::ranges::find_if(extensions, case_insensitive_ends_with) == extensions.end())
         {
-            throw validation_error{detail::to_string("Expected one of the following valid extensions: ", extensions,
+            throw validation_error{seqan3::detail::to_string("Expected one of the following valid extensions: ", extensions,
                                                      "! Got ", all_extensions, " instead!")};
         }
     }
@@ -409,7 +367,7 @@ protected:
     /*!\brief Checks if the given path is readable.
      * \param path The path to check.
      * \returns `true` if readable, otherwise `false`.
-     * \throws seqan3::validation_error if the path is not readable, or
+     * \throws sharg::validation_error if the path is not readable, or
      *         std::filesystem::filesystem_error on underlying OS API errors.
      */
     void validate_readability(std::filesystem::path const & path) const
@@ -420,37 +378,37 @@ protected:
             std::error_code ec{};
             std::filesystem::directory_iterator{path, ec};  // if directory iterator cannot be created, ec will be set.
             if (static_cast<bool>(ec))
-                throw validation_error{detail::to_string("Cannot read the directory ", path ,"!")};
+                throw validation_error{seqan3::detail::to_string("Cannot read the directory ", path ,"!")};
         }
         else
         {
             // Must be a regular file.
             if (!std::filesystem::is_regular_file(path))
-                throw validation_error{detail::to_string("Expected a regular file ", path, "!")};
+                throw validation_error{seqan3::detail::to_string("Expected a regular file ", path, "!")};
 
             std::ifstream file{path};
             if (!file.is_open() || !file.good())
-                throw validation_error{detail::to_string("Cannot read the file ", path, "!")};
+                throw validation_error{seqan3::detail::to_string("Cannot read the file ", path, "!")};
         }
     }
 
     /*!\brief Checks if the given path is writable.
      * \param path The path to check.
      * \returns `true` if writable, otherwise `false`.
-     * \throws seqan3::validation_error if the file could not be opened for writing, or
+     * \throws sharg::validation_error if the file could not be opened for writing, or
      *         std::filesystem::filesystem_error on underlying OS API errors.
      */
     void validate_writeability(std::filesystem::path const & path) const
     {
         std::ofstream file{path};
-        detail::safe_filesystem_entry file_guard{path};
+        seqan3::detail::safe_filesystem_entry file_guard{path};
 
         bool is_open = file.is_open();
         bool is_good = file.good();
         file.close();
 
         if (!is_good || !is_open)
-            throw validation_error{detail::to_string("Cannot write ", path, "!")};
+            throw validation_error{seqan3::detail::to_string("Cannot write ", path, "!")};
 
         file_guard.remove();
     }
@@ -461,7 +419,7 @@ protected:
         if (extensions.empty())
             return "";
         else
-            return detail::to_string(" Valid file extensions are: [", extensions | views::join_with(std::string{", "}), "].");
+            return seqan3::detail::to_string(" Valid file extensions are: [", extensions | seqan3::views::join_with(std::string{", "}), "].");
     }
 
     /*!\brief Helper function that checks if a string is a suffix of another string. Case insensitive.
@@ -487,21 +445,21 @@ protected:
 
 /*!\brief A validator that checks if a given path is a valid input file.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  * \tparam file_t The type of the file to get the valid extensions for; `void` on default.
  *
  * \details
  *
  * On construction, the validator can receive a list (std::vector over std::string) of valid file extensions.
- * The class acts as a functor that throws a seqan3::validation_error exception whenever a given filename's
+ * The class acts as a functor that throws a sharg::validation_error exception whenever a given filename's
  * extension (std::filesystem::path) is not in the given list of valid file extensions, if the file does not exist, or
  * if the file does not have the proper read permissions.
  *
  * \include test/snippet/argument_parser/validators_input_file.cpp
  *
- * The valid extensions can also be obtained from a seqan3 formatted file type, e.g. seqan3::sequence_input_file, if
+ * The valid extensions can also be obtained from a seqan3 formatted file type, e.g. sharg::sequence_input_file, if
  * it is given as template argument to this class. The following snippet demonstrates the different ways to instantiate
- * the seqan3::input_file_validator.
+ * the sharg::input_file_validator.
  *
  * \include test/snippet/argument_parser/validators_input_file_ext_from_file.cpp
  *
@@ -514,7 +472,7 @@ class input_file_validator : public file_validator_base
 {
 public:
 
-    static_assert(std::same_as<file_t, void> || detail::has_type_valid_formats<file_t>,
+    static_assert(std::same_as<file_t, void> || seqan3::detail::has_type_valid_formats<file_t>,
                   "Expected either a template type with a static member called valid_formats (a file type) or void.");
 
     // Import from base class.
@@ -535,7 +493,7 @@ public:
     input_file_validator()
     {
         if constexpr (!std::same_as<file_t, void>)
-            file_validator_base::extensions = detail::valid_file_extensions<typename file_t::valid_formats>();
+            file_validator_base::extensions = seqan3::detail::valid_file_extensions<typename file_t::valid_formats>();
     }
 
     input_file_validator(input_file_validator const &) = default;             //!< Defaulted.
@@ -570,7 +528,7 @@ public:
 
     /*!\brief Tests whether path is an existing regular file and is readable.
      * \param file The input value to check.
-     * \throws seqan3::validation_error if the validation process failed. Might be nested with
+     * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
      */
     virtual void operator()(std::filesystem::path const & file) const override
@@ -578,7 +536,7 @@ public:
         try
         {
             if (!std::filesystem::exists(file))
-                throw validation_error{detail::to_string("The file ", file, " does not exist!")};
+                throw validation_error{seqan3::detail::to_string("The file ", file, " does not exist!")};
 
             // Check if file is regular and can be opened for reading.
             validate_readability(file);
@@ -617,25 +575,25 @@ enum class output_file_open_options
 
 /*!\brief A validator that checks if a given path is a valid output file.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  * \tparam file_t The type of the file to get the valid extensions for; `void` on default.
  *
  * \details
  *
  * On construction, the validator can receive a list (std::vector over std::string) of valid file extensions.
- * The class acts as a functor that throws a seqan3::validation_error exception whenever a given filename's extension
+ * The class acts as a functor that throws a sharg::validation_error exception whenever a given filename's extension
  * (std::string) is not in the given list of valid file extensions, or if the parent path does not have the proper
  * writer permissions.
- * In addition, the validator receives a seqan3::output_file_open_options which allows you to specify what to do if your
- * output file already exists. seqan3::output_file_open_options::create_new will throw a seqan3::validation_error
- * exception if it already exists and seqan3::output_file_open_options::open_or_create will skip this check (that means
+ * In addition, the validator receives a sharg::output_file_open_options which allows you to specify what to do if your
+ * output file already exists. sharg::output_file_open_options::create_new will throw a sharg::validation_error
+ * exception if it already exists and sharg::output_file_open_options::open_or_create will skip this check (that means
  * you are allowed to overwrite the existing file).
  *
  * \include test/snippet/argument_parser/validators_output_file.cpp
  *
- * The valid extensions can also be obtained from a seqan3 formatted file type, e.g. seqan3::sequence_input_file, if
+ * The valid extensions can also be obtained from a seqan3 formatted file type, e.g. sharg::sequence_input_file, if
  * it is given as template argument to this class. The following snippet demonstrates the different ways to instantiate
- * the seqan3::output_file_validator.
+ * the sharg::output_file_validator.
  *
  * \include test/snippet/argument_parser/validators_output_file_ext_from_file.cpp
  *
@@ -647,7 +605,7 @@ template <typename file_t = void>
 class output_file_validator : public file_validator_base
 {
 public:
-    static_assert(std::same_as<file_t, void> || detail::has_type_valid_formats<file_t>,
+    static_assert(std::same_as<file_t, void> || seqan3::detail::has_type_valid_formats<file_t>,
                 "Expected either a template type with a static member called valid_formats (a file type) or void.");
 
     // Import from base class.
@@ -657,7 +615,7 @@ public:
      * \{
      */
 
-    //!\copydoc seqan3::input_file_validator::input_file_validator()
+    //!\copydoc sharg::input_file_validator::input_file_validator()
     output_file_validator() : output_file_validator{output_file_open_options::create_new}
     {}
 
@@ -668,10 +626,10 @@ public:
     virtual ~output_file_validator() = default; //!< Virtual Destructor.
 
     /*!\brief Constructs from a given overwrite mode and a list of valid extensions.
-     * \param[in] mode A seqan3::output_file_open_options indicating whether the validator throws if a file already
+     * \param[in] mode A sharg::output_file_open_options indicating whether the validator throws if a file already
                        exists.
      * \param[in] extensions The valid extensions to validate for. Defaults to
-     *                       seqan3::output_file_validator::default_extensions.
+     *                       sharg::output_file_validator::default_extensions.
      */
     explicit output_file_validator(output_file_open_options const mode,
                                    std::vector<std::string> extensions = default_extensions())
@@ -695,7 +653,7 @@ public:
     static std::vector<std::string> default_extensions()
     {
         if constexpr (!std::same_as<file_t, void>)
-            return detail::valid_file_extensions<typename file_t::valid_formats>();
+            return seqan3::detail::valid_file_extensions<typename file_t::valid_formats>();
         return {};
     }
 
@@ -704,7 +662,7 @@ public:
 
     /*!\brief Tests whether path is does not already exists and is writable.
      * \param file The input value to check.
-     * \throws seqan3::validation_error if the validation process failed. Might be nested with
+     * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
      */
     virtual void operator()(std::filesystem::path const & file) const override
@@ -712,7 +670,7 @@ public:
         try
         {
             if ((mode == output_file_open_options::create_new) && std::filesystem::exists(file))
-                throw validation_error{detail::to_string("The file ", file, " already exists!")};
+                throw validation_error{seqan3::detail::to_string("The file ", file, " already exists!")};
 
             // Check if file has any write permissions.
             validate_writeability(file);
@@ -748,11 +706,11 @@ private:
 
 /*!\brief A validator that checks if a given path is a valid input directory.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  *
  * \details
  *
- * The class acts as a functor that throws a seqan3::validation_error exception whenever a given directory
+ * The class acts as a functor that throws a sharg::validation_error exception whenever a given directory
  * (std::filesystem::path) does not exist, the specified path is not a directory, or if the directory is not
  * readable.
  *
@@ -787,7 +745,7 @@ public:
 
     /*!\brief Tests whether path is an existing directory and is readable.
      * \param dir The input value to check.
-     * \throws seqan3::validation_error if the validation process failed. Might be nested with
+     * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
      */
     virtual void operator()(std::filesystem::path const & dir) const override
@@ -795,10 +753,10 @@ public:
         try
         {
             if (!std::filesystem::exists(dir))
-                throw validation_error{detail::to_string("The directory ", dir, " does not exists!")};
+                throw validation_error{seqan3::detail::to_string("The directory ", dir, " does not exists!")};
 
             if (!std::filesystem::is_directory(dir))
-                throw validation_error{detail::to_string("The path ", dir, " is not a directory!")};
+                throw validation_error{seqan3::detail::to_string("The path ", dir, " is not a directory!")};
 
             // Check if directory has any read permissions.
             validate_readability(dir);
@@ -818,17 +776,17 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return detail::to_string("An existing, readable path for the input directory.");
+        return seqan3::detail::to_string("An existing, readable path for the input directory.");
     }
 };
 
 /*!\brief A validator that checks if a given path is a valid output directory.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  *
  * \details
  *
- * The class acts as a functor that throws a seqan3::validation_error exception whenever a given path
+ * The class acts as a functor that throws a sharg::validation_error exception whenever a given path
  * (std::filesystem::path) is not writable. This can happen if either the parent path does not exists, or the
  * path doesn't have the proper write permissions.
  *
@@ -863,7 +821,7 @@ public:
 
     /*!\brief Tests whether path is writable.
      * \param dir The input value to check.
-     * \throws seqan3::validation_error if the validation process failed. Might be nested with
+     * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
      */
     virtual void operator()(std::filesystem::path const & dir) const override
@@ -874,13 +832,13 @@ public:
         std::filesystem::create_directory(dir, ec); // does nothing and is not treated as error if path already exists.
         // if error code was set or if dummy.txt could not be created within the output dir, throw an error.
         if (static_cast<bool>(ec))
-            throw validation_error{detail::to_string("Cannot create directory: ", dir, "!")};
+            throw validation_error{seqan3::detail::to_string("Cannot create directory: ", dir, "!")};
 
         try
         {
             if (!dir_exists)
             {
-                detail::safe_filesystem_entry dir_guard{dir};
+                seqan3::detail::safe_filesystem_entry dir_guard{dir};
                 validate_writeability(dir / "dummy.txt");
                 dir_guard.remove_all();
             }
@@ -904,13 +862,13 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return detail::to_string("A valid path for the output directory.");
+        return seqan3::detail::to_string("A valid path for the output directory.");
     }
 };
 
 /*!\brief A validator that checks if a matches a regular expression pattern.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  *
  * \details
  *
@@ -920,7 +878,7 @@ public:
  * Note: A regex_match will only return true if the strings matches the pattern
  * completely (in contrast to regex_search which also matches substrings).
  *
- * The class than acts as a functor, that throws a seqan3::validation_error
+ * The class than acts as a functor, that throws a sharg::validation_error
  * exception whenever string does not match the pattern.
  *
  * \include test/snippet/argument_parser/validators_4.cpp
@@ -942,20 +900,20 @@ public:
 
     /*!\brief Tests whether cmp lies inside values.
      * \param[in] cmp The value to validate.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     void operator()(option_value_type const & cmp) const
     {
         std::regex rgx(pattern);
         if (!std::regex_match(cmp, rgx))
-            throw validation_error{detail::to_string("Value ", cmp, " did not match the pattern ", pattern, ".")};
+            throw validation_error{seqan3::detail::to_string("Value ", cmp, " did not match the pattern ", pattern, ".")};
     }
 
     /*!\brief Tests whether every filename in list v matches the pattern.
      * \tparam range_type The type of range to check; must model std::ranges::forward_range and the value type must
      *                    be convertible to std::string.
      * \param  v          The input range to iterate over and check every element.
-     * \throws seqan3::validation_error
+     * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
     //!\cond
@@ -973,7 +931,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return detail::to_string("Value must match the pattern '", pattern, "'.");
+        return seqan3::detail::to_string("Value must match the pattern '", pattern, "'.");
     }
 
 private:
@@ -986,7 +944,7 @@ namespace detail
 
 /*!\brief Validator that always returns true.
  * \ingroup argument_parser
- * \implements seqan3::validator
+ * \implements sharg::validator
  * \tparam option_value_t Must be a (container of) arithmetic type(s).
  *
  * \details
@@ -1015,12 +973,12 @@ struct default_validator
 
 /*!\brief A helper struct to chain validators recursively via the pipe operator.
  *\ingroup argument_parser
- *\implements seqan3::validator
+ *\implements sharg::validator
  *
  *\details
  *
  * Note that both validators must operate on the same option_value_type in order to
- * avoid unexpected behaviour and ensure that the seqan3::argument_parser::add_option
+ * avoid unexpected behaviour and ensure that the sharg::argument_parser::add_option
  * call is well-formed. (add_option(val, ...., validator) requires
  * that val is of same type as validator::option_value_type).
  *
@@ -1079,7 +1037,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return detail::to_string(vali1.get_help_page_message(), " ", vali2.get_help_page_message());
+        return seqan3::detail::to_string(vali1.get_help_page_message(), " ", vali2.get_help_page_message());
     }
 
 private:
@@ -1094,10 +1052,10 @@ private:
 /*!\brief Enables the chaining of validators.
  * \ingroup argument_parser
  * \tparam validator1_type The type of the fist validator;
- *                         Must satisfy the seqan3::validator and the
+ *                         Must satisfy the sharg::validator and the
  *                         same option_value_type as the second validator type.
  * \tparam validator2_type The type of the second validator;
- *                         Must satisfy the seqan3::validator and the
+ *                         Must satisfy the sharg::validator and the
  *                         same option_value_type as the fist validator type.
  * \param[in] vali1 The first validator to chain.
  * \param[in] vali2 The second validator to chain.
@@ -1110,8 +1068,8 @@ private:
  *
  * For example you may want a file name that only accepts absolute paths but
  * also must have one out of some given file extensions.
- * For this purpose you can chain a seqan3::regex_validator to a
- * seqan3::input_file_validator like this:
+ * For this purpose you can chain a sharg::regex_validator to a
+ * sharg::input_file_validator like this:
  *
  * \include test/snippet/argument_parser/validators_chaining.cpp
  *
@@ -1131,4 +1089,4 @@ auto operator|(validator1_type && vali1, validator2_type && vali2)
                                            std::forward<validator2_type>(vali2)};
 }
 
-} // namespace seqan3
+} // namespace sharg

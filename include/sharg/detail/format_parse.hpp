@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -21,7 +21,7 @@
 #include <sharg/detail/format_base.hpp>
 #include <seqan3/utility/char_operations/predicate.hpp>
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 
 /*!\brief The format that organizes the actual parsing of command line arguments.
@@ -34,7 +34,7 @@ namespace seqan3::detail
  * Directly parsing is also difficult, since the order of parsing options/flags
  * is non trivial (e.g. ambiguousness of '-g 4' => option+value or flag+positional).
  * Therefore, we store the parsing calls of the developer in a function object,
- * (format_parse::option_and_flag_calls, seqan3::detail::format_parse::positional_option_calls)
+ * (format_parse::option_and_flag_calls, sharg::detail::format_parse::positional_option_calls)
  * executing them in a new order when calling format_parse::parse().
  * This enables us to parse any option type and resolve any ambiguousness, so no
  * additional restrictions apply to the developer when setting up the parser.
@@ -72,14 +72,14 @@ public:
     {}
     //!\}
 
-    /*!\brief Adds an seqan3::detail::get_option call to be evaluated later on.
-     * \copydetails seqan3::argument_parser::add_option
+    /*!\brief Adds an sharg::detail::get_option call to be evaluated later on.
+     * \copydetails sharg::argument_parser::add_option
      */
     template <typename option_type, typename validator_type>
     void add_option(option_type & value,
                     char const short_id,
                     std::string const & long_id,
-                    std::string const & SEQAN3_DOXYGEN_ONLY(desc),
+                    std::string const & SHARG_DOXYGEN_ONLY(desc),
                     option_spec const spec,
                     validator_type && option_validator)
     {
@@ -90,13 +90,13 @@ public:
     }
 
     /*!\brief Adds a get_flag call to be evaluated later on.
-     * \copydetails seqan3::argument_parser::add_flag
+     * \copydetails sharg::argument_parser::add_flag
      */
     void add_flag(bool & value,
                   char const short_id,
                   std::string const & long_id,
-                  std::string const & SEQAN3_DOXYGEN_ONLY(desc),
-                  option_spec const & SEQAN3_DOXYGEN_ONLY(spec))
+                  std::string const & SHARG_DOXYGEN_ONLY(desc),
+                  option_spec const & SHARG_DOXYGEN_ONLY(spec))
     {
         flag_calls.push_back([this, &value, short_id, long_id]()
         {
@@ -105,11 +105,11 @@ public:
     }
 
     /*!\brief Adds a get_positional_option call to be evaluated later on.
-     * \copydetails seqan3::argument_parser::add_positional_option
+     * \copydetails sharg::argument_parser::add_positional_option
      */
     template <typename option_type, typename validator_type>
     void add_positional_option(option_type & value,
-                               std::string const & SEQAN3_DOXYGEN_ONLY(desc),
+                               std::string const & SHARG_DOXYGEN_ONLY(desc),
                                validator_type && option_validator)
     {
         positional_option_calls.push_back([this, &value, option_validator]()
@@ -157,7 +157,7 @@ public:
         if constexpr (std::same_as<std::remove_cvref_t<id_type>, std::string>)
             return id.empty();
         else // char
-            return is_char<'\0'>(id);
+            return seqan3::is_char<'\0'>(id);
     }
 
     /*!\brief Finds the position of a short/long identifier in format_parse::argv.
@@ -289,15 +289,15 @@ private:
     }
 
     /*!\brief Tries to parse an input string into a value using the stream `operator>>`.
-     * \tparam option_t Must model seqan3::input_stream_over.
+     * \tparam option_t Must model sharg::seqan3::input_stream_over.
      * \param[out] value Stores the parsed value.
      * \param[in] in The input argument to be parsed.
-     * \returns seqan3::option_parse_result::error if `in` could not be parsed via the stream
-     *          operator and otherwise seqan3::option_parse_result::success.
+     * \returns sharg::option_parse_result::error if `in` could not be parsed via the stream
+     *          operator and otherwise sharg::option_parse_result::success.
      */
     template <typename option_t>
     //!\cond
-        requires input_stream_over<std::istringstream, option_t>
+        requires seqan3::input_stream_over<std::istringstream, option_t>
     //!\endcond
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
@@ -310,17 +310,17 @@ private:
         return option_parse_result::success;
     }
 
-    /*!\brief Sets an option value depending on the keys found in seqan3::enumeration_names<option_t>.
-     * \tparam option_t Must model seqan3::named_enumeration.
+    /*!\brief Sets an option value depending on the keys found in sharg::enumeration_names<option_t>.
+     * \tparam option_t Must model sharg::named_enumeration.
      * \param[out] value Stores the parsed value.
      * \param[in] in The input argument to be parsed.
-     * \throws seqan3::user_input_error if `in` is not a key in seqan3::enumeration_names<option_t>.
-     * \returns seqan3::option_parse_result::success.
+     * \throws sharg::user_input_error if `in` is not a key in sharg::enumeration_names<option_t>.
+     * \returns sharg::option_parse_result::success.
      */
     template <named_enumeration option_t>
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
-        auto map = seqan3::enumeration_names<option_t>;
+        auto map = sharg::enumeration_names<option_t>;
 
         if (auto it = map.find(in); it == map.end())
         {
@@ -335,7 +335,7 @@ private:
                     return pair1.first < pair2.first;
                 });
 
-            throw user_input_error{detail::to_string("You have chosen an invalid input value: ", in,
+            throw user_input_error{seqan3::detail::to_string("You have chosen an invalid input value: ", in,
                                                      ". Please use one of: ", key_value_pairs | std::views::keys)};
         }
         else
@@ -355,7 +355,7 @@ private:
     //!\endcond
 
     /*!\brief Parses the given option value and appends it to the target container.
-     * \tparam container_option_t Must model seqan3::detail::is_container_option and
+     * \tparam container_option_t Must model sharg::detail::is_container_option and
      *                            its value_type must be parseable via parse_option_value
      * \tparam format_parse_t Needed to make the function "dependent" (i.e. do instantiation in the second phase of
      *                        two-phase lookup) as the requires clause needs to be able to access the other
@@ -363,7 +363,7 @@ private:
      *
      * \param[out] value The container that stores the parsed value.
      * \param[in] in The input argument to be parsed.
-     * \returns A seqan3::option_parse_result whether parsing was successful or not.
+     * \returns A sharg::option_parse_result whether parsing was successful or not.
      */
     template <detail::is_container_option container_option_t, typename format_parse_t = format_parse>
     //!\cond
@@ -371,7 +371,7 @@ private:
                            typename container_option_t::value_type & container_value,
                            std::string const & in)
         {
-            SEQAN3_RETURN_TYPE_CONSTRAINT(fp.parse_option_value(container_value, in),
+            SHARG_RETURN_TYPE_CONSTRAINT(fp.parse_option_value(container_value, in),
                                           std::same_as,
                                           option_parse_result);
         }
@@ -392,17 +392,17 @@ private:
      * \tparam option_t The option value type; must model seqan3::arithmetic.
      * \param[out] value Stores the parsed value.
      * \param[in] in The input argument to be parsed.
-     * \returns seqan3::option_parse_result::error if `in` could not be parsed to an arithmetic type
-     *          via std::from_chars, seqan3::option_parse_result::overflow_error if `in` could be parsed but the
-     *          value is too large for the respective type, and otherwise seqan3::option_parse_result::success.
+     * \returns sharg::option_parse_result::error if `in` could not be parsed to an arithmetic type
+     *          via std::from_chars, sharg::option_parse_result::overflow_error if `in` could be parsed but the
+     *          value is too large for the respective type, and otherwise sharg::option_parse_result::success.
      *
      * \details
      *
      * This function delegates to std::from_chars.
      */
-    template <arithmetic option_t>
+    template <seqan3::arithmetic option_t>
     //!\cond
-        requires input_stream_over<std::istringstream, option_t>
+        requires seqan3::input_stream_over<std::istringstream, option_t>
     //!\endcond
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
@@ -419,7 +419,7 @@ private:
     /*!\brief Tries to parse an input string into a boolean value.
      * \param[out] value Stores the parsed value.
      * \param[in] in The input argument to be parsed.
-     * \returns A seqan3::option_parse_result whether parsing was successful or not.
+     * \returns A sharg::option_parse_result whether parsing was successful or not.
      *
      * \details
      *
@@ -447,7 +447,7 @@ private:
      * \param[in] option_name The name of the option whose input was parsed.
      * \param[in] input_value The original user input in question.
      *
-     * \throws seqan3::user_input_error if `res` was not seqan3::option_parse_result::success.
+     * \throws sharg::user_input_error if `res` was not sharg::option_parse_result::success.
      */
     template <typename option_type>
     void throw_on_input_error(option_parse_result const res,
@@ -462,7 +462,7 @@ private:
                                    get_type_name_as_string(option_type{}) + "."};
         }
 
-        if constexpr (arithmetic<option_type>)
+        if constexpr (seqan3::arithmetic<option_type>)
         {
             if (res == option_parse_result::overflow_error)
             {
@@ -481,8 +481,8 @@ private:
      * \param[in]  option_it The iterator where the option identifier was found.
      * \param[in]  id        The option identifier supplied on the command line.
      *
-     * \throws seqan3::too_few_arguments if the option was not followed by a value.
-     * \throws seqan3::user_input_error if the given option value was invalid.
+     * \throws sharg::too_few_arguments if the option was not followed by a value.
+     * \throws sharg::user_input_error if the given option value was invalid.
      *
      * \details
      *
@@ -540,7 +540,7 @@ private:
      * \param[out] value Stores the value found in argv, parsed by parse_option_value.
      * \param[in] id The option identifier supplied on the command line.
      *
-     * \throws seqan3::option_declared_multiple_times
+     * \throws sharg::option_declared_multiple_times
      *
      * \details
      *
@@ -598,7 +598,7 @@ private:
 
     /*!\brief Checks format_parse::argv for unknown options/flags.
      *
-     * \throws seqan3::unknown_option
+     * \throws sharg::unknown_option
      *
      * \details
      *
@@ -640,7 +640,7 @@ private:
 
     /*!\brief Checks format_parse::argv for unknown options/flags.
      *
-     * \throws seqan3::too_many_arguments
+     * \throws sharg::too_many_arguments
      *
      * \details
      *
@@ -660,12 +660,12 @@ private:
      * \param[out] value     The variable in which to store the given command line argument.
      * \param[in]  short_id  The short identifier for the option (e.g. 'i').
      * \param[in]  long_id   The long identifier for the option (e.g. "integer").
-     * \param[in]  spec      Advanced option specification, see seqan3::option_spec.
+     * \param[in]  spec      Advanced option specification, see sharg::option_spec.
      * \param[in]  validator The validator applied to the value after parsing (callable).
      *
-     * \throws seqan3::option_declared_multiple_times
-     * \throws seqan3::validation_error
-     * \throws seqan3::required_option_missing
+     * \throws sharg::option_declared_multiple_times
+     * \throws sharg::validation_error
+     * \throws sharg::required_option_missing
      *
      * \details
      *
@@ -730,10 +730,10 @@ private:
      * \param[out] value     The variable in which to store the given command line argument.
      * \param[in]  validator The validator applied to the value after parsing (callable).
      *
-     * \throws seqan3::argument_parser_error
-     * \throws seqan3::too_few_arguments
-     * \throws seqan3::validation_error
-     * \throws seqan3::design_error
+     * \throws sharg::argument_parser_error
+     * \throws sharg::too_few_arguments
+     * \throws sharg::validation_error
+     * \throws sharg::design_error
      *
      * \details
      *
@@ -812,4 +812,4 @@ private:
     std::vector<std::string>::iterator end_of_options_it;
 };
 
-} // namespace seqan3
+} // namespace sharg

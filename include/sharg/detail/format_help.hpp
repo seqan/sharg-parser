@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -21,7 +21,7 @@
 #include <sharg/detail/terminal.hpp>
 #include <seqan3/core/detail/test_accessor.hpp>
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 
 /*!\brief The format that prints the help page to std::cout.
@@ -391,7 +391,7 @@ protected:
  *
  * The short help message printing is not done immediately, because the user cannot provide
  * meta information (e.g. app_name) on construction of the parser. Thus the meta information is collected
- * and only evaluated when calling seqan3::detail::format_version::parse.
+ * and only evaluated when calling sharg::detail::format_version::parse.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
@@ -451,7 +451,7 @@ public:
  *
  * The copyright message printing is not done immediately, because the user cannot provide
  * meta information (e.g. long_copyright) on construction of the parser. Thus the meta information is collected
- * and only evaluated when calling seqan3::detail::format_version::parse.
+ * and only evaluated when calling sharg::detail::format_version::parse.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
@@ -464,7 +464,7 @@ public:
     void parse(argument_parser_meta_data const & parser_meta)
     {
         meta = parser_meta;
-        debug_stream_type stream{std::cout};
+        seqan3::debug_stream_type stream{std::cout};
         std::string seqan_license{
 R"(Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
@@ -521,4 +521,4 @@ DAMAGE.)"};
     }
 };
 
-} // namespace seqan3::detail
+} // namespace sharg::detail

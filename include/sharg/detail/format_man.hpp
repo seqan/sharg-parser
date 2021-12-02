@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -18,7 +18,7 @@
 #include <sharg/detail/terminal.hpp>
 #include <seqan3/version.hpp>
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 
 /*!\brief The format that prints the help page information formatted for a man page to std::cout.
@@ -30,7 +30,7 @@ namespace seqan3::detail
  * provide meta information, positional options, etc. in the correct order.
  * In addition the needed order would be different from the parse format.
  * Thus the calls are stored (parser_set_up_calls and positional_option_calls)
- * and only evaluated when calling seqan3::detail::format_help_base::parse.
+ * and only evaluated when calling sharg::detail::format_help_base::parse.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
@@ -150,4 +150,4 @@ private:
     bool is_first_in_section{true};
 };
 
-} // namespace seqan3
+} // namespace sharg

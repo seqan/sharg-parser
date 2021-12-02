@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 #include <fstream>
@@ -43,7 +43,7 @@ std::string const basic_options_str = "OPTIONS\n"
 std::string const basic_version_str = "VERSION\n"
                                       "    Last update:\n"
                                       "    test_parser version:\n"
-                                      "    SeqAn version: " + std::string{seqan3::seqan3_version_cstring} + "\n";
+                                      "    SeqAn version: " + std::string{sharg::sharg_version_cstring} + "\n";
 
 std::string license_text()
 {
@@ -63,12 +63,12 @@ namespace seqan3::detail
 {
 struct test_accessor
 {
-    static void set_terminal_width(seqan3::argument_parser & parser, unsigned terminal_width)
+    static void set_terminal_width(sharg::argument_parser & parser, unsigned terminal_width)
     {
         std::visit([terminal_width](auto & f)
         {
-            if constexpr(std::is_same_v<decltype(f), seqan3::detail::format_help &>)
-                f.layout = seqan3::detail::format_help::console_layout_struct{terminal_width};
+            if constexpr(std::is_same_v<decltype(f), sharg::detail::format_help &>)
+                f.layout = sharg::detail::format_help::console_layout_struct{terminal_width};
         }, parser.format);
     }
 };
@@ -78,8 +78,8 @@ using seqan3::detail::test_accessor;
 
 TEST(help_page_printing, short_help)
 {
-    // Empty call with no options given. For seqan3::detail::format_short_help
-    seqan3::argument_parser parser0{"empty_options", 1, argv0};
+    // Empty call with no options given. For sharg::detail::format_short_help
+    sharg::argument_parser parser0{"empty_options", 1, argv0};
     test_accessor::set_terminal_width(parser0, 80);
     parser0.info.synopsis.push_back("./some_binary_name synopsis");
     testing::internal::CaptureStdout();
@@ -96,7 +96,7 @@ TEST(help_page_printing, short_help)
 TEST(help_page_printing, no_information)
 {
     // Empty help call with -h
-    seqan3::argument_parser parser1{"test_parser", 2, argv1};
+    sharg::argument_parser parser1{"test_parser", 2, argv1};
     test_accessor::set_terminal_width(parser1, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -113,7 +113,7 @@ TEST(help_page_printing, no_information)
 TEST(help_page_printing, with_short_copyright)
 {
     // Again, but with short copyright, long copyright, and citation.
-    seqan3::argument_parser short_copy("test_parser", 2, argv1);
+    sharg::argument_parser short_copy("test_parser", 2, argv1);
     test_accessor::set_terminal_width(short_copy, 80);
     short_copy.info.short_copyright = "short";
     testing::internal::CaptureStdout();
@@ -135,7 +135,7 @@ TEST(help_page_printing, with_short_copyright)
 
 TEST(help_page_printing, with_long_copyright)
 {
-    seqan3::argument_parser long_copy("test_parser", 2, argv1);
+    sharg::argument_parser long_copy("test_parser", 2, argv1);
     test_accessor::set_terminal_width(long_copy, 80);
     long_copy.info.long_copyright = "long";
     testing::internal::CaptureStdout();
@@ -157,7 +157,7 @@ TEST(help_page_printing, with_long_copyright)
 
 TEST(help_page_printing, with_citation)
 {
-    seqan3::argument_parser citation("test_parser", 2, argv1);
+    sharg::argument_parser citation("test_parser", 2, argv1);
     test_accessor::set_terminal_width(citation, 80);
     citation.info.citation = "citation";
     testing::internal::CaptureStdout();
@@ -179,7 +179,7 @@ TEST(help_page_printing, with_citation)
 
 TEST(help_page_printing, with_author)
 {
-    seqan3::argument_parser author("test_parser", 2, argv1);
+    sharg::argument_parser author("test_parser", 2, argv1);
     test_accessor::set_terminal_width(author, 80);
     author.info.author = "author";
     testing::internal::CaptureStdout();
@@ -201,7 +201,7 @@ TEST(help_page_printing, with_author)
 
 TEST(help_page_printing, with_email)
 {
-    seqan3::argument_parser email("test_parser", 2, argv1);
+    sharg::argument_parser email("test_parser", 2, argv1);
     test_accessor::set_terminal_width(email, 80);
     email.info.email = "email";
     testing::internal::CaptureStdout();
@@ -224,7 +224,7 @@ TEST(help_page_printing, with_email)
 TEST(help_page_printing, empty_advanced_help)
 {
     // Empty help call with -hh
-    seqan3::argument_parser parser2{"test_parser", 2, argv2};
+    sharg::argument_parser parser2{"test_parser", 2, argv2};
     test_accessor::set_terminal_width(parser2, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser2.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -241,7 +241,7 @@ TEST(help_page_printing, empty_advanced_help)
 TEST(help_page_printing, empty_version_call)
 {
     // Empty version call
-    seqan3::argument_parser parser3{"test_parser", 2, argv3};
+    sharg::argument_parser parser3{"test_parser", 2, argv3};
     test_accessor::set_terminal_width(parser3, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser3.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -256,7 +256,7 @@ TEST(help_page_printing, empty_version_call)
 TEST(help_page_printing, version_call)
 {
     // Version call with url and options.
-    seqan3::argument_parser parser4{"test_parser", 2, argv3};
+    sharg::argument_parser parser4{"test_parser", 2, argv3};
     test_accessor::set_terminal_width(parser4, 80);
     parser4.info.url = "https://seqan.de";
     parser4.add_option(option_value, 'i', "int", "this is a int option.");
@@ -278,10 +278,10 @@ TEST(help_page_printing, version_call)
 TEST(help_page_printing, do_not_print_hidden_options)
 {
     // Add an option and request help.
-    seqan3::argument_parser parser5{"test_parser", 2, argv1};
+    sharg::argument_parser parser5{"test_parser", 2, argv1};
     test_accessor::set_terminal_width(parser5, 80);
-    parser5.add_option(option_value, 'i', "int", "this is a int option.", seqan3::option_spec::hidden);
-    parser5.add_flag(flag_value, 'f', "flag", "this is a flag.", seqan3::option_spec::hidden);
+    parser5.add_option(option_value, 'i', "int", "this is a int option.", sharg::option_spec::hidden);
+    parser5.add_flag(flag_value, 'f', "flag", "this is a flag.", sharg::option_spec::hidden);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser5.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     std_cout = testing::internal::GetCapturedStdout();
@@ -299,35 +299,35 @@ TEST(help_page_printing, advanced_options)
     int32_t option_value{5};
     bool flag_value{};
 
-    auto set_up = [&option_value, &flag_value] (seqan3::argument_parser & parser)
+    auto set_up = [&option_value, &flag_value] (sharg::argument_parser & parser)
     {
         // default or required information are always displayed
-        parser.add_section("default section", seqan3::option_spec::required);
-        parser.add_subsection("default subsection", seqan3::option_spec::required); // same as DEFAULT
-        parser.add_option(option_value, 'i', "int", "this is a int option.", seqan3::option_spec::required);
-        parser.add_flag(flag_value, 'g', "goo", "this is a flag.", seqan3::option_spec::required); // same as DEFAULT
-        parser.add_list_item("-s, --some", "list item.", seqan3::option_spec::required); // same as DEFAULT
-        parser.add_line("some line.", true, seqan3::option_spec::required); // same as DEFAULT
+        parser.add_section("default section", sharg::option_spec::required);
+        parser.add_subsection("default subsection", sharg::option_spec::required); // same as DEFAULT
+        parser.add_option(option_value, 'i', "int", "this is a int option.", sharg::option_spec::required);
+        parser.add_flag(flag_value, 'g', "goo", "this is a flag.", sharg::option_spec::required); // same as DEFAULT
+        parser.add_list_item("-s, --some", "list item.", sharg::option_spec::required); // same as DEFAULT
+        parser.add_line("some line.", true, sharg::option_spec::required); // same as DEFAULT
 
         // advanced information
-        parser.add_section("advanced section", seqan3::option_spec::advanced);
-        parser.add_subsection("advanced subsection", seqan3::option_spec::advanced);
-        parser.add_option(option_value, 'j', "jnt", "this is a int option.", seqan3::option_spec::advanced);
-        parser.add_flag(flag_value, 'f', "flag", "this is a flag.", seqan3::option_spec::advanced);
-        parser.add_list_item("-s, --some", "list item.", seqan3::option_spec::advanced);
-        parser.add_line("some line.", true, seqan3::option_spec::advanced);
+        parser.add_section("advanced section", sharg::option_spec::advanced);
+        parser.add_subsection("advanced subsection", sharg::option_spec::advanced);
+        parser.add_option(option_value, 'j', "jnt", "this is a int option.", sharg::option_spec::advanced);
+        parser.add_flag(flag_value, 'f', "flag", "this is a flag.", sharg::option_spec::advanced);
+        parser.add_list_item("-s, --some", "list item.", sharg::option_spec::advanced);
+        parser.add_line("some line.", true, sharg::option_spec::advanced);
 
         // hidden information (never displayed, normally used for options not section information)
-        parser.add_section("hidden section", seqan3::option_spec::hidden);
-        parser.add_subsection("hidden subsection", seqan3::option_spec::hidden);
-        parser.add_option(option_value, 'd', "dnt", "hidden option.", seqan3::option_spec::hidden);
-        parser.add_flag(flag_value, 'l', "lflag", "hidden a flag.", seqan3::option_spec::hidden);
-        parser.add_list_item("-s, --some", "hidden list item.", seqan3::option_spec::hidden);
-        parser.add_line("hidden line.", true, seqan3::option_spec::hidden);
+        parser.add_section("hidden section", sharg::option_spec::hidden);
+        parser.add_subsection("hidden subsection", sharg::option_spec::hidden);
+        parser.add_option(option_value, 'd', "dnt", "hidden option.", sharg::option_spec::hidden);
+        parser.add_flag(flag_value, 'l', "lflag", "hidden a flag.", sharg::option_spec::hidden);
+        parser.add_list_item("-s, --some", "hidden list item.", sharg::option_spec::hidden);
+        parser.add_line("hidden line.", true, sharg::option_spec::hidden);
     };
 
     // without -hh, only the non/advanced information are shown
-    seqan3::argument_parser parser_normal_help{"test_parser", 2, argv1};
+    sharg::argument_parser parser_normal_help{"test_parser", 2, argv1};
     test_accessor::set_terminal_width(parser_normal_help, 80);
     set_up(parser_normal_help);
     testing::internal::CaptureStdout();
@@ -353,7 +353,7 @@ TEST(help_page_printing, advanced_options)
     EXPECT_EQ(std_cout, expected);
 
     // with -hh everything is shown
-    seqan3::argument_parser parser_advanced_help{"test_parser", 2, argv2};
+    sharg::argument_parser parser_advanced_help{"test_parser", 2, argv2};
     test_accessor::set_terminal_width(parser_advanced_help, 80);
     set_up(parser_advanced_help);
     testing::internal::CaptureStdout();
@@ -409,7 +409,7 @@ TEST(help_page_printing, full_information)
     foo enum_option_value{};
 
     // Add synopsis, description, short description, positional option, option, flag, and example.
-    seqan3::argument_parser parser6{"test_parser", 2, argv1};
+    sharg::argument_parser parser6{"test_parser", 2, argv1};
     test_accessor::set_terminal_width(parser6, 80);
     parser6.info.synopsis.push_back("./some_binary_name synopsis");
     parser6.info.synopsis.push_back("./some_binary_name synopsis2");
@@ -417,10 +417,10 @@ TEST(help_page_printing, full_information)
     parser6.info.description.push_back("description2");
     parser6.info.short_description = "so short";
     parser6.add_option(option_value, 'i', "int", "this is a int option.");
-    parser6.add_option(enum_option_value, 'e', "enum", "this is an enum option.", seqan3::option_spec::standard,
-                       seqan3::value_list_validator{seqan3::enumeration_names<foo> | std::views::values});
+    parser6.add_option(enum_option_value, 'e', "enum", "this is an enum option.", sharg::option_spec::standard,
+                       sharg::value_list_validator{sharg::enumeration_names<foo> | std::views::values});
     parser6.add_option(required_option, 'r', "required-int", "this is another int option.",
-                       seqan3::option_spec::required);
+                       sharg::option_spec::required);
     parser6.add_section("Flags");
     parser6.add_subsection("SubFlags");
     parser6.add_line("here come all the flags");
@@ -479,7 +479,7 @@ TEST(help_page_printing, copyright)
 {
     // Tests the --copyright call.
     const char * argvCopyright[] = {"./copyright", "--copyright"};
-    seqan3::argument_parser copyright("myApp", 2, argvCopyright);
+    sharg::argument_parser copyright("myApp", 2, argvCopyright);
 
     std::string license_string = license_text();
 
@@ -549,10 +549,10 @@ TEST(parse_test, subcommand_argument_parser)
     std::string option_value2{};
 
     const char * argv[]{"./test_parser", "-h"};
-    seqan3::argument_parser top_level_parser{"test_parser",
+    sharg::argument_parser top_level_parser{"test_parser",
                                              2,
                                              argv,
-                                             seqan3::update_notifications::on,
+                                             sharg::update_notifications::on,
                                              {"sub1", "sub2"}};
     test_accessor::set_terminal_width(top_level_parser, 80);
     top_level_parser.info.description.push_back("description");

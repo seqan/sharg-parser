@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
@@ -18,7 +18,7 @@ TEST(html_format, empty_information)
 
     // Empty html help page.
     const char * argv0[] = {"./help_add_test --version-check false", "--export-help", "html"};
-    seqan3::argument_parser parser0{"empty_options", 3, argv0};
+    sharg::argument_parser parser0{"empty_options", 3, argv0};
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser0.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     my_stdout = testing::internal::GetCapturedStdout();
@@ -53,14 +53,14 @@ TEST(html_format, empty_information)
                            "<br>\n"
                            "<strong>empty_options version: </strong>\n"
                            "<br>\n"
-                           "<strong>SeqAn version: </strong>" + std::string{seqan3::seqan3_version_cstring} + "\n"
+                           "<strong>SeqAn version: </strong>" + std::string{sharg::sharg_version_cstring} + "\n"
                            "<br>\n"
                            "</p>\n"
                            "</body></html>");
     EXPECT_EQ(my_stdout, expected);
 
     const char * argv1[] = {"./help_add_test --version-check false", "--export-help=html"};
-    seqan3::argument_parser parser1{"empty_options", 2, argv1};
+    sharg::argument_parser parser1{"empty_options", 2, argv1};
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     my_stdout = testing::internal::GetCapturedStdout();
@@ -78,7 +78,7 @@ TEST(html_format, full_information_information)
 
    // Full html help page.
    const char * argv0[] = {"./help_add_test --version-check false", "--export-help", "html"};
-   seqan3::argument_parser parser1{"program_full_options", 3, argv0};
+   sharg::argument_parser parser1{"program_full_options", 3, argv0};
    parser1.info.synopsis.push_back("./some_binary_name synopsis");
    parser1.info.synopsis.push_back("./some_binary_name synopsis2");
    parser1.info.description.push_back("description");
@@ -91,7 +91,7 @@ TEST(html_format, full_information_information)
    parser1.info.author = "author";
    parser1.info.email = "email";
    parser1.add_option(option_value, 'i', "int", "this is a int option.");
-   parser1.add_option(option_value, 'j', "jint", "this is a required int option.", seqan3::option_spec::required);
+   parser1.add_option(option_value, 'j', "jint", "this is a required int option.", sharg::option_spec::required);
    parser1.add_flag(flag_value, 'f', "flag", "this is a flag.");
    parser1.add_flag(flag_value, 'k', "kflag", "this is a flag.");
    parser1.add_positional_option(non_list_pos_opt_value, "this is a positional option.");
@@ -169,7 +169,7 @@ TEST(html_format, full_information_information)
                           "<br>\n"
                           "<strong>program_full_options version: </strong>\n"
                           "<br>\n"
-                          "<strong>SeqAn version: </strong>" + std::string{seqan3::seqan3_version_cstring} + "\n"
+                          "<strong>SeqAn version: </strong>" + std::string{sharg::sharg_version_cstring} + "\n"
                           "<br>\n"
                           "</p>\n"
                           "<h2>Url</h2>\n"
@@ -203,11 +203,11 @@ TEST(export_help, parse_error)
     const char * argv3[] = {"./help_add_test --version-check false", "--export-help", "atml"};
 
     // no value after --export-help
-    EXPECT_THROW((seqan3::argument_parser{"test_parser", 2, argv}), seqan3::argument_parser_error);
+    EXPECT_THROW((sharg::argument_parser{"test_parser", 2, argv}), sharg::argument_parser_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((seqan3::argument_parser{"test_parser", 2, argv2}), seqan3::validation_error);
+    EXPECT_THROW((sharg::argument_parser{"test_parser", 2, argv2}), sharg::validation_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((seqan3::argument_parser{"test_parser", 3, argv3}), seqan3::validation_error);
+    EXPECT_THROW((sharg::argument_parser{"test_parser", 3, argv3}), sharg::validation_error);
 }

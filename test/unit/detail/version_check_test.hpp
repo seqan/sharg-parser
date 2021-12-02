@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
@@ -23,14 +23,14 @@ namespace seqan3::detail
 {
 struct test_accessor
 {
-    static auto & version_check_future(seqan3::argument_parser & parser)
+    static auto & version_check_future(sharg::argument_parser & parser)
     {
         return parser.version_check_future;
     }
 };
 } // seqan3::detail
 
-bool wait_for(seqan3::argument_parser & parser)
+bool wait_for(sharg::argument_parser & parser)
 {
     auto & future = seqan3::detail::test_accessor::version_check_future(parser);
 
@@ -55,10 +55,10 @@ struct version_check : public ::testing::Test
         using namespace std::string_literals;
         auto tmp_directory = tmp_file.get_path().parent_path();
 
-        int result = setenv(seqan3::detail::version_checker::home_env_name, tmp_directory.c_str(), 1);
+        int result = setenv(sharg::detail::version_checker::home_env_name, tmp_directory.c_str(), 1);
         if (result != 0)
             throw std::runtime_error{"Couldn't set environment variable 'home_env_name' (="s +
-                                     seqan3::detail::version_checker::home_env_name + ")"s};
+                                     sharg::detail::version_checker::home_env_name + ")"s};
 
         auto is_prefix_path = [](std::string const & base_path, std::string const & path)
         {
@@ -82,7 +82,7 @@ struct version_check : public ::testing::Test
 
     std::filesystem::path app_tmp_path()
     {
-        return seqan3::detail::version_checker::get_path();
+        return sharg::detail::version_checker::get_path();
     }
 
     std::filesystem::path app_version_filename()
@@ -92,7 +92,7 @@ struct version_check : public ::testing::Test
 
     std::filesystem::path app_timestamp_filename()
     {
-        return seqan3::detail::version_checker{app_name, std::string{}}.timestamp_filename;
+        return sharg::detail::version_checker{app_name, std::string{}}.timestamp_filename;
     }
 
     std::chrono::duration<long int>::rep current_unix_timestamp()
@@ -107,15 +107,15 @@ struct version_check : public ::testing::Test
     {
         // make sure that the environment variable is not set
         std::string previous_value{};
-        if (char * env = std::getenv("SEQAN3_NO_VERSION_CHECK"))
+        if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
         {
             previous_value = env;
-            unsetenv("SEQAN3_NO_VERSION_CHECK");
+            unsetenv("SHARG_NO_VERSION_CHECK");
         }
 
         bool app_call_succeeded{false};
 
-        seqan3::argument_parser parser{app_name, argc, argv};
+        sharg::argument_parser parser{app_name, argc, argv};
         parser.info.version = "2.3.4";
 
         // In case we don't want to specify --version-check but avoid that short help format will be set (no arguments)
@@ -133,7 +133,7 @@ struct version_check : public ::testing::Test
         app_call_succeeded = wait_for(parser);
 
         if (!previous_value.empty())
-            setenv("SEQAN3_NO_VERSION_CHECK", previous_value.c_str(), 1);
+            setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
 
         return {out, err, app_call_succeeded};
     }
@@ -228,7 +228,7 @@ TEST_F(version_check, option_on)
 }
 
 // Note that we cannot test interactiveness because google test captures std::cin and thus
-// seqan3::detail::is_terminal() is always false
+// sharg::detail::is_terminal() is always false
 TEST_F(version_check, option_implicitely_on)
 {
     const char * argv[2] = {app_name.c_str(), "-f"};
@@ -281,14 +281,14 @@ TEST_F(version_check, environment_variable_set)
 {
     // store variable for resetting it
     std::string previous_value{};
-    if (char * env = std::getenv("SEQAN3_NO_VERSION_CHECK"))
+    if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
         previous_value = env;
 
-    setenv("SEQAN3_NO_VERSION_CHECK", "foo", 1);
+    setenv("SHARG_NO_VERSION_CHECK", "foo", 1);
 
     const char * argv[2] = {app_name.c_str(), "-f"};
 
-    seqan3::argument_parser parser{app_name, 2, argv};
+    sharg::argument_parser parser{app_name, 2, argv};
     parser.info.version = "2.3.4";
     bool dummy{};
     parser.add_flag(dummy, 'f', "dummy-flag", "A dummy flag.");
@@ -311,9 +311,9 @@ TEST_F(version_check, environment_variable_set)
     EXPECT_FALSE(std::filesystem::exists(app_version_filename()));
 
     if (previous_value.empty())
-        unsetenv("SEQAN3_NO_VERSION_CHECK");
+        unsetenv("SHARG_NO_VERSION_CHECK");
     else
-        setenv("SEQAN3_NO_VERSION_CHECK", previous_value.c_str(), 1);
+        setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
@@ -337,13 +337,13 @@ TEST_F(version_check, option_off)
     const char * argv2[4] = {app_name.c_str(), "-h", OPTION_VERSION_CHECK, OPTION_OFF};
 
     std::string previous_value{};
-    if (char * env = std::getenv("SEQAN3_NO_VERSION_CHECK"))
+    if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
     {
         previous_value = env;
-        unsetenv("SEQAN3_NO_VERSION_CHECK");
+        unsetenv("SHARG_NO_VERSION_CHECK");
     }
 
-    seqan3::argument_parser parser{app_name, 4, argv2};
+    sharg::argument_parser parser{app_name, 4, argv2};
     parser.info.version = "2.3.4";
 
     EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -353,7 +353,7 @@ TEST_F(version_check, option_off)
     EXPECT_FALSE(wait_for(parser));
 
     if (!previous_value.empty())
-        setenv("SEQAN3_NO_VERSION_CHECK", previous_value.c_str(), 1);
+        setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
 
     // no timestamp is written since the decision was made explicitly
     EXPECT_FALSE(std::filesystem::exists(app_version_filename())) << app_version_filename();
@@ -377,7 +377,7 @@ TEST_F(version_check, smaller_seqan3_version)
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
-    EXPECT_EQ(err, seqan3::detail::version_checker::message_seqan3_update);
+    EXPECT_EQ(err, sharg::detail::version_checker::message_seqan3_update);
 
     EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
 
@@ -390,7 +390,7 @@ TEST_F(version_check, greater_app_version)
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
     // create version file with equal seqan version and a smaller app version than the current
-    ASSERT_TRUE(create_file(app_version_filename(), std::string{"1.5.9\n"} + seqan3::seqan3_version_cstring));
+    ASSERT_TRUE(create_file(app_version_filename(), std::string{"1.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401)); // one day = 86400 seconds
@@ -399,7 +399,7 @@ TEST_F(version_check, greater_app_version)
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
-    EXPECT_EQ(err, seqan3::detail::version_checker::message_registered_app_update);
+    EXPECT_EQ(err, sharg::detail::version_checker::message_registered_app_update);
 
     EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
 
@@ -411,7 +411,7 @@ TEST_F(version_check, unregistered_app)
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
     // create version file with equal seqan version and a smaller app version than the current
-    ASSERT_TRUE(create_file(app_version_filename(), std::string{"UNREGISTERED_APP\n"} + seqan3::seqan3_version_cstring));
+    ASSERT_TRUE(create_file(app_version_filename(), std::string{"UNREGISTERED_APP\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401)); // one day = 86400 seconds
@@ -420,7 +420,7 @@ TEST_F(version_check, unregistered_app)
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
-    EXPECT_EQ(err, seqan3::detail::version_checker::message_unregistered_app);
+    EXPECT_EQ(err, sharg::detail::version_checker::message_unregistered_app);
 
     EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
 
@@ -435,7 +435,7 @@ TEST_F(version_check, smaller_app_version)
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
     // create version file with equal seqan version and a greater app version than the current
-    ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + seqan3::seqan3_version_cstring));
+    ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
@@ -444,7 +444,7 @@ TEST_F(version_check, smaller_app_version)
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
-    EXPECT_EQ(err, (seqan3::detail::version_checker{app_name, "2.3.4"}.message_app_update));
+    EXPECT_EQ(err, (sharg::detail::version_checker{app_name, "2.3.4"}.message_app_update));
 
     EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
 
@@ -454,21 +454,21 @@ TEST_F(version_check, smaller_app_version)
 TEST_F(version_check, smaller_app_version_custom_url)
 {
     std::string previous_value{};
-    if (char * env = std::getenv("SEQAN3_NO_VERSION_CHECK"))
+    if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
     {
         previous_value = env;
-        unsetenv("SEQAN3_NO_VERSION_CHECK");
+        unsetenv("SHARG_NO_VERSION_CHECK");
     }
 
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
     // create version file with equal seqan version and a greater app version than the current
-    ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + seqan3::seqan3_version_cstring));
+    ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    seqan3::argument_parser parser{app_name, 3, argv};
+    sharg::argument_parser parser{app_name, 3, argv};
     parser.info.version = "2.3.4";
     parser.info.url = "https//foo.de";
 
@@ -484,12 +484,12 @@ TEST_F(version_check, smaller_app_version_custom_url)
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err,
-              (seqan3::detail::version_checker{app_name, parser.info.version, parser.info.url}.message_app_update));
+              (sharg::detail::version_checker{app_name, parser.info.version, parser.info.url}.message_app_update));
 
     EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
 
     if (!previous_value.empty())
-        setenv("SEQAN3_NO_VERSION_CHECK", previous_value.c_str(), 1);
+        setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
