@@ -25,7 +25,7 @@
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/terminal.hpp>
 #include <seqan3/io/detail/safe_filesystem_entry.hpp>
-#include <seqan3/version.hpp>
+#include <sharg/version.hpp>
 
 namespace sharg::detail
 {

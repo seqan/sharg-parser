@@ -24,7 +24,7 @@
 #include <sharg/exceptions.hpp>
 #include <sharg/validators.hpp>
 #include <seqan3/utility/detail/type_name_as_string.hpp>
-#include <seqan3/version.hpp>
+#include <sharg/version.hpp>
 
 namespace sharg::detail
 {
