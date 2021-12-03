@@ -12,14 +12,7 @@
 
 #pragma once
 
-#include <future>
-#include <iostream>
 #include <set>
-#include <sstream>
-#include <string>
-#include <variant>
-#include <vector>
-#include <regex>
 
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/detail/test_accessor.hpp>

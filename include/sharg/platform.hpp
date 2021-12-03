@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include <cinttypes>
-#include <ciso646> // makes _LIBCPP_VERSION available
-#include <cstddef> // makes __GLIBCXX__ available
-
 /*!\file
  * \brief Provides platform and dependency checks.
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>

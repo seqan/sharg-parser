@@ -14,9 +14,6 @@
 
 #pragma once
 
-#include <cassert>
-#include <iostream>
-
 #include <seqan3/core/detail/test_accessor.hpp>
 
 #include <sharg/detail/format_base.hpp>

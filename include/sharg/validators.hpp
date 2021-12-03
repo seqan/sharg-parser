@@ -12,10 +12,8 @@
 
 #pragma once
 
-#include <filesystem>
 #include <fstream>
 #include <regex>
-#include <sstream>
 
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/debug_stream/range.hpp>
