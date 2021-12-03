@@ -21,15 +21,15 @@
 #include <vector>
 #include <regex>
 
-// #include <sharg/detail/format_ctd.hpp>
+#include <seqan3/core/debug_stream/detail/to_string.hpp>
+#include <seqan3/core/detail/test_accessor.hpp>
+
 #include <sharg/detail/format_help.hpp>
 #include <sharg/detail/format_html.hpp>
 #include <sharg/detail/format_man.hpp>
 #include <sharg/detail/format_parse.hpp>
 #include <sharg/detail/terminal.hpp>
 #include <sharg/detail/version_check.hpp>
-#include <seqan3/core/debug_stream/detail/to_string.hpp>
-#include <seqan3/core/detail/test_accessor.hpp>
 
 namespace sharg
 {

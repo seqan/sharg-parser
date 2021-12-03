@@ -14,7 +14,6 @@
 
 #include <sys/stat.h>
 
-#include <seqan3/std/charconv>
 #include <chrono>
 #include <fstream>
 #include <future>
@@ -22,9 +21,11 @@
 #include <optional>
 #include <regex>
 
+#include <seqan3/io/detail/safe_filesystem_entry.hpp>
+#include <seqan3/std/charconv>
+
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/terminal.hpp>
-#include <seqan3/io/detail/safe_filesystem_entry.hpp>
 #include <sharg/version.hpp>
 
 namespace sharg::detail

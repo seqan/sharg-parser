@@ -12,14 +12,15 @@
 
 #pragma once
 
-#include <seqan3/std/charconv>
-#include <seqan3/std/concepts>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include <sharg/detail/format_base.hpp>
+#include <seqan3/std/charconv>
+#include <seqan3/std/concepts>
 #include <seqan3/utility/char_operations/predicate.hpp>
+
+#include <sharg/detail/format_base.hpp>
 
 namespace sharg::detail
 {

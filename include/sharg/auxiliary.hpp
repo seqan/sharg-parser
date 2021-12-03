@@ -12,15 +12,15 @@
 
 #pragma once
 
-#include <seqan3/std/concepts>
 #include <sstream>
-#include <seqan3/std/type_traits>
 #include <unordered_map>
 #include <vector>
 
 #include <seqan3/core/debug_stream/debug_stream_type.hpp>
 #include <seqan3/core/detail/customisation_point.hpp>
 #include <seqan3/io/stream/concept.hpp>
+#include <seqan3/std/concepts>
+#include <seqan3/std/type_traits>
 
 namespace sharg::custom
 {
