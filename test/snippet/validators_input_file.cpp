@@ -1,6 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
-#include <seqan3/std/filesystem>
 
 int main(int argc, const char ** argv)
 {
@@ -25,6 +23,6 @@ int main(int argc, const char ** argv)
         return -1;
     }
 
-    seqan3::debug_stream << "filename given by user passed validation: " << myfile << "\n";
+    std::cerr << "filename given by user passed validation: " << myfile << "\n";
     return 0;
 }

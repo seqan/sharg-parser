@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
 
 int main(int argc, char ** argv)
 {
@@ -19,10 +18,10 @@ int main(int argc, char ** argv)
     }
 
     if (myparser.is_option_set('a'))
-        seqan3::debug_stream << "The user set option -a on the command line.\n";
+        std::cerr << "The user set option -a on the command line.\n";
 
     if (myparser.is_option_set("awesome-parameter"))
-        seqan3::debug_stream << "The user set option --awesome-parameter on the command line.\n";
+        std::cerr << "The user set option --awesome-parameter on the command line.\n";
 
     // Asking for an option identifier that was not used before throws an error:
     // myparser.is_option_set("foo"); // throws sharg::design_error

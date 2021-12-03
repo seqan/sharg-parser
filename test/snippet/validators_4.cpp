@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
 
 int main(int argc, const char ** argv)
 {
@@ -25,6 +24,6 @@ int main(int argc, const char ** argv)
         return -1;
     }
 
-    seqan3::debug_stream << "email address given by user passed validation: " << my_string << "\n";
+    std::cerr << "email address given by user passed validation: " << my_string << "\n";
     return 0;
 }
