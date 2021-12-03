@@ -1,5 +1,4 @@
 #include <sharg/all.hpp> // includes all necessary headers
-#include <seqan3/core/debug_stream.hpp>   // our custom output stream
 
 void initialise_argument_parser(sharg::argument_parser & parser)
 {
