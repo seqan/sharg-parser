@@ -13,8 +13,6 @@
 #pragma once
 
 #include <sharg/detail/format_base.hpp>
-#include <sharg/detail/terminal.hpp>
-#include <sharg/version.hpp>
 
 namespace sharg::detail
 {

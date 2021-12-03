@@ -20,7 +20,6 @@
 #include <sharg/detail/format_html.hpp>
 #include <sharg/detail/format_man.hpp>
 #include <sharg/detail/format_parse.hpp>
-#include <sharg/detail/terminal.hpp>
 #include <sharg/detail/version_check.hpp>
 
 namespace sharg

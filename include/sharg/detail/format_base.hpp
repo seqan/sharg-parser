@@ -18,9 +18,7 @@
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/concept.hpp>
-#include <sharg/exceptions.hpp>
 #include <sharg/validators.hpp>
-#include <sharg/version.hpp>
 
 namespace sharg::detail
 {

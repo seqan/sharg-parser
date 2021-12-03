@@ -23,7 +23,6 @@
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/terminal.hpp>
-#include <sharg/version.hpp>
 
 namespace sharg::detail
 {
