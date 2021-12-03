@@ -7,13 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <stdlib.h>
+#include <seqan3/test/tmp_filename.hpp>
 
 #include <sharg/argument_parser.hpp>
-#include <seqan3/test/tmp_filename.hpp>
 
 //------------------------------------------------------------------------------
 // test fixtures

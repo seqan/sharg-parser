@@ -9,6 +9,4 @@
     #define NDEBUG // test in release mode
 #endif
 
-#include <string>
-
 #include "version_check_test.hpp"

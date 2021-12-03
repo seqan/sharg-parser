@@ -5,13 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------------
 
-#include <fstream>
-#include <seqan3/std/ranges>
-
 #include <gtest/gtest.h>
 
 #include <sharg/argument_parser.hpp>
-#include <sharg/detail/format_help.hpp>
 
 // reused global variables
 std::string std_cout;

@@ -7,13 +7,10 @@
 
 #include <gtest/gtest.h>
 
-#include <seqan3/std/filesystem>
-#include <fstream>
-#include <seqan3/std/ranges>
-
-#include <sharg/argument_parser.hpp>
 #include <seqan3/test/file_access.hpp>
 #include <seqan3/test/tmp_filename.hpp>
+
+#include <sharg/argument_parser.hpp>
 
 struct dummy_file
 {

@@ -5,13 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------------
 
-#include <string>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include <sharg/argument_parser.hpp>
-#include <sharg/detail/format_man.hpp>
 
 // Reused global variables
 struct format_man_test : public ::testing::Test

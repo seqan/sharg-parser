@@ -9,6 +9,4 @@
     #undef NDEBUG // test in debug mode
 #endif
 
-#include <string>
-
 #include "version_check_test.hpp"

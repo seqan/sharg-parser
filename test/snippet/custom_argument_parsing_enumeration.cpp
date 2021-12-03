@@ -1,7 +1,6 @@
 #include <system_error>
 
 #include <sharg/all.hpp>
-#include <seqan3/std/ranges>
 
 namespace sharg::custom
 {
