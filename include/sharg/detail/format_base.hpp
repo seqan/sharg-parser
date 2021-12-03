@@ -14,6 +14,7 @@
 #pragma once
 
 #include <seqan3/utility/detail/type_name_as_string.hpp>
+#include <seqan3/utility/type_list/traits.hpp>
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/concept.hpp>

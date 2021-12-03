@@ -15,7 +15,6 @@
 #include <set>
 
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
-#include <seqan3/core/detail/test_accessor.hpp>
 
 #include <sharg/detail/format_help.hpp>
 #include <sharg/detail/format_html.hpp>

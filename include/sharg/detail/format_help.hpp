@@ -14,10 +14,15 @@
 
 #pragma once
 
-#include <seqan3/core/detail/test_accessor.hpp>
-
 #include <sharg/detail/format_base.hpp>
 #include <sharg/detail/terminal.hpp>
+
+namespace seqan3::detail
+{
+
+struct test_accessor;
+
+} // seqan3::detail
 
 namespace sharg::detail
 {
