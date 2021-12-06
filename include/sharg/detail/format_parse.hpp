@@ -153,7 +153,7 @@ public:
         if constexpr (std::same_as<std::remove_cvref_t<id_type>, std::string>)
             return id.empty();
         else // char
-            return seqan3::is_char<'\0'>(id);
+            return id == '\0';
     }
 
     /*!\brief Finds the position of a short/long identifier in format_parse::argv.
