@@ -1,6 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
-#include <seqan3/std/filesystem>
 
 int main(int argc, const char ** argv)
 {
@@ -26,6 +24,6 @@ int main(int argc, const char ** argv)
         return -1;
     }
 
-    seqan3::debug_stream << "directory given by user passed validation: " << mydir << "\n";
+    std::cerr << "directory given by user passed validation: " << mydir << "\n";
     return 0;
 }

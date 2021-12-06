@@ -1,11 +1,5 @@
 //![program]
-#include <seqan3/std/charconv>            // includes std::from_chars
-#include <filesystem>                     // use std::filesystem::path
-#include <fstream>
-#include <numeric>
-
 #include <sharg/all.hpp> // includes all necessary headers
-#include <seqan3/core/debug_stream.hpp>   // our custom output stream
 
 // This is the program!
 // Take a look at it if you are interested in an example of parsing a data file.
@@ -20,7 +14,7 @@ number_type to_number(range_type && range)
 
     if (res.ec != std::errc{})
     {
-        seqan3::debug_stream << "Could not cast '" << range << "' to a valid number\n";
+        std::cerr << "Could not cast '" << str << "' to a valid number\n";
         throw std::invalid_argument{"CAST ERROR"};
     }
     return num;
@@ -48,16 +42,16 @@ void run_program(std::filesystem::path & path, uint32_t yr, std::string & aggr_b
         }
 
         if (aggr_by == "median")
-            seqan3::debug_stream << ([&v] () { std::sort(v.begin(), v.end()); return v[v.size()/2]; })() << '\n';
+            std::cerr << ([&v] () { std::sort(v.begin(), v.end()); return v[v.size()/2]; })() << '\n';
         else if (aggr_by == "mean")
-            seqan3::debug_stream << ([&v] () { double sum{}; for (auto i : v) sum += i; return sum / v.size(); })()
+            std::cerr << ([&v] () { double sum{}; for (auto i : v) sum += i; return sum / v.size(); })()
                                  << '\n';
         else
-            seqan3::debug_stream << "I do not know the aggregation method " << aggr_by << '\n';
+            std::cerr << "I do not know the aggregation method " << aggr_by << '\n';
     }
     else
     {
-        seqan3::debug_stream << "Error: Cannot open file for reading.\n";
+        std::cerr << "Error: Cannot open file for reading.\n";
     }
 }
 // -----------------------------------------------------------------------------
@@ -102,7 +96,7 @@ int main(int argc, char ** argv)
     }
     catch (sharg::argument_parser_error const & ext)                     // catch user errors
     {
-        seqan3::debug_stream << "[Winter has come] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
         return -1;
     }
 

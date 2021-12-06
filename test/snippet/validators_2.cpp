@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
 
 int main(int argc, const char ** argv)
 {
@@ -25,6 +24,6 @@ int main(int argc, const char ** argv)
         return -1;
     }
 
-    seqan3::debug_stream << "integer given by user passed validation: " << myint << "\n";
+    std::cerr << "integer given by user passed validation: " << myint << "\n";
     return 0;
 }

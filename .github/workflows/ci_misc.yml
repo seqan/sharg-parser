@@ -42,6 +42,33 @@ jobs:
             skip_build_tests: false
             skip_run_tests: false
 
+          - name: "Header gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build: header
+            build_type: Debug
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.10.3
+            requires_toolchain: true
+            requires_ccache: true
+            skip_build_tests: false
+            skip_run_tests: false
+
+          - name: "Header gcc9"
+            cxx: "g++-9"
+            cc: "gcc-9"
+            build: header
+            build_type: Debug
+            build_threads: 2
+            test_threads: 2
+            cxx_flags: "-std=c++2a"
+            cmake: 3.10.3
+            requires_toolchain: true
+            requires_ccache: true
+            skip_build_tests: false
+            skip_run_tests: false
+
           - name: "Documentation"
             build: documentation
             build_threads: 2
@@ -127,6 +154,7 @@ jobs:
                                                   -DSHARG_VERBOSE_TESTS=OFF
           case "${{ matrix.build }}" in
             snippet) make -j${{ matrix.build_threads }} gtest_build;;
+            header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build;;
             documentation) make -j${{ matrix.build_threads }} download-cppreference-doxygen-web-tag;;
           esac
 

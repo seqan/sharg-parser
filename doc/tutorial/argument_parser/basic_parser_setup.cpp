@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>   // includes all necessary headers
-#include <seqan3/core/debug_stream.hpp>     // our custom output stream
 
 int main(int argc, char ** argv)
 {
@@ -13,7 +12,7 @@ int main(int argc, char ** argv)
     }
     catch (sharg::argument_parser_error const & ext)                     // catch user errors
     {
-        seqan3::debug_stream << "[Winter has come] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
         return -1;
     }
 }

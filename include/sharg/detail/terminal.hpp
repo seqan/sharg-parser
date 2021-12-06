@@ -73,4 +73,4 @@ inline unsigned get_terminal_width()
 #endif
 }
 
-}  // namespace seqan::detail
+}  // namespace sharg::detail

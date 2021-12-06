@@ -1,11 +1,10 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
 
 void run_program(std::filesystem::path const & reference_path,
                  std::filesystem::path const & index_path)
 {
-    seqan3::debug_stream << "reference_file_path: " << reference_path << '\n';
-    seqan3::debug_stream << "index_path           " << index_path << '\n';
+    std::cerr << "reference_file_path: " << reference_path << '\n';
+    std::cerr << "index_path           " << index_path << '\n';
 }
 
 struct cmd_arguments

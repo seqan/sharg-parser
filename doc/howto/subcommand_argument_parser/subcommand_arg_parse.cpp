@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
 
 // =====================================================================================================================
 // pull
@@ -25,11 +24,11 @@ int run_git_pull(sharg::argument_parser & parser)
     }
     catch (sharg::argument_parser_error const & ext)
     {
-        seqan3::debug_stream << "[Error git pull] " << ext.what() << "\n";
+        std::cerr << "[Error git pull] " << ext.what() << "\n";
         return -1;
     }
 
-    seqan3::debug_stream << "Git pull with repository " << args.repository << " and branch " << args.branch << '\n';
+    std::cerr << "Git pull with repository " << args.repository << " and branch " << args.branch << '\n';
 
     return 0;
 }
@@ -58,11 +57,14 @@ int run_git_push(sharg::argument_parser & parser)
     }
     catch (sharg::argument_parser_error const & ext)
     {
-        seqan3::debug_stream << "[Error git push] " << ext.what() << "\n";
+        std::cerr << "[Error git push] " << ext.what() << "\n";
         return -1;
     }
 
-    seqan3::debug_stream << "Git push with repository " << args.repository << " and branches " << args.branches << '\n';
+    std::cerr << "Git push with repository " << args.repository << " and branches ";
+    for (auto && branch : args.branches)
+        std::cerr << branch << ' ';
+    std::cerr << '\n';
 
     return 0;
 }
@@ -93,7 +95,7 @@ int main(int argc, char const ** argv)
     }
     catch (sharg::argument_parser_error const & ext) // catch user errors
     {
-        seqan3::debug_stream << "[Error] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Error] " << ext.what() << "\n"; // customise your error message
         return -1;
     }
 

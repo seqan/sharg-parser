@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/core/debug_stream.hpp>
 
 int main(int argc, char ** argv)
 {
@@ -32,7 +31,7 @@ int main(int argc, char ** argv)
 
     avg = avg / grades.size();
 
-    seqan3::debug_stream << name << " has an average grade of " << avg << '\n';
+    std::cerr << name << " has an average grade of " << avg << '\n';
 
     return 0;
 }

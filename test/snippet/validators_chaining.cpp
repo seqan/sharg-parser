@@ -1,5 +1,4 @@
 #include <sharg/all.hpp>
-#include <seqan3/std/filesystem>
 
 int main(int argc, const char ** argv)
 {

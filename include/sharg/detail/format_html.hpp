@@ -12,11 +12,7 @@
 
 #pragma once
 
-#include <iostream>
-
 #include <sharg/detail/format_base.hpp>
-#include <sharg/detail/terminal.hpp>
-#include <seqan3/version.hpp>
 
 namespace sharg::detail
 {
