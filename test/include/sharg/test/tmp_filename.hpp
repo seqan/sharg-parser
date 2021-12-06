@@ -11,7 +11,7 @@
  *        Define some helper classes and functions for the tests that would be misplaced in the seqan3/include
  *        directory.
  */
- 
+
 #pragma once
 
 // Add support for Windows platforms, when we support it.
