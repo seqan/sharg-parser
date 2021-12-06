@@ -18,9 +18,9 @@
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/debug_stream/range.hpp>
 #include <seqan3/io/detail/misc.hpp>
-#include <seqan3/io/detail/safe_filesystem_entry.hpp>
 #include <seqan3/utility/views/join_with.hpp>
 
+#include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/exceptions.hpp>
 
 namespace sharg
@@ -393,7 +393,7 @@ protected:
     void validate_writeability(std::filesystem::path const & path) const
     {
         std::ofstream file{path};
-        seqan3::detail::safe_filesystem_entry file_guard{path};
+        sharg::detail::safe_filesystem_entry file_guard{path};
 
         bool is_open = file.is_open();
         bool is_good = file.good();
@@ -830,7 +830,7 @@ public:
         {
             if (!dir_exists)
             {
-                seqan3::detail::safe_filesystem_entry dir_guard{dir};
+                sharg::detail::safe_filesystem_entry dir_guard{dir};
                 validate_writeability(dir / "dummy.txt");
                 dir_guard.remove_all();
             }

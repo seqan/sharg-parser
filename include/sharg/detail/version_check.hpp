@@ -18,10 +18,10 @@
 #include <optional>
 #include <regex>
 
-#include <seqan3/io/detail/safe_filesystem_entry.hpp>
 #include <seqan3/std/charconv>
 
 #include <sharg/auxiliary.hpp>
+#include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/detail/terminal.hpp>
 
 namespace sharg::detail
@@ -250,7 +250,7 @@ public:
         // check if files can be written inside dir
         path dummy = tmp_path / "dummy.txt";
         std::ofstream file{dummy};
-        seqan3::detail::safe_filesystem_entry file_guard{dummy};
+        sharg::detail::safe_filesystem_entry file_guard{dummy};
 
         bool is_open = file.is_open();
         bool is_good = file.good();
