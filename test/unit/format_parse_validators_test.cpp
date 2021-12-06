@@ -8,9 +8,9 @@
 #include <gtest/gtest.h>
 
 #include <seqan3/test/file_access.hpp>
-#include <seqan3/test/tmp_filename.hpp>
 
 #include <sharg/argument_parser.hpp>
+#include <sharg/test/tmp_filename.hpp>
 
 struct dummy_file
 {
@@ -87,10 +87,10 @@ TEST(validator_test, fullfill_concept)
 
 TEST(validator_test, input_file)
 {
-    seqan3::test::tmp_filename tmp_name{"testbox.fasta"};
-    seqan3::test::tmp_filename tmp_name_2{"testbox_2.fasta"};
-    seqan3::test::tmp_filename tmp_name_hidden{".testbox.fasta"};
-    seqan3::test::tmp_filename tmp_name_multiple{"testbox.fasta.txt"};
+    sharg::test::tmp_filename tmp_name{"testbox.fasta"};
+    sharg::test::tmp_filename tmp_name_2{"testbox_2.fasta"};
+    sharg::test::tmp_filename tmp_name_hidden{".testbox.fasta"};
+    sharg::test::tmp_filename tmp_name_multiple{"testbox.fasta.txt"};
 
     std::vector formats{std::string{"fa"}, std::string{"sam"}, std::string{"fasta"}, std::string{"fasta.txt"}};
 
@@ -210,13 +210,13 @@ TEST(validator_test, input_file_ext_from_file)
 
 TEST(validator_test, output_file)
 {
-    seqan3::test::tmp_filename tmp_name{"testbox.fasta"};
+    sharg::test::tmp_filename tmp_name{"testbox.fasta"};
     std::filesystem::path not_existing_path{tmp_name.get_path()};
-    seqan3::test::tmp_filename tmp_name_2{"testbox_2.fasta"};
+    sharg::test::tmp_filename tmp_name_2{"testbox_2.fasta"};
     std::ofstream tmp_file_2(tmp_name_2.get_path());    // create file
     std::filesystem::path existing_path{tmp_name_2.get_path()};
-    seqan3::test::tmp_filename tmp_name_3{"testbox_3.fa"};
-    seqan3::test::tmp_filename hidden_name{".testbox.fasta"};
+    sharg::test::tmp_filename tmp_name_3{"testbox_3.fa"};
+    sharg::test::tmp_filename hidden_name{".testbox.fasta"};
 
     std::vector formats{std::string{"fa"}, std::string{"sam"}, std::string{"fasta"}, std::string{"fasta.txt"}};
 
@@ -389,7 +389,7 @@ TEST(validator_test, output_file_ext_from_file)
 
 TEST(validator_test, input_directory)
 {
-    seqan3::test::tmp_filename tmp_name{"testbox.fasta"};
+    sharg::test::tmp_filename tmp_name{"testbox.fasta"};
 
     { // directory
 
@@ -450,7 +450,7 @@ TEST(validator_test, input_directory)
 
 TEST(validator_test, output_directory)
 {
-    seqan3::test::tmp_filename tmp_name{"testbox.fasta"};
+    sharg::test::tmp_filename tmp_name{"testbox.fasta"};
 
     { // read directory
         std::filesystem::path p = tmp_name.get_path();
@@ -475,7 +475,7 @@ TEST(validator_test, output_directory)
     }
 
     { // Parent path exists and is writable.
-        seqan3::test::tmp_filename tmp_child_name{"dir/child_dir"};
+        sharg::test::tmp_filename tmp_child_name{"dir/child_dir"};
         std::filesystem::path tmp_child_dir{tmp_child_name.get_path()};
         std::filesystem::path tmp_parent_path{tmp_child_dir.parent_path()};
 
@@ -513,7 +513,7 @@ TEST(validator_test, output_directory)
 
 TEST(validator_test, inputfile_not_readable)
 {
-    seqan3::test::tmp_filename tmp_name{"my_file.test"};
+    sharg::test::tmp_filename tmp_name{"my_file.test"};
     std::filesystem::path tmp_file{tmp_name.get_path()};
     std::ofstream str{tmp_name.get_path()};
 
@@ -537,7 +537,7 @@ TEST(validator_test, inputfile_not_readable)
 
 TEST(validator_test, inputfile_not_regular)
 {
-    seqan3::test::tmp_filename tmp{"my_file.test"};
+    sharg::test::tmp_filename tmp{"my_file.test"};
     std::filesystem::path filename = tmp.get_path();
     mkfifo(filename.c_str(), 0644);
 
@@ -546,7 +546,7 @@ TEST(validator_test, inputfile_not_regular)
 
 TEST(validator_test, inputdir_not_existing)
 {
-    seqan3::test::tmp_filename tmp_name{"dir"};
+    sharg::test::tmp_filename tmp_name{"dir"};
     std::filesystem::path not_existing_dir{tmp_name.get_path()};
 
     EXPECT_THROW(sharg::input_directory_validator{}(not_existing_dir), sharg::validation_error);
@@ -554,7 +554,7 @@ TEST(validator_test, inputdir_not_existing)
 
 TEST(validator_test, inputdir_not_readable)
 {
-    seqan3::test::tmp_filename tmp_name{"dir"};
+    sharg::test::tmp_filename tmp_name{"dir"};
     std::filesystem::path tmp_dir{tmp_name.get_path()};
 
     std::filesystem::create_directory(tmp_dir);
@@ -579,7 +579,7 @@ TEST(validator_test, inputdir_not_readable)
 
 TEST(validator_test, outputfile_not_writable)
 {
-    seqan3::test::tmp_filename tmp_name{"my_file.test"};
+    sharg::test::tmp_filename tmp_name{"my_file.test"};
     std::filesystem::path tmp_file{tmp_name.get_path()};
 
     EXPECT_NO_THROW(sharg::output_file_validator{sharg::output_file_open_options::create_new}(tmp_file));
@@ -606,14 +606,14 @@ TEST(validator_test, outputfile_not_writable)
 TEST(validator_test, outputdir_not_writable)
 {
     { // parent dir is not writable.
-        seqan3::test::tmp_filename tmp_name{"dir"};
+        sharg::test::tmp_filename tmp_name{"dir"};
         std::filesystem::path tmp_dir{tmp_name.get_path()};
 
         EXPECT_NO_THROW(sharg::output_file_validator{sharg::output_file_open_options::create_new}(tmp_dir));
         EXPECT_FALSE(std::filesystem::exists(tmp_dir));
 
         // parent dir does not exist
-        seqan3::test::tmp_filename tmp_child_name{"dir/child_dir"};
+        sharg::test::tmp_filename tmp_child_name{"dir/child_dir"};
         std::filesystem::path tmp_child_dir{tmp_child_name.get_path()};
         std::filesystem::path tmp_parent_dir{tmp_child_dir.parent_path()};
 
@@ -656,7 +656,7 @@ TEST(validator_test, outputdir_not_writable)
     }
 
     {  // this dir is not writable
-        seqan3::test::tmp_filename tmp_name{"dir"};
+        sharg::test::tmp_filename tmp_name{"dir"};
         std::filesystem::path tmp_dir{tmp_name.get_path()};
 
         std::filesystem::create_directory(tmp_dir);
@@ -1269,7 +1269,7 @@ TEST(validator_test, chaining_validators)
     sharg::regex_validator absolute_path_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"};
     sharg::output_file_validator my_file_ext_validator{sharg::output_file_open_options::create_new, {"sa", "so"}};
 
-    seqan3::test::tmp_filename tmp_name{"file.sa"};
+    sharg::test::tmp_filename tmp_name{"file.sa"};
     std::filesystem::path invalid_extension{tmp_name.get_path()};
     invalid_extension.replace_extension(".invalid");
 
