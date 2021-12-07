@@ -14,7 +14,6 @@
 #pragma once
 
 #include <seqan3/utility/detail/type_name_as_string.hpp>
-#include <seqan3/utility/type_list/traits.hpp>
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/concept.hpp>
@@ -38,37 +37,35 @@ protected:
     static std::string get_type_name_as_string(value_type const & /**/)
     {
         using type = std::decay_t<value_type>;
-        using types = seqan3::type_list<int8_t,
-                                        uint8_t,
-                                        int16_t,
-                                        uint16_t,
-                                        int32_t,
-                                        uint32_t,
-                                        int64_t,
-                                        uint64_t,
-                                        double,
-                                        float,
-                                        bool,
-                                        char,
-                                        std::string,
-                                        std::filesystem::path>;
-        std::vector<std::string> names{"signed 8 bit integer",
-                                       "unsigned 8 bit integer",
-                                       "signed 16 bit integer",
-                                       "unsigned 16 bit integer",
-                                       "signed 32 bit integer",
-                                       "unsigned 32 bit integer",
-                                       "signed 64 bit integer",
-                                       "unsigned 64 bit integer",
-                                       "double",
-                                       "float",
-                                       "bool",
-                                       "char",
-                                       "std::string",
-                                       "std::filesystem::path"};
 
-        if constexpr (seqan3::list_traits::contains<type, types>)
-            return names[seqan3::list_traits::find<type, types>];
+        if constexpr (std::is_same_v<type, int8_t>)
+            return "signed 8 bit integer";
+        else if constexpr (std::is_same_v<type, uint8_t>)
+            return "unsigned 8 bit integer";
+        else if constexpr (std::is_same_v<type, int16_t>)
+            return "signed 16 bit integer";
+        else if constexpr (std::is_same_v<type, uint16_t>)
+            return "unsigned 16 bit integer";
+        else if constexpr (std::is_same_v<type, int32_t>)
+            return "signed 32 bit integer";
+        else if constexpr (std::is_same_v<type, uint32_t>)
+            return "unsigned 32 bit integer";
+        else if constexpr (std::is_same_v<type, int64_t>)
+            return "signed 64 bit integer";
+        else if constexpr (std::is_same_v<type, uint64_t>)
+            return "unsigned 64 bit integer";
+        else if constexpr (std::is_same_v<type, double>)
+            return "double";
+        else if constexpr (std::is_same_v<type, float>)
+            return "float";
+        else if constexpr (std::is_same_v<type, bool>)
+            return "bool";
+        else if constexpr (std::is_same_v<type, char>)
+            return "char";
+        else if constexpr (std::is_same_v<type, std::string>)
+            return "std::string";
+        else if constexpr (std::is_same_v<type, std::filesystem::path>)
+            return "std::filesystem::path";
         else
             return seqan3::detail::type_name_as_string<value_type>;
     }
