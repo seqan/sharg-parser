@@ -293,9 +293,10 @@ TEST(help_page_printing, do_not_print_hidden_options)
 TEST(help_page_printing, advanced_options)
 {
     int32_t option_value{5};
+    uint8_t another_option_value{2};
     bool flag_value{};
 
-    auto set_up = [&option_value, &flag_value] (sharg::argument_parser & parser)
+    auto set_up = [&option_value, &flag_value, &another_option_value] (sharg::argument_parser & parser)
     {
         // default or required information are always displayed
         parser.add_section("default section", sharg::option_spec::required);
@@ -308,7 +309,7 @@ TEST(help_page_printing, advanced_options)
         // advanced information
         parser.add_section("advanced section", sharg::option_spec::advanced);
         parser.add_subsection("advanced subsection", sharg::option_spec::advanced);
-        parser.add_option(option_value, 'j', "jnt", "this is a int option.", sharg::option_spec::advanced);
+        parser.add_option(another_option_value, 'j', "jnt", "this is a int option.", sharg::option_spec::advanced);
         parser.add_flag(flag_value, 'f', "flag", "this is a flag.", sharg::option_spec::advanced);
         parser.add_list_item("-s, --some", "list item.", sharg::option_spec::advanced);
         parser.add_line("some line.", true, sharg::option_spec::advanced);
@@ -374,8 +375,8 @@ TEST(help_page_printing, advanced_options)
                "ADVANCED SECTION\n"
                "\n"
                "  advanced subsection\n"
-               "    -j, --jnt (signed 32 bit integer)\n"
-               "          this is a int option. Default: 5.\n"
+               "    -j, --jnt (unsigned 8 bit integer)\n"
+               "          this is a int option. Default: 2.\n"
                "    -f, --flag\n"
                "          this is a flag.\n"
                "    -s, --some\n"
