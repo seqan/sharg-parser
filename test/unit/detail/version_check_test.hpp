@@ -7,9 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include <seqan3/test/tmp_filename.hpp>
-
 #include <sharg/argument_parser.hpp>
+#include <sharg/test/tmp_filename.hpp>
 
 //------------------------------------------------------------------------------
 // test fixtures
@@ -44,7 +43,7 @@ struct version_check : public ::testing::Test
     std::string const app_name = std::string{"test_version_check"};
 
     // This tmp_filename will create the file "version_checker.tmpfile" in a unique folder.
-    seqan3::test::tmp_filename tmp_file{"version_checker.tmpfile"};
+    sharg::test::tmp_filename tmp_file{"version_checker.tmpfile"};
 
     void randomise_home_folder()
     {

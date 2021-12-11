@@ -9,13 +9,12 @@
 
 #include <fstream>
 
-#include <seqan3/test/tmp_filename.hpp>
-
 #include <sharg/detail/safe_filesystem_entry.hpp>
+#include <sharg/test/tmp_filename.hpp>
 
 TEST(safe_filesystem_entry, file)
 {
-    seqan3::test::tmp_filename tmp_file{"dummy.txt"};
+    sharg::test::tmp_filename tmp_file{"dummy.txt"};
     std::filesystem::path my_file = tmp_file.get_path();
     {
         std::ofstream file{my_file};
@@ -28,7 +27,7 @@ TEST(safe_filesystem_entry, file)
 
 TEST(safe_filesystem_entry, file_already_removed)
 {
-    seqan3::test::tmp_filename tmp_file{"dummy.txt"};
+    sharg::test::tmp_filename tmp_file{"dummy.txt"};
     std::filesystem::path my_file = tmp_file.get_path();
     {
         EXPECT_FALSE(std::filesystem::exists(my_file));
@@ -40,7 +39,7 @@ TEST(safe_filesystem_entry, file_already_removed)
 
 TEST(safe_filesystem_entry, directory)
 {
-    seqan3::test::tmp_filename tmp_file{"dummy.txt"};
+    sharg::test::tmp_filename tmp_file{"dummy.txt"};
     std::filesystem::path my_dir = tmp_file.get_path();
     {
         std::filesystem::create_directory(my_dir);
@@ -53,7 +52,7 @@ TEST(safe_filesystem_entry, directory)
 
 TEST(safe_filesystem_entry, directory_already_removed)
 {
-    seqan3::test::tmp_filename tmp_file{"dummy.txt"};
+    sharg::test::tmp_filename tmp_file{"dummy.txt"};
     std::filesystem::path my_dir = tmp_file.get_path();
     {
         EXPECT_FALSE(std::filesystem::exists(my_dir));
@@ -65,7 +64,7 @@ TEST(safe_filesystem_entry, directory_already_removed)
 
 TEST(safe_filesystem_entry, remove)
 {
-    seqan3::test::tmp_filename tmp_file{"dummy.txt"};
+    sharg::test::tmp_filename tmp_file{"dummy.txt"};
     std::filesystem::path my_file = tmp_file.get_path();
     {
         std::ofstream file{my_file};
@@ -79,7 +78,7 @@ TEST(safe_filesystem_entry, remove)
 
 TEST(safe_filesystem_entry, remove_all)
 {
-    seqan3::test::tmp_filename tmp_file{"dummy.txt"};
+    sharg::test::tmp_filename tmp_file{"dummy.txt"};
     std::filesystem::path my_dir = tmp_file.get_path();
     {
         std::filesystem::create_directory(my_dir);
