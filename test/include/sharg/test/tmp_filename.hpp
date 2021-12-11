@@ -5,15 +5,14 @@
 // shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------------
 
-#pragma once
-
-
 /*!\file
  * \author Lydia Buntrock <lydia.buntrock AT fu-berlin.de>
  * \brief Internal test infrastructure.
  *        Define some helper classes and functions for the tests that would be misplaced in the seqan3/include
  *        directory.
  */
+ 
+#pragma once
 
 // Add support for Windows platforms, when we support it.
 #if defined(__APPLE__)
@@ -31,6 +30,7 @@
 
 namespace sharg::test
 {
+
 #if defined(_WIN32)
 inline char * mkdtemp(char * template_name)
 {
@@ -138,4 +138,5 @@ private:
     //!\brief The object storing the path to the temporary directory.
     std::filesystem::path directory_path{};
 };
+
 } // namespace sharg::test
