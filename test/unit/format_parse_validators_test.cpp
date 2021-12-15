@@ -7,9 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include <seqan3/test/file_access.hpp>
-
 #include <sharg/argument_parser.hpp>
+#include <sharg/test/file_access.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
 struct dummy_file
@@ -524,7 +523,7 @@ TEST(validator_test, inputfile_not_readable)
                                  std::filesystem::perms::others_read,
                                  std::filesystem::perm_options::remove);
 
-    if (!seqan3::test::read_access(tmp_file)) // Do not execute with root permissions.
+    if (!sharg::test::read_access(tmp_file)) // Do not execute with root permissions.
     {
         EXPECT_THROW(sharg::input_file_validator{}(tmp_file), sharg::validation_error);
     }
@@ -566,7 +565,7 @@ TEST(validator_test, inputdir_not_readable)
                                  std::filesystem::perms::others_read,
                                  std::filesystem::perm_options::remove);
 
-    if (!seqan3::test::read_access(tmp_dir)) // Do not execute with root permissions.
+    if (!sharg::test::read_access(tmp_dir)) // Do not execute with root permissions.
     {
         EXPECT_THROW(sharg::input_directory_validator{}(tmp_dir), sharg::validation_error);
     }
@@ -590,7 +589,7 @@ TEST(validator_test, outputfile_not_writable)
                                  std::filesystem::perms::others_write,
                                  std::filesystem::perm_options::remove);
 
-    if (!seqan3::test::write_access(tmp_file)) // Do not execute with root permissions.
+    if (!sharg::test::write_access(tmp_file)) // Do not execute with root permissions.
     {
         EXPECT_THROW(sharg::output_file_validator{sharg::output_file_open_options::create_new}(tmp_file),
                      sharg::validation_error);
@@ -627,7 +626,7 @@ TEST(validator_test, outputdir_not_writable)
                                      std::filesystem::perm_options::remove);
 
         EXPECT_TRUE(std::filesystem::exists(tmp_dir));
-        if (!seqan3::test::write_access(tmp_dir)) // Do not execute with root permissions.
+        if (!sharg::test::write_access(tmp_dir)) // Do not execute with root permissions.
         {
             EXPECT_THROW(sharg::output_directory_validator{}(tmp_dir), sharg::validation_error);
         }
@@ -638,7 +637,7 @@ TEST(validator_test, outputdir_not_writable)
                                      std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::remove);
 
-        if (!seqan3::test::write_access(tmp_dir)) // Do not execute with root permissions.
+        if (!sharg::test::write_access(tmp_dir)) // Do not execute with root permissions.
         {
             EXPECT_THROW(sharg::output_file_validator{sharg::output_file_open_options::create_new}(tmp_dir),
                          sharg::validation_error);
@@ -668,7 +667,7 @@ TEST(validator_test, outputdir_not_writable)
                                      std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::remove);
 
-        if (!seqan3::test::write_access(tmp_dir)) // Do not execute with root permissions.
+        if (!sharg::test::write_access(tmp_dir)) // Do not execute with root permissions.
         {
             EXPECT_THROW(sharg::output_file_validator{sharg::output_file_open_options::create_new}(tmp_dir),
                          sharg::validation_error);
