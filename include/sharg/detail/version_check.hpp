@@ -12,13 +12,12 @@
 
 #pragma once
 
+#include <sharg/std/charconv>
 #include <fstream>
 #include <future>
 #include <iostream>
 #include <optional>
 #include <regex>
-
-#include <seqan3/std/charconv>
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/safe_filesystem_entry.hpp>
