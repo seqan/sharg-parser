@@ -213,6 +213,20 @@ TEST_F(version_check, option_on)
     if (app_call_succeeded)
     {
         EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
+
+        // This is not an actual check s.t. the test does not fail because there is something wrong with
+        // the server in Tuebingen. But upon manual execution of the test this can give valuable insight
+        // on whats happening.
+        std::cout << "Cookie:" << std::endl;
+        std::ifstream app_version_file{app_version_filename()};
+        std::string line;
+        std::getline(app_version_file, line);
+        std::cout << line << " << Should be UNREGISTERED_APP!" << std::endl;
+        std::getline(app_version_file, line);
+        std::cout << line
+                  << " << Should be the latest Sharg version! "
+                  << "Updates done here: https://github.com/OpenMS/usage_plots/blob/master/seqan_versions.txt"
+                  << std::endl;
     }
     else
     {
@@ -325,6 +339,7 @@ TEST_F(version_check, option_off)
 
     // no timestamp is written since the decision was made explicitly
     EXPECT_FALSE(std::filesystem::exists(app_version_filename())) << app_version_filename();
+    EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename())) << app_timestamp_filename();
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 
