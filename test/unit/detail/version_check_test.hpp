@@ -342,9 +342,12 @@ TEST_F(version_check, option_off)
     EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename())) << app_timestamp_filename();
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
+}
 
+TEST_F(version_check, option_off_with_help_page)
+{
     // Version check option always needs to be parsed, even if special formats get selected
-    const char * argv2[4] = {app_name.c_str(), "-h", OPTION_VERSION_CHECK, OPTION_OFF};
+    const char * argv[4] = {app_name.c_str(), "-h", OPTION_VERSION_CHECK, OPTION_OFF};
 
     std::string previous_value{};
     if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
@@ -353,7 +356,7 @@ TEST_F(version_check, option_off)
         unsetenv("SHARG_NO_VERSION_CHECK");
     }
 
-    sharg::argument_parser parser{app_name, 4, argv2};
+    sharg::argument_parser parser{app_name, 4, argv};
     parser.info.version = "2.3.4";
 
     EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
