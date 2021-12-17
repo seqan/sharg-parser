@@ -16,13 +16,7 @@
 
 #include <sharg/detail/format_base.hpp>
 #include <sharg/detail/terminal.hpp>
-
-namespace seqan3::detail
-{
-
-struct test_accessor;
-
-} // seqan3::detail
+#include <sharg/detail/test_accessor.hpp>
 
 namespace sharg::detail
 {
@@ -380,8 +374,8 @@ protected:
     //!\brief Needed for correct formatting while calling different print functions.
     bool prev_was_paragraph{false};
 
-    //!\brief Befriend seqan3::detail::test_accessor to grant access to layout.
-    friend struct ::seqan3::detail::test_accessor;
+    //!\brief Befriend sharg::detail::test_accessor to grant access to layout.
+    friend struct ::sharg::detail::test_accessor;
 
     //!\brief Stores the relevant parameters of the documentation on the screen.
     console_layout_struct layout{};
