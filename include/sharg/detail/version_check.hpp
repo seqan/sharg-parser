@@ -190,7 +190,7 @@ public:
                               " " +
                               out_file.string() +
                               " " +
-                              std::string{"http://seqan-update.informatik.uni-tuebingen.de/check/SeqAn3_"} +
+                              std::string{"http://seqan-update.informatik.uni-tuebingen.de/check/SeqAn-Sharg_"} +
 #ifdef __linux
                               "Linux" +
 #elif __APPLE__
