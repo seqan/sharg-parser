@@ -284,7 +284,7 @@ private:
     }
 
     /*!\brief Tries to parse an input string into a value using the stream `operator>>`.
-     * \tparam option_t Must model sharg::seqan3::input_stream_over.
+     * \tparam option_t Must model seqan3::input_stream_over.
      * \param[out] value Stores the parsed value.
      * \param[in] in The input argument to be parsed.
      * \returns sharg::option_parse_result::error if `in` could not be parsed via the stream
@@ -331,7 +331,8 @@ private:
                 });
 
             throw user_input_error{seqan3::detail::to_string("You have chosen an invalid input value: ", in,
-                                                     ". Please use one of: ", key_value_pairs | std::views::keys)};
+                                                             ". Please use one of: ",
+                                                             key_value_pairs | std::views::keys)};
         }
         else
         {

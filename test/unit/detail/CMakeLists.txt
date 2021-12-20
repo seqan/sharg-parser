@@ -17,5 +17,6 @@ sharg_test(format_html_test.cpp CYCLIC_DEPENDING_INCLUDES
             include-seqan3-argument_parser-detail-format_man.hpp)
 sharg_test(format_man_test.cpp)
 sharg_test(safe_filesystem_entry_test.cpp)
+sharg_test(type_name_as_string_test.cpp)
 sharg_test(version_check_debug_test.cpp)
 sharg_test(version_check_release_test.cpp)

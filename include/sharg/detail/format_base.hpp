@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <seqan3/utility/detail/type_name_as_string.hpp>
+#include <sharg/detail/type_name_as_string.hpp>
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/concept.hpp>
@@ -67,7 +67,7 @@ protected:
         else if constexpr (std::is_same_v<type, std::filesystem::path>)
             return "std::filesystem::path";
         else
-            return seqan3::detail::type_name_as_string<value_type>;
+            return sharg::detail::type_name_as_string<value_type>;
     }
 
     /*!\brief Returns the `value_type` of the input container as a string (reflection).
@@ -255,7 +255,7 @@ public:
         {
             ++positional_option_count;
             derived_t().print_list_item(seqan3::detail::to_string("\\fBARGUMENT-", positional_option_count, "\\fP ",
-                                                          option_type_and_list_info(value)),
+                                                                  option_type_and_list_info(value)),
                                         desc +
                                         // a list at the end may be empty and thus have a default value
                                         ((detail::is_container_option<option_type>)
