@@ -7,10 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include <sharg/detail/type_name_as_string.hpp>
+#include <type_traits>
 
-#include <seqan3/utility/type_list/traits.hpp>
-#include <seqan3/utility/type_list/type_list.hpp>
+#include <sharg/detail/type_name_as_string.hpp>
 
 // Some test namespace to check if namespace information are preserved within the naming.
 namespace foo
@@ -26,21 +25,30 @@ struct bar
 using reflection_types = ::testing::Types<char, char16_t const, char32_t &, short *, double const * const,
                                           foo::bar<char> const &, foo::bar<foo::bar<char, double>>>;
 
-// Helper type list to use some traits functions on type lists.
-using as_type_list_t = seqan3::detail::transfer_template_args_onto_t<reflection_types, seqan3::type_list>;
-
 template <typename param_type>
 class type_inspection : public ::testing::Test
 {
-    // The corresponding list of names that should be generated. Must have the same order as `reflection_types`.
-    inline static const std::vector names{"char", "char16_t const", "char32_t &", "short*", "double const* const",
-                                          "foo::bar<char> const &", "foo::bar<foo::bar<char, double> >"};
 
 public:
     // Returns the name of the type according to the list of names defined above.
-    std::string expected_name()
+    std::string const expected_name() const
     {
-        return names[seqan3::list_traits::find<param_type, as_type_list_t>];
+        if constexpr (std::is_same_v<param_type, char>)
+            return "char";
+        else if constexpr (std::is_same_v<param_type, char16_t const>)
+            return "char16_t const";
+        else if constexpr (std::is_same_v<param_type, char32_t &>)
+            return "char32_t &";
+        else if constexpr (std::is_same_v<param_type, short *>)
+            return "short*";
+        else if constexpr (std::is_same_v<param_type, double const * const>)
+            return "double const* const";
+        else if constexpr (std::is_same_v<param_type, foo::bar<char> const &>)
+            return "foo::bar<char> const &";
+        else if constexpr (std::is_same_v<param_type, foo::bar<foo::bar<char, double>>>)
+            return "foo::bar<foo::bar<char, double> >";
+        else
+            throw std::runtime_error{"Encountered unknown type in test."};
     }
 };
 

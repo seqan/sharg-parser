@@ -13,10 +13,9 @@
 
 #pragma once
 
-#include <sharg/detail/type_name_as_string.hpp>
-
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/concept.hpp>
+#include <sharg/detail/type_name_as_string.hpp>
 #include <sharg/validators.hpp>
 
 namespace sharg::detail
