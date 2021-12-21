@@ -14,7 +14,7 @@
 // test fixtures
 //------------------------------------------------------------------------------
 
-namespace seqan3::detail
+namespace sharg::detail
 {
 struct test_accessor
 {
@@ -23,11 +23,11 @@ struct test_accessor
         return parser.version_check_future;
     }
 };
-} // seqan3::detail
+} // sharg::detail
 
 bool wait_for(sharg::argument_parser & parser)
 {
-    auto & future = seqan3::detail::test_accessor::version_check_future(parser);
+    auto & future = sharg::detail::test_accessor::version_check_future(parser);
 
     if (future.valid())
         return future.get();
