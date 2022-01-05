@@ -77,7 +77,7 @@ public:
         if (!app_url.empty())
         {
             message_app_update.pop_back(); // remove second newline
-            message_app_update.append("[APP INFO] :: Visit " + app_url + " for updates.\n\n");
+            message_app_update.append("[APP VERSION INFO] :: Visit " + app_url + " for updates.\n\n");
         }
 
 #if defined(NDEBUG)
@@ -107,14 +107,14 @@ public:
      *    * content is a timestamp: The "time-of-last-version-check" is read from file. The function only
      *                              continues if the last version check is more than a day old.
      *
-     * 2. If a version file exists, the app version and seqan3 version are compared to the current ones and the
+     * 2. If a version file exists, the app version and Sharg version are compared to the current ones and the
      *    the following message may be printed:
      *    **Debug mode** (directed at the developer of the application)
      *    * If the app is unregistered (no version information is available at the server) the developer will be
      *      notified that he has the possibility of registering his application with us
      *      (see sharg::version_checker::message_unregistered_app).
-     *    * If the current seqan version is smaller then the one returned by the server call, the developer is notified
-     *      that he may update to the newest seqan3 version (see sharg::version_checker::message_seqan3_update).
+     *    * If the current Sharg version is smaller than the one returned by the server call, the developer is notified
+     *      that he may update to the newest Sharg version (see sharg::version_checker::message_sharg_update).
      *    * If the current app version is greater than the one returned by the server call, we assume that the
      *      developer has released a new version and is notified to send us the new version
      *      (see sharg::version_checker::message_registered_app_update).
@@ -126,7 +126,7 @@ public:
     {
         std::array<int, 3> empty_version{0, 0, 0};
         std::array<int, 3> srv_app_version{};
-        std::array<int, 3> srv_seqan_version{};
+        std::array<int, 3> srv_sharg_version{};
 
         std::ifstream version_file{cookie_path / (name + ".version")};
 
@@ -142,19 +142,19 @@ public:
             std::cerr << message_unregistered_app;
 #endif // !defined(NDEBUG)
 
-            std::getline(version_file, line); // get second line which should only contain the version number of seqan
-            srv_seqan_version = get_numbers_from_version_string(line);
+            std::getline(version_file, line); // get second line which should only contain the version number of sharg
+            srv_sharg_version = get_numbers_from_version_string(line);
 
             version_file.close();
         }
 
-#if !defined(NDEBUG) // only check seqan version in debug
-        if (srv_seqan_version != empty_version)
+#if !defined(NDEBUG) // only check Sharg version in debug
+        if (srv_sharg_version != empty_version)
         {
-            std::array<int, 3> seqan_version = {SEQAN3_VERSION_MAJOR, SEQAN3_VERSION_MINOR, SEQAN3_VERSION_PATCH};
+            std::array<int, 3> sharg_version = {SHARG_VERSION_MAJOR, SHARG_VERSION_MINOR, SHARG_VERSION_PATCH};
 
-            if (seqan_version < srv_seqan_version)
-                std::cerr << message_seqan3_update;
+            if (sharg_version < srv_sharg_version)
+                std::cerr << message_sharg_update;
         }
 #endif
 
@@ -189,7 +189,7 @@ public:
                               " " +
                               out_file.string() +
                               " " +
-                              std::string{"http://seqan-update.informatik.uni-tuebingen.de/check/SeqAn3_"} +
+                              std::string{"https://seqan-update.informatik.uni-tuebingen.de/check/SeqAn-Sharg_"} +
 #ifdef __linux
                               "Linux" +
 #elif __APPLE__
@@ -238,7 +238,7 @@ public:
         // If this did not fail we, create the seqan subdirectory.
         if (!err)
         {
-            tmp_path /= "seqan";
+            tmp_path /= "seqan"; // sharg is part of seqan, so the naming is fine.
             create_directory(tmp_path, err);
         }
 
@@ -401,27 +401,27 @@ public:
 
     //!\brief The identification string that may appear in the version file if an app is unregistered.
     static constexpr std::string_view unregistered_app = "UNREGISTERED_APP";
-    //!\brief The message directed to the developer of the app if a new seqan3 version is available.
-    static constexpr std::string_view message_seqan3_update =
-        "[SEQAN3 INFO] :: A new SeqAn version is available online.\n"
-        "[SEQAN3 INFO] :: Please visit www.github.com/seqan/seqan3.git for an update\n"
-        "[SEQAN3 INFO] :: or inform the developer of this app.\n"
-        "[SEQAN3 INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
+    //!\brief The message directed to the developer of the app if a new sharg version is available.
+    static constexpr std::string_view message_sharg_update =
+        "[SHARG VERSION INFO] :: A new Sharg version is available online.\n"
+        "[SHARG VERSION INFO] :: Please visit www.github.com/seqan/sharg-parser.git for an update\n"
+        "[SHARG VERSION INFO] :: or inform the developer of this app.\n"
+        "[SHARG VERSION INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
     //!\brief The message directed to the developer of the app if the app is not yet registered with us.
     static constexpr std::string_view message_unregistered_app =
-        "[SEQAN3 INFO] :: Thank you for using SeqAn!\n"
-        "[SEQAN3 INFO] :: Do you wish to register your app for update notifications?\n"
-        "[SEQAN3 INFO] :: Just send an email to support@seqan.de with your app name and version number.\n"
-        "[SEQAN3 INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
+        "[SHARG VERSION INFO] :: Thank you for using Sharg!\n"
+        "[SHARG VERSION INFO] :: Do you wish to register your app for update notifications?\n"
+        "[SHARG VERSION INFO] :: Just send an email to support@seqan.de with your app name and version number.\n"
+        "[SHARG VERSION INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
     //!\brief The message directed to the developer if the application is registered but under a lower version.
     static constexpr std::string_view message_registered_app_update =
-        "[APP INFO] :: We noticed the app version you use is newer than the one registered with us.\n"
-        "[APP INFO] :: Please send us an email with the new version so we can correct it (support@seqan.de)\n\n";
+        "[APP VERSION INFO] :: We noticed the app version you use is newer than the one registered with us.\n"
+        "[APP VERSION INFO] :: Please send us an email with the new version so we can correct it (support@seqan.de)\n\n";
     //!\brief The message directed to the user of the app if a new app version is available.
     std::string message_app_update =
-        "[APP INFO] :: A new version of this application is now available.\n"
-        "[APP INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
-        /*Might be extended if a url is given on construction.*/
+        "[APP VERSION INFO] :: A new version of this application is now available.\n"
+        "[APP VERSION INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
+        /*Will be extended if a url is given on construction of version_check.*/
 
     //!\brief The environment name of the home environment used by getenv()
     static constexpr char const * home_env_name

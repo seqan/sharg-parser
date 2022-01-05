@@ -82,7 +82,7 @@ struct format_man_test : public ::testing::Test
     R"(.br)" "\n"
     R"(\fBdefault version: \fR01.01.01)" "\n"
     R"(.br)" "\n"
-    R"(\fBSeqAn version: \fR)" + version_str + "\n";
+    R"(\fBSharg version: \fR)" + version_str + "\n";
 
     // Full info parser initialisation
     void dummy_init(sharg::argument_parser & parser)
@@ -148,7 +148,7 @@ TEST_F(format_man_test, empty_information)
     R"(.br)" "\n"
     R"(\fBdefault version: \fR01.01.01)" "\n"
     R"(.br)" "\n"
-    R"(\fBSeqAn version: \fR)" + version_str + "\n";
+    R"(\fBSharg version: \fR)" + version_str + "\n";
 
     // Test the dummy parser with minimal information.
     testing::internal::CaptureStdout();
