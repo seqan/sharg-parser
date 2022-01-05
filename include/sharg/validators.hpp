@@ -82,7 +82,7 @@ public:
      * \param[in] max_ Maximum set for the range to test.
      */
     arithmetic_range_validator(option_value_type const min_, option_value_type const max_) :
-        min{min_}, max{max_}
+        min{min_}, max{max_}, valid_range_str{"[" + std::to_string(min_) + "," + std::to_string(max_) + "]"}
     {}
 
     /*!\brief Tests whether cmp lies inside [`min`, `max`].
@@ -92,7 +92,7 @@ public:
     void operator()(option_value_type const & cmp) const
     {
         if (!((cmp <= max) && (cmp >= min)))
-            throw validation_error{seqan3::detail::to_string("Value ", cmp, " is not in range [", min, ",", max, "].")};
+            throw validation_error{"Value " + std::to_string(cmp) + " is not in range " + valid_range_str + "."};
     }
 
     /*!\brief Tests whether every element in \p range lies inside [`min`, `max`].
@@ -113,7 +113,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string("Value must be in range [", min, ",", max, "].");
+        return std::string{"Value must be in range "} + valid_range_str + ".";
     }
 
 private:
@@ -122,6 +122,9 @@ private:
 
     //!\brief Maximum of the range to test.
     option_value_type max{};
+
+    //!\brief The range as string
+    std::string valid_range_str;
 };
 
 /*!\brief A validator that checks whether a value is inside a list of valid values.
