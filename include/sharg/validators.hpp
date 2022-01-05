@@ -575,6 +575,7 @@ public:
     std::string get_help_page_message() const
     {
         return "The input file must exist and read permissions must be granted." +
+               ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
                valid_extensions_help_page_message();
     }
 };
@@ -709,10 +710,19 @@ public:
     std::string get_help_page_message() const
     {
         if (mode == output_file_open_options::open_or_create)
-            return "Write permissions must be granted." + valid_extensions_help_page_message();
-        else // mode == create_new
-            return "The output file must not exist already and write permissions must be granted." +
+        {
+            return "Write permissions must be granted." +
+                   ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
                    valid_extensions_help_page_message();
+
+        }
+        else // mode == create_new
+        {
+            return "The output file must not exist already and write permissions must be granted." +
+                   ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
+                   valid_extensions_help_page_message();
+
+        }
     }
 
 private:
