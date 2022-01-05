@@ -18,7 +18,6 @@
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/debug_stream/range.hpp>
 #include <seqan3/io/detail/misc.hpp>
-#include <seqan3/utility/views/join_with.hpp>
 
 #include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/exceptions.hpp>
@@ -333,8 +332,10 @@ protected:
 
         // Check if extension is available.
         if (!path.has_extension())
-            throw validation_error{seqan3::detail::to_string("The given filename ", path.string(), " has no extension. Expected"
-                                                     " one of the following valid extensions:", extensions, "!")};
+        {
+            throw validation_error{"The given filename " + path.string() + " has no extension. Expected one of the "
+                                   "following valid extensions:" + extensions_str + "!"};
+        }
 
         std::string file_path{path.filename().string()};
 
@@ -354,8 +355,8 @@ protected:
         // Check if requested extension is present.
         if (std::ranges::find_if(extensions, case_insensitive_ends_with) == extensions.end())
         {
-            throw validation_error{seqan3::detail::to_string("Expected one of the following valid extensions: ", extensions,
-                                                     "! Got ", all_extensions, " instead!")};
+            throw validation_error{"Expected one of the following valid extensions: " + extensions_str + "! Got " +
+                                    all_extensions + " instead!"};
         }
     }
 
@@ -373,17 +374,17 @@ protected:
             std::error_code ec{};
             std::filesystem::directory_iterator{path, ec};  // if directory iterator cannot be created, ec will be set.
             if (static_cast<bool>(ec))
-                throw validation_error{seqan3::detail::to_string("Cannot read the directory ", path ,"!")};
+                throw validation_error{"Cannot read the directory \"" + path.string() + "\"!"};
         }
         else
         {
             // Must be a regular file.
             if (!std::filesystem::is_regular_file(path))
-                throw validation_error{seqan3::detail::to_string("Expected a regular file ", path, "!")};
+                throw validation_error{"Expected a regular file \"" + path.string() + "\"!"};
 
             std::ifstream file{path};
             if (!file.is_open() || !file.good())
-                throw validation_error{seqan3::detail::to_string("Cannot read the file ", path, "!")};
+                throw validation_error{"Cannot read the file \"" + path.string() + "\"!"};
         }
     }
 
@@ -403,7 +404,7 @@ protected:
         file.close();
 
         if (!is_good || !is_open)
-            throw validation_error{seqan3::detail::to_string("Cannot write ", path, "!")};
+            throw validation_error{"Cannot write \"" + path.string() + "\"!"};
 
         file_guard.remove();
     }
@@ -414,7 +415,7 @@ protected:
         if (extensions.empty())
             return "";
         else
-            return seqan3::detail::to_string(" Valid file extensions are: [", extensions | seqan3::views::join_with(std::string{", "}), "].");
+            return " Valid file extensions are: " + extensions_str + ".";
     }
 
     /*!\brief Helper function that checks if a string is a suffix of another string. Case insensitive.
@@ -434,8 +435,26 @@ protected:
                });
     }
 
+    std::string create_extensions_str()
+    {
+        std::string result{};
+
+        if (!extensions.empty())
+        {
+            result += "[";
+            for (std::string const & ext : extensions)
+                result += ext + ", ";
+            result.replace(result.size() - 2, 2, "]"); // repalce last ", " by "]"
+        }
+
+        return result;
+    }
+
     //!\brief Stores the extensions.
     std::vector<std::string> extensions{};
+
+    //!\brief The extension range as a std:;string for pretty printing.
+    std::string extensions_str{};
 };
 
 /*!\brief A validator that checks if a given path is a valid input file.
@@ -489,6 +508,8 @@ public:
     {
         if constexpr (!std::same_as<file_t, void>)
             file_validator_base::extensions = seqan3::detail::valid_file_extensions<typename file_t::valid_formats>();
+
+        file_validator_base::extensions_str = create_extensions_str();
     }
 
     input_file_validator(input_file_validator const &) = default;             //!< Defaulted.
@@ -512,6 +533,7 @@ public:
         : file_validator_base{}
     {
         file_validator_base::extensions = std::move(extensions);
+        file_validator_base::extensions_str = create_extensions_str();
     }
 
     // Import base class constructor.
@@ -531,7 +553,7 @@ public:
         try
         {
             if (!std::filesystem::exists(file))
-                throw validation_error{seqan3::detail::to_string("The file ", file, " does not exist!")};
+                throw validation_error{"The file \"" + file.string() + "\" does not exist!"};
 
             // Check if file is regular and can be opened for reading.
             validate_readability(file);
@@ -631,6 +653,7 @@ public:
         : file_validator_base{}, mode{mode}
     {
         file_validator_base::extensions = std::move(extensions);
+        file_validator_base::extensions_str = create_extensions_str();
     }
 
     // Import base constructor.
@@ -665,7 +688,7 @@ public:
         try
         {
             if ((mode == output_file_open_options::create_new) && std::filesystem::exists(file))
-                throw validation_error{seqan3::detail::to_string("The file ", file, " already exists!")};
+                throw validation_error{"The file \"" + file.string() + "\" already exists!"};
 
             // Check if file has any write permissions.
             validate_writeability(file);
@@ -748,10 +771,10 @@ public:
         try
         {
             if (!std::filesystem::exists(dir))
-                throw validation_error{seqan3::detail::to_string("The directory ", dir, " does not exists!")};
+                throw validation_error{"The directory \"" + dir.string() + "\" does not exists!"};
 
             if (!std::filesystem::is_directory(dir))
-                throw validation_error{seqan3::detail::to_string("The path ", dir, " is not a directory!")};
+                throw validation_error{"The path \"" + dir.string() + "\" is not a directory!"};
 
             // Check if directory has any read permissions.
             validate_readability(dir);
@@ -771,7 +794,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string("An existing, readable path for the input directory.");
+        return "An existing, readable path for the input directory.";
     }
 };
 
@@ -827,7 +850,7 @@ public:
         std::filesystem::create_directory(dir, ec); // does nothing and is not treated as error if path already exists.
         // if error code was set or if dummy.txt could not be created within the output dir, throw an error.
         if (static_cast<bool>(ec))
-            throw validation_error{seqan3::detail::to_string("Cannot create directory: ", dir, "!")};
+            throw validation_error{"Cannot create directory: \"" + dir.string() + "\"!"};
 
         try
         {
@@ -857,7 +880,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string("A valid path for the output directory.");
+        return "A valid path for the output directory.";
     }
 };
 
