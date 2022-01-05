@@ -461,7 +461,6 @@ public:
     void parse(argument_parser_meta_data const & parser_meta)
     {
         meta = parser_meta;
-        seqan3::debug_stream_type stream{std::cout};
         std::string seqan_license{
 R"(Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
@@ -491,28 +490,28 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGE.)"};
 
-        stream << std::string(80, '=') << "\n"
-               << in_bold("Copyright information for " + meta.app_name + ":\n")
-               << std::string(80, '-') << '\n';
+        std::cout << std::string(80, '=') << "\n"
+                  << in_bold("Copyright information for " + meta.app_name + ":\n")
+                  << std::string(80, '-') << '\n';
 
         if (!empty(meta.long_copyright))
         {
-            stream << to_text("\\fP") << meta.long_copyright << "\n";
+            std::cout << to_text("\\fP") << meta.long_copyright << "\n";
         }
         else if (!empty(meta.short_copyright))
         {
-            stream << in_bold(meta.app_name + " full copyright information not available. " +
+            std::cout << in_bold(meta.app_name + " full copyright information not available. " +
                               "Displaying short copyright information instead:\n" )
-                   << meta.short_copyright << "\n";
+                      << meta.short_copyright << "\n";
         }
         else
         {
-            stream << to_text("\\fP") << meta.app_name << " copyright information not available.\n";
+            std::cout << to_text("\\fP") << meta.app_name << " copyright information not available.\n";
         }
 
-        stream << std::string(80, '=') << '\n'
-               << in_bold("This program contains SeqAn code licensed under the following terms:\n")
-               << std::string(80, '-') << '\n' << seqan_license << '\n';
+        std::cout << std::string(80, '=') << '\n'
+                  << in_bold("This program contains SeqAn code licensed under the following terms:\n")
+                  << std::string(80, '-') << '\n' << seqan_license << '\n';
 
         std::exit(EXIT_SUCCESS);
     }
