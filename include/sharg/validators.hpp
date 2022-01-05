@@ -924,7 +924,7 @@ public:
     {
         std::regex rgx(pattern);
         if (!std::regex_match(cmp, rgx))
-            throw validation_error{seqan3::detail::to_string("Value ", cmp, " did not match the pattern ", pattern, ".")};
+            throw validation_error{"Value " + cmp + " did not match the pattern " + pattern + "."};
     }
 
     /*!\brief Tests whether every filename in list v matches the pattern.
@@ -949,7 +949,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string("Value must match the pattern '", pattern, "'.");
+        return "Value must match the pattern '" + pattern + "'.";
     }
 
 private:
