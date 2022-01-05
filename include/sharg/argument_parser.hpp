@@ -587,7 +587,7 @@ public:
      * VERSION
      *     Last update: 12.01.2017
      *     Penguin_Parade version: 2.0.0
-     *     Sharg version: 1.0.0
+     *     Sharg version: 0.1.0
      * ```
      */
     argument_parser_meta_data info;

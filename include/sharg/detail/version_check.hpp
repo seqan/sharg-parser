@@ -114,7 +114,7 @@ public:
      *    * If the app is unregistered (no version information is available at the server) the developer will be
      *      notified that he has the possibility of registering his application with us
      *      (see sharg::version_checker::message_unregistered_app).
-     *    * If the current Sharg version is smaller then the one returned by the server call, the developer is notified
+     *    * If the current Sharg version is smaller than the one returned by the server call, the developer is notified
      *      that he may update to the newest Sharg version (see sharg::version_checker::message_sharg_update).
      *    * If the current app version is greater than the one returned by the server call, we assume that the
      *      developer has released a new version and is notified to send us the new version
@@ -190,7 +190,7 @@ public:
                               " " +
                               out_file.string() +
                               " " +
-                              std::string{"http://seqan-update.informatik.uni-tuebingen.de/check/SeqAn-Sharg_"} +
+                              std::string{"https://seqan-update.informatik.uni-tuebingen.de/check/SeqAn-Sharg_"} +
 #ifdef __linux
                               "Linux" +
 #elif __APPLE__
@@ -239,7 +239,7 @@ public:
         // If this did not fail we, create the seqan subdirectory.
         if (!err)
         {
-            tmp_path /= "seqan"; // although sharg performs the version check, as it belongs to seqan this is fine.
+            tmp_path /= "seqan"; // sharg is part of seqan, so the naming is fine.
             create_directory(tmp_path, err);
         }
 
