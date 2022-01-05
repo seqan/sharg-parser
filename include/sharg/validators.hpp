@@ -1055,7 +1055,7 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string(vali1.get_help_page_message(), " ", vali2.get_help_page_message());
+        return vali1.get_help_page_message() + " " + vali2.get_help_page_message();
     }
 
 private:
