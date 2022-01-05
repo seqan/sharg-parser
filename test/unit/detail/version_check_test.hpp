@@ -196,6 +196,34 @@ TEST_F(sanity_checks, create_and_delete_files)
     EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename()));
 }
 
+TEST_F(sanity_checks, cookie)
+{
+    const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
+    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+
+    if (app_call_succeeded)
+    {
+        // Write out the cookie for inspection.
+        // When manually executing this test, check that the cookie looks like this:
+        // ```
+        // UNREGISTERED_APP
+        // X.X.X <-- Should reflect the latest release of sharg
+        // ```
+        // This should not be tested via EXPECT_EQ(..) because then sharg tests fail if the server wasn't
+        // configured correctly and we want to be independent of the server.
+        std::cout << "Cookie:" << std::endl;
+        std::ifstream app_version_file{app_version_filename()};
+        std::string line;
+        std::getline(app_version_file, line);
+        std::cout << line << " <-- Should be UNREGISTERED_APP!" << std::endl;
+        std::getline(app_version_file, line);
+        std::cout << line
+                  << " <-- Should be the latest Sharg version! "
+                  << "Updates done here: https://github.com/OpenMS/usage_plots/blob/master/seqan_versions.txt"
+                  << std::endl;
+    }
+}
+
 //------------------------------------------------------------------------------
 // version checks
 //------------------------------------------------------------------------------
@@ -213,20 +241,6 @@ TEST_F(version_check, option_on)
     if (app_call_succeeded)
     {
         EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
-
-        // This is not an actual check s.t. the test does not fail because there is something wrong with
-        // the server in Tuebingen. But upon manual execution of the test this can give valuable insight
-        // on whats happening.
-        std::cout << "Cookie:" << std::endl;
-        std::ifstream app_version_file{app_version_filename()};
-        std::string line;
-        std::getline(app_version_file, line);
-        std::cout << line << " << Should be UNREGISTERED_APP!" << std::endl;
-        std::getline(app_version_file, line);
-        std::cout << line
-                  << " << Should be the latest Sharg version! "
-                  << "Updates done here: https://github.com/OpenMS/usage_plots/blob/master/seqan_versions.txt"
-                  << std::endl;
     }
     else
     {
