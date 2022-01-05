@@ -501,7 +501,7 @@ DAMAGE.)"};
         else if (!empty(meta.short_copyright))
         {
             std::cout << in_bold(meta.app_name + " full copyright information not available. " +
-                              "Displaying short copyright information instead:\n" )
+                                 "Displaying short copyright information instead:\n" )
                       << meta.short_copyright << "\n";
         }
         else

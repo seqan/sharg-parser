@@ -123,7 +123,7 @@ private:
     option_value_type max{};
 
     //!\brief The range as string
-    std::string valid_range_str;
+    std::string valid_range_str{};
 };
 
 /*!\brief A validator that checks whether a value is inside a list of valid values.
@@ -415,7 +415,7 @@ protected:
         if (extensions.empty())
             return "";
         else
-            return " Valid file extensions are: " + extensions_str + ".";
+            return "Valid file extensions are: " + extensions_str + ".";
     }
 
     /*!\brief Helper function that checks if a string is a suffix of another string. Case insensitive.
@@ -435,18 +435,16 @@ protected:
                });
     }
 
-    std::string create_extensions_str()
+    //!\brief Creates a std::string from the extensions list, e.g. "[ext, ext2]".
+    std::string const create_extensions_str() const
     {
-        std::string result{};
+        if (extensions.empty())
+            return "[]";
 
-        if (!extensions.empty())
-        {
-            result += "[";
-            for (std::string const & ext : extensions)
-                result += ext + ", ";
-            result.replace(result.size() - 2, 2, "]"); // repalce last ", " by "]"
-        }
-
+        std::string result{'['};
+        for (std::string const & ext : extensions)
+            result += ext + ", ";
+        result.replace(result.size() - 2, 2, "]"); // replace last ", " by "]"
         return result;
     }
 
