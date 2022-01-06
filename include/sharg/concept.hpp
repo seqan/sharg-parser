@@ -47,7 +47,6 @@ concept istreamable = requires (std::istream & is, value_type & val)
  * \remark For a complete overview, take a look at \ref argument_parser
  */
 template <typename option_type>
-concept argument_parser_compatible_option = seqan3::input_stream_over<std::istringstream, option_type> ||
-                                            named_enumeration<option_type>;
+concept argument_parser_compatible_option = sharg::istreamable<option_type> || named_enumeration<option_type>;
 
 } // namespace sharg
