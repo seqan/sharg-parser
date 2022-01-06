@@ -14,8 +14,6 @@
 
 #include <set>
 
-#include <seqan3/core/debug_stream/detail/to_string.hpp>
-
 #include <sharg/detail/format_help.hpp>
 #include <sharg/detail/format_html.hpp>
 #include <sharg/detail/format_man.hpp>
@@ -390,9 +388,15 @@ public:
 
         if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
         {
-            throw too_few_arguments{seqan3::detail::to_string("You either forgot or misspelled the subcommand! Please specify"
-                                                      " which sub-program you want to use: one of ", subcommands,
-                                                      ". Use -h/--help for more information.")};
+            assert(!subcommands.empty());
+            std::string subcommands_str{"["};
+            for (std::string const & command : subcommands)
+                subcommands_str += command + ", ";
+            subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
+
+            throw too_few_arguments{"You either forgot or misspelled the subcommand! Please specify which sub-program "
+                                    "you want to use: one of " + subcommands_str + ". Use -h/--help for more "
+                                    "information."};
         }
 
         if (app_version.decide_if_check_is_performed(version_check_dev_decision, version_check_user_decision))
