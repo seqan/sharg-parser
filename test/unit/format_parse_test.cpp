@@ -1090,7 +1090,7 @@ TEST(parse_test, enum_error_message)
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
         std::string expected_message{"You have chosen an invalid input value: nine. "
-                                     "Please use one of: [one,two,three]"};
+                                     "Please use one of: [one, two, three]"};
 
         try
         {
@@ -1116,7 +1116,7 @@ TEST(parse_test, enum_error_message)
         parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
 
         std::string expected_message{"You have chosen an invalid input value: nine. "
-                                     "Please use one of: [1,one,2,two]"};
+                                     "Please use one of: [1, one, 2, two]"};
 
         try
         {

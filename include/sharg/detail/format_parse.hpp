@@ -319,20 +319,29 @@ private:
 
         if (auto it = map.find(in); it == map.end())
         {
-            std::vector<std::pair<std::string_view, option_t>> key_value_pairs(map.begin(), map.end());
-            std::ranges::sort(key_value_pairs, [] (auto pair1, auto pair2)
+            std::string keys = [&map] ()
+            {
+                std::vector<std::pair<std::string_view, option_t>> key_value_pairs(map.begin(), map.end());
+
+                std::sort(key_value_pairs.begin(), key_value_pairs.end(), [] (auto pair1, auto pair2)
                 {
                     if constexpr (std::totally_ordered<option_t>)
                     {
                         if (pair1.second != pair2.second)
                             return pair1.second < pair2.second;
                     }
-                    return pair1.first < pair2.first;
-                });
 
-            throw user_input_error{seqan3::detail::to_string("You have chosen an invalid input value: ", in,
-                                                             ". Please use one of: ",
-                                                             key_value_pairs | std::views::keys)};
+                    return pair1.first < pair2.first;
+                }); // needed for deterministic output when using unordered maps
+
+                std::string result{'['};
+                for (auto const & [key, value] : key_value_pairs)
+                    result += std::string{key.data()} + ", ";
+                result.replace(result.size() - 2, 2, "]"); // replace last ", " by "]"
+                return result;
+            }();
+
+            throw user_input_error{"You have chosen an invalid input value: " + in + ". Please use one of: " + keys};
         }
         else
         {
