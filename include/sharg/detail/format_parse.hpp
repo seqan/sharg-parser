@@ -15,6 +15,7 @@
 #include <sharg/std/charconv>
 
 #include <sharg/detail/format_base.hpp>
+#include <sharg/concept.hpp>
 
 namespace sharg::detail
 {

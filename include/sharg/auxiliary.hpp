@@ -186,24 +186,6 @@ concept named_enumeration = requires
     { sharg::enumeration_names<option_type> };
 };
 
-/*!\concept sharg::argument_parser_compatible_option
- * \brief Checks whether the the type can be used in an add_(positional_)option call on the argument parser.
- * \ingroup argument_parser
- * \tparam option_type The type to check.
- *
- * ### Requirements
- *
- * In order to model this concept, the type must either be streamable to std::istringstream or
- * model sharg::named_enumeration<option_type>.
- *
- * \remark For a complete overview, take a look at \ref argument_parser
- */
-template <typename option_type>
-concept argument_parser_compatible_option = seqan3::input_stream_over<std::istringstream, option_type> ||
-                                            named_enumeration<option_type>;
-
-
-
 /*!\brief Used to further specify argument_parser options/flags.
  * \ingroup argument_parser
  *
