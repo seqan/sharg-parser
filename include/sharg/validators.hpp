@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <seqan3/std/algorithm>
 #include <fstream>
 #include <regex>
 
