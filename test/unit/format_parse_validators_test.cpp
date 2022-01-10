@@ -11,19 +11,6 @@
 #include <sharg/test/file_access.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
-struct dummy_file
-{
-
-    struct format
-    {
-        static inline std::vector<std::string> file_extensions{ {"fa"}, {"fasta"}, {"sam"}, {"bam"}};
-    };
-
-};
-
-dummy_file::format f;
-std::vector<std::string> dummy_file_extensions = f.file_extensions;
-
 std::string const basic_options_str = "OPTIONS\n"
                                       "\n"
                                       "  Basic options:\n"
@@ -129,11 +116,6 @@ TEST(validator_test, input_file)
             EXPECT_NO_THROW(my_validator(tmp_name_multiple.get_path()));
         }
 
-        {  // read from file
-            sharg::input_file_validator my_validator{dummy_file_extensions};
-            EXPECT_NO_THROW(my_validator(tmp_name.get_path()));
-        }
-
         std::filesystem::path file_in_path;
 
         // option
@@ -188,6 +170,15 @@ TEST(validator_test, input_file)
                                "\n" +
                                basic_version_str;
         EXPECT_EQ(my_stdout, expected);
+    }
+
+    { // get help page message (file extensions)
+        sharg::input_file_validator validator1{formats};
+        EXPECT_EQ(validator1.get_help_page_message(), "The input file must exist and read permissions must be granted. "
+                                                      "Valid file extensions are: [fa, sam, fasta, fasta.txt].");
+
+        sharg::input_file_validator validator2{std::vector<std::string> {}};
+        EXPECT_EQ(validator2.get_help_page_message(), "The input file must exist and read permissions must be granted.");
     }
 }
 
@@ -247,16 +238,6 @@ TEST(validator_test, output_file)
             multiple_extension.replace_extension("fasta.txt");
             sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new, formats};
             EXPECT_NO_THROW(my_validator(multiple_extension));
-        }
-
-        {  // read from file
-            sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new,
-                                                      dummy_file_extensions};
-            EXPECT_NO_THROW(my_validator(tmp_name.get_path()));
-
-            sharg::output_file_validator my_validator2{sharg::output_file_open_options::open_or_create,
-                                                       dummy_file_extensions};
-            EXPECT_NO_THROW(my_validator2(tmp_name.get_path()));
         }
 
         std::filesystem::path file_out_path;
@@ -345,6 +326,17 @@ TEST(validator_test, output_file)
                                "\n" +
                                basic_version_str;
         EXPECT_EQ(my_stdout, expected);
+    }
+
+    { // get help page message (file extensions)
+        sharg::output_file_validator validator1{sharg::output_file_open_options::create_new, formats};
+        EXPECT_EQ(validator1.get_help_page_message(), "The output file must not exist already and write permissions "
+                                                      "must be granted. Valid file extensions are: "
+                                                      "[fa, sam, fasta, fasta.txt].");
+
+        sharg::output_file_validator validator2{sharg::output_file_open_options::create_new, std::vector<std::string> {}};
+        EXPECT_EQ(validator2.get_help_page_message(), "The output file must not exist already and write permissions "
+                                                      "must be granted.");
     }
 }
 
