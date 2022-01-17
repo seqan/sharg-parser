@@ -174,7 +174,7 @@ public:
     value_list_validator(range_type rng)
     {
         values.clear();
-    std::move(rng.begin(), rng.end(), std::back_inserter(values));
+        std::move(rng.begin(), rng.end(), std::back_inserter(values));
     }
 
     /*!\brief Constructing from a parameter pack.
