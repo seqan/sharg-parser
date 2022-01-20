@@ -23,3 +23,14 @@ The following API changes should be documented as such:
 
 If possible, provide tooling that performs the changes, e.g. a shell-script.
 -->
+
+## API changes
+
+#### I/O
+
+* In order to avoid using the seqan3 I/O module, you now have to give a list of file extensions explicitly to
+`sharg::input_file_validator` and `sharg::output_file_validator`:
+For example `sharg::input_file_validator validator{std::vector<std::string>{{"exe"}, {"fasta"}}};`. Please follow
+https://github.com/seqan/seqan3/issues/2927 to see how the list of file extensions can be extracted from seqan3 files.
+We also removed the `default_extensions()` function, as we now can construct `output_file_validator` with just a given
+mode: `output_file_validator(output_file_open_options const mode)`. The extensions will be an empty array in this case.

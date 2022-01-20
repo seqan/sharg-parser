@@ -12,12 +12,12 @@
 
 #pragma once
 
+#include <seqan3/std/algorithm>
 #include <fstream>
 #include <regex>
 
 #include <seqan3/core/debug_stream/detail/to_string.hpp>
 #include <seqan3/core/debug_stream/range.hpp>
-#include <seqan3/io/detail/misc.hpp>
 
 #include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/exceptions.hpp>
@@ -262,7 +262,6 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
 
 /*!\brief An abstract base class for the file and directory validators.
  * \ingroup argument_parser
- * \tparam file_t The type of the file to get the valid extensions for; `void` on default.
  *
  * \details
  *
@@ -458,7 +457,6 @@ protected:
 /*!\brief A validator that checks if a given path is a valid input file.
  * \ingroup argument_parser
  * \implements sharg::validator
- * \tparam file_t The type of the file to get the valid extensions for; `void` on default.
  *
  * \details
  *
@@ -469,9 +467,7 @@ protected:
  *
  * \include test/snippet/argument_parser/validators_input_file.cpp
  *
- * The valid extensions can also be obtained from a seqan3 formatted file type, e.g. sharg::sequence_input_file, if
- * it is given as template argument to this class. The following snippet demonstrates the different ways to instantiate
- * the sharg::input_file_validator.
+ * The following snippet demonstrates the different ways to instantiate the sharg::input_file_validator.
  *
  * \include test/snippet/argument_parser/validators_input_file_ext_from_file.cpp
  *
@@ -479,13 +475,9 @@ protected:
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-template <typename file_t = void>
 class input_file_validator : public file_validator_base
 {
 public:
-
-    static_assert(std::same_as<file_t, void> || seqan3::detail::has_type_valid_formats<file_t>,
-                  "Expected either a template type with a static member called valid_formats (a file type) or void.");
 
     // Import from base class.
     using typename file_validator_base::option_value_type;
@@ -494,22 +486,7 @@ public:
      * \{
      */
 
-    /*!\brief Default constructor.
-     *
-     * \details
-     *
-     * If the class' template argument `file_t` names a valid seqan3 file type that contains a
-     * static member `valid_formats`, e.g. seqan3::sequence_input_file::valid_formats, then it generates the
-     * list of valid extensions from this file. Otherwise the extensions list is empty.
-     */
-    input_file_validator()
-    {
-        if constexpr (!std::same_as<file_t, void>)
-            file_validator_base::extensions = seqan3::detail::valid_file_extensions<typename file_t::valid_formats>();
-
-        file_validator_base::extensions_str = create_extensions_str();
-    }
-
+    input_file_validator() = default;                                         //!< Defaulted.
     input_file_validator(input_file_validator const &) = default;             //!< Defaulted.
     input_file_validator(input_file_validator &&) = default;                  //!< Defaulted.
     input_file_validator & operator=(input_file_validator const &) = default; //!< Defaulted.
@@ -518,17 +495,8 @@ public:
 
     /*!\brief Constructs from a given collection of valid extensions.
      * \param[in] extensions The valid extensions to validate for.
-     *
-     * \details
-     *
-     * This constructor is only available if `file_t` does not name a valid seqan3 file type that contains a
-     * static member `valid_formats`.
      */
-    explicit input_file_validator(std::vector<std::string> extensions)
-    //!\cond
-        requires std::same_as<file_t, void>
-    //!\endcond
-        : file_validator_base{}
+    explicit input_file_validator(std::vector<std::string> extensions) : file_validator_base{}
     {
         file_validator_base::extensions = std::move(extensions);
         file_validator_base::extensions_str = create_extensions_str();
@@ -592,7 +560,6 @@ enum class output_file_open_options
 /*!\brief A validator that checks if a given path is a valid output file.
  * \ingroup argument_parser
  * \implements sharg::validator
- * \tparam file_t The type of the file to get the valid extensions for; `void` on default.
  *
  * \details
  *
@@ -607,9 +574,7 @@ enum class output_file_open_options
  *
  * \include test/snippet/argument_parser/validators_output_file.cpp
  *
- * The valid extensions can also be obtained from a seqan3 formatted file type, e.g. sharg::sequence_input_file, if
- * it is given as template argument to this class. The following snippet demonstrates the different ways to instantiate
- * the sharg::output_file_validator.
+ * The following snippet demonstrates the different ways to instantiate the sharg::output_file_validator.
  *
  * \include test/snippet/argument_parser/validators_output_file_ext_from_file.cpp
  *
@@ -617,12 +582,9 @@ enum class output_file_open_options
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-template <typename file_t = void>
 class output_file_validator : public file_validator_base
 {
 public:
-    static_assert(std::same_as<file_t, void> || seqan3::detail::has_type_valid_formats<file_t>,
-                "Expected either a template type with a static member called valid_formats (a file type) or void.");
 
     // Import from base class.
     using typename file_validator_base::option_value_type;
@@ -632,23 +594,20 @@ public:
      */
 
     //!\copydoc sharg::input_file_validator::input_file_validator()
-    output_file_validator() : output_file_validator{output_file_open_options::create_new}
-    {}
+    output_file_validator() : output_file_validator{output_file_open_options::create_new} {}
 
-    output_file_validator(output_file_validator const &) = default; //!< Defaulted.
-    output_file_validator(output_file_validator &&) = default; //!< Defaulted.
+    output_file_validator(output_file_validator const &) = default;             //!< Defaulted.
+    output_file_validator(output_file_validator &&) = default;                  //!< Defaulted.
     output_file_validator & operator=(output_file_validator const &) = default; //!< Defaulted.
-    output_file_validator & operator=(output_file_validator &&) = default; //!< Defaulted.
+    output_file_validator & operator=(output_file_validator &&) = default;      //!< Defaulted.
     virtual ~output_file_validator() = default; //!< Virtual Destructor.
 
     /*!\brief Constructs from a given overwrite mode and a list of valid extensions.
      * \param[in] mode A sharg::output_file_open_options indicating whether the validator throws if a file already
                        exists.
-     * \param[in] extensions The valid extensions to validate for. Defaults to
-     *                       sharg::output_file_validator::default_extensions.
+     * \param[in] extensions The valid extensions to validate for.
      */
-    explicit output_file_validator(output_file_open_options const mode,
-                                   std::vector<std::string> extensions = default_extensions())
+    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> extensions = {})
         : file_validator_base{}, mode{mode}
     {
         file_validator_base::extensions = std::move(extensions);
@@ -658,21 +617,6 @@ public:
     // Import base constructor.
     using file_validator_base::file_validator_base;
     //!\}
-
-    /*!\brief The default extensions of `file_t`.
-     * \returns A list of default extensions for `file_t`, will be empty if `file_t` is `void`.
-     *
-     * \details
-     *
-     * If `file_t` does name a valid seqan3 file type that contains a static member `valid_formats` returns the
-     * extensions of that `file_t` type. Otherwise returns an empty list.
-     */
-    static std::vector<std::string> default_extensions()
-    {
-        if constexpr (!std::same_as<file_t, void>)
-            return seqan3::detail::valid_file_extensions<typename file_t::valid_formats>();
-        return {};
-    }
 
     // Import the base::operator()
     using file_validator_base::operator();

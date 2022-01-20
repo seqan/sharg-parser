@@ -13,6 +13,7 @@
 #pragma once
 
 #include <set>
+#include <variant>
 
 #include <sharg/detail/format_help.hpp>
 #include <sharg/detail/format_html.hpp>

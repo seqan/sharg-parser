@@ -11,35 +11,19 @@
 #include <sharg/test/file_access.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
-struct dummy_file
-{
-
-    struct format1
-    {
-        static inline std::vector<std::string> file_extensions{ {"fa"}, {"fasta"}};
-    };
-
-    struct format2
-    {
-        static inline std::vector<std::string> file_extensions{ {"sam"}, {"bam"}};
-    };
-
-    using valid_formats = seqan3::type_list<format1, format2>;
-};
-
 std::string const basic_options_str = "OPTIONS\n"
-                                     "\n"
-                                     "  Basic options:\n"
-                                     "    -h, --help\n"
-                                     "          Prints the help page.\n"
-                                     "    -hh, --advanced-help\n"
-                                     "          Prints the help page including advanced options.\n"
-                                     "    --version\n"
-                                     "          Prints the version information.\n"
-                                     "    --copyright\n"
-                                     "          Prints the copyright/license information.\n"
-                                     "    --export-help (std::string)\n"
-                                     "          Export the help page information. Value must be one of [html, man].\n";
+                                      "\n"
+                                      "  Basic options:\n"
+                                      "    -h, --help\n"
+                                      "          Prints the help page.\n"
+                                      "    -hh, --advanced-help\n"
+                                      "          Prints the help page including advanced options.\n"
+                                      "    --version\n"
+                                      "          Prints the version information.\n"
+                                      "    --copyright\n"
+                                      "          Prints the copyright/license information.\n"
+                                      "    --export-help (std::string)\n"
+                                      "          Export the help page information. Value must be one of [html, man].\n";
 
 std::string const basic_version_str = "VERSION\n"
                                       "    Last update:\n"
@@ -73,8 +57,8 @@ TEST(validator_test, fullfill_concept)
     EXPECT_TRUE(sharg::validator<sharg::arithmetic_range_validator<int>>);
     EXPECT_TRUE(sharg::validator<sharg::value_list_validator<double>>);
     EXPECT_TRUE(sharg::validator<sharg::value_list_validator<std::string>>);
-    EXPECT_TRUE(sharg::validator<sharg::input_file_validator<>>);
-    EXPECT_TRUE(sharg::validator<sharg::output_file_validator<>>);
+    EXPECT_TRUE(sharg::validator<sharg::input_file_validator>);
+    EXPECT_TRUE(sharg::validator<sharg::output_file_validator>);
     EXPECT_TRUE(sharg::validator<sharg::input_directory_validator>);
     EXPECT_TRUE(sharg::validator<sharg::output_directory_validator>);
     EXPECT_TRUE(sharg::validator<sharg::regex_validator>);
@@ -132,11 +116,6 @@ TEST(validator_test, input_file)
             EXPECT_NO_THROW(my_validator(tmp_name_multiple.get_path()));
         }
 
-        {  // read from file
-            sharg::input_file_validator<dummy_file> my_validator{};
-            EXPECT_NO_THROW(my_validator(tmp_name.get_path()));
-        }
-
         std::filesystem::path file_in_path;
 
         // option
@@ -192,17 +171,15 @@ TEST(validator_test, input_file)
                                basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
-}
 
-TEST(validator_test, input_file_ext_from_file)
-{
-    // Give as a template argument the seqan3 file type to get all valid extensions for this file.
-    sharg::input_file_validator<dummy_file> validator{};
-    EXPECT_EQ(validator.get_help_page_message(), "The input file must exist and read permissions must be granted. "
-                                                 "Valid file extensions are: [fa, fasta, sam, bam].");
+    { // get help page message (file extensions)
+        sharg::input_file_validator validator1{formats};
+        EXPECT_EQ(validator1.get_help_page_message(), "The input file must exist and read permissions must be granted. "
+                                                      "Valid file extensions are: [fa, sam, fasta, fasta.txt].");
 
-    sharg::input_file_validator validator2{};
-    EXPECT_EQ(validator2.get_help_page_message(), "The input file must exist and read permissions must be granted.");
+        sharg::input_file_validator validator2{std::vector<std::string> {}};
+        EXPECT_EQ(validator2.get_help_page_message(), "The input file must exist and read permissions must be granted.");
+    }
 }
 
 TEST(validator_test, output_file)
@@ -261,11 +238,6 @@ TEST(validator_test, output_file)
             multiple_extension.replace_extension("fasta.txt");
             sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new, formats};
             EXPECT_NO_THROW(my_validator(multiple_extension));
-        }
-
-        {  // read from file
-            sharg::output_file_validator<dummy_file> my_validator{};
-            EXPECT_NO_THROW(my_validator(tmp_name.get_path()));
         }
 
         std::filesystem::path file_out_path;
@@ -355,33 +327,17 @@ TEST(validator_test, output_file)
                                basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
-}
 
-TEST(validator_test, output_file_ext_from_file)
-{
-    // Give as a template argument the seqan3 file type to get all valid extensions for this file.
-    sharg::output_file_validator<dummy_file> validator1{};
-    EXPECT_EQ(validator1.get_help_page_message(), "The output file must not exist already and write permissions must "
-                                                  "be granted. Valid file extensions are: [fa, fasta, sam, bam].");
+    { // get help page message (file extensions)
+        sharg::output_file_validator validator1{sharg::output_file_open_options::create_new, formats};
+        EXPECT_EQ(validator1.get_help_page_message(), "The output file must not exist already and write permissions "
+                                                      "must be granted. Valid file extensions are: "
+                                                      "[fa, sam, fasta, fasta.txt].");
 
-    sharg::output_file_validator<dummy_file> validator2{sharg::output_file_open_options::create_new};
-    EXPECT_EQ(validator2.get_help_page_message(), "The output file must not exist already and write permissions must "
-                                                  "be granted. Valid file extensions are: [fa, fasta, sam, bam].");
-
-    sharg::output_file_validator<dummy_file> validator3{sharg::output_file_open_options::open_or_create};
-    EXPECT_EQ(validator3.get_help_page_message(), "Write permissions must be granted. Valid file extensions are: [fa, "
-                                                  "fasta, sam, bam].");
-
-    sharg::output_file_validator validator4{};
-    EXPECT_EQ(validator4.get_help_page_message(), "The output file must not exist already and write permissions must "
-                                                  "be granted.");
-
-    sharg::output_file_validator validator5{sharg::output_file_open_options::create_new};
-    EXPECT_EQ(validator5.get_help_page_message(), "The output file must not exist already and write permissions must "
-                                                  "be granted.");
-
-    sharg::output_file_validator validator6{sharg::output_file_open_options::open_or_create};
-    EXPECT_EQ(validator6.get_help_page_message(), "Write permissions must be granted.");
+        sharg::output_file_validator validator2{sharg::output_file_open_options::create_new, std::vector<std::string> {}};
+        EXPECT_EQ(validator2.get_help_page_message(), "The output file must not exist already and write permissions "
+                                                      "must be granted.");
+    }
 }
 
 TEST(validator_test, input_directory)
