@@ -57,7 +57,7 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
 /*!\brief A validator that checks whether a number is inside a given range.
  * \ingroup argument_parser
  * \implements sharg::validator
- * \tparam option_value_t The value type of the range; must model seqan3::arithmetic .
+ * \tparam option_value_t The value type of the range; must model std::is_arithmetic_v.
  *
  * \details
  *
@@ -69,7 +69,10 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-template <seqan3::arithmetic option_value_t>
+template <typename option_value_t>
+//!\cond
+    requires std::is_arithmetic_v<option_value_t>
+//!\endcond
 class arithmetic_range_validator
 {
 public:
@@ -96,13 +99,13 @@ public:
 
     /*!\brief Tests whether every element in \p range lies inside [`min`, `max`].
      * \tparam range_type The type of range to check; must model std::ranges::forward_range. The value type must model
-     *                    seqan3::arithmetic.
+     *                    std::is_arithmetic_v.
      * \param  range      The input range to iterate over and check every element.
      * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
     //!\cond
-        requires seqan3::arithmetic<std::ranges::range_value_t<range_type>>
+        requires std::is_arithmetic_v<std::ranges::range_value_t<range_type>>
     //!\endcond
     void operator()(range_type const & range) const
     {
