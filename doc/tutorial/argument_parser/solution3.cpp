@@ -7,9 +7,8 @@
 template <typename number_type, typename range_type>
 number_type to_number(range_type && range)
 {
-    std::string str;
+    std::string str = [&range] () { std::string s; for (auto c : range) s.push_back(c); return s; }();
     number_type num;
-    std::ranges::copy(range, std::cpp20::back_inserter(str));
     auto res = std::from_chars(&str[0], &str[0] + str.size(), num);
 
     if (res.ec != std::errc{})
