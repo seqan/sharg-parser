@@ -67,6 +67,7 @@ requires (std::ostream & os, type & con)
  * \remark For a complete overview, take a look at \ref argument_parser
  */
 template <typename option_type>
-concept argument_parser_compatible_option = sharg::istreamable<option_type> || named_enumeration<option_type>;
+concept argument_parser_compatible_option = (sharg::istreamable<option_type> && sharg::ostreamable<option_type>) ||
+                                            named_enumeration<option_type>;
 
 } // namespace sharg

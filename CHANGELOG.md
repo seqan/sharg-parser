@@ -20,7 +20,13 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 ## API changes
 
-#### I/O
+#### General
+
+* Custom option types must not only model `sharg::istreamable` (`stream >> option`)
+  but must also model `sharg::ostreamable` in order to be used in `parser.add_option()` calls.
+  All standard types as well as types that overload `sharg::named_enumeration` are not affected.
+
+#### Validators
 
 * In order to avoid using the seqan3 I/O module, you now have to give a list of file extensions explicitly to
 `sharg::input_file_validator` and `sharg::output_file_validator`:
