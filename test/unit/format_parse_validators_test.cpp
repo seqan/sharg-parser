@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include <seqan3/std/ranges>
+
 #include <sharg/argument_parser.hpp>
 #include <sharg/test/file_access.hpp>
 #include <sharg/test/tmp_filename.hpp>
@@ -956,7 +958,7 @@ TEST(validator_test, value_list_validator_success)
                            "\n" +
                            basic_options_str +
                            "    -i, --int-option (List of signed 32 bit integer)\n"
-                           "          desc Default: []. Value must be one of [-10,48,50].\n\n" +
+                           "          desc Default: []. Value must be one of [-10, 48, 50].\n\n" +
                            basic_version_str);
     EXPECT_EQ(my_stdout, expected);
 }

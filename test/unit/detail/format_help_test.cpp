@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include <seqan3/std/ranges>
+
 #include <sharg/argument_parser.hpp>
 
 // reused global variables
@@ -449,8 +451,8 @@ TEST(help_page_printing, full_information)
                "    -i, --int (signed 32 bit integer)\n"
                "          this is a int option. Default: 5.\n"
                "    -e, --enum (foo)\n"
-               "          this is an enum option. Default: one. Value must be one of\n"
-               "          [three,two,one].\n"
+               "          this is an enum option. Default: one. Value must be one of [three,\n"
+               "          two, one].\n"
                "    -r, --required-int (signed 8 bit integer)\n"
                "          this is another int option.\n"
                "\n"

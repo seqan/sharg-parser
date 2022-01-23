@@ -222,7 +222,7 @@ public:
     {
         std::string id = prep_id_for_help(short_id, long_id) + " " + option_type_and_list_info(value);
         std::string info{desc};
-        info += ((spec & option_spec::required) ? std::string{" "} : seqan3::detail::to_string(" Default: ", value, ". "));
+        info += ((spec & option_spec::required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
         info += option_validator.get_help_page_message();
         store_help_page_element([this, id, info] () { derived_t().print_list_item(id, info); }, spec);
     }
@@ -253,12 +253,12 @@ public:
         positional_option_calls.push_back([this, &value, desc, msg] ()
         {
             ++positional_option_count;
-            derived_t().print_list_item(seqan3::detail::to_string("\\fBARGUMENT-", positional_option_count, "\\fP ",
-                                                                  option_type_and_list_info(value)),
+            derived_t().print_list_item(detail::to_string("\\fBARGUMENT-", positional_option_count, "\\fP ",
+                                        option_type_and_list_info(value)),
                                         desc +
                                         // a list at the end may be empty and thus have a default value
                                         ((detail::is_container_option<option_type>)
-                                            ? seqan3::detail::to_string(" Default: ", value, ". ")
+                                            ? detail::to_string(" Default: ", value, ". ")
                                             : std::string{" "}) +
                                         msg);
         });
