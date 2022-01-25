@@ -228,6 +228,13 @@ TEST(validator_test, output_file)
             EXPECT_THROW(my_validator(no_extension), sharg::validation_error);
         }
 
+        { // filename is shorter than extension.
+            std::filesystem::path filename{tmp_name.get_path()};
+            std::vector<std::string> long_extension{"super_duper_long_extension_longer_than_seqan_tmp_filename"};
+            sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new, long_extension};
+            EXPECT_THROW(my_validator(filename), sharg::validation_error);
+        }
+
         { // filename starts with dot.
             sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new, formats};
             EXPECT_NO_THROW(my_validator(hidden_name.get_path()));
