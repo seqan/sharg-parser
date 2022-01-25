@@ -1,7 +1,7 @@
 # Contributing {#about_contributing}
 
-First of all, thanks for wanting to contribute to the Sharg-parser from the SeqAn team! Community is important to us and we strive to maintain a great
-culture and atmosphere. Please have a look at our [Code of Conduct](\ref about_code_of_conduct).
+First of all, thanks for wanting to contribute to the SeqAn's Sharg-parser! Community is important to us and we strive 
+to maintain a great culture and atmosphere. Please have a look at our [Code of Conduct](\ref about_code_of_conduct).
 
 The following is a guide that helps stream-line the process of adding changes. If you haven't contributed to Sharg/SeqAn
 before, don't worry about getting something wrong, that's absolutely OK. However, following this guide closely
@@ -21,8 +21,8 @@ The overall workflow of contributing changes to this repository is:
 
 ## Creating an issue
 
-Go to https://github.com/seqan/sharg-parser/issues and check if someone else has already reported the same issue. If not,
-create a new issue and follow the template.
+Go to https://github.com/seqan/sharg-parser/issues and check if someone else has already reported the same issue. If 
+not, create a new issue and follow the template.
 
 We usually reply quickly to issues; if there is no reply within a week (and it's not prime vacation season in Europe)
 feel free to reply to the issue and explicitly mention `@seqan/core`.
@@ -74,7 +74,7 @@ work-in-progress.
 
 After opening a PR it goes through the review process. This is a two-step process, first a regular member of the team
 needs to approve your changes, then one of the SeqAn core members needs to approve and merge it. If you
-are a collaborator of the project and know the SeqAn team member most suitable for the review you can request a review
+are a collaborator of the project and know the SeqAn team member most suitable for the review, you can request a review
 yourself. Otherwise, wait for a reviewer to be assigned to the PR. Do not request reviews from a core member at this
 point. Always only request review from one person at a time.
 
@@ -82,7 +82,8 @@ point. Always only request review from one person at a time.
 
 If you have not contributed to SeqAn before, you will likely receive a lot of comments on the style of your code. This
 is not a sign that we don't appreciate your contribution, but we have high code quality standards and everything
-must conform to our [style guide](https://github.com/seqan/seqan3/wiki#library-coding-guide). In the future we hope to automate this step.
+must conform to our [style guide](https://github.com/seqan/seqan3/wiki#library-coding-guide). In the future we hope 
+to automate this step.
 After you have received the first review, go through all comments and clarify any suggestions and requests. When
 you are confident that you know how to address all comments, implement the changes and update your PR.
 
@@ -96,7 +97,7 @@ changes. Repeat the last steps until you get approval.
 
 ### Request review by a SeqAn core member
 
-Once your changes are approved by one reviewer, request a second review from a core member (or wait for it to be assigned).
+Once your changes are approved by one reviewer, request a second review from a core member (or wait for assignment).
 They will go through everything briefly again and make sure that nothing escaped the first reviewer's notice.
 Ultimately, they will approve your changes and merge your branch.
 
