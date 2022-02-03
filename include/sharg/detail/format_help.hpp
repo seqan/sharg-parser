@@ -317,17 +317,14 @@ protected:
 
         // Tokenize the text.
         std::istringstream iss(text.c_str());
-        std::vector<std::string> tokens;
-        std::ranges::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
-                          std::cpp20::back_inserter(tokens));
+        std::vector<std::string> tokens{std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>()};
 
         // Print the text.
         assert(pos <= tab);
         std::fill_n(out, tab - pos, ' ');  // go to tab
 
         pos = tab;
-        typedef std::vector<std::string>::const_iterator TConstIter;
-        for (TConstIter it = tokens.begin(); it != tokens.end(); ++it)
+        for (auto it = tokens.begin(); it != tokens.end(); ++it)
         {
             if (it == tokens.begin())
             {

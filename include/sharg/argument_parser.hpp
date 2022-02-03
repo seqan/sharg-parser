@@ -697,7 +697,7 @@ private:
         {
             std::string arg{argv[i]};
 
-            if (std::ranges::find(subcommands, arg) != subcommands.end())
+            if (std::find(subcommands.begin(), subcommands.end(), arg) != subcommands.end())
             {
                 sub_parser = std::make_unique<argument_parser>(info.app_name + "-" + arg,
                                                                argc - i,

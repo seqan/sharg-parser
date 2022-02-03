@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include <seqan3/std/algorithm>
 #include <fstream>
 #include <regex>
 
@@ -355,7 +354,7 @@ protected:
         };
 
         // Check if requested extension is present.
-        if (std::ranges::find_if(extensions, case_insensitive_ends_with) == extensions.end())
+        if (std::find_if(extensions.begin(), extensions.end(), case_insensitive_ends_with) == extensions.end())
         {
             throw validation_error{"Expected one of the following valid extensions: " + extensions_str + "! Got " +
                                     all_extensions + " instead!"};
@@ -429,12 +428,15 @@ protected:
     {
         size_t const suffix_length{suffix.size()};
         size_t const str_length{str.size()};
-        return suffix_length > str_length ?
-               false :
-               std::ranges::equal(str.substr(str_length - suffix_length), suffix, [] (char const chr1, char const chr2)
-               {
-                   return std::tolower(chr1) == std::tolower(chr2);
-               });
+
+        if (suffix_length > str_length)
+            return false;
+
+        for (size_t j = 0, s_start = str_length - suffix_length; j < suffix_length; ++j)
+            if (std::tolower(str[s_start + j]) != std::tolower(suffix[j]))
+                return false;
+
+        return true;
     }
 
     //!\brief Creates a std::string from the extensions list, e.g. "[ext, ext2]".
