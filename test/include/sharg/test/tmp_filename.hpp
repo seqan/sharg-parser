@@ -8,7 +8,7 @@
 /*!\file
  * \author Lydia Buntrock <lydia.buntrock AT fu-berlin.de>
  * \brief Internal test infrastructure.
- *        Define some helper classes and functions for the tests that would be misplaced in the seqan3/include
+ *        Define some helper classes and functions for the tests that would be misplaced in the sharg/include
  *        directory.
  */
 

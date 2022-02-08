@@ -138,7 +138,7 @@ TEST(tmp_filename_throw, directory_not_writeable)
     {
         // Create a directory in the temporary directory.
         std::filesystem::path test_path = std::filesystem::temp_directory_path();
-        test_path /= "seqan3_tmp_filename_throw";
+        test_path /= "sharg_tmp_filename_throw";
         read_only_directory test_directory{test_path};
 
         // Set TMPDIR. This is the first env var that is looked up for `temp_directory_path` inside the `tmp_filename`.
