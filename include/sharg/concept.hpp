@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <seqan3/std/concepts>
+
 #include <sharg/auxiliary.hpp>
 
 namespace sharg
