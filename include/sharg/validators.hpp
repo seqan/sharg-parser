@@ -363,7 +363,6 @@ protected:
 
     /*!\brief Checks if the given path is readable.
      * \param path The path to check.
-     * \returns `true` if readable, otherwise `false`.
      * \throws sharg::validation_error if the path is not readable, or
      *         std::filesystem::filesystem_error on underlying OS API errors.
      */
@@ -391,7 +390,6 @@ protected:
 
     /*!\brief Checks if the given path is writable.
      * \param path The path to check.
-     * \returns `true` if writable, otherwise `false`.
      * \throws sharg::validation_error if the file could not be opened for writing, or
      *         std::filesystem::filesystem_error on underlying OS API errors.
      */
