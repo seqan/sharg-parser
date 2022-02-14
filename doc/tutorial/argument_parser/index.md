@@ -418,7 +418,7 @@ input when parsing the command line. The sharg::argument_parser provides **valid
 A *validator* is a [functor](https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses) that is
 called within the argument parser after retrieving and converting a command line argument. We provide several validators,
 which we hope cover most of the use cases, but you can always create your own validator
-(see section [Create your own validator](#section_create_your_own_validator)).
+(see section [Create your own validator](#cookbook_custom_validator)).
 
 \attention You can pass a validator to the sharg::argument_parser::add_option function only after passing the
 sharg::option_spec parameter. Pass the sharg::option_spec::standard tag if there are no further restrictions on your option.
@@ -432,8 +432,8 @@ The following validators are provided in the SeqAn library and can be included w
 All the validators below work on single values or a container of values. In case the variable is a container,
 the validator is called **on each element** separately.
 
-\note If the validators below do not suit your needs, you can always create your own validator. See the concept tutorial
-for an example of how to create your own validator.
+\note If the validators below do not suit your needs, you can always create your own validator
+(see section [Create your own validator](#cookbook_custom_validator)).
 
 ### The sharg::arithmetic_range_validator
 
