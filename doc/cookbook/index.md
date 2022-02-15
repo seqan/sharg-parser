@@ -17,3 +17,9 @@ please feel free to contact us.
 # Constructing a subcommand argument parser
 
 \include doc/howto/subcommand_argument_parser/subcommand_arg_parse.cpp
+
+# Write a custom validator {#cookbook_custom_validator}
+This recipe implements a validator that checks whether a numeric argument is an integral square (i.e. 0, 1, 4, 9...).
+Invalid values throw a sharg::validation_error.
+
+\snippet doc/tutorial/concepts/custom_validator_solution.cpp validator
