@@ -36,7 +36,7 @@ parser.add_option(variable, 'n', "my-number", "This is a description.");
 {
 sharg::argument_parser parser{"Example-Parser", argc, argv};
 //![add_flag]
-bool variable{};
+bool variable{false};
 parser.add_flag(variable, 'f', "my_flag", "This is a description.");
 //![add_flag]
 }
