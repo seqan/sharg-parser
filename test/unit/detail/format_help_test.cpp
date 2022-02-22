@@ -13,7 +13,7 @@
 std::string std_cout;
 std::string expected;
 int option_value{5};
-bool flag_value{};
+bool flag_value{false};
 std::vector<std::string> pos_opt_value{};
 const char * argv0[] = {"./help_add_test --version-check false"};
 const char * argv1[] = {"./help_add_test --version-check false", "-h"};
@@ -292,7 +292,7 @@ TEST(help_page_printing, advanced_options)
 {
     int32_t option_value{5};
     uint8_t another_option_value{2};
-    bool flag_value{};
+    bool flag_value{false};
 
     auto set_up = [&option_value, &flag_value, &another_option_value] (sharg::argument_parser & parser)
     {

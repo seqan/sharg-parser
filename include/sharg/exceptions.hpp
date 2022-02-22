@@ -138,6 +138,7 @@ public:
  *
  * - Reuse of a short or long identifier (must be unique)
  * - Both identifiers must not be empty (one is ok)
+ * - Flag default value must be false
  */
 class design_error : public argument_parser_error
 {

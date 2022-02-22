@@ -13,7 +13,7 @@
 struct format_man_test : public ::testing::Test
 {
     int option_value{5};
-    bool flag_value{};
+    bool flag_value{false};
     int8_t non_list_pos_opt_value{1};
     std::vector<std::string> list_pos_opt_value{};
     std::string my_stdout{};

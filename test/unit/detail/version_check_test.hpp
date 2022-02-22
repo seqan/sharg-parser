@@ -114,7 +114,7 @@ struct version_check : public ::testing::Test
         parser.info.version = "2.3.4";
 
         // In case we don't want to specify --version-check but avoid that short help format will be set (no arguments)
-        bool dummy{};
+        bool dummy{false};
         parser.add_flag(dummy, 'f', "dummy-flag", "A dummy flag.");
 
         testing::internal::CaptureStdout();
@@ -313,7 +313,7 @@ TEST_F(version_check, environment_variable_set)
 
     sharg::argument_parser parser{app_name, 2, argv};
     parser.info.version = "2.3.4";
-    bool dummy{};
+    bool dummy{false};
     parser.add_flag(dummy, 'f', "dummy-flag", "A dummy flag.");
 
     testing::internal::CaptureStdout();

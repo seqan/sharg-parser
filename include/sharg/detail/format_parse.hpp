@@ -718,7 +718,7 @@ private:
 
     /*!\brief Handles command line flags, whether they are set or not.
      *
-     * \param[out] value    The variable in which to store the given command line argument.
+     * \param[out] value    The variable which shows if the flag is turned off (default) or on.
      * \param[in]  short_id The short identifier for the flag (e.g. 'i').
      * \param[in]  long_id  The long identifier for the flag (e.g. "integer").
      *
