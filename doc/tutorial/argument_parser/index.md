@@ -20,7 +20,7 @@ This class will give you the following functionality:
 * Robust parsing of command line arguments.
 * Simple validation of arguments (e.g. within a range or one of a list of allowed values).
 * Automatically generated and nicely formatted help screens when your program is called with `--help`. You can also
-* export this help to HTML and man pages.
+export this help to HTML and man pages.
 * In the future, you are also able to automatically generate nodes for work flow engines such as KNIME or Galaxy.
 
 ## Command line argument terminology
@@ -79,12 +79,13 @@ screen.
 The argument parser checks the following restrictions and throws a sharg::design_error if they are not satisfied:
 
 * **Long identifiers**: must be unique, more than one character long, may only contain alphanumeric characters, as well
-* as `_`, `-`, or `@`, but never start with `-`.
+as `_`, `-`, or `@`, but never start with `-`.
 * **Short identifiers**: must be unique and consist of only a single letter that is alphanumeric characters, `_` or `@`.
-* either the short or long id may be empty but not both at the same time.
+Either the short or long id may be empty but not both at the same time.
 * Only the last positional option may be a list (see [lists](#section_list_positional_options)).
 * The flag identifiers `-h`, `--help`, `--advanced-help`, `--advanced-help`, `--export-help`, `--version`, `--copyright`
-* are predefined and cannot be specified manually or used otherwise.
+are predefined and cannot be specified manually or used otherwise.
+* **Flags**: value must be false by default. Passing the flag identifier on the command line marks it as true.
 * The sharg::argument_parser::parse function may only be called once (per parser).
 
 ## Input restrictions
@@ -203,6 +204,9 @@ You can add an option like this:
 Additionally to the variable that will store the value and the description, you need to specify a short and long
 identifier. The example above will recognize an option `-n` or `--my-number` given on the command line and expect it to
 be followed by a value separated only by `=` or space or by nothing at all.
+
+\note Unlike regular options which take id-value pairs, flags are passed as an identifier only. The variable associated 
+to a flag must be false by default and is switched to true when the flag is present on the command line.
 
 Finally, you can add a flag with the following call:
 

@@ -59,7 +59,7 @@ struct cmd_arguments
     std::filesystem::path file_path{};
     std::vector<uint8_t> seasons{};
     std::string aggregate_by{"mean"};
-    bool header_is_set{};
+    bool header_is_set{false};
 };
 
 void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments & args)
