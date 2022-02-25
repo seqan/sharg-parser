@@ -27,8 +27,6 @@ namespace sharg
  * ### Requirements
  *
  * `std::istream` must support the (un)formatted input function (`operator>>`) for an l-value of a given `value_type`.
- *
- * todo: link to how-to page how to make your type istreamable
  */
 template <typename value_type>
 concept istreamable = requires (std::istream & is, value_type & val)
