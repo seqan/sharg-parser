@@ -5,17 +5,17 @@
 # API stability {#api_stability}
 
 Sharg adheres to [semantic versioning](https://semver.org) and provides a stable API within
-one major release (all of `sharg-1.*.*`) unless otherwise noted.
+one major release unless otherwise noted.
 
-For details regarding API stability please see the
-[SeqAn part on API stability](http://docs.seqan.de/seqan/3-master-user/about_api.html#api_stability).
+For details regarding API stability, please see the
+[SeqAn documentation on API stability](http://docs.seqan.de/seqan/3-master-user/about_api.html#api_stability).
 
 # ABI stability
 
 There is no ABI stability.
 
-For details regarding API stability please see the
-[SeqAn part on ABI stability](http://docs.seqan.de/seqan/3-master-user/about_api.html#autotoc_md38).
+For details regarding API stability, please see the
+[SeqAn documentation on ABI stability](http://docs.seqan.de/seqan/3-master-user/about_api.html#autotoc_md38).
 
 # Platform stability {#platform_stability}
 
@@ -59,4 +59,4 @@ patches are welcome, but we do not actively test for those operating systems. Se
 
 # Dependencies
 
-We will try to keep the Sharg Parser independent of any external libraries.
+We will keep Sharg independent of any external libraries, unless absolutely necessary.
