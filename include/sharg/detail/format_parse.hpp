@@ -15,6 +15,7 @@
 #include <sharg/std/charconv>
 
 #include <sharg/detail/format_base.hpp>
+#include <sharg/concept.hpp>
 
 namespace sharg::detail
 {
@@ -284,7 +285,7 @@ private:
     }
 
     /*!\brief Tries to parse an input string into a value using the stream `operator>>`.
-     * \tparam option_t Must model seqan3::input_stream_over.
+     * \tparam option_t Must model sharg::istreamable.
      * \param[out] value Stores the parsed value.
      * \param[in] in The input argument to be parsed.
      * \returns sharg::option_parse_result::error if `in` could not be parsed via the stream
@@ -292,7 +293,7 @@ private:
      */
     template <typename option_t>
     //!\cond
-        requires seqan3::input_stream_over<std::istringstream, option_t>
+        requires istreamable<option_t>
     //!\endcond
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
@@ -407,7 +408,7 @@ private:
      */
     template <typename option_t>
     //!\cond
-        requires std::is_arithmetic_v<option_t> && seqan3::input_stream_over<std::istringstream, option_t>
+        requires std::is_arithmetic_v<option_t> && istreamable<option_t>
     //!\endcond
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
