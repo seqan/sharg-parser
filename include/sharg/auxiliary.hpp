@@ -14,8 +14,8 @@
 
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
-#include <seqan3/core/debug_stream/debug_stream_type.hpp>
 #include <seqan3/core/detail/customisation_point.hpp>
 
 #include <sharg/platform.hpp>
@@ -291,11 +291,11 @@ struct argument_parser_meta_data // holds all meta information
 } // namespace sharg
 
 //!\cond
-namespace seqan3
+namespace std
 {
-template <typename char_t, typename option_type>
+template <typename option_type>
     requires sharg::named_enumeration<std::remove_cvref_t<option_type>>
-inline debug_stream_type<char_t> & operator<<(debug_stream_type<char_t> & s, option_type && op)
+inline ostream & operator<<(ostream & s, option_type && op)
 {
     for (auto & [key, value] : sharg::enumeration_names<option_type>)
     {
@@ -305,5 +305,5 @@ inline debug_stream_type<char_t> & operator<<(debug_stream_type<char_t> & s, opt
 
     return s << "<UNKNOWN_VALUE>";
 }
-}
+} // namespace std
 //!\endcond

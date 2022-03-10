@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include <seqan3/std/ranges>
+
 #include <sharg/argument_parser.hpp>
 
 TEST(parse_type_test, add_option_short_id)

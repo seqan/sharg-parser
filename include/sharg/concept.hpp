@@ -34,6 +34,26 @@ concept istreamable = requires (std::istream & is, value_type & val)
     SHARG_RETURN_TYPE_CONSTRAINT(is >> val, std::same_as, std::istream&);
 };
 
+/*!\concept sharg::ostreamable
+ * \ingroup argument_parser
+ * \brief Concept for types that can be parsed into a std::ostream via the stream operator.
+ * \tparam type The type to check whether it's stremable via std::ostream or it's a container over streamable values.
+ *
+ * ### Requirements
+ *
+ * `std::ostream` must support the (un)formatted output function (`operator<<`) for an l-value of a given `type` or
+ * for an l-value of `type::reference`.
+ */
+template <typename type>
+concept ostreamable = requires (std::ostream & os, type & val)
+{
+    SHARG_RETURN_TYPE_CONSTRAINT(os << val, std::same_as, std::ostream&);
+} ||
+requires (std::ostream & os, type & con)
+{
+    SHARG_RETURN_TYPE_CONSTRAINT(os << con[0], std::same_as, std::ostream&);
+};
+
 /*!\concept sharg::argument_parser_compatible_option
  * \brief Checks whether the the type can be used in an add_(positional_)option call on the argument parser.
  * \ingroup argument_parser
@@ -47,6 +67,7 @@ concept istreamable = requires (std::istream & is, value_type & val)
  * \remark For a complete overview, take a look at \ref argument_parser
  */
 template <typename option_type>
-concept argument_parser_compatible_option = sharg::istreamable<option_type> || named_enumeration<option_type>;
+concept argument_parser_compatible_option = (sharg::istreamable<option_type> && sharg::ostreamable<option_type>) ||
+                                            named_enumeration<option_type>;
 
 } // namespace sharg

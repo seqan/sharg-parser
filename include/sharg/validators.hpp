@@ -15,10 +15,11 @@
 #include <fstream>
 #include <regex>
 
-#include <seqan3/core/debug_stream/detail/to_string.hpp>
-#include <seqan3/core/debug_stream/range.hpp>
+#include <seqan3/std/concepts>
+#include <seqan3/std/ranges>
 
 #include <sharg/detail/safe_filesystem_entry.hpp>
+#include <sharg/detail/to_string.hpp>
 #include <sharg/exceptions.hpp>
 
 namespace sharg
@@ -131,7 +132,7 @@ private:
 /*!\brief A validator that checks whether a value is inside a list of valid values.
  * \ingroup argument_parser
  * \implements sharg::validator
- * \tparam option_value_t \copybrief sharg::value_list_validator::option_value_type
+ * \tparam option_value_t The type the validator is called on. Must model sharg::argument_parser_compatible_option.
  *
  * \details
  *
@@ -147,7 +148,7 @@ private:
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-template <typename option_value_t>
+template <argument_parser_compatible_option option_value_t>
 class value_list_validator
 {
 public:
@@ -201,7 +202,7 @@ public:
     void operator()(option_value_type const & cmp) const
     {
         if (!(std::find(values.begin(), values.end(), cmp) != values.end()))
-            throw validation_error{seqan3::detail::to_string("Value ", cmp, " is not one of ", std::views::all(values), ".")};
+            throw validation_error{detail::to_string("Value ", cmp, " is not one of ", values,".")};
     }
 
     /*!\brief Tests whether every element in \p range lies inside values.
@@ -221,11 +222,10 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string("Value must be one of ", std::views::all(values), ".");
+        return detail::to_string("Value must be one of ", values, ".");
     }
 
 private:
-
     //!\brief Minimum of the range to test.
     std::vector<option_value_type> values{};
 };
@@ -437,19 +437,6 @@ protected:
         return true;
     }
 
-    //!\brief Creates a std::string from the extensions list, e.g. "[ext, ext2]".
-    std::string const create_extensions_str() const
-    {
-        if (extensions.empty())
-            return "[]";
-
-        std::string result{'['};
-        for (std::string const & ext : extensions)
-            result += ext + ", ";
-        result.replace(result.size() - 2, 2, "]"); // replace last ", " by "]"
-        return result;
-    }
-
     //!\brief Stores the extensions.
     std::vector<std::string> extensions{};
 
@@ -501,8 +488,8 @@ public:
      */
     explicit input_file_validator(std::vector<std::string> extensions) : file_validator_base{}
     {
+        file_validator_base::extensions_str = detail::to_string(extensions);
         file_validator_base::extensions = std::move(extensions);
-        file_validator_base::extensions_str = create_extensions_str();
     }
 
     // Import base class constructor.
@@ -613,8 +600,8 @@ public:
     explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> extensions = {})
         : file_validator_base{}, mode{mode}
     {
+        file_validator_base::extensions_str = detail::to_string(extensions);
         file_validator_base::extensions = std::move(extensions);
-        file_validator_base::extensions_str = create_extensions_str();
     }
 
     // Import base constructor.
