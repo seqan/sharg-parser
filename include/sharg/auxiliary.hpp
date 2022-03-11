@@ -16,8 +16,6 @@
 #include <vector>
 #include <iostream>
 
-#include <seqan3/core/detail/customisation_point.hpp>
-
 #include <sharg/platform.hpp>
 
 namespace sharg::custom
@@ -65,6 +63,25 @@ struct argument_parsing<t const &> : argument_parsing<t>
 
 } // sharg::custom
 
+namespace sharg::detail
+{
+//!\brief A tag that allows controlled overload resolution via implicit base conversion rules.
+//!\ingroup core
+template <size_t I>
+struct priority_tag
+//!\cond
+// Doxygen fail
+: priority_tag<I-1>
+//!\endcond
+{};
+
+//!\brief Recursion anchor for sharg::detail::priority_tag.
+template <>
+struct priority_tag<0>
+{};
+
+} // sharg::detail
+
 namespace sharg::detail::adl_only
 {
 
@@ -72,7 +89,7 @@ namespace sharg::detail::adl_only
 template <typename t>
 std::unordered_map<std::string_view, t> enumeration_names(t) = delete;
 
-//!\brief seqan3::detail::customisation_point_object (CPO) definition for sharg::enumeration_names.
+//!\brief sharg::detail::customisation_point_object (CPO) definition for sharg::enumeration_names.
 //!\ingroup argument_parser
 //!\remark For a complete overview, take a look at \ref argument_parser
 template <typename option_t>
@@ -101,7 +118,7 @@ struct enumeration_names_cpo
      * \tparam option_type The type of the option. (Needed to defer instantiation for incomplete types.)
      */
     template <typename option_type = option_t>
-    static constexpr auto cpo_overload(seqan3::detail::priority_tag<1>)
+    static constexpr auto cpo_overload(sharg::detail::priority_tag<1>)
     noexcept(noexcept(sharg::custom::argument_parsing<option_type>::enumeration_names)) \
       -> decltype(sharg::custom::argument_parsing<option_type>::enumeration_names) \
     {
@@ -118,7 +135,7 @@ struct enumeration_names_cpo
      * `enumeration_names(std::type_identity<option_t>{})` will be called.
      */
     template <typename option_type = option_t>
-    static constexpr auto cpo_overload(seqan3::detail::priority_tag<0>)
+    static constexpr auto cpo_overload(sharg::detail::priority_tag<0>)
     noexcept(noexcept(enumeration_names(option_or_type_identity<option_type>{})))
       -> decltype(enumeration_names(option_or_type_identity<option_type>{}))
     {
@@ -128,19 +145,19 @@ struct enumeration_names_cpo
     /*!\brief SFINAE-friendly call-operator to resolve CPO overload resolution.
      *
      * This operator implements the actual CPO overload resolution. Overload resolution will try each base class of
-     * seqan3::detail::priority_tag<1> and seqan3::detail::priority_tag<0>.
-     * seqan3::detail::priority_tag<0> as first argument to `cpo_overload`. That means a high priority in
-     * seqan3::detail::priority_tag will be evaluated first and one can define an order which overload should be
+     * sharg::detail::priority_tag<1> and sharg::detail::priority_tag<0>.
+     * sharg::detail::priority_tag<0> as first argument to `cpo_overload`. That means a high priority in
+     * sharg::detail::priority_tag will be evaluated first and one can define an order which overload should be
      * prioritised if multiple overloads match.
      *
      * It perfectly forwards the result and noexcept-property of the `cpo_overload`.
      */
     template <typename ...args_t, typename option_type = option_t /*circumvent incomplete types*/>
     constexpr auto operator()(args_t && ...args) const
-    noexcept(noexcept(cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...)))
-      -> decltype(cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...))
+    noexcept(noexcept(cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...)))
+      -> decltype(cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...))
     {
-        return cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...);
+        return cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...);
     }
 };
 
