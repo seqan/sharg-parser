@@ -76,12 +76,17 @@ std::unordered_map<std::string_view, t> enumeration_names(t) = delete;
 //!\ingroup argument_parser
 //!\remark For a complete overview, take a look at \ref argument_parser
 template <typename option_t>
-struct enumeration_names_cpo : public seqan3::detail::customisation_point_object<enumeration_names_cpo<option_t>, 1>
+struct enumeration_names_cpo
 {
-    //!\brief CRTP base class seqan3::detail::customisation_point_object.
-    using base_t = seqan3::detail::customisation_point_object<enumeration_names_cpo<option_t>, 1>;
-    //!\brief Only this class is allowed to import the constructors from #base_t. (CRTP safety idiom)
-    using base_t::base_t;
+    /*!\name Constructors, destructor and assignment
+     * \{
+     */
+    constexpr enumeration_names_cpo() = default; //!< Defaulted.
+    constexpr enumeration_names_cpo(enumeration_names_cpo &&) = default; //!< Defaulted.
+    constexpr enumeration_names_cpo(enumeration_names_cpo const &) = default; //!< Defaulted.
+    constexpr enumeration_names_cpo & operator=(enumeration_names_cpo &&) = default; //!< Defaulted.
+    constexpr enumeration_names_cpo & operator=(enumeration_names_cpo const &) = default; //!< Defaulted.
+    //!\}
 
     /*!\brief If `option_t` isn't std::is_nothrow_default_constructible, enumeration_names will be called with
      *        std::type_identity instead of a default constructed alphabet.
@@ -114,6 +119,23 @@ struct enumeration_names_cpo : public seqan3::detail::customisation_point_object
     static constexpr auto SEQAN3_CPO_OVERLOAD(seqan3::detail::priority_tag<0>)
     (
         /*return*/ enumeration_names(option_or_type_identity<option_type>{}) /*;*/
+    );
+
+    /*!\brief SFINAE-friendly call-operator to resolve CPO overload resolution.
+     *
+     * This operator implements the actual CPO overload resolution. Overload resolution will try each base class of
+     * seqan3::detail::priority_tag<1> and seqan3::detail::priority_tag<0>.
+     * seqan3::detail::priority_tag<0> as first argument to `cpo_overload`. That means a high priority in
+     * seqan3::detail::priority_tag will be evaluated first and one can define an order which overload should be
+     * prioritised if multiple overloads match.
+     *
+     * It perfectly forwards the result and noexcept-property of the `cpo_overload`.
+     */
+    template <typename ...args_t, typename option_type = option_t /*circumvent incomplete types*/>
+    constexpr auto operator()(args_t && ...args) const
+    SEQAN3_CPO_OVERLOAD_BODY
+    (
+        /*return*/ cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...) /*;*/
     );
 };
 
