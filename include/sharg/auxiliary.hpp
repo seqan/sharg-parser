@@ -101,10 +101,12 @@ struct enumeration_names_cpo
      * \tparam option_type The type of the option. (Needed to defer instantiation for incomplete types.)
      */
     template <typename option_type = option_t>
-    static constexpr auto SEQAN3_CPO_OVERLOAD(seqan3::detail::priority_tag<1>)
-    (
-        /*return*/ sharg::custom::argument_parsing<option_type>::enumeration_names /*;*/
-    );
+    static constexpr auto cpo_overload(seqan3::detail::priority_tag<1>)
+    noexcept(noexcept(sharg::custom::argument_parsing<option_type>::enumeration_names)) \
+      -> decltype(sharg::custom::argument_parsing<option_type>::enumeration_names) \
+    {
+        return sharg::custom::argument_parsing<option_type>::enumeration_names;
+    }
 
     /*!\brief CPO overload (check 1 out of 2): argument dependent lookup (ADL), i.e.
      *        `enumeration_names(option_type{})`
@@ -116,10 +118,12 @@ struct enumeration_names_cpo
      * `enumeration_names(std::type_identity<option_t>{})` will be called.
      */
     template <typename option_type = option_t>
-    static constexpr auto SEQAN3_CPO_OVERLOAD(seqan3::detail::priority_tag<0>)
-    (
-        /*return*/ enumeration_names(option_or_type_identity<option_type>{}) /*;*/
-    );
+    static constexpr auto cpo_overload(seqan3::detail::priority_tag<0>)
+    noexcept(noexcept(enumeration_names(option_or_type_identity<option_type>{})))
+      -> decltype(enumeration_names(option_or_type_identity<option_type>{}))
+    {
+        return enumeration_names(option_or_type_identity<option_type>{});
+    }
 
     /*!\brief SFINAE-friendly call-operator to resolve CPO overload resolution.
      *
@@ -133,10 +137,11 @@ struct enumeration_names_cpo
      */
     template <typename ...args_t, typename option_type = option_t /*circumvent incomplete types*/>
     constexpr auto operator()(args_t && ...args) const
-    SEQAN3_CPO_OVERLOAD_BODY
-    (
-        /*return*/ cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...) /*;*/
-    );
+    noexcept(noexcept(cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...)))
+      -> decltype(cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...))
+    {
+        return cpo_overload(seqan3::detail::priority_tag<1>{}, std::forward<args_t>(args)...);
+    }
 };
 
 } // namespace sharg::detail::adl_only
