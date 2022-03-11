@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <sharg/validators.hpp>
 
 int main()
