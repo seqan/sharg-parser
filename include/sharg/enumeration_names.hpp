@@ -12,9 +12,9 @@
 
 #pragma once
 
+#include <iostream>
 #include <string_view>
 #include <unordered_map>
-#include <iostream>
 
 #include <sharg/platform.hpp>
 
@@ -89,7 +89,7 @@ namespace sharg::detail::adl_only
 template <typename t>
 std::unordered_map<std::string_view, t> enumeration_names(t) = delete;
 
-//!\brief sharg::detail::customisation_point_object (CPO) definition for sharg::enumeration_names.
+//!\brief Customization Point Object (CPO) definition for sharg::enumeration_names.
 //!\ingroup argument_parser
 //!\remark For a complete overview, take a look at \ref argument_parser
 template <typename option_t>
@@ -105,7 +105,7 @@ struct enumeration_names_cpo
     constexpr enumeration_names_cpo & operator=(enumeration_names_cpo const &) = default; //!< Defaulted.
     //!\}
 
-    /*!\brief If `option_t` isn't std::is_nothrow_default_constructible, enumeration_names will be called with
+    /*!\brief If `option_t` is not std::is_nothrow_default_constructible, enumeration_names will be called with
      *        std::type_identity instead of a default constructed alphabet.
      */
     template <typename option_type>
@@ -125,13 +125,13 @@ struct enumeration_names_cpo
         return sharg::custom::argument_parsing<option_type>::enumeration_names;
     }
 
-    /*!\brief CPO overload (check 1 out of 2): argument dependent lookup (ADL), i.e.
+    /*!\brief CPO overload (check 2 out of 2): argument dependent lookup (ADL), i.e.
      *        `enumeration_names(option_type{})`
      * \tparam option_type The type of the option. (Needed to defer instantiation for incomplete types.)
      *
      * \details
      *
-     * If the option_type isn't std::is_nothrow_default_constructible,
+     * If the option_type is not std::is_nothrow_default_constructible,
      * `enumeration_names(std::type_identity<option_t>{})` will be called.
      */
     template <typename option_type = option_t>
@@ -142,15 +142,16 @@ struct enumeration_names_cpo
         return enumeration_names(option_or_type_identity<option_type>{});
     }
 
-    /*!\brief SFINAE-friendly call-operator to resolve CPO overload resolution.
+    /*!\brief SFINAE-friendly call-operator to resolve the CPO overload.
      *
-     * This operator implements the actual CPO overload resolution. Overload resolution will try each base class of
-     * sharg::detail::priority_tag<1> and sharg::detail::priority_tag<0>.
-     * sharg::detail::priority_tag<0> as first argument to `cpo_overload`. That means a high priority in
-     * sharg::detail::priority_tag will be evaluated first and one can define an order which overload should be
-     * prioritised if multiple overloads match.
+     * This operator decides which `cpo_overload` implementation to use. It will start with the highest
+     * priority, in this case `sharg::detail::priority_tag<1>`. If this is not well-defined, the base class
+     * of the priority_tag is checked (`sharg::detail::priority_tag<0>`).
+     * If there are multiple `cpo_overload` overloads, the `priority_tag` decides the order of resolution,
+     * the highest number is tried first.
      *
-     * It perfectly forwards the result and noexcept-property of the `cpo_overload`.
+     * If any matching overload is found, this operator perfectly forwards the result and noexcept-property of the 
+     * `cpo_overload`.
      */
     template <typename ...args_t, typename option_type = option_t /*circumvent incomplete types*/>
     constexpr auto operator()(args_t && ...args) const
@@ -172,7 +173,7 @@ namespace sharg
 
 /*!\brief Return a conversion map from std::string_view to option_type.
  * \tparam your_type Type of the value to retrieve the conversion map for.
- * \param value The value is not used, just its type.
+ * \param value The value is not accessed, only its type is used.
  * \returns A std::unordered_map<std::string_view, your_type> that maps a string identifier to a value of your_type.
  * \ingroup argument_parser
  * \details
@@ -188,7 +189,7 @@ namespace sharg
  *
  * ### Example
  *
- * If you are working on a type in your own namespace, you should implement a free function like this:
+ * If you are working on a type in your namespace, you should implement a free function like this:
  *
  * \include test/snippet/argument_parser/custom_enumeration.cpp
  *
@@ -201,7 +202,7 @@ namespace sharg
  *
  * ### Customisation point
  *
- * This is a customisation point (see \ref about_customisation). To specify the behaviour for your own type,
+ * This is a customisation point (see \ref about_customisation). To specify the behaviour for your type,
  * simply provide one of the two functions specified above.
  */
 template <typename option_type>
@@ -218,7 +219,7 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
  *
  * ### Requirements
  *
- * * A instance of sharg::enumeration_names<option_type> must exist and be of type
+ * * An instance of sharg::enumeration_names<option_type> must exist and be of the type
  *   `std::unordered_map<std::string, option_type>`.
  *
  * \remark For a complete overview, take a look at \ref argument_parser
