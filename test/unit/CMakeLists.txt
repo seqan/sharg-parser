@@ -56,6 +56,7 @@ list_missing_unit_tests()
 
 add_subdirectories ()
 
+sharg_test(enumeration_names_test.cpp)
 sharg_test(format_parse_test.cpp)
 sharg_test(format_parse_validators_test.cpp)
 sharg_test(argument_parser_design_error_test.cpp)

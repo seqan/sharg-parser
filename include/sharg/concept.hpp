@@ -14,7 +14,7 @@
 
 #include <seqan3/std/concepts>
 
-#include <sharg/auxiliary.hpp>
+#include <sharg/enumeration_names.hpp>
 
 namespace sharg
 {
