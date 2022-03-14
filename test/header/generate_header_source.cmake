@@ -32,8 +32,8 @@ TEST(${HEADER_TEST_NAME_SAFE}) {}")
 # test that sharg headers include platform.hpp
 if ("${HEADER_COMPONENT}" MATCHES "sharg")
 
-    # exclude sharg/std/*, sharg/contrib/*, and sharg/version.hpp from platform test
-    if (NOT HEADER_FILE_INCLUDE MATCHES "sharg/(std/|contrib/|version.hpp)")
+    # exclude sharg/std/* and sharg/version.hpp from platform test
+    if (NOT HEADER_FILE_INCLUDE MATCHES "sharg/(std/|version.hpp)")
         file (APPEND "${HEADER_TARGET_SOURCE}" "
 #ifndef SHARG_DOXYGEN_ONLY
 #error \"Your header '${HEADER_FILE_INCLUDE}' file is missing #include <sharg/platform.hpp>\"
@@ -45,7 +45,7 @@ if ("${HEADER_COMPONENT}" MATCHES "sharg")
     if (HEADER_FILE_INCLUDE MATCHES "sharg/std/")
         file (APPEND "${HEADER_TARGET_SOURCE}" "
 #ifdef SHARG_DOXYGEN_ONLY
-#error \"The standard header '${HEADER_FILE_INCLUDE}' file MUST NOT include any other sharg header (except for sharg/contrib)\"
+#error \"The standard header '${HEADER_FILE_INCLUDE}' file MUST NOT include any other sharg header\"
 #endif")
     endif ()
 
