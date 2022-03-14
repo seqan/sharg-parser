@@ -13,61 +13,30 @@
 
 #pragma once
 
-#if __has_include(<version>)
-#include <version> // from C++20 all feature macros should be defined here
-#endif
-
-#include <utility> // __cpp_lib_to_chars may be defined here as currently documented
+#include <charconv>
+#include <utility> // __cpp_lib_to_chars may be defined here as currently documented.
+#include <version> // From C++20 onwards, all feature macros should be defined here.
 
 /*!\defgroup std_charconv charconv
  * \ingroup std
  * \brief The [\<charconv\> header](https://en.cppreference.com/w/cpp/header/charconv) from C++17's standard library.
- */
-
-// =========================================================================
-// Determine charconv implementation state (full, int only or no implementation)
-// =========================================================================
-
-/*!\brief A workaround for __cpp_lib_to_chars.
- * \ingroup std_charconv
- *
  * \details
  *
  * The following table describes what implementation of std::to_chars and std::from_chars will be used
  *
- * | stdlib version | __cpp_lib_to_chars                   | SHARG_CPP_LIB_TO_CHARS    | chars_format   | to_chars_result | from_chars_result | to_chars (int) | from_chars (int) | to_chars (float)     | from_chars (float)   |
- * | -------------- | ------------------------------------ | ------------------------- | -------------- | --------------- | ----------------- | -------------- | ---------------- | -------------------- | -------------------- |
- * | gcc 10         | undefined and `<charconv>` header    | 100000                    | stdlib         | stdlib          | stdlib            | stdlib         | stdlib           | shim (ostringstream) | shim (strto[f/d/ld]) |
- * | gcc 11         | undefined and `<charconv>` header    | 100000* (could be 201611) | stdlib         | stdlib          | stdlib            | stdlib         | stdlib           | stdlib               | stdlib               |
+ * | stdlib version | __cpp_lib_to_chars                               | chars_format   | to_chars_result | from_chars_result | to_chars (int) | from_chars (int) | to_chars (float)     | from_chars (float)   |
+ * | -------------- | ------------------------------------------------ | -------------- | --------------- | ----------------- | -------------- | ---------------- | -------------------- | -------------------- |
+ * | gcc 10         | undefined and `<charconv>` header                | stdlib         | stdlib          | stdlib            | stdlib         | stdlib           | shim (ostringstream) | shim (strto[f/d/ld]) |
+ * | gcc 11         | undefined (or 201611) and `<charconv>` header    | stdlib         | stdlib          | stdlib            | stdlib         | stdlib           | stdlib               | stdlib               |
  *
  * Note: gcc 11 implements float too, but does not define __cpp_lib_to_chars
  */
-#ifdef SHARG_DOXYGEN_ONLY // needed as sharg/core/platform.hpp might not be included
-#if SHARG_DOXYGEN_ONLY(1)0
-// documentation-only
-#define SHARG_CPP_LIB_TO_CHARS IMPLEMENTATION_DEFINED
-#endif // SHARG_DOXYGEN_ONLY(1)0
-#endif // SHARG_DOXYGEN_ONLY
-
-#if __cpp_lib_to_chars >= 201611 // iff complete (int AND float) charconv implementation
-#  define SHARG_CPP_LIB_TO_CHARS __cpp_lib_to_chars
-#elif __has_include(<charconv>) // iff incomplete (only int) charconv implementation
-#  define SHARG_CPP_LIB_TO_CHARS 100000
-#endif // __cpp_lib_to_chars >= 201611
 
 // =========================================================================
-// If any std implementation is present use that as basis (>= gcc8)
+// If float implementation is missing, add our own shim-implementation
 // =========================================================================
 
-#if SHARG_CPP_LIB_TO_CHARS >= 100000
-#include <charconv>
-#endif // SHARG_CPP_LIB_TO_CHARS >= 100000
-
-// =========================================================================
-// if float implementation is missing add our own shim-implementation
-// =========================================================================
-
-#if !defined(SHARG_CPP_LIB_TO_CHARS) || SHARG_CPP_LIB_TO_CHARS == 100000
+#if __cpp_lib_to_chars < 201611
 #include <cassert>
 #include <type_traits>
 #include <sstream>
@@ -142,7 +111,6 @@ inline from_chars_result from_chars_floating_point(char const * first,
         if (fmt == chars_format::fixed && exponent_is_present)
             return {last, std::errc::invalid_argument};
     }
-
 
     // In contrast to std::from_chars, std::strto[f/d/ld] does not treat the second
     // parameter (str_end) as "end of the sequence to parse" but merely as an out
@@ -305,4 +273,4 @@ using ::sharg::contrib::charconv_float::to_chars; // import our shim-float versi
 using ::sharg::contrib::charconv_float::from_chars; // import our shim-float version
 } // namespace std
 
-#endif // !defined(SHARG_CPP_LIB_TO_CHARS) || SHARG_CPP_LIB_TO_CHARS == 100000
+#endif // __cpp_lib_to_chars < 201611
