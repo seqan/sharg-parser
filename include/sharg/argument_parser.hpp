@@ -34,10 +34,6 @@ namespace sharg
  * It automatically generates a help page and can export manual-pages as well
  * as HTML documentation.
  *
- * Furthermore common tool descriptor (CTD) files can be
- * exported (<a href="https://github.com/seqan/seqan3/issues/89">soon</a>)
- * and a server be queried for available application updates.
- *
  * ### Terminology
  *
  * Since the terms option and arguments are frequently used in different contexts
