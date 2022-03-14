@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------------
 
-find_path (SHARG_TEST_LICENSE_DIR NAMES LICENSE.md HINTS "${SEQAN3_CLONE_DIR}")
+find_path (SHARG_TEST_LICENSE_DIR NAMES LICENSE.md HINTS "${SHARG_CLONE_DIR}")
 
 add_definitions(-DSHARG_TEST_LICENSE_DIR="${SHARG_TEST_LICENSE_DIR}")
 
