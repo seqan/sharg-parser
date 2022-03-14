@@ -8,9 +8,7 @@
 cmake_minimum_required (VERSION 3.10)
 project (sharg_test_unit CXX)
 
-find_package (SHARG REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../../build_system)
-
-include (${CMAKE_CURRENT_LIST_DIR}/../../lib/seqan3/test/seqan3-test.cmake)
+include (../sharg-test.cmake)
 include (GoogleTest OPTIONAL)
 
 include (diagnostics/list_missing_unit_tests)
@@ -24,13 +22,11 @@ macro (sharg_test unit_test_cpp)
     cmake_parse_arguments(SHARG_TEST "" "" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
 
     file (RELATIVE_PATH unit_test "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_LIST_DIR}/${unit_test_cpp}")
-    seqan3_test_component (target "${unit_test}" TARGET_NAME)
-    seqan3_test_component (test_name "${unit_test}" TEST_NAME)
+    sharg_test_component (target "${unit_test}" TARGET_NAME)
+    sharg_test_component (test_name "${unit_test}" TEST_NAME)
 
     add_executable (${target} ${unit_test_cpp})
-    target_link_libraries (${target} seqan3::test::unit sharg::sharg)
-    target_include_directories (${target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../../include)
-    target_include_directories (${target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../../test/include)
+    target_link_libraries (${target} sharg::test::unit)
     add_include_dependencies (${target} "${SHARG_TEST_CYCLIC_DEPENDING_INCLUDES}")
     collect_used_test (${target})
     if (SHARG_VERBOSE_TESTS)
@@ -44,19 +40,14 @@ macro (sharg_test unit_test_cpp)
     unset (test_name)
 endmacro ()
 
-seqan3_require_ccache ()
-seqan3_require_test ()
-
-list_missing_unit_tests()
-
-# this does not work, yet:
-#list_unused_unit_tests ()
-
-# Top-level tests
-
-add_subdirectories ()
+sharg_require_ccache ()
+sharg_require_test ()
 
 sharg_test(enumeration_names_test.cpp)
 sharg_test(format_parse_test.cpp)
 sharg_test(format_parse_validators_test.cpp)
 sharg_test(argument_parser_design_error_test.cpp)
+add_subdirectories ()
+
+list_missing_unit_tests()
+list_unused_unit_tests ()

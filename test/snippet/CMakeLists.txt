@@ -8,23 +8,20 @@
 cmake_minimum_required (VERSION 3.10)
 project (sharg_test_snippet CXX)
 
-find_package (SHARG REQUIRED HINTS ${CMAKE_SOURCE_DIR}/../../build_system)
-
-include (${CMAKE_SOURCE_DIR}/../../lib/seqan3/test/seqan3-test.cmake)
-include (${CMAKE_SOURCE_DIR}/../../lib/seqan3/test/cmake/diagnostics/list_unused_snippets.cmake)
+include (../sharg-test.cmake)
+include (../cmake/diagnostics/list_unused_snippets.cmake)
 
 add_library (snippet_main snippet_main.cpp)
-target_link_libraries (snippet_main PUBLIC seqan3::test gtest)
+target_link_libraries (snippet_main PUBLIC sharg::test gtest)
 
 macro (sharg_snippet test_name_prefix snippet snippet_base_path)
-    seqan3_test_component (snippet_target_name "${snippet}" TARGET_NAME)
-    seqan3_test_component (snippet_test_name "${snippet}" TEST_NAME)
-    seqan3_test_component (snippet_target_path "${snippet}" TARGET_PATH)
+    sharg_test_component (snippet_target_name "${snippet}" TARGET_NAME)
+    sharg_test_component (snippet_test_name "${snippet}" TEST_NAME)
+    sharg_test_component (snippet_target_path "${snippet}" TARGET_PATH)
     set (target "${snippet_target_name}_snippet")
 
     add_executable (${target} "${snippet_base_path}/${snippet}")
-    target_link_libraries (${target} PUBLIC snippet_main sharg::sharg)
-    target_include_directories (${target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../../include)
+    target_link_libraries (${target} PUBLIC snippet_main)
     set_target_properties(${target}
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${snippet_target_path}"
@@ -43,7 +40,7 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
               COMMAND ${CMAKE_COMMAND}
                       -DTARGET_FILE=$<TARGET_FILE:${target}>
                       -DSOURCE_FILE=${snippet_base_path}/${snippet}
-                      -P "${CMAKE_SOURCE_DIR}/../../lib/seqan3/test/snippet/compare_snippet_output.cmake")
+                      -P "${CMAKE_SOURCE_DIR}/compare_snippet_output.cmake")
 
     # disable version checker, as it interferes with comparing the snippet output
     set_tests_properties ("${snippet_compare_test_target}" PROPERTIES ENVIRONMENT SHARG_NO_VERSION_CHECK=0)
@@ -57,14 +54,14 @@ endmacro ()
 macro (sharg_snippets test_name_prefix snippet_base_path_)
     get_filename_component(snippet_base_path "${snippet_base_path_}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
     message (STATUS "${snippet_base_path}")
-    seqan3_test_files (snippet_files "${snippet_base_path}" "*.cpp")
+    sharg_test_files (snippet_files "${snippet_base_path}" "*.cpp")
     foreach (snippet ${snippet_files})
         sharg_snippet("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
     endforeach ()
 endmacro ()
 
-seqan3_require_ccache ()
-seqan3_require_test ()
+sharg_require_ccache ()
+sharg_require_test ()
 
 sharg_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
 sharg_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
