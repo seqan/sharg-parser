@@ -205,7 +205,7 @@ Additionally to the variable that will store the value and the description, you 
 identifier. The example above will recognize an option `-n` or `--my-number` given on the command line and expect it to
 be followed by a value separated only by `=` or space or by nothing at all.
 
-\note Unlike regular options which take id-value pairs, flags are passed as an identifier only. The variable associated 
+\note Unlike regular options which take id-value pairs, flags are passed as an identifier only. The variable associated
 to a flag must be false by default and is switched to true when the flag is present on the command line.
 
 Finally, you can add a flag with the following call:
@@ -445,7 +445,7 @@ On construction, this validator receives a maximum and a minimum number.
 The validator throws a sharg::validation_error exception whenever a given value does not lie inside the given min/max
 range.
 
-\snippet test/snippet/argument_parser/validators_1.cpp validator_call
+\snippet test/snippet/validators_1.cpp validator_call
 
 Our application has a another flaw that you might have noticed by now: If you supply a season that is not in the data
 file, the program will again misbehave. Instead of fixing the program, let's restrict the user input accordingly.
@@ -462,7 +462,7 @@ Add a sharg::arithmetic_range_validator to the `-s/--season` option that sets th
 On construction, the validator receives a list (vector) of valid values.
 The validator throws a sharg::validation_error exception whenever a given value is not in the given list.
 
-\snippet test/snippet/argument_parser/validators_2.cpp validator_call
+\snippet test/snippet/validators_2.cpp validator_call
 
 \assignment{Assignment 7}
 Add a sharg::value_list_validator to the `-a/--aggregate-by` option that sets the list of valid values to `["median", "mean"]`.
@@ -486,11 +486,11 @@ which you can use to indicate whether you want to allow the output files to be o
 
 Using the sharg::input_file_validator:
 
-\snippet test/snippet/argument_parser/validators_input_file.cpp validator_call
+\snippet test/snippet/validators_input_file.cpp validator_call
 
 Using the sharg::output_file_validator:
 
-\snippet test/snippet/argument_parser/validators_output_file.cpp validator_call
+\snippet test/snippet/validators_output_file.cpp validator_call
 
 ### The directory validator
 
@@ -505,11 +505,11 @@ filesystem happens, a std::filesystem_error will be thrown.
 
 Using the sharg::input_directory_validator:
 
-\snippet test/snippet/argument_parser/validators_input_directory.cpp validator_call
+\snippet test/snippet/validators_input_directory.cpp validator_call
 
 Using the sharg::output_directory_validator:
 
-\snippet test/snippet/argument_parser/validators_output_directory.cpp validator_call
+\snippet test/snippet/validators_output_directory.cpp validator_call
 
 \assignment{Assignment 8}
 Add a validator to the first positional option that expects a file formatted with tab separated values.
@@ -529,7 +529,7 @@ Note that a regex_match will only return true if the string matches the pattern 
 which also matches substrings). The validator throws a sharg::validation_error exception whenever a given parameter
 does not match the given regular expression.
 
-\snippet test/snippet/argument_parser/validators_4.cpp validator_call
+\snippet test/snippet/validators_4.cpp validator_call
 
 ## Chaining validators
 
@@ -540,7 +540,7 @@ For example, you may want a file name that only accepts absolute paths, but also
 file extensions.
 For this purpose you can chain a sharg::regex_validator to a sharg::input_file_validator:
 
-\snippet test/snippet/argument_parser/validators_chaining.cpp validator_call
+\snippet test/snippet/validators_chaining.cpp validator_call
 
 You can chain as many validators as you want, they will be evaluated one after the other from left to right (first to last).
 
