@@ -198,25 +198,6 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
-# Require C++ Concepts
-# ----------------------------------------------------------------------------
-
-#set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
-
-#set (CXXSTD_TEST_SOURCE
-    #"static_assert (__cpp_concepts >= 201507);
-    #int main() {}")
-
-#set (CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE} ${SHARG_CXX_FLAGS}")
-#check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" SHARG_CONCEPTS)
-
-#if (SHARG_CONCEPTS_FLAG)
-    #sharg_config_print ("C++ Concepts support:       builtin")
-#else ()
-    #sharg_config_error ("SHARG requires C++ Concepts, but your compiler does not support them.")
-#endif ()
-
-# ----------------------------------------------------------------------------
 # thread support (pthread, windows threads)
 # ----------------------------------------------------------------------------
 
