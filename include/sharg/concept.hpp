@@ -31,7 +31,7 @@ namespace sharg
 template <typename value_type>
 concept istreamable = requires (std::istream & is, value_type & val)
 {
-    SHARG_RETURN_TYPE_CONSTRAINT(is >> val, std::same_as, std::istream&);
+    {is >> val} -> std::same_as<std::istream&>;
 };
 
 /*!\concept sharg::ostreamable
@@ -47,11 +47,11 @@ concept istreamable = requires (std::istream & is, value_type & val)
 template <typename type>
 concept ostreamable = requires (std::ostream & os, type & val)
 {
-    SHARG_RETURN_TYPE_CONSTRAINT(os << val, std::same_as, std::ostream&);
+    {os << val} -> std::same_as<std::ostream&>;
 } ||
 requires (std::ostream & os, type & con)
 {
-    SHARG_RETURN_TYPE_CONSTRAINT(os << con[0], std::same_as, std::ostream&);
+    {os << con[0]} -> std::same_as<std::ostream&>;
 };
 
 /*!\concept sharg::argument_parser_compatible_option

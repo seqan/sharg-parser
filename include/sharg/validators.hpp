@@ -49,8 +49,8 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
 {
     typename std::remove_reference_t<validator_type>::option_value_type;
 
-    SHARG_RETURN_TYPE_CONSTRAINT(validator(value), std::same_as, void);
-    SHARG_RETURN_TYPE_CONSTRAINT(validator.get_help_page_message(), std::same_as, std::string);
+    {validator(value)} -> std::same_as<void>;
+    {validator.get_help_page_message()} -> std::same_as<std::string>;
 };
 
 /*!\brief A validator that checks whether a number is inside a given range.

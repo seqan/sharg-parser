@@ -377,9 +377,7 @@ private:
                            typename container_option_t::value_type & container_value,
                            std::string const & in)
         {
-            SHARG_RETURN_TYPE_CONSTRAINT(fp.parse_option_value(container_value, in),
-                                          std::same_as,
-                                          option_parse_result);
+            {fp.parse_option_value(container_value, in)} -> std::same_as<option_parse_result>;
         }
     //!\endcond
     option_parse_result parse_option_value(container_option_t & value, std::string const & in)
