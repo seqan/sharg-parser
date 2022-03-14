@@ -12,11 +12,10 @@
 
 #pragma once
 
+#include <concepts>
 #include <fstream>
+#include <ranges>
 #include <regex>
-
-#include <seqan3/std/concepts>
-#include <seqan3/std/ranges>
 
 #include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/detail/to_string.hpp>

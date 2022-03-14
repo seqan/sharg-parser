@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <seqan3/std/concepts>
+#include <concepts>
 
 #include <sharg/enumeration_names.hpp>
 

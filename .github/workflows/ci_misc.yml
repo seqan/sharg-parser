@@ -28,14 +28,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Snippet gcc9"
-            cxx: "g++-9"
-            cc: "gcc-9"
+          - name: "Snippet gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
             build: snippet
             build_type: Release
             build_threads: 2
             test_threads: 1 # snippets create and delete files and some separate tests create/delete the same files
-            cxx_flags: "-std=c++2a"
+            cxx_flags: "-std=c++20"
             cmake: 3.10.3
             requires_toolchain: true
             requires_ccache: true
@@ -49,20 +49,6 @@ jobs:
             build_type: Debug
             build_threads: 2
             test_threads: 2
-            cmake: 3.10.3
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: false
-
-          - name: "Header gcc9"
-            cxx: "g++-9"
-            cc: "gcc-9"
-            build: header
-            build_type: Debug
-            build_threads: 2
-            test_threads: 2
-            cxx_flags: "-std=c++2a"
             cmake: 3.10.3
             requires_toolchain: true
             requires_ccache: true
