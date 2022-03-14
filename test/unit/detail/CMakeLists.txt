@@ -10,11 +10,11 @@ find_path (SHARG_TEST_LICENSE_DIR NAMES LICENSE.md HINTS "${SHARG_CLONE_DIR}")
 add_definitions(-DSHARG_TEST_LICENSE_DIR="${SHARG_TEST_LICENSE_DIR}")
 
 sharg_test(format_help_test.cpp CYCLIC_DEPENDING_INCLUDES
-            include-seqan3-argument_parser-detail-format_html.hpp
-            include-seqan3-argument_parser-detail-format_man.hpp)
+            include-sharg-detail-format_html.hpp
+            include-sharg-detail-format_man.hpp)
 sharg_test(format_html_test.cpp CYCLIC_DEPENDING_INCLUDES
-            include-seqan3-argument_parser-detail-format_help.hpp
-            include-seqan3-argument_parser-detail-format_man.hpp)
+            include-sharg-detail-format_help.hpp
+            include-sharg-detail-format_man.hpp)
 sharg_test(format_man_test.cpp)
 sharg_test(safe_filesystem_entry_test.cpp)
 sharg_test(type_name_as_string_test.cpp)
