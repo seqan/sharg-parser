@@ -582,26 +582,51 @@ public:
      * \{
      */
 
-    //!\copydoc sharg::input_file_validator::input_file_validator()
-    output_file_validator() : output_file_validator{output_file_open_options::create_new} {}
-
-    output_file_validator(output_file_validator const &) = default;             //!< Defaulted.
-    output_file_validator(output_file_validator &&) = default;                  //!< Defaulted.
+    output_file_validator() = default; //!< Defaulted.
+    output_file_validator(output_file_validator const &) = default; //!< Defaulted.
+    output_file_validator(output_file_validator &&) = default; //!< Defaulted.
     output_file_validator & operator=(output_file_validator const &) = default; //!< Defaulted.
-    output_file_validator & operator=(output_file_validator &&) = default;      //!< Defaulted.
+    output_file_validator & operator=(output_file_validator &&) = default; //!< Defaulted.
     virtual ~output_file_validator() = default; //!< Virtual Destructor.
 
     /*!\brief Constructs from a given overwrite mode and a list of valid extensions.
      * \param[in] mode A sharg::output_file_open_options indicating whether the validator throws if a file already
-                       exists.
+     *                 exists.
      * \param[in] extensions The valid extensions to validate for.
      */
-    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> extensions = {})
-        : file_validator_base{}, mode{mode}
+    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> const & extensions)
+        : open_mode{mode}
     {
         file_validator_base::extensions_str = detail::to_string(extensions);
         file_validator_base::extensions = std::move(extensions);
     }
+
+    /*!\brief Constructs from a given overwrite mode and a parameter pack of valid extensions.
+     * \param[in] mode A sharg::output_file_open_options indicating whether the validator throws if a file already
+     *                 exists.
+     * \param[in] extensions Parameter pack representing valid extensions. std::string must be constructible from each
+     *                       argument. The pack may be empty ( → all extensions are valid).
+     */
+    explicit output_file_validator(output_file_open_options const mode, auto && ...extensions)
+        requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
+        : output_file_validator{mode, std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
+    {}
+
+    /*!\brief Constructs from a list of valid extensions.
+     * \param[in] extensions The valid extensions to validate for.
+     */
+    explicit output_file_validator(std::vector<std::string> const & extensions)
+        : output_file_validator{output_file_open_options::create_new, extensions}
+    {}
+
+    /*!\brief Constructs from a parameter pack of valid extensions.
+     * \param[in] extensions Parameter pack representing valid extensions. std::string must be constructible from each
+     *                       argument. The pack may be empty ( → all extensions are valid).
+     */
+    explicit output_file_validator(auto && ...extensions)
+        requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
+        : output_file_validator{std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
+    {}
 
     // Import base constructor.
     using file_validator_base::file_validator_base;
@@ -619,7 +644,7 @@ public:
     {
         try
         {
-            if ((mode == output_file_open_options::create_new) && std::filesystem::exists(file))
+            if ((open_mode == output_file_open_options::create_new) && std::filesystem::exists(file))
                 throw validation_error{"The file \"" + file.string() + "\" already exists!"};
 
             // Check if file has any write permissions.
@@ -642,14 +667,14 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        if (mode == output_file_open_options::open_or_create)
+        if (open_mode == output_file_open_options::open_or_create)
         {
             return "Write permissions must be granted." +
                    ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
                    valid_extensions_help_page_message();
 
         }
-        else // mode == create_new
+        else // open_mode == create_new
         {
             return "The output file must not exist already and write permissions must be granted." +
                    ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
@@ -660,7 +685,7 @@ public:
 
 private:
     //!\brief Stores the current mode of whether it is valid to overwrite the output file.
-    output_file_open_options mode{output_file_open_options::create_new};
+    output_file_open_options open_mode{output_file_open_options::create_new};
 };
 
 /*!\brief A validator that checks if a given path is a valid input directory.
