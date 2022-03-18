@@ -59,4 +59,4 @@
 you can add this library to your application or include the [seqan3 library](https://github.com/seqan/seqan3)
 with even more bio c++ features.
 
-More information and highlights will folllow soon.
+More information and highlights will follow soon.

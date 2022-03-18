@@ -1,10 +1,10 @@
 # Welcome {#mainpage}
 
-Welcome to the documentation of the SeqAn library.
+Welcome to the documentation of the Sharg argument parser.
 This web-site contains the API reference (documentation of our interfaces) and more elaborate Tutorials and
 How-Tos.
 
-If you are new to SeqAn, we recommend that you begin by reading \ref setup.
+If you are new to [SeqAn](https://github.com/seqan/seqan3) or the Sharg argument parser, we recommend that you begin by reading \ref setup.
 
 In contrast to the Tutorials (which are expected to be useful for all developers), the How-Tos contain more advanced
 or specific guides.
@@ -14,15 +14,15 @@ have finished the full tutorial and you are implementing your own code.
 When you are looking for some inspiration on how to perform a particular task or when you searching for something you
 already know - its on the tip of your tongue - but you can't remember the syntax, take a look here.
 
-Before you publish and/or redistribute software based on SeqAn, please read through the notes on \ref about_copyright
-and \ref about_citing.
+Before you publish and/or redistribute software based on Sharg, please read through the notes on \ref about_copyright.
 There are few requirements beyond proper attribution, but this requirement we take seriously as it is the basis of
-acquiring funding for the future development and maintenance of SeqAn.
+acquiring funding for the future development and maintenance of Sharg.
 
 Resources outside of this web-site that might be useful:
 
   * The [project homepage](https://www.seqan.de) with news and application pages.
   * The [GitHub repository](https://github.com/seqan/seqan3) with issue tracker and downloads.
+  * The [SeqAn documentation](https://docs.seqan.de/).
 
 ### Some notes on using this documentation
 
