@@ -12,11 +12,10 @@
 
 #pragma once
 
+#include <concepts>
 #include <fstream>
+#include <ranges>
 #include <regex>
-
-#include <seqan3/std/concepts>
-#include <seqan3/std/ranges>
 
 #include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/detail/to_string.hpp>
@@ -37,7 +36,7 @@ namespace sharg
  *
  * SeqAn provides several common-use-case validators, e.g. the sharg::arithmetic_range_validator.
  *
- * \include test/snippet/argument_parser/validators_2.cpp
+ * \include test/snippet/validators_2.cpp
  *
  * You can learn more about SeqAn validators in our tutorial \ref section_validation.
  *
@@ -50,8 +49,8 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
 {
     typename std::remove_reference_t<validator_type>::option_value_type;
 
-    SHARG_RETURN_TYPE_CONSTRAINT(validator(value), std::same_as, void);
-    SHARG_RETURN_TYPE_CONSTRAINT(validator.get_help_page_message(), std::same_as, std::string);
+    {validator(value)} -> std::same_as<void>;
+    {validator.get_help_page_message()} -> std::same_as<std::string>;
 };
 
 /*!\brief A validator that checks whether a number is inside a given range.
@@ -65,7 +64,7 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
  * The class than acts as a functor, that throws a sharg::validation_error
  * exception whenever a given value does not lie inside the given min/max range.
  *
- * \include test/snippet/argument_parser/validators_1.cpp
+ * \include test/snippet/validators_1.cpp
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
@@ -144,7 +143,7 @@ private:
  *       range's value type is convertible to it. Otherwise, the option value type is deduced to the value type of the
  *       range.
  *
- * \include test/snippet/argument_parser/validators_2.cpp
+ * \include test/snippet/validators_2.cpp
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
@@ -455,11 +454,11 @@ protected:
  * extension (std::filesystem::path) is not in the given list of valid file extensions, if the file does not exist, or
  * if the file does not have the proper read permissions.
  *
- * \include test/snippet/argument_parser/validators_input_file.cpp
+ * \include test/snippet/validators_input_file.cpp
  *
  * The following snippet demonstrates the different ways to instantiate the sharg::input_file_validator.
  *
- * \include test/snippet/argument_parser/validators_input_file_ext_from_file.cpp
+ * \include test/snippet/validators_input_file_ext_from_file.cpp
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
@@ -562,11 +561,11 @@ enum class output_file_open_options
  * exception if it already exists and sharg::output_file_open_options::open_or_create will skip this check (that means
  * you are allowed to overwrite the existing file).
  *
- * \include test/snippet/argument_parser/validators_output_file.cpp
+ * \include test/snippet/validators_output_file.cpp
  *
  * The following snippet demonstrates the different ways to instantiate the sharg::output_file_validator.
  *
- * \include test/snippet/argument_parser/validators_output_file_ext_from_file.cpp
+ * \include test/snippet/validators_output_file_ext_from_file.cpp
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
@@ -674,7 +673,7 @@ private:
  * (std::filesystem::path) does not exist, the specified path is not a directory, or if the directory is not
  * readable.
  *
- * \include test/snippet/argument_parser/validators_input_directory.cpp
+ * \include test/snippet/validators_input_directory.cpp
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
@@ -750,7 +749,7 @@ public:
  * (std::filesystem::path) is not writable. This can happen if either the parent path does not exists, or the
  * path doesn't have the proper write permissions.
  *
- * \include test/snippet/argument_parser/validators_output_directory.cpp
+ * \include test/snippet/validators_output_directory.cpp
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
@@ -841,7 +840,7 @@ public:
  * The class than acts as a functor, that throws a sharg::validation_error
  * exception whenever string does not match the pattern.
  *
- * \include test/snippet/argument_parser/validators_4.cpp
+ * \include test/snippet/validators_4.cpp
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
@@ -1031,7 +1030,7 @@ private:
  * For this purpose you can chain a sharg::regex_validator to a
  * sharg::input_file_validator like this:
  *
- * \include test/snippet/argument_parser/validators_chaining.cpp
+ * \include test/snippet/validators_chaining.cpp
  *
  * You can chain as many validators as you want which will be evaluated one after
  * the other from left to right (first to last).

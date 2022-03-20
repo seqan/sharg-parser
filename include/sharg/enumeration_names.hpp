@@ -33,7 +33,7 @@ namespace sharg::custom
  * In order to use a third party type within the sharg::argument_parser::add_option or
  * sharg::argument_parser::add_positional_option call, you can specialise this struct in the following way:
  *
- * \include test/snippet/argument_parser/custom_argument_parsing_enumeration.cpp
+ * \include test/snippet/custom_argument_parsing_enumeration.cpp
  *
  * Please note that by default the `t const`, `t &` and `t const &` specialisations of this class inherit the
  * specialisation for `t` so you usually only need to provide a specialisation for `t`.
@@ -150,7 +150,7 @@ struct enumeration_names_cpo
      * If there are multiple `cpo_overload` overloads, the `priority_tag` decides the order of resolution,
      * the highest number is tried first.
      *
-     * If any matching overload is found, this operator perfectly forwards the result and noexcept-property of the 
+     * If any matching overload is found, this operator perfectly forwards the result and noexcept-property of the
      * `cpo_overload`.
      */
     template <typename ...args_t, typename option_type = option_t /*circumvent incomplete types*/>
@@ -191,12 +191,12 @@ namespace sharg
  *
  * If you are working on a type in your namespace, you should implement a free function like this:
  *
- * \include test/snippet/argument_parser/custom_enumeration.cpp
+ * \include test/snippet/custom_enumeration.cpp
  *
  * **Only if you cannot access the namespace of your type to customize** you may specialize
  * the sharg::custom::argument_parsing struct like this:
  *
- * \include test/snippet/argument_parser/custom_argument_parsing_enumeration.cpp
+ * \include test/snippet/custom_argument_parsing_enumeration.cpp
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  *

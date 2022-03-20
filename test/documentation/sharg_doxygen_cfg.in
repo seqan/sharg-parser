@@ -54,7 +54,6 @@ PREDEFINED             = "CEREAL_SERIALIZE_FUNCTION_NAME=serialize" \
                          "CEREAL_LOAD_MINIMAL_FUNCTION_NAME=load_minimal" \
                          "CEREAL_SAVE_MINIMAL_FUNCTION_NAME=save_minimal" \
                          "SHARG_DOXYGEN_ONLY(x)= x" \
-                         "SHARG_RETURN_TYPE_CONSTRAINT(expression,concept_name,...)={expression} -> concept_name<__VA_ARGS__>" \
                          "${SHARG_DOXYGEN_PREDEFINED_NDEBUG}"
 
 TAGFILES               += "${SHARG_DOXYGEN_STD_TAGFILE}=https://en.cppreference.com/w/"

@@ -34,10 +34,6 @@ namespace sharg
  * It automatically generates a help page and can export manual-pages as well
  * as HTML documentation.
  *
- * Furthermore common tool descriptor (CTD) files can be
- * exported (<a href="https://github.com/seqan/seqan3/issues/89">soon</a>)
- * and a server be queried for available application updates.
- *
  * ### Terminology
  *
  * Since the terms option and arguments are frequently used in different contexts
@@ -63,7 +59,7 @@ namespace sharg
  * the value from the command line and enable every other mechanism you need
  * to call the sharg::argument_parser::parse function in the end.
  *
- * \include test/snippet/argument_parser/argument_parser_1.cpp
+ * \include test/snippet/argument_parser_1.cpp
  *
  * Now you can call your application via the command line:
  *
@@ -352,7 +348,7 @@ public:
      *
      * Example:
      *
-     * \include test/snippet/argument_parser/argument_parser_2.cpp
+     * \include test/snippet/argument_parser_2.cpp
      *
      * The code above gives the following output when calling `--help`:
      *
@@ -445,7 +441,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/argument_parser/is_option_set.cpp
+     * \include test/snippet/is_option_set.cpp
      *
      * ### Exceptions
      *
@@ -566,7 +562,7 @@ public:
      * You can access the members directly:
      * (see sharg::argument_parser_meta_data for a list of the info members)
      *
-     * \include test/snippet/argument_parser/argument_parser_3.cpp
+     * \include test/snippet/argument_parser_3.cpp
      *
      * This will produce a nice help page when the user calls `-h` or `--help`:
      *

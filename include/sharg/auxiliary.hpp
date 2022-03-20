@@ -28,7 +28,7 @@ namespace sharg
  * All options and flags are set to option_spec::standard unless specified
  * otherwise by the developer, e.g. when calling argument_parser::add_option().
  *
- * \include test/snippet/argument_parser/auxiliary.cpp
+ * \include test/snippet/auxiliary.cpp
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */

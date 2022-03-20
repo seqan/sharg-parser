@@ -135,14 +135,14 @@ To test whether everything works, we will now compile and run a small example.
 
 First we create the file `hello_world.cpp` in the `source` directory with the following contents:
 
-\include test/external_project/src/hello_world.cpp
+<!-- \include test/external_project/src/hello_world.cpp -->
 
 To compile it, we first create a `CMakeLists.txt` file in the `source` directory:
 <!-- Parsing the snippet like this to avoid verbatim includes of the snippet identifiers if we used nested snippets. -->
 <!-- Snippet start -->
-\dontinclude test/external_project/seqan3_setup_tutorial/CMakeLists.txt
+<!-- \dontinclude test/external_project/seqan3_setup_tutorial/CMakeLists.txt
 \skipline cmake_minimum_required
-\until target_link_libraries
+\until target_link_libraries -->
 <!-- Snippet end -->
 
 The directories should now look like this:
@@ -185,7 +185,7 @@ cmake -DCMAKE_CXX_COMPILER=/path/to/executable/g++-10 ../source
 If you create a new `cpp` file and want to compile it, you need to add another `add_executable` and
 `target_link_libraries` directive to you `CMakeLists.txt`.
 For example, after adding `another_program.cpp` your `CMakeLists.txt` may look like this:
-\snippet test/external_project/seqan3_setup_tutorial/CMakeLists.txt adding_files
+<!-- \snippet test/external_project/seqan3_setup_tutorial/CMakeLists.txt adding_files -->
 
 # Encountered issues
 
