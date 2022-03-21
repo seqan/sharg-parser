@@ -60,3 +60,13 @@ you can add this library to your application or include the [seqan3 library](htt
 with even more bio c++ features.
 
 More information and highlights will follow soon.
+
+## Sponsorships
+
+[![Vercel][7]][8]
+
+[7]: https://raw.githubusercontent.com/seqan/sharg-parser/master/test/documentation/.vercel/powered-by-vercel.svg "Powered by Vercel"
+[8]: https://vercel.com/?utm_source=seqan&utm_campaign=oss
+
+Vercel is kind enough to build and host our documentation and even provide preview-builds within our pull requests.
+Check them out!
