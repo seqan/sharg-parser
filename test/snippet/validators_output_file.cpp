@@ -13,9 +13,11 @@ int main(int argc, const char ** argv)
                         sharg::output_file_validator{sharg::output_file_open_options::open_or_create, {"fa","fasta"}});
 
     // ... or that you will throw a sharg::validation_error if the user specified output file already exists
+    // No sharg::output_file_open_options is passed: The default sharg::output_file_open_options::create_new is used.
+    // Possible extensions can also be passed as separate arguments.
     myparser.add_option(myfile, 'g', "file2", "Output file containing the processed sequences.",
                         sharg::option_spec::standard,
-                        sharg::output_file_validator{sharg::output_file_open_options::create_new, {"fa","fasta"}});
+                        sharg::output_file_validator{"fa","fasta"});
     //! [validator_call]
 
     // an exception will be thrown if the user specifies a filename

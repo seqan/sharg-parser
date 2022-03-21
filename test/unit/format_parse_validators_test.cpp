@@ -205,6 +205,10 @@ TEST(validator_test, output_file)
             EXPECT_NO_THROW(my_validator2(not_existing_path));
             sharg::output_file_validator my_validator3{}; // default: create_new
             EXPECT_NO_THROW(my_validator3(not_existing_path));
+            sharg::output_file_validator my_validator4{std::vector<std::string>{}}; // empty formats -> no formats
+            EXPECT_NO_THROW(my_validator4(not_existing_path));
+            sharg::output_file_validator my_validator5{""}; // empty formats -> no formats
+            EXPECT_NO_THROW(my_validator5(not_existing_path));
         }
 
         { // file does exist & overwriting is prohibited
@@ -346,6 +350,21 @@ TEST(validator_test, output_file)
         sharg::output_file_validator validator2{sharg::output_file_open_options::create_new, std::vector<std::string> {}};
         EXPECT_EQ(validator2.get_help_page_message(), "The output file must not exist already and write permissions "
                                                       "must be granted.");
+    }
+
+    { // parameter pack constructor - extensions only
+        sharg::output_file_validator validator1{"fa", "sam", "fasta", "fasta.txt"};
+        sharg::output_file_validator validator2{formats};
+        sharg::output_file_validator validator3{sharg::output_file_open_options::create_new, formats};
+        EXPECT_EQ(validator1.get_help_page_message(), validator2.get_help_page_message());
+        EXPECT_EQ(validator2.get_help_page_message(), validator3.get_help_page_message());
+    }
+
+    { // parameter pack constructor - mode + extensions
+        sharg::output_file_validator validator1{sharg::output_file_open_options::open_or_create,
+                                                "fa", "sam", "fasta", "fasta.txt"};
+        sharg::output_file_validator validator2{sharg::output_file_open_options::open_or_create, formats};
+        EXPECT_EQ(validator1.get_help_page_message(), validator2.get_help_page_message());
     }
 }
 
