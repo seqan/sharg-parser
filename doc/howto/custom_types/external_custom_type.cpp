@@ -1,29 +1,31 @@
 #include <sharg/all.hpp>
 
-// external type
+// external type, i.e., you cannot change the implementation
 namespace external
 {
+
 class bar
 {
 public:
     int a;
 };
+
 } // namespace external
 
 namespace std
 {
 
-// Make external::bar model sharg::ostreamable
+// Make external::bar satisfy sharg::ostreamable
 ostream & operator<<(ostream & output, const external::bar & ext_bar)
 {
-    output << ext_bar.a; // this needs to be adapted to suit your type
+    output << ext_bar.a; // Adapt this for your type
     return output;
 }
 
-// Make external::bar model sharg::istreamable
+// Make external::bar satisfy sharg::istreamable
 istream & operator>>(istream & input, external::bar & ext_bar)
 {
-    input >> ext_bar.a;  // this needs to be adapted to suit your type
+    input >> ext_bar.a;  // Adapt this for your type
     return input;
 }
 

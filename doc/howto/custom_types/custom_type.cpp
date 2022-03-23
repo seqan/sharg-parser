@@ -9,17 +9,17 @@ class bar
 public:
     int a;
 
-    // Make foo::bar model sharg::ostreamable
-    friend std::ostream &operator<<( std::ostream & output, const bar & foob)
+    // Make foo::bar satisfy sharg::ostreamable
+    friend std::ostream & operator<<(std::ostream & output, const bar & my_bar)
     {
-        output << foob.a; // this needs to be adapted to suit your type
+        output << my_bar.a; // Adapt this for your type
         return output;
     }
 
-    // Make foo::bar model sharg::istreamable
-    friend std::istream &operator>>( std::istream & input, bar & foob)
+    // Make foo::bar satisfy sharg::istreamable
+    friend std::istream & operator>>(std::istream & input, bar & my_bar)
     {
-        input >> foob.a;  // this needs to be adapted to suit your type
+        input >> my_bar.a;  // Adapt this for your type
         return input;
     }
 };
@@ -30,8 +30,8 @@ int main(int argc, char const ** argv)
 {
     sharg::argument_parser parser{"my_foobar_parser", argc, argv, sharg::update_notifications::off};
 
-    foo::bar foob{};
-    parser.add_option(foob, 'f', "foo-bar", "Please supply an integer for member foo::bar::a");
+    foo::bar my_bar{};
+    parser.add_option(my_bar, 'f', "foo-bar", "Please supply an integer for member foo::bar::a");
 
     try
     {
@@ -43,7 +43,7 @@ int main(int argc, char const ** argv)
         return -1;
     }
 
-    std::cout << "foob was initialised with a = " << foob.a << std::endl;
+    std::cout << "my_bar was initialised with a = " << my_bar.a << std::endl;
 
     return 0;
 }
