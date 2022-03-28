@@ -24,6 +24,10 @@ namespace sharg
  * \brief Concept for types that can be parsed from a std::istream via the stream operator.
  * \tparam value_type The type to check whether it's stremable via std::istream.
  *
+ * Read up on how to make a type model this concept here:
+ *
+ * \ref fulfil_argument_parser_compatible_option.
+ *
  * ### Requirements
  *
  * `std::istream` must support the (un)formatted input function (`operator>>`) for an l-value of a given `value_type`.
@@ -38,6 +42,10 @@ concept istreamable = requires (std::istream & is, value_type & val)
  * \ingroup argument_parser
  * \brief Concept for types that can be parsed into a std::ostream via the stream operator.
  * \tparam type The type to check whether it's stremable via std::ostream or it's a container over streamable values.
+ *
+ * Read up on how to make a type model this concept here:
+ *
+ * \ref fulfil_argument_parser_compatible_option.
  *
  * ### Requirements
  *
@@ -58,6 +66,10 @@ requires (std::ostream & os, type & con)
  * \brief Checks whether the the type can be used in an add_(positional_)option call on the argument parser.
  * \ingroup argument_parser
  * \tparam option_type The type to check.
+ *
+ * Read up on how to make a type model this concept here:
+ *
+ * \ref fulfil_argument_parser_compatible_option.
  *
  * ### Requirements
  *
