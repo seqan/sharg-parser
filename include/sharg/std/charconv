@@ -11,8 +11,8 @@
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
-#ifndef SEQAN_CHARCONV_SHIM // to avoid multiple definitions if other seqan modules also implement this
-#define SEQAN_CHARCONV_SHIM
+#ifndef SEQAN_STD_CHARCONV_SHIM // to avoid multiple definitions if other seqan modules also implement this
+#define SEQAN_STD_CHARCONV_SHIM
 
 #include <charconv>
 #include <utility> // __cpp_lib_to_chars may be defined here as currently documented.
@@ -276,4 +276,4 @@ using ::sharg::contrib::charconv_float::from_chars; // import our shim-float ver
 
 #endif // __cpp_lib_to_chars < 201611
 
-#endif // SEQAN_CHARCONV_SHIM
+#endif // SEQAN_STD_CHARCONV_SHIM
