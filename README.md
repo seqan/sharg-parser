@@ -56,10 +56,41 @@
 -->
 [6]: https://codecov.io/gh/seqan/sharg-parser
 
+[7]: https://img.shields.io/badge/license-BSD-green.svg "Open Copyright page"
+<!--
+    This is the Copyright badge link:
+        `"Open Copyright page"` - this text will be shown on hover
+-->
+[8]: https://sharg.vercel.app/usr/html/about_copyright.html
+
+[9]: https://img.shields.io/badge/platform-linux%20%7C%20bsd%20%7C%20osx-informational.svg "Read more about our API"
+<!--
+    This is the API badge link:
+        Redirects to seqan's copyright page.
+        `"Read more about our API"` - this text will be shown on hover
+-->
+[10]: https://sharg.vercel.app/usr/html/about_api.html
+
+[11]: https://img.shields.io/twitter/follow/SeqAnLib.svg?label=follow&style=social "Follow us on Twitter"
+<!--
+    This is the API badge link:
+        Redirects to seqan's copyright page.
+        `"Follow us on Twitter"` - this text will be shown on hover
+-->
+[12]: https://twitter.com/seqanlib
+
 you can add this library to your application or include the [seqan3 library](https://github.com/seqan/seqan3)
 with even more bio c++ features.
 
 More information and highlights will follow soon.
+
+## Dependencies
+
+|                   | requirement                                          | version  | comment                                     |
+|-------------------|------------------------------------------------------|----------|---------------------------------------------|
+|**compiler**       | [GCC](https://gcc.gnu.org)                           | ≥ 10     | no other compiler is currently supported!   |
+|**build system**   | [CMake](https://cmake.org)                           | ≥ 3.4    | optional, but recommended                   |
+
 
 ## Sponsorships
 
