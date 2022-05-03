@@ -79,10 +79,14 @@
 -->
 [12]: https://twitter.com/seqanlib
 
-you can add this library to your application or include the [seqan3 library](https://github.com/seqan/seqan3)
-with even more bio c++ features.
+The Sharg argument parser offers a neat and easy-to-use library for argument parsing with C++. With sharg your
+input/output can be validated in a single line, can be customized to your specific needs while providing helpful templates
+and makes even subcommanding feel effortless. For more information, details and a tutorial on how to use our features,
+please see our [online documentation](https://sharg.vercel.app/usr/html/index.html).
 
-More information and highlights will follow soon.
+If you are working in the field of sequence analysis, we recommend to use the
+[seqan3 library](https://github.com/seqan/seqan3), which not only contains sharg, but also offers a wide range of bio
+C++ features.
 
 ## Dependencies
 
