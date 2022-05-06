@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <numeric>
+
 #include <sharg/detail/format_base.hpp>
 #include <tdl/ParamCTDFile.h>
 
@@ -37,7 +39,7 @@ public:
     enum class FileFormat { CTD };
 
     //!\brief Vector of functions that stores all calls except add_positional_option.
-    std::vector<std::function<void()>> parser_set_up_calls;
+    std::vector<std::function<void(std::string_view)>> parser_set_up_calls;
     //!\brief Vector of functions that stores add_positional_option calls.
     std::vector<std::function<void()>> positional_option_calls; // singled out to be printed on top
     //!\brief Keeps track of the number of positional options
@@ -45,7 +47,6 @@ public:
     //!\brief The names of subcommand programs.
     std::vector<std::string> command_names{};
     //!\brief Whether to show advanced options or not.
-    bool show_advanced_options{true};
 
 
     tdl::ToolInfo info;
@@ -79,11 +80,6 @@ public:
     format_tdl(format_tdl &&) = default;                     //!< Defaulted.
     format_tdl & operator=(format_tdl &&) = default;         //!< Defaulted.
     ~format_tdl() = default;                                 //!< Defaulted.
-
-    //!\copydoc format_help_base(std::vector<std::string> const &, bool const)
-    format_tdl(std::vector<std::string> const & names, bool const advanced = false) : command_names{names}, show_advanced_options{advanced}
-    {};
-    //!\}
 
 
     /*!\brief Prints a section title in man page format to std::cout.
@@ -193,17 +189,17 @@ public:
         if constexpr (std::same_as<std::filesystem::path, option_type>) {
             //!TODO maybe TDL should support std::filesystem::path
             auto valueAsStr = to_string(value);
-            store_help_page_element([this, long_id, info, valueAsStr, tags] () {
-                param.setValue("--" + long_id, valueAsStr, text_only(info), tags);
+            store_help_page_element([this, long_id, info, valueAsStr, tags] (std::string_view app_name) {
+                param.setValue(std::string{app_name} + ":--" + long_id, valueAsStr, text_only(info), tags);
             }, spec);
         } else if constexpr (requires { { param.setValue("--" + long_id, value, text_only(info), tags) }; }) {
-            store_help_page_element([this, long_id, value, info, tags] () {
-                param.setValue("--" + long_id, value, text_only(info), tags);
+            store_help_page_element([this, long_id, value, info, tags] (std::string_view app_name) {
+                param.setValue(std::string{app_name} + ":--" + long_id, value, text_only(info), tags);
             }, spec);
         } else {
             //!TODO what should we do if the type is unknown?
-            store_help_page_element([this, long_id, info, tags] () {
-                param.setValue("--" + long_id, "", text_only(info), tags);
+            store_help_page_element([this, long_id, info, tags] (std::string_view app_name) {
+                param.setValue(std::string{app_name} + ":--" + long_id, "", text_only(info), tags);
             }, spec);
         }
     }
@@ -211,14 +207,15 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::argument_parser::add_flag
      */
-    void add_flag(bool & SHARG_DOXYGEN_ONLY(value),
+    void add_flag(bool const & value,
                   char const SHARG_DOXYGEN_ONLY(short_id),
                   std::string const & long_id,
                   std::string const & desc,
                   option_spec const spec)
     {
-        store_help_page_element([this, long_id, desc] () {
-            param.setValue("--" + long_id, "", text_only(desc));
+        store_help_page_element([this, long_id, value, desc] (std::string_view app_name) {
+        //!TODO TDL needs support for bools
+            param.setValue(std::string{app_name} + ":--" + long_id, value, text_only(desc));
         }, spec);
     }
 
@@ -268,29 +265,35 @@ public:
             //           "specified \\fBbefore\\fP the subcommand key word. Every argument after the "
             //           "subcommand key word is passed on to the corresponding sub-parser.", true);
         }
+        param.setValue(meta.app_name + ":", meta.short_description);
+
+//        param.getEntry(":app-name");
+
 
         // add positional options if specified
-        if (!positional_option_calls.empty())
-            print_section("Positional Arguments");
+/*        if (!positional_option_calls.empty())
+            print_section("Positional Arguments");*/
 
         // each call will evaluate the function print_list_item()
         for (auto f : positional_option_calls)
             f();
 
         // add options and flags if specified
-        if (!parser_set_up_calls.empty())
-            print_section("Options");
+/*        if (!parser_set_up_calls.empty())
+            print_section("Options");*/
 
         // each call will evaluate the function print_list_item()
         for (auto f : parser_set_up_calls)
-            f();
+            f(meta.app_name);
 
         auto info = tdl::ToolInfo {
             .version_     = meta.version,
             .name_        = meta.app_name,
             .docurl_      = meta.url,
             .category_    = "",
-            .description_ = meta.short_description,
+            .description_ = std::accumulate(begin(meta.description), end(meta.description), std::string{}, [](auto a, auto v) {
+                return a + v + '\n';
+            }),
             .citations_   = {meta.citation},
         };
 
@@ -309,7 +312,7 @@ public:
      */
     void add_section(std::string const & title, option_spec const spec)
     {
-        store_help_page_element([this, title] () { print_section(title); }, spec);
+        store_help_page_element([this, title] (std::string_view) { print_section(title); }, spec);
     }
 
     /*!\brief Adds a print_subsection call to parser_set_up_calls.
@@ -317,7 +320,9 @@ public:
      */
     void add_subsection(std::string const & title, option_spec const spec)
     {
-        store_help_page_element([this, title] () { print_subsection(title); }, spec);
+        store_help_page_element([this, title] (std::string_view app_name) {
+            print_subsection(std::string{app_name} + ":" + title); },
+        spec);
     }
 
     /*!\brief Adds a print_line call to parser_set_up_calls.
@@ -325,7 +330,9 @@ public:
      */
     void add_line(std::string const & text, bool is_paragraph, option_spec const spec)
     {
-        store_help_page_element([this, text, is_paragraph] () { print_line(text, is_paragraph); }, spec);
+        store_help_page_element([this, text, is_paragraph] (std::string_view) {
+            print_line(text, is_paragraph);
+        }, spec);
     }
 
     /*!\brief Adds a sharg::print_list_item call to parser_set_up_calls.
@@ -333,10 +340,18 @@ public:
      */
     void add_list_item(std::string const & key, std::string const & desc, option_spec const spec)
     {
-        store_help_page_element([this, key, desc] () {
-            param.setValue(text_only(key), "", text_only(desc));
+        //!TODO this function shouldn't really exists
+        store_help_page_element([this, key, desc] (std::string_view app_name) {
+            auto str = text_only(key);
+            auto p = str.find(' ');
+            if (p != std::string::npos) {
+                str = str.substr(0, p);
+            }
+            str = std::string{app_name} + ":" + str;
+            param.setValue(str, "", text_only(desc));
         }, spec);
     }
+private:
     /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `spec` does not prevent it.
      * \param[in] printer The invokable that, if added to `parser_set_up_calls`, prints information to the help page.
      * \param[in] spec The option specification deciding whether to add the information to the help page.
@@ -344,13 +359,11 @@ public:
      * \details
      *
      * If `spec` equals `sharg::option_spec::hidden`, the information is never added to the help page.
-     * If `spec` equals `sharg::option_spec::advanced`, the information is only added to the help page if
-     * the advanced help page has been queried on the command line (`show_advanced_options == true`).
      */
-    void store_help_page_element(std::function<void()> printer, option_spec const spec)
+    void store_help_page_element(std::function<void(std::string_view)> printer, option_spec const spec)
     {
-        if (!(spec & option_spec::hidden) && (!(spec & option_spec::advanced) || show_advanced_options))
-            parser_set_up_calls.push_back(std::move(printer));
+        if (spec & option_spec::hidden) return;
+        parser_set_up_calls.push_back(std::move(printer));
     }
 
 
