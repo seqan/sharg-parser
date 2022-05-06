@@ -265,8 +265,6 @@ public:
             //           "specified \\fBbefore\\fP the subcommand key word. Every argument after the "
             //           "subcommand key word is passed on to the corresponding sub-parser.", true);
         }
-        param.setValue(meta.app_name + ":", meta.short_description);
-
 //        param.getEntry(":app-name");
 
 
