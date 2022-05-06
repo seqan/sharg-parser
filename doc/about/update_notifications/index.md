@@ -35,7 +35,7 @@ information regarding your input/output files is transmitted. All our code is op
 any time.
 
 The server does a simple form of non-personalised data aggregation that gives us a better overview of which apps are
-most commonly used and how well new Sharg versions are picked up. This helps the SeqAn project a lot, also in acquiring
+most commonly used and how well new Sharg versions are picked up. This helps the SeqAn project (www.seqan.de) a lot, also in acquiring
 funding. The web-server that receives the requests currently logs IP-Addresses as part of its standard behaviour,
 however, we are working on removing this behaviour.
 
