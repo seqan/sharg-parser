@@ -85,25 +85,6 @@ public:
     {};
     //!\}
 
-    //!\brief Prints a synopsis in any format.
-    void print_synopsis()
-    {
-        for (unsigned i = 0; i < meta.synopsis.size(); ++i)
-        {
-            std::string text = "\\fB";
-            text.append(meta.synopsis[i]);
-            text.insert(text.find_first_of(" \t"), "\\fP");
-
-            print_line(text, false);
-        }
-    }
-
-
-    //!\brief Prints a help page header in man page format to std::cout.
-    void print_header()
-    {
-        std::cout << "Some header\n";
-    }
 
     /*!\brief Prints a section title in man page format to std::cout.
      * \param[in] title The title of the section to print.
@@ -152,27 +133,6 @@ public:
         std::cout << "list_item: " << text_only(term) << " " << text_only(desc) << "\n";
     }
 
-    //!\brief Prints a help page footer in man page format.
-    void print_footer()
-    {
-        std::cout << "footer\n\n\n";
-        auto info = tdl::ToolInfo {
-            .version_     = meta.version,
-            .name_        = meta.app_name,
-            .docurl_      = meta.url,
-            .category_    = "",
-            .description_ = meta.short_description,
-            .citations_   = {meta.citation},
-        };
-
-        if (fileFormat == FileFormat::CTD) {
-            tdl::ParamCTDFile file;
-            file.writeCTDToStream(&std::cout, param, info);
-        } else {
-            throw std::runtime_error("unsupported file format (this is a bug)");
-        }
-    }
-
     std::string text_only(std::string const & input) const
     {
         std::string result;
@@ -208,44 +168,57 @@ public:
     }
 
 
-    /*!\brief Format string as in_bold.
-     * \param[in] str The input string to format in bold.
-     * \returns The string `str` wrapped in bold formatting.
-     */
-    std::string in_bold(std::string const & str) const
-    {
-        return str;
-    }
-
     template <typename option_type, typename validator_type>
     void add_option(option_type & value,
-                    char const short_id,
+                    char const SHARG_DOXYGEN_ONLY(short_id),
                     std::string const & long_id,
                     std::string const & desc,
                     option_spec const spec,
                     validator_type && option_validator)
     {
-        std::string id = prep_id_for_help(short_id, long_id) + " " + option_type_and_list_info(value);
+//        std::string id = long_id + " " + option_type_and_list_info(value);
         std::string info{desc};
         info += ((spec & option_spec::required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
         info += option_validator.get_help_page_message();
-        store_help_page_element([this, id, info] () {
-            param.setValue(text_only(id), "", text_only(info));
-        }, spec);
+
+        auto tags = std::vector<std::string>{};
+        if (spec & option_spec::required)
+        {
+            tags.emplace_back("required");
+        }
+        if (spec & option_spec::advanced)
+        {
+            tags.emplace_back("advanced");
+        }
+        if constexpr (std::same_as<std::filesystem::path, option_type>) {
+            //!TODO maybe TDL should support std::filesystem::path
+            auto valueAsStr = to_string(value);
+            store_help_page_element([this, long_id, info, valueAsStr, tags] () {
+                param.setValue("--" + long_id, valueAsStr, text_only(info), tags);
+            }, spec);
+        } else if constexpr (requires { { param.setValue("--" + long_id, value, text_only(info), tags) }; }) {
+            store_help_page_element([this, long_id, value, info, tags] () {
+                param.setValue("--" + long_id, value, text_only(info), tags);
+            }, spec);
+        } else {
+            //!TODO what should we do if the type is unknown?
+            store_help_page_element([this, long_id, info, tags] () {
+                param.setValue("--" + long_id, "", text_only(info), tags);
+            }, spec);
+        }
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::argument_parser::add_flag
      */
     void add_flag(bool & SHARG_DOXYGEN_ONLY(value),
-                  char const short_id,
+                  char const SHARG_DOXYGEN_ONLY(short_id),
                   std::string const & long_id,
                   std::string const & desc,
                   option_spec const spec)
     {
-        std::string id = prep_id_for_help(short_id, long_id);
-        store_help_page_element([this, id, desc] () {
-            param.setValue(text_only(id), "", text_only(desc));
+        store_help_page_element([this, long_id, desc] () {
+            param.setValue("--" + long_id, "", text_only(desc));
         }, spec);
     }
 
@@ -274,29 +247,6 @@ public:
         });
     }
 
-    /*!\brief Formats the option/flag identifier pair for the help page printing.
-     * \param[in] short_id The short identifier of the option/flag.
-     * \param[in] long_id  The long identifier of the option/flag.
-     * \returns The name of the short and long id, prepended with (double)dash.
-     *
-     * \details  e.g. "-i,--integer", "-i", or "--integer".
-     */
-    static std::string prep_id_for_help(char const short_id, std::string const & long_id)
-    {
-        // Build list item term.
-        std::string term;
-        if (short_id != '\0')
-            term = "\\fB-" + std::string(1, short_id) + "\\fP";
-
-        if (short_id != '\0' && !long_id.empty())
-            term.append(", ");
-
-        if (!long_id.empty())
-            term.append("\\fB--" + long_id + "\\fP");
-
-        return term;
-    }
-
 
     /*!\brief Initiates the printing of the help page to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed help page.
@@ -305,39 +255,25 @@ public:
     {
         meta = parser_meta;
 
-        print_header();
-
-        if (!meta.synopsis.empty())
-        {
-            print_section("Synopsis");
-            print_synopsis();
-        }
-
-        if (!meta.description.empty())
-        {
-            print_section("Description");
-            for (auto desc : meta.description)
-                print_line(desc);
-        }
 
         if (!command_names.empty())
         {
-            print_section("Subcommands");
-            print_line("This program must be invoked with one of the following subcommands:", false);
-            for (std::string const & name : command_names)
-                print_line("- \\fB" + name + "\\fP", false);
-            print_line("See the respective help page for further details (e.g. by calling " +
-                                   meta.app_name + " " + command_names[0] + " -h).", true);
-            print_line("The following options below belong to the top-level parser and need to be "
-                       "specified \\fBbefore\\fP the subcommand key word. Every argument after the "
-                       "subcommand key word is passed on to the corresponding sub-parser.", true);
+            //print_section("Subcommands");
+            //print_line("This program must be invoked with one of the following subcommands:", false);
+            //for (std::string const & name : command_names)
+            //    print_line("- \\fB" + name + "\\fP", false);
+            //print_line("See the respective help page for further details (e.g. by calling " +
+            //                       meta.app_name + " " + command_names[0] + " -h).", true);
+            //print_line("The following options below belong to the top-level parser and need to be "
+            //           "specified \\fBbefore\\fP the subcommand key word. Every argument after the "
+            //           "subcommand key word is passed on to the corresponding sub-parser.", true);
         }
 
         // add positional options if specified
         if (!positional_option_calls.empty())
             print_section("Positional Arguments");
 
-        // each call will evaluate the function derived_t().print_list_item()
+        // each call will evaluate the function print_list_item()
         for (auto f : positional_option_calls)
             f();
 
@@ -345,22 +281,25 @@ public:
         if (!parser_set_up_calls.empty())
             print_section("Options");
 
-        // each call will evaluate the function derived_t().print_list_item()
+        // each call will evaluate the function print_list_item()
         for (auto f : parser_set_up_calls)
             f();
 
-        if (!meta.examples.empty())
-        {
-            print_section("Examples");
-            for (auto example : meta.examples)
-                print_line(example);
+        auto info = tdl::ToolInfo {
+            .version_     = meta.version,
+            .name_        = meta.app_name,
+            .docurl_      = meta.url,
+            .category_    = "",
+            .description_ = meta.short_description,
+            .citations_   = {meta.citation},
+        };
+
+        if (fileFormat == FileFormat::CTD) {
+            tdl::ParamCTDFile file;
+            file.writeCTDToStream(&std::cout, param, info);
+        } else {
+            throw std::runtime_error("unsupported file format (this is a bug)");
         }
-
-        //print_version();
-
-        //print_legal();
-
-        print_footer();
 
         std::exit(EXIT_SUCCESS); // program should not continue from here
     }
