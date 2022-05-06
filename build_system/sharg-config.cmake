@@ -258,6 +258,25 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
+# tool description lib (tdl) dependency
+# ----------------------------------------------------------------------------
+
+# Dependency: TDL.
+find_package (TDL QUIET REQUIRED HINTS ${CMAKE_SOURCE_DIR}/../../submodules/tool_description_lib/build_system)
+
+# Allow to include CMake scripts from tdl.
+list (APPEND CMAKE_MODULE_PATH "${TDL_CLONE_DIR}/test/cmake/")
+
+if (TDL_FOUND)
+    set (SHARG_LIBRARIES               ${SHARG_LIBRARIES}               ${TDL_LIBRARIES})
+    set (SHARG_DEPENDENCY_INCLUDE_DIRS ${SHARG_DEPENDENCY_INCLUDE_DIRS} ${TDL_INCLUDE_DIRS})
+    sharg_config_print ("Dependency:        TDL-${TDL_VERSION_STRING} found.")
+else ()
+    sharg_config_print ("Dependency:        TDL not found.")
+endif ()
+
+
+# ----------------------------------------------------------------------------
 # System dependencies
 # ----------------------------------------------------------------------------
 
