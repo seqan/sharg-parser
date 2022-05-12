@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CMAKE_VERSION: 3.10.3
+  CMAKE_VERSION: 3.12.4
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
