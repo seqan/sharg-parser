@@ -10,23 +10,23 @@
 #include <sharg/argument_parser.hpp>
 
 // Reused global variables
-struct format_tdl_test : public ::testing::Test
+struct format_ctd_test : public ::testing::Test
 {
     int option_value{5};
     bool flag_value{false};
     int8_t non_list_pos_opt_value{1};
     std::vector<std::string> list_pos_opt_value{};
     std::string my_stdout{};
-    const char * argv[4] = {"./format_tdl_test --version-check false", "--export-help", "tdl"};
+    const char * argv[4] = {"./format_ctd_test --version-check false", "--export-help", "ctd"};
     std::string const version_str{sharg::sharg_version_cstring};
     std::string expected =
-    R"(.TH DEFAULT 1 "December 01, 1994" "default 01.01.01" "default_tdl_page_title")" "\n"
+    R"(.TH DEFAULT 1 "December 01, 1994" "default 01.01.01" "default_ctd_page_title")" "\n"
     R"(.SH NAME)" "\n"
     R"(default \- A short description here.)" "\n"
     R"(.SH SYNOPSIS)" "\n"
-    R"(\fB./format_tdl_test\fP synopsis)" "\n"
+    R"(\fB./format_ctd_test\fP synopsis)" "\n"
     R"(.br)" "\n"
-    R"(\fB./format_tdl_test\fP synopsis2)" "\n"
+    R"(\fB./format_ctd_test\fP synopsis2)" "\n"
     R"(.SH DESCRIPTION)" "\n"
     R"(description)" "\n"
     R"(.sp)" "\n"
@@ -109,7 +109,7 @@ struct format_tdl_test : public ::testing::Test
     }
 };
 
-TEST_F(format_tdl_test, empty_information)
+TEST_F(format_ctd_test, empty_information)
 {
     // Create the dummy parser.
     sharg::argument_parser parser{"default", 3, argv};
@@ -158,7 +158,7 @@ TEST_F(format_tdl_test, empty_information)
     EXPECT_EQ(my_stdout, expected_short);
 }
 
-TEST_F(format_tdl_test, full_information)
+TEST_F(format_ctd_test, full_information)
 {
     // Create the dummy parser.
     sharg::argument_parser parser{"default", 3, argv};
