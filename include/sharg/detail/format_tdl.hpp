@@ -88,7 +88,7 @@ public:
     void print_section(std::string const & title)
     {
         param.addSection("nokey", title);
-        std::cout << "Section: " << title << "\n";
+        //std::cout << "Section: " << title << "\n";
     }
 
     /*!\brief Prints a subsection title in man page format to std::cout.
@@ -96,7 +96,8 @@ public:
      */
     void print_subsection(std::string const & title)
     {
-        std::cout << "subsection: " << title << "\n";
+        (void)title;
+        //std::cout << "subsection: " << title << "\n";
     }
 
     /*!\brief Prints a help page section in man page format to std::cout.
@@ -107,7 +108,9 @@ public:
      */
     void print_line(std::string const & text, bool const line_is_paragraph = true)
     {
-        std::cout << "line: " << text << " " << line_is_paragraph << "\n";
+        (void)text;
+        (void)line_is_paragraph;
+        //std::cout << "line: " << text << " " << line_is_paragraph << "\n";
     }
 
 
@@ -126,7 +129,7 @@ public:
         param.setValue(text_only(term), "", text_only(desc));
 //        ParamEntry entry{term, desc};
 
-        std::cout << "list_item: " << text_only(term) << " " << text_only(desc) << "\n";
+        //std::cout << "list_item: " << text_only(term) << " " << text_only(desc) << "\n";
     }
 
     std::string text_only(std::string const & input) const
