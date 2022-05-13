@@ -19,24 +19,24 @@
 namespace sharg::detail
 {
 
-/*!!TODO this is just copied from format_tdl
- * \brief The format that prints the help page information formatted for a man page to std::cout.
+/*!\brief A generalized format to create different tool description files
  * \ingroup argument_parser
  *
  * \details
  *
- * The help page printing is not done immediately, because the user might not
- * provide meta information, positional options, etc. in the correct order.
- * In addition the needed order would be different from the parse format.
- * Thus the calls are stored (parser_set_up_calls and positional_option_calls)
- * and only evaluated when calling sharg::detail::format_help_base::parse.
- *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * This class allows to create different outputs format. See FileFormat for
+ * available formats.
  */
 class format_tdl : format_base
 {
 public:
-    enum class FileFormat { CTD };
+    /*!\brief Supported tool description file formats
+     */
+    enum class FileFormat
+    {
+        CTD, // Support for CTD format
+        /*CWL, // !TODO in the future this is supposed to also support cwl*/
+    };
 
     //!\brief Vector of functions that stores all calls except add_positional_option.
     std::vector<std::function<void(std::string_view)>> parser_set_up_calls;
@@ -46,11 +46,12 @@ public:
     unsigned positional_option_count{0};
     //!\brief The names of subcommand programs.
     std::vector<std::string> command_names{};
-    //!\brief Whether to show advanced options or not.
 
-
+    //!\brief TDL DS filled with tool meta information
     tdl::ToolInfo info;
+    //!\brief TDL DS used to registered all options
     tdl::Param    param;
+    //!\brief Targeted tool description format
     FileFormat    fileFormat;
 
     /*!\brief Stores all meta information about the application
@@ -73,6 +74,10 @@ public:
 public:
     /*!\name Constructors, destructor and assignment
      * \{
+     */
+    /*!\brief CTor
+     *
+     * \param fileFormat file format type
      */
     format_tdl(FileFormat fileFormat) : fileFormat{fileFormat} {}
     format_tdl(format_tdl const & pf) = default;             //!< Defaulted.
@@ -132,6 +137,11 @@ public:
         //std::cout << "list_item: " << text_only(term) << " " << text_only(desc) << "\n";
     }
 
+    /*!\brief removes man page specific formats
+     *
+     * \param input input string
+     * \return string with removed man page specific formats
+     */
     std::string text_only(std::string const & input) const
     {
         std::string result;
