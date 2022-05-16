@@ -26,7 +26,8 @@ But we send at most one request per day [we keep track of this by saving a times
 
 If a newer app version is registered in our database (or can be automatically determined), we inform the user about it.
 If the app is running in debug mode and the Sharg version is outdated, we assume the user is the app developer and
-inform them about it.
+inform them about it. Additionally, we recommend to register your app with us 
+if it is not already registered (support@seqan.de).
 
 ## Privacy Implications
 
