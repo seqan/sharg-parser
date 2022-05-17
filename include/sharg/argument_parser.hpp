@@ -98,10 +98,13 @@ namespace sharg
  * among others:
  *
  * 1. Options without arguments can use one hyphen, for example `-a -b` is equivalent to `-ab`.
- * 2. Between an option and an argument is no space required, for example `-c foo` is equivalent to `-cfoo`.
- * 3. `--` terminates the options and signals that only position option arguments follow (therefore enabling the user to
- * use an argument containg an `-` without it being misinterpreted as an option identifier).
+ * 2. Whitespaces between a short option and its argument are optional. For example, `-c foo` is equivalent to `-cfoo`.
+ * 3. `--` terminates the options and signals that only positional options follow. This enables the user to
+ * use a positional option beginning with `-` without it being misinterpreted as an option identifier.
  *
+ * Be aware that the sharg parser at the moment in disagreement with the
+ * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) does not interpret a
+ * single hyphen character as an ordinary non-option argument.
  *
  * ### Errors that are caught by the argument_parser
  *
