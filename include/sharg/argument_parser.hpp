@@ -91,6 +91,22 @@ namespace sharg
  *
  * ```
  *
+ * ###  The POSIX conventions
+ *
+ * The sharg::argument_parser follows the
+ * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). Note that this means
+ * among others:
+ *
+ * 1. Options without arguments can use one hyphen, for example `-a -b` is equivalent to `-ab`.
+ * 2. Whitespaces between a short option and its argument are optional. For example, `-c foo` is equivalent to `-cfoo`.
+ * 3. `--` terminates the options and signals that only positional options follow. This enables the user to
+ * use a positional option beginning with `-` without it being misinterpreted as an option identifier.
+ *
+ * \attention Currently, the sharg::argument_parser is in disagreement with one of the
+ * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). It does not 
+ * interpret a single hyphen character as an ordinary non-option argument that may be used for in-/output from
+ * standard streams.
+ *
  * ### Errors that are caught by the argument_parser
  *
  * There are two different kinds of errors: Developer errors and user errors.
