@@ -102,9 +102,10 @@ namespace sharg
  * 3. `--` terminates the options and signals that only positional options follow. This enables the user to
  * use a positional option beginning with `-` without it being misinterpreted as an option identifier.
  *
- * Be aware that the sharg parser at the moment in disagreement with the
- * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) does not interpret a
- * single hyphen character as an ordinary non-option argument.
+ * \attention Currently, the sharg::argument_parser is in disagreement with one of the
+ * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). It does not 
+ * interpret a single hyphen character as an ordinary non-option argument that may be used for in-/output from
+ * standard streams.
  *
  * ### Errors that are caught by the argument_parser
  *
