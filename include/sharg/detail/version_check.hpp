@@ -353,7 +353,7 @@ public:
  Please enter one of [a, n, y, s] and press [RETURN].
 
  For more information, see:
- https://github.com/seqan/seqan3/wiki/Update-Notifications
+ https://sharg.vercel.app/usr/html/about_update_notifications.html
 
 #######################################################################
 
@@ -391,7 +391,7 @@ public:
    Automatic Update Notifications
 #######################################################################
  This app performs automatic checks for updates. For more information
- see: https://github.com/seqan/seqan3/wiki/Update-Notifications
+ see: https://sharg.vercel.app/usr/html/about_update_notifications.html
 #######################################################################
 
 )";
