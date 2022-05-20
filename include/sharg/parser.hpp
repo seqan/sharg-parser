@@ -713,6 +713,9 @@ private:
     //!\brief The command line arguments.
     std::vector<std::string> cmd_arguments{};
 
+    //!\brief The command that lead to calling this parser, e.g. [./build/bin/raptor, build]
+    std::vector<std::string> executable_name{};
+
     /*!\brief Initializes the sharg::parser class on construction.
      *
      * \param[in] argc        The number of command line arguments.
@@ -747,6 +750,9 @@ private:
      */
     void init(int argc, char const * const * const argv)
     {
+        assert(argc > 0);
+        executable_name.emplace_back(argv[0]);
+
         bool special_format_was_set{false};
 
         for (int i = 1, argv_len = argc; i < argv_len; ++i) // start at 1 to skip binary name
@@ -757,6 +763,12 @@ private:
             {
                 sub_parser =
                     std::make_unique<parser>(info.app_name + "-" + arg, argc - i, argv + i, update_notifications::off);
+
+                // Add the original calls to the front, e.g. ["raptor"],
+                // s.t. ["raptor", "build"] will be the list after constructing the subparser
+                sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
+                                                   executable_name.begin(),
+                                                   executable_name.end());
                 break;
             }
 
