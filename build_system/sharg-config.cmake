@@ -18,10 +18,6 @@
 #   C++20
 #   pthread
 #
-# SHARG requires the following libraries:
-#
-#   SeqAn3    -- the succinct data structure library
-#
 # SHARG has the following optional dependencies:
 #
 #   ZLIB      -- zlib compression library
