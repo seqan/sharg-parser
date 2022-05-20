@@ -702,6 +702,11 @@ private:
      */
     void init(int argc, char const * const * const argv)
     {
+        // This is an exeception, normally info isn't being filled by the argument parser
+        if (info.executable_call.empty()) {
+            info.executable_call = argv[0];
+        }
+
         if (argc <= 1) // no arguments provided
         {
             format = detail::format_short_help{};
