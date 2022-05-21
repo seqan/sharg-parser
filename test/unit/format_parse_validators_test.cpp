@@ -25,7 +25,8 @@ std::string const basic_options_str = "OPTIONS\n"
                                       "    --copyright\n"
                                       "          Prints the copyright/license information.\n"
                                       "    --export-help (std::string)\n"
-                                      "          Export the help page information. Value must be one of [html, man].\n";
+                                      "          Export the help page information. Value must be one of [html, man,\n"
+                                      "          ctd].\n";
 
 std::string const basic_version_str = "VERSION\n"
                                       "    Last update:\n"

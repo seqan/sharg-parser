@@ -18,6 +18,7 @@
 #include <sharg/detail/format_help.hpp>
 #include <sharg/detail/format_html.hpp>
 #include <sharg/detail/format_man.hpp>
+#include <sharg/detail/format_tdl.hpp>
 #include <sharg/detail/format_parse.hpp>
 #include <sharg/detail/version_check.hpp>
 
@@ -659,6 +660,7 @@ private:
                  detail::format_version,
                  detail::format_html,
                  detail::format_man,
+                 detail::format_tdl,
                  detail::format_copyright/*,
                  detail::format_ctd*/> format{detail::format_help{{}, false}}; // Will be overwritten in any case.
 
@@ -694,10 +696,10 @@ private:
      * - <b>\--version</b> sets the format to sharg::detail::format_version.
      * - <b>\--export-help html</b> sets the format to sharg::detail::format_html.
      * - <b>\--export-help man</b> sets the format to sharg::detail::format_man.
-     * - <b>\--export-help ctd</b> sets the format to sharg::detail::format_ctd.
+     * - <b>\--export-help ctd</b> sets the format to sharg::detail::format_tdl{FileFormat::CTD}.
      * - else the format is that to sharg::detail::format_parse
      *
-     * If `--export-help` is specified with a value other than html/man or ctd
+     * If `--export-help` is specified with a value other than html, man or ctd
      * an sharg::argument_parser_error is thrown.
      */
     void init(int argc, char const * const * const argv)
@@ -760,12 +762,11 @@ private:
                     format = detail::format_html{subcommands};
                 else if (export_format == "man")
                     format = detail::format_man{subcommands};
-                // TODO (smehringer) use when CTD support is available
-                // else if (export_format == "ctd")
-                //     format = detail::format_ctd{};
+                else if (export_format == "ctd")
+                    format = detail::format_tdl{detail::format_tdl::FileFormat::CTD};
                 else
                     throw validation_error{"Validation failed for option --export-help: "
-                                            "Value must be one of [html, man]"};
+                                            "Value must be one of [html, man, ctd]."};
                 init_standard_options();
                 special_format_was_set = true;
             }
@@ -811,7 +812,7 @@ private:
         add_list_item("\\fB--version\\fP", "Prints the version information.");
         add_list_item("\\fB--copyright\\fP", "Prints the copyright/license information.");
         add_list_item("\\fB--export-help\\fP (std::string)",
-                                    "Export the help page information. Value must be one of [html, man].");
+                                    "Export the help page information. Value must be one of [html, man, ctd].");
         if (version_check_dev_decision == update_notifications::on)
             add_list_item("\\fB--version-check\\fP (bool)", "Whether to check for the newest app version. Default: true.");
     }
