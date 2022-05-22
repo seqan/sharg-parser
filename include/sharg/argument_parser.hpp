@@ -103,7 +103,7 @@ namespace sharg
  * use a positional option beginning with `-` without it being misinterpreted as an option identifier.
  *
  * \attention Currently, the sharg::argument_parser is in disagreement with one of the
- * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). It does not 
+ * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). It does not
  * interpret a single hyphen character as an ordinary non-option argument that may be used for in-/output from
  * standard streams.
  *
@@ -135,7 +135,7 @@ namespace sharg
  * The functionality helps getting new versions out to users faster.
  * It is also used to inform application developers of new versions of the SeqAn library
  * which means that applications ship with less bugs.
- * For privacy implications, please see: https://github.com/seqan/seqan3/wiki/Update-Notifications.
+ * For privacy implications, please see: https://sharg.vercel.app/usr/html/about_update_notifications.html.
  *
  * Developers that wish to disable this feature permanently can pass an extra constructor argument:
  *
