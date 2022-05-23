@@ -8,9 +8,9 @@ int main(int argc, char ** argv)
     bool bonus{false};
     std::vector<double> grades{}; // you can also specify a vector that is treated as a list option.
 
-    myparser.add_option(name, 'n', "name", "Please specify your name.");
-    myparser.add_flag(bonus, 'b', "bonus", "Please specify if you got the bonus.");
-    myparser.add_positional_option(grades, "Please specify your grades.");
+    myparser.add_option(name, sharg::config{.short_id = 'n', .long_id = "name", .description = "Your name please."});
+    myparser.add_flag(bonus, sharg::config{.short_id = 'b', .long_id = "bonus", .description = "Got a bonus?."});
+    myparser.add_positional_option(grades, sharg::config{.description = "Please specify your grades."});
 
     try
     {

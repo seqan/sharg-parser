@@ -36,7 +36,7 @@ int main(int argc, char const ** argv)
     sharg::parser parser{"my_ext_bar_parser", argc, argv, sharg::update_notifications::off};
 
     external::bar ext_bar{};
-    parser.add_option(ext_bar, 'f', "external-bar", "Please supply an integer for member external::bar::a");
+    parser.add_option(ext_bar, sharg::config{.short_id = 'f', .long_id = "ext-bar", .description = "Supply an int."});
 
     try
     {

@@ -6,13 +6,11 @@ int main(int argc, char const ** argv)
 
     //![validator_call]
     std::filesystem::path myfile;
+    auto vali = sharg::input_file_validator{{"fa", "fasta"}};
 
-    myparser.add_option(myfile,
-                        'f',
-                        "file",
-                        "Give me a filename.",
-                        sharg::option_spec::standard,
-                        sharg::input_file_validator{{"fa", "fasta"}});
+    myparser.add_option(
+        myfile,
+        sharg::config{.short_id = 'f', .long_id = "file", .description = "Give me a filename.", .validator = vali});
     //![validator_call]
 
     // an exception will be thrown if the user specifies a filename

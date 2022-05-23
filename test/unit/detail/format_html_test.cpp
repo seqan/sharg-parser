@@ -91,12 +91,17 @@ TEST(html_format, full_information_information)
     parser1.info.citation = "citation";
     parser1.info.author = "author";
     parser1.info.email = "email";
-    parser1.add_option(option_value, 'i', "int", "this is a int option.");
-    parser1.add_option(option_value, 'j', "jint", "this is a required int option.", sharg::option_spec::required);
-    parser1.add_flag(flag_value, 'f', "flag", "this is a flag.");
-    parser1.add_flag(flag_value, 'k', "kflag", "this is a flag.");
-    parser1.add_positional_option(non_list_pos_opt_value, "this is a positional option.");
-    parser1.add_positional_option(list_pos_opt_value, "this is a positional option.");
+    parser1.add_option(option_value,
+                       sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option."});
+    parser1.add_option(option_value,
+                       sharg::config{.short_id = 'j',
+                                     .long_id = "jint",
+                                     .description = "this is a required int option.",
+                                     .required = true});
+    parser1.add_flag(flag_value, sharg::config{.short_id = 'f', .long_id = "flag", .description = "this is a flag."});
+    parser1.add_flag(flag_value, sharg::config{.short_id = 'k', .long_id = "kflag", .description = "this is a flag."});
+    parser1.add_positional_option(non_list_pos_opt_value, sharg::config{.description = "this is a positional option."});
+    parser1.add_positional_option(list_pos_opt_value, sharg::config{.description = "this is a positional option."});
     parser1.info.examples.push_back("example");
     parser1.info.examples.push_back("example2");
     testing::internal::CaptureStdout();

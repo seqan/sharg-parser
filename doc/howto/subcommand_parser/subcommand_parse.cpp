@@ -15,8 +15,8 @@ int run_git_pull(sharg::parser & parser)
 {
     pull_arguments args{};
 
-    parser.add_positional_option(args.repository, "The repository name to pull from.");
-    parser.add_positional_option(args.branch, "The branch name to pull from.");
+    parser.add_positional_option(args.repository, sharg::config{.description = "The repository name to pull from."});
+    parser.add_positional_option(args.branch, sharg::config{.description = "The branch name to pull from."});
 
     try
     {
@@ -48,8 +48,8 @@ int run_git_push(sharg::parser & parser)
 {
     push_arguments args{};
 
-    parser.add_positional_option(args.repository, "The repository name to push to.");
-    parser.add_positional_option(args.branches, "The branch names to push (if none are given, push current).");
+    parser.add_positional_option(args.repository, sharg::config{.description = "The repository name to push to."});
+    parser.add_positional_option(args.branches, sharg::config{.description = "The branch names to push."});
 
     try
     {
@@ -83,7 +83,7 @@ int main(int argc, char const ** argv)
     // Because of ambiguity, we do not allow any (positional) options for the top-level parser.
     top_level_parser.info.description.push_back("You can push or pull from a remote repository.");
     bool flag{false};
-    top_level_parser.add_flag(flag, 'f', "flag", "some flag");
+    top_level_parser.add_flag(flag, sharg::config{.short_id = 'f', .long_id = "flag", .description = "some flag"});
 
     try
     {

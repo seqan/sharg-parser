@@ -239,9 +239,9 @@ TEST(help_page_printing, version_call)
     sharg::parser parser4{"test_parser", 2, argv3};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
     parser4.info.url = "https://seqan.de";
-    parser4.add_option(option_value, 'i', "int", "this is a int option.");
-    parser4.add_flag(flag_value, 'f', "flag", "this is a flag.");
-    parser4.add_positional_option(pos_opt_value, "this is a positional option.");
+    parser4.add_option(option_value, sharg::config{.short_id = 'i'});
+    parser4.add_flag(flag_value, sharg::config{.short_id = 'f'});
+    parser4.add_positional_option(pos_opt_value, sharg::config{});
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser4.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     std_cout = testing::internal::GetCapturedStdout();
@@ -259,8 +259,8 @@ TEST(help_page_printing, do_not_print_hidden_options)
     // Add an option and request help.
     sharg::parser parser5{"test_parser", 2, argv1};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
-    parser5.add_option(option_value, 'i', "int", "this is a int option.", sharg::option_spec::hidden);
-    parser5.add_flag(flag_value, 'f', "flag", "this is a flag.", sharg::option_spec::hidden);
+    parser5.add_option(option_value, sharg::config{.short_id = 'i', .hidden = true});
+    parser5.add_flag(flag_value, sharg::config{.short_id = 'f', .hidden = true});
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser5.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     std_cout = testing::internal::GetCapturedStdout();
@@ -280,28 +280,30 @@ TEST(help_page_printing, advanced_options)
     auto set_up = [&option_value, &flag_value, &another_option_value](sharg::parser & parser)
     {
         // default or required information are always displayed
-        parser.add_section("default section", sharg::option_spec::required);
-        parser.add_subsection("default subsection", sharg::option_spec::required); // same as DEFAULT
-        parser.add_option(option_value, 'i', "int", "this is a int option.", sharg::option_spec::required);
-        parser.add_flag(flag_value, 'g', "goo", "this is a flag.", sharg::option_spec::required); // same as DEFAULT
-        parser.add_list_item("-s, --some", "list item.", sharg::option_spec::required);           // same as DEFAULT
-        parser.add_line("some line.", true, sharg::option_spec::required);                        // same as DEFAULT
+        parser.add_section("default section", false);
+        parser.add_subsection("default subsection", false);
+        parser.add_option(
+            option_value,
+            sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option.", .required = true});
+        parser.add_flag(flag_value,
+                        sharg::config{.short_id = 'g',
+                                      .long_id = "goo",
+                                      .description = "this is a flag.",
+                                      .required = true}); // required has no impact here
+        parser.add_list_item("-s, --some", "list item.", false);
+        parser.add_line("some line.", true, false);
 
         // advanced information
-        parser.add_section("advanced section", sharg::option_spec::advanced);
-        parser.add_subsection("advanced subsection", sharg::option_spec::advanced);
-        parser.add_option(another_option_value, 'j', "jnt", "this is a int option.", sharg::option_spec::advanced);
-        parser.add_flag(flag_value, 'f', "flag", "this is a flag.", sharg::option_spec::advanced);
-        parser.add_list_item("-s, --some", "list item.", sharg::option_spec::advanced);
-        parser.add_line("some line.", true, sharg::option_spec::advanced);
-
-        // hidden information (never displayed, normally used for options not section information)
-        parser.add_section("hidden section", sharg::option_spec::hidden);
-        parser.add_subsection("hidden subsection", sharg::option_spec::hidden);
-        parser.add_option(option_value, 'd', "dnt", "hidden option.", sharg::option_spec::hidden);
-        parser.add_flag(flag_value, 'l', "lflag", "hidden a flag.", sharg::option_spec::hidden);
-        parser.add_list_item("-s, --some", "hidden list item.", sharg::option_spec::hidden);
-        parser.add_line("hidden line.", true, sharg::option_spec::hidden);
+        parser.add_section("advanced section", true);
+        parser.add_subsection("advanced subsection", true);
+        parser.add_option(
+            another_option_value,
+            sharg::config{.short_id = 'j', .long_id = "jnt", .description = "this is a int option.", .advanced = true});
+        parser.add_flag(
+            flag_value,
+            sharg::config{.short_id = 'f', .long_id = "flag", .description = "this is a flag.", .advanced = true});
+        parser.add_list_item("-s, --some", "list item.", true);
+        parser.add_line("some line.", true, true);
     };
 
     // without -hh, only the non/advanced information are shown
@@ -394,24 +396,25 @@ TEST(help_page_printing, full_information)
     parser6.info.description.push_back("description");
     parser6.info.description.push_back("description2");
     parser6.info.short_description = "so short";
-    parser6.add_option(option_value, 'i', "int", "this is a int option.");
-    parser6.add_option(enum_option_value,
-                       'e',
-                       "enum",
-                       "this is an enum option.",
-                       sharg::option_spec::standard,
-                       sharg::value_list_validator{sharg::enumeration_names<foo> | std::views::values});
+    parser6.add_option(option_value,
+                       sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option."});
+    parser6.add_option(
+        enum_option_value,
+        sharg::config{.short_id = 'e',
+                      .long_id = "enum",
+                      .description = "this is an enum option.",
+                      .validator = sharg::value_list_validator{sharg::enumeration_names<foo> | std::views::values}});
     parser6.add_option(required_option,
-                       'r',
-                       "required-int",
-                       "this is another int option.",
-                       sharg::option_spec::required);
+                       sharg::config{.short_id = 'r',
+                                     .long_id = "required-int",
+                                     .description = "this is another int option.",
+                                     .required = true});
     parser6.add_section("Flags");
     parser6.add_subsection("SubFlags");
     parser6.add_line("here come all the flags");
-    parser6.add_flag(flag_value, 'f', "flag", "this is a flag.");
-    parser6.add_positional_option(non_list_optional, "this is not a list.");
-    parser6.add_positional_option(pos_opt_value, "this is a positional option.");
+    parser6.add_flag(flag_value, sharg::config{.short_id = 'f', .long_id = "flag", .description = "this is a flag."});
+    parser6.add_positional_option(non_list_optional, sharg::config{.description = "this is not a list."});
+    parser6.add_positional_option(pos_opt_value, sharg::config{.description = "this is a positional option."});
     parser6.info.examples.push_back("example");
     parser6.info.examples.push_back("example2");
     testing::internal::CaptureStdout();
@@ -537,7 +540,8 @@ TEST(parse_test, subcommand_parser)
     sharg::parser top_level_parser{"test_parser", 2, argv, sharg::update_notifications::on, {"sub1", "sub2"}};
     sharg::detail::test_accessor::set_terminal_width(top_level_parser, 80);
     top_level_parser.info.description.push_back("description");
-    top_level_parser.add_option(option_value, 'f', "foo", "foo bar.");
+    top_level_parser.add_option(option_value,
+                                sharg::config{.short_id = 'f', .long_id = "foo", .description = "foo bar."});
 
     testing::internal::CaptureStdout();
     EXPECT_EXIT(top_level_parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");

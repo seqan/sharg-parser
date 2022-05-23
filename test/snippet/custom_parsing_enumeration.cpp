@@ -27,12 +27,12 @@ int main(int argc, char const * argv[])
     // Because of the parsing struct and
     // the static member function enumeration_names
     // you can now add an option that takes a value of type std::errc:
+    auto validator = sharg::value_list_validator{(sharg::enumeration_names<std::errc> | std::views::values)};
     parser.add_option(value,
-                      'e',
-                      "errc",
-                      "Give me a std::errc value.",
-                      sharg::option_spec::standard,
-                      sharg::value_list_validator{(sharg::enumeration_names<std::errc> | std::views::values)});
+                      sharg::config{.short_id = 'e',
+                                    .long_id = "errc",
+                                    .description = "Give me a std::errc value.",
+                                    .validator = validator});
 
     try
     {

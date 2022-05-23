@@ -6,7 +6,7 @@ int main(int argc, char ** argv)
 
     int age{30}; // define default values directly in the variable
 
-    myparser.add_option(age, 'a', "user-age", "Please specify your age.");
+    myparser.add_option(age, sharg::config{.short_id = 'a', .long_id = "user-age", .description = "Your age please."});
 
     try
     {

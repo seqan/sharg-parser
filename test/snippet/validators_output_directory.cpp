@@ -8,11 +8,10 @@ int main(int argc, char const ** argv)
     std::filesystem::path mydir{};
 
     myparser.add_option(mydir,
-                        'd',
-                        "dir",
-                        "The output directory for storing the files.",
-                        sharg::option_spec::standard,
-                        sharg::output_directory_validator{});
+                        sharg::config{.short_id = 'd',
+                                      .long_id = "dir",
+                                      .description = "The output directory for storing the files.",
+                                      .validator = sharg::output_directory_validator{}});
     //! [validator_call]
 
     // an exception will be thrown if the user specifies a directory that cannot be created by the filesystem either

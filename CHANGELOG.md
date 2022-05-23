@@ -20,7 +20,33 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 ## API changes
 
-#### General
+#### add_option/add_flag/add_positional_option
+
+**!Important!** New API of `add_option/add_flag/add_positional_option` calls that is more descriptive and flexible.
+An option flag or positional option is added with only two parameters:
+(1) Its value that stores the command line parameter (nothing changed here)
+(2) A `sharg::config` object (NEW)
+
+Before:
+```cpp
+parser.add_option(val, 'i', "int", "some int");
+```
+Now:
+```cpp
+parser.add_option(val, sharg::config{.short_id = 'i', .long_id = "int", .description = "some int"});
+```
+We take advantage of [*Designated initializers*](https://en.cppreference.com/w/cpp/language/aggregate_initialization#Designated_initializers) 
+that make the call much more descriptive and flexible.
+E.g., you can leave out parameters you don't need, but beware that the order must be as specified in `sharg::config`.
+
+You can now set an option as required without the need of the `sharg::option_spec`
+```cpp
+parser.add_option(val, sharg::config{.short_id = 'i', .required = true});
+```
+
+**!Important!** We removed the `sharg::option_spec` as it is obsolete in the new API.
+
+#### Concepts
 
 * Custom option types must not only model `sharg::istreamable` (`stream >> option`)
   but must also model `sharg::ostreamable` in order to be used in `parser.add_option()` calls.

@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 sharg::parser parser{"Example-Parser", argc, argv};
 //![add_positional_option]
 size_t variable{};
-parser.add_positional_option(variable, "This is a description.");
+parser.add_positional_option(variable, sharg::config{.description = "This is a description."});
 //![add_positional_option]
 }
 
@@ -30,7 +30,7 @@ parser.add_positional_option(variable, "This is a description.");
 sharg::parser parser{"Example-Parser", argc, argv};
 //![add_option]
 size_t variable{};
-parser.add_option(variable, 'n', "my-number", "This is a description.");
+parser.add_option(variable, sharg::config{.short_id = 'n', .long_id = "my-num", .description = "A description."});
 //![add_option]
 }
 
@@ -38,7 +38,7 @@ parser.add_option(variable, 'n', "my-number", "This is a description.");
 sharg::parser parser{"Example-Parser", argc, argv};
 //![add_flag]
 bool variable{false};
-parser.add_flag(variable, 'f', "my_flag", "This is a description.");
+parser.add_flag(variable, sharg::config{.short_id = 'f', .long_id = "my-flag", .description = "A description."});
 //![add_flag]
 }
 
@@ -46,7 +46,7 @@ parser.add_flag(variable, 'f', "my_flag", "This is a description.");
 sharg::parser parser{"Example-Parser", argc, argv};
 //![option_list]
 std::vector<std::string> list_variable{};
-parser.add_option(list_variable, 'n', "names", "Give me some names.");
+parser.add_option(list_variable, sharg::config{.short_id = 'n', .long_id = "names", .description = "Some names."});
 //![option_list]
 }
 
@@ -55,8 +55,8 @@ sharg::parser parser{"Example-Parser", argc, argv};
 //![positional_option_list]
 std::string variable{};
 std::vector<std::string> list_variable{};
-parser.add_positional_option(variable, "Give me a single variable.");
-parser.add_positional_option(list_variable, "Give me one or more variables!.");
+parser.add_positional_option(variable, sharg::config{.description = "Give me a single variable."});
+parser.add_positional_option(list_variable, sharg::config{.description = "Give me one or more variables!."});
 //![positional_option_list]
 }
 
@@ -64,16 +64,15 @@ parser.add_positional_option(list_variable, "Give me one or more variables!.");
 sharg::parser parser{"Example-Parser", argc, argv};
 //![required_option]
 std::string required_variable{};
-parser.add_option(required_variable, 'n', "name", "I really need a name.", sharg::option_spec::required);
+parser.add_option(required_variable, sharg::config{.short_id = 'n', .long_id = "name", .description = "I really need a name.", .required = true});
 //![required_option]
 }
 
 {
 sharg::parser parser{"Example-Parser", argc, argv};
 //![input_file_validator]
-parser.add_positional_option(args.file_path,
-                             "Please provide a tab separated data file.",
-                             sharg::input_file_validator{{"tsv"}});
+parser.add_positional_option(args.file_path, sharg::config{.description = "Please provide a tab separated data file.",
+                             .validator = sharg::input_file_validator{{"tsv"}}});
 //![input_file_validator]
 }
 }

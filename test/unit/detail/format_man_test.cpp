@@ -157,15 +157,23 @@ struct format_man_test : public ::testing::Test
         parser.info.synopsis.push_back("./format_man_test synopsis2");
         parser.info.description.push_back("description");
         parser.info.description.push_back("description2");
-        parser.add_option(option_value, 'i', "int", "this is a int option.");
-        parser.add_option(option_value, 'j', "jint", "this is a required int option.", sharg::option_spec::required);
+        parser.add_option(option_value,
+                          sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option."});
+        parser.add_option(option_value,
+                          sharg::config{.short_id = 'j',
+                                        .long_id = "jint",
+                                        .description = "this is a required int option.",
+                                        .required = true});
         parser.add_section("Flags");
         parser.add_subsection("SubFlags");
         parser.add_line("here come all the flags");
-        parser.add_flag(flag_value, 'f', "flag", "this is a flag.");
-        parser.add_flag(flag_value, 'k', "kflag", "this is a flag.");
-        parser.add_positional_option(non_list_pos_opt_value, "this is a positional option.");
-        parser.add_positional_option(list_pos_opt_value, "this is a positional option.");
+        parser.add_flag(flag_value,
+                        sharg::config{.short_id = 'f', .long_id = "flag", .description = "this is a flag."});
+        parser.add_flag(flag_value,
+                        sharg::config{.short_id = 'k', .long_id = "kflag", .description = "this is a flag."});
+        parser.add_positional_option(non_list_pos_opt_value,
+                                     sharg::config{.description = "this is a positional option."});
+        parser.add_positional_option(list_pos_opt_value, sharg::config{.description = "this is a positional option."});
         parser.info.examples.push_back("example");
         parser.info.examples.push_back("example2");
     }

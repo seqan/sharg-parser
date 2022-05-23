@@ -15,6 +15,7 @@
 #include <set>
 #include <variant>
 
+#include <sharg/config.hpp>
 #include <sharg/detail/format_help.hpp>
 #include <sharg/detail/format_html.hpp>
 #include <sharg/detail/format_man.hpp>
@@ -231,35 +232,28 @@ public:
      *                        value. Must model sharg::validator.
      *
      * \param[in, out] value The variable in which to store the given command line argument.
-     * \param[in] short_id The short identifier for the option (e.g. 'a').
-     * \param[in] long_id The long identifier for the option (e.g. "age").
-     * \param[in] desc The description of the option to be shown in the help page.
-     * \param[in] spec Advanced option specification, see sharg::option_spec.
-     * \param[in] option_validator A sharg::validator that verifies the value after parsing (callable).
+     * \param[in] config A configuration object to customise the sharg::parser behaviour. See sharg::config.
+     *
+     * The `config.validator` must be applicable to the given output variable (\p value).
      *
      * \throws sharg::design_error
      */
-    template <typename option_type, validator validator_type = detail::default_validator>
+    template <typename option_type, typename validator_type>
         requires (parser_compatible_option<option_type>
                   || parser_compatible_option<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
-    void add_option(option_type & value,
-                    char const short_id,
-                    std::string const & long_id,
-                    std::string const & desc,
-                    option_spec const spec = option_spec::standard,
-                    validator_type option_validator = validator_type{}) // copy to bind rvalues
+    void add_option(option_type & value, config<validator_type> const & config)
     {
         if (sub_parser != nullptr)
             throw design_error{"You may only specify flags for the top-level parser."};
 
-        verify_identifiers(short_id, long_id);
+        verify_identifiers(config.short_id, config.long_id);
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
-            [=, &value](auto & f)
+            [=, &value, &config](auto & f)
             {
-                f.add_option(value, short_id, long_id, desc, spec, option_validator);
+                f.add_option(value, config);
             },
             format);
     }
@@ -267,30 +261,25 @@ public:
     /*!\brief Adds a flag to the sharg::parser.
      *
      * \param[in, out] value     The variable which shows if the flag is turned off (default) or on.
-     * \param[in]      short_id  The short identifier for the flag (e.g. 'i').
-     * \param[in]      long_id   The long identifier for the flag (e.g. "integer").
-     * \param[in]      desc      The description of the flag to be shown in the help page.
-     * \param[in]      spec      Advanced flag specification, see sharg::option_spec.
+     * \param[in] config A configuration object to customise the sharg::parser behaviour. See sharg::config.
      *
      * \throws sharg::design_error
      *
      */
-    void add_flag(bool & value,
-                  char const short_id,
-                  std::string const & long_id,
-                  std::string const & desc,
-                  option_spec const spec = option_spec::standard)
+    template <typename validator_type>
+        requires std::invocable<validator_type, bool>
+    void add_flag(bool & value, config<validator_type> const & config)
     {
         if (value)
             throw design_error("A flag's default value must be false.");
 
-        verify_identifiers(short_id, long_id);
+        verify_identifiers(config.short_id, config.long_id);
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
             [=, &value](auto & f)
             {
-                f.add_flag(value, short_id, long_id, desc, spec);
+                f.add_flag(value, config);
             },
             format);
     }
@@ -307,22 +296,19 @@ public:
      *                        value. Must model sharg::validator.
      *
      * \param[in, out] value The variable in which to store the given command line argument.
-     * \param[in] desc The description of the positional option to be shown in the help page.
-     * \param[in] option_validator A sharg::validator that verifies the value after parsing (callable).
+     * \param[in] config Customise the sharg::parser behaviour. See sharg::positional_config.
      *
      * \throws sharg::design_error
      *
      * \details
      *
-     * The validator must be applicable to the given output variable (\p value).
+     * The `config.validator` must be applicable to the given output variable (\p value).
      */
-    template <typename option_type, validator validator_type = detail::default_validator>
+    template <typename option_type, typename validator_type>
         requires (parser_compatible_option<option_type>
                   || parser_compatible_option<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
-    void add_positional_option(option_type & value,
-                               std::string const & desc,
-                               validator_type option_validator = validator_type{}) // copy to bind rvalues
+    void add_positional_option(option_type & value, config<validator_type> const & config)
     {
         if (sub_parser != nullptr)
             throw design_error{"You may only specify flags for the top-level parser."};
@@ -337,9 +323,9 @@ public:
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
-            [=, &value](auto & f)
+            [=, &value, &config](auto & f)
             {
-                f.add_positional_option(value, desc, option_validator);
+                f.add_positional_option(value, config);
             },
             format);
     }
@@ -524,32 +510,30 @@ public:
 
     /*!\brief Adds an help page section to the sharg::parser.
      * \param[in] title The title of the section.
-     * \param[in] spec Whether to always display this section title (sharg::option_spec::standard), only when showing
-     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
+     * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
      * \details This only affects the help page and other output formats.
      */
-    void add_section(std::string const & title, option_spec const spec = option_spec::standard)
+    void add_section(std::string const & title, bool const advanced_only = false)
     {
         std::visit(
             [&](auto & f)
             {
-                f.add_section(title, spec);
+                f.add_section(title, advanced_only);
             },
             format);
     }
 
     /*!\brief Adds an help page subsection to the sharg::parser.
      * \param[in] title The title of the subsection.
-     * \param[in] spec Whether to always display this subsection title (sharg::option_spec::standard), only when showing
-     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
+     * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
      * \details This only affects the help page and other output formats.
      */
-    void add_subsection(std::string const & title, option_spec const spec = option_spec::standard)
+    void add_subsection(std::string const & title, bool const advanced_only = false)
     {
         std::visit(
             [&](auto & f)
             {
-                f.add_subsection(title, spec);
+                f.add_subsection(title, advanced_only);
             },
             format);
     }
@@ -557,18 +541,17 @@ public:
     /*!\brief Adds an help page text line to the sharg::parser.
      * \param[in] text The text to print.
      * \param[in] is_paragraph Whether to insert as paragraph or just a line (Default: false).
-     * \param[in] spec Whether to always display this line (sharg::option_spec::standard), only when showing
-     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
+     * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
      * \details
      * If the line is not a paragraph (false), only one line break is appended, otherwise two line breaks are appended.
      * This only affects the help page and other output formats.
      */
-    void add_line(std::string const & text, bool is_paragraph = false, option_spec const spec = option_spec::standard)
+    void add_line(std::string const & text, bool is_paragraph = false, bool const advanced_only = false)
     {
         std::visit(
             [&](auto & f)
             {
-                f.add_line(text, is_paragraph, spec);
+                f.add_line(text, is_paragraph, advanced_only);
             },
             format);
     }
@@ -576,8 +559,7 @@ public:
     /*!\brief Adds an help page list item (key-value) to the sharg::parser.
      * \param[in] key  The key of the key-value pair of the list item.
      * \param[in] desc The value of the key-value pair of the list item.
-     * \param[in] spec Whether to always display this list item (sharg::option_spec::standard), only when showing
-     *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
+     * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
      *
      * \details
      *
@@ -591,13 +573,12 @@ public:
      *            Super important integer for age.
      *```
      */
-    void
-    add_list_item(std::string const & key, std::string const & desc, option_spec const spec = option_spec::standard)
+    void add_list_item(std::string const & key, std::string const & desc, bool const advanced_only = false)
     {
         std::visit(
             [&](auto & f)
             {
-                f.add_list_item(key, desc, spec);
+                f.add_list_item(key, desc, advanced_only);
             },
             format);
     }

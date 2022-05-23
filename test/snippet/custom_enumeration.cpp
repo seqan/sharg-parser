@@ -26,12 +26,10 @@ int main(int argc, char const * argv[])
 
     // Because of the enumeration_names function
     // you can now add an option that takes a value of type bar:
-    parser.add_option(value,
-                      'f',
-                      "foo",
-                      "Give me a foo value.",
-                      sharg::option_spec::standard,
-                      sharg::value_list_validator{(sharg::enumeration_names<foo::bar> | std::views::values)});
+    auto vali = sharg::value_list_validator{(sharg::enumeration_names<foo::bar> | std::views::values)};
+    parser.add_option(
+        value,
+        sharg::config{.short_id = 'f', .long_id = "foo", .description = "Give me a value for foo.", .validator = vali});
 
     try
     {

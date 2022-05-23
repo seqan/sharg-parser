@@ -75,34 +75,35 @@ void initialise_parser(sharg::parser & parser, cmd_arguments & args)
     parser.info.version = "1.0.0";
 
     //![file_validator]
-    parser.add_positional_option(args.file_path,
-                                 "Please provide a tab separated seasons file.",
-                                 sharg::regex_validator{".*seasons\\..+$"} | sharg::input_file_validator{{"tsv"}});
+    parser.add_positional_option(
+        args.file_path,
+        sharg::config{.description = "Please provide a tab separated seasons file.",
+                      .validator = sharg::regex_validator{".*seasons\\..+$"} | sharg::input_file_validator{{"tsv"}}});
     //![file_validator]
 
     //![arithmetic_range_validator]
     parser.add_option(args.seasons,
-                      's',
-                      "season",
-                      "Choose the seasons to aggregate.",
-                      sharg::option_spec::required,
-                      sharg::arithmetic_range_validator{1, 7});
+                      sharg::config{.short_id = 's',
+                                    .long_id = "season",
+                                    .description = "Choose the seasons to aggregate.",
+                                    .required = true,
+                                    .validator = sharg::arithmetic_range_validator{1, 7}});
     //![arithmetic_range_validator]
 
     //![value_list_validator]
     parser.add_option(args.aggregate_by,
-                      'a',
-                      "aggregate-by",
-                      "Choose your method of aggregation.",
-                      sharg::option_spec::standard,
-                      sharg::value_list_validator{"median", "mean"});
+                      sharg::config{.short_id = 'a',
+                                    .long_id = "aggregate-by",
+                                    .description = "Choose your method of aggregation.",
+                                    .validator = sharg::value_list_validator{"median", "mean"}});
     //![value_list_validator]
 
-    parser.add_flag(args.header_is_set,
-                    'H',
-                    "header-is-set",
-                    "Let us know whether your data file contains a "
-                    "header to ensure correct parsing.");
+    parser.add_flag(
+        args.header_is_set,
+        sharg::config{.short_id = 'H',
+                      .long_id = "header-is-set",
+                      .description =
+                          "Let us know whether your data file contains a header to ensure correct parsing."});
 }
 
 int main(int argc, char ** argv)

@@ -31,7 +31,8 @@ int main(int argc, char const ** argv)
     sharg::parser parser{"my_foobar_parser", argc, argv, sharg::update_notifications::off};
 
     foo::bar my_bar{};
-    parser.add_option(my_bar, 'f', "foo-bar", "Please supply an integer for member foo::bar::a");
+    parser.add_option(my_bar,
+                      sharg::config{.short_id = 'f', .long_id = "foo-bar", .description = "Supply an integer."});
 
     try
     {
