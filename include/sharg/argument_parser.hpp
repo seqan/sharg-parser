@@ -238,7 +238,7 @@ public:
      *
      * \throws sharg::design_error
      */
-    template <typename option_type, validator validator_type = detail::default_validator<option_type>>
+    template <typename option_type, validator validator_type = detail::default_validator>
     //!\cond
         requires (argument_parser_compatible_option<option_type> ||
                   argument_parser_compatible_option<std::ranges::range_value_t<option_type>>) &&
@@ -307,7 +307,7 @@ public:
      *
      * The validator must be applicable to the given output variable (\p value).
      */
-    template <typename option_type, validator validator_type = detail::default_validator<option_type>>
+    template <typename option_type, validator validator_type = detail::default_validator>
     //!\cond
         requires (argument_parser_compatible_option<option_type> ||
                   argument_parser_compatible_option<std::ranges::range_value_t<option_type>>) &&

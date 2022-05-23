@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <any>
 #include <concepts>
 #include <fstream>
 #include <ranges>
@@ -929,7 +930,6 @@ namespace detail
 /*!\brief Validator that always returns true.
  * \ingroup argument_parser
  * \implements sharg::validator
- * \tparam option_value_t Must be a (container of) arithmetic type(s).
  *
  * \details
  *
@@ -938,13 +938,13 @@ namespace detail
  *
  * \remark For a complete overview, take a look at \ref argument_parser
  */
-template <typename option_value_t>
 struct default_validator
 {
-    //!\brief Type of values that are tested by validator
-    using option_value_type = option_value_t;
+    //!\brief Dummy type needed to model sharg::validator but any type is accepted in the `operator()`.
+    using option_value_type = std::any;
 
-    //!\brief Value cmp always passes validation because the operator never throws.
+    //!\brief Value cmp always passes validation for any type and never throws.
+    template <typename option_value_t>
     void operator()(option_value_t const & /*cmp*/) const noexcept
     {}
 
