@@ -51,11 +51,8 @@ TEST(validator_test, fullfill_concept)
 {
     EXPECT_FALSE(sharg::validator<int>);
 
-    EXPECT_TRUE(sharg::validator<sharg::detail::default_validator<int>>);
-    EXPECT_TRUE(sharg::validator<sharg::detail::default_validator<int> const>);
-    EXPECT_TRUE(sharg::validator<sharg::detail::default_validator<int> &>);
+    EXPECT_TRUE(sharg::validator<sharg::detail::default_validator>);
 
-    EXPECT_TRUE(sharg::validator<sharg::detail::default_validator<std::vector<int>>>);
     EXPECT_TRUE(sharg::validator<sharg::arithmetic_range_validator<int>>);
     EXPECT_TRUE(sharg::validator<sharg::value_list_validator<double>>);
     EXPECT_TRUE(sharg::validator<sharg::value_list_validator<std::string>>);
