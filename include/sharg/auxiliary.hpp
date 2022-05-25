@@ -121,6 +121,11 @@ struct argument_parser_meta_data // holds all meta information
      *        "./my_read_mapper -s 3 --my_flag path/infile1").
      */
     std::vector<std::string> examples;
+    /*!\brief String on how the executable was called.
+     * If this string is not being manually filled, it will be filled by `argument_parser` by
+     * the name used on the command line to call this executable (This is recommended).
+     */
+    std::string executable_call;
 };
 
 } // namespace sharg
