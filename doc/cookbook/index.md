@@ -1,8 +1,8 @@
-# The SeqAn Cookbook {#cookbook}
+# The Sharg Cookbook {#cookbook}
 
 [TOC]
 
-This document provides example recipes on how to carry out particular tasks using the SeqAn functionalities in C++.
+This document provides example recipes on how to carry out particular tasks using the Sharg functionalities in C++.
 Please note that these **recipes are not ordered**. You can use the links in the table of contents or the search
 function of your browser to navigate them.
 

@@ -24,7 +24,7 @@
 namespace sharg
 {
 
-/*!\brief The SeqAn command line parser.
+/*!\brief The Sharg command line parser.
  * \ingroup argument_parser
  *
  * \details
