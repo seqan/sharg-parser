@@ -1,4 +1,4 @@
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/argument_parser.hpp>
 
 struct custom_validator
 {
@@ -16,7 +16,7 @@ struct custom_validator
     }
 };
 
-static_assert(seqan3::validator<custom_validator>); // does not cause compile error
+static_assert(sharg::validator<custom_validator>); // does not cause compile error
 
 int main()
 {}
