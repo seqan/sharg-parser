@@ -22,7 +22,7 @@ if a numeric argument is an integral square (i.e. the user shall only be allowed
 In order to model the sharg::validator, your custom validator must provide the following:
 
   1. It needs to expose a `value_type` type member which identifies the type of variable the validator works on.
-     Currently, the SeqAn validators either have value_type `double` or `std::string`.
+     Currently, the Sharg validators either have value_type `double` or `std::string`.
      Since the validator works on every type that has a common reference type to `value_type`, it enables a validator
      with `value_type = double` to work on all arithmetic values.
      \attention In order to be chainable, the validators need to share the same value_type!
@@ -44,11 +44,11 @@ struct custom_validator
 static_assert(sharg::validator<custom_validator>);
 ```
 
-To formally satisfy the requirements, your functions don't need the correct behaviour, yet.
+To formally satisfy the requirements, your functions do not need the correct behaviour, yet.
 Only the signatures need to be fully specified.
 
 \assignment{Assignment 3: Custom validator I}
-Implement enough of the above mentioned `struct custom_validator` for it to model sharg::validator and pass
+Implement enough of the above-mentioned `struct custom_validator` for it to model sharg::validator and pass
 the check. You can use an empty `main()`-function for now.
 \endassignment
 \solution
@@ -64,14 +64,14 @@ It should be usable with this main function:
 
 Try to think of the correct behaviour of this program.
 
-It should print "Yeah!" for the arguments `-i 0`, `-i 4`, or `-i 144`; and/or `-j 0` or `-j 4`.
+It should print "Yeah!" for the arguments `-i 0`, `-i 4`, or `-i 144` with `-j 0` or `-j 4`.
 
-It should fail for the arguments `-i 3`; and/or `-j 144` or `-j 3`.
+It should fail for the arguments `-i 3` with `-j 144` or `-j 3`.
 
 \assignment{Assignment 4: Custom validator II}
-Implement your validator fully, i.e. make it throw seqan3::validation_error if the number provided is not a
+Implement your validator fully, i.e. make it throw sharg::validation_error if the number provided is not a
 square.
-Also, give a nice description for the help page.
+Additionally, give a nice description for the help page.
 
 \endassignment
 \solution
