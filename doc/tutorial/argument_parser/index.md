@@ -1,4 +1,4 @@
-# Parsing command line arguments with SeqAn {#tutorial_argument_parser}
+# Parsing command line arguments with sharg {#tutorial_argument_parser}
 
 <b>Learning Objective:</b> <br>
 You will learn how to use the sharg::argument_parser class to parse command line arguments. This tutorial is a
@@ -13,7 +13,7 @@ walkthrough with links to the API documentation and is also meant as a source fo
 # Introduction
 
 An easy and very flexible interface to a program is through the command line. This tutorial explains how to parse the
-command line using the SeqAn library’s sharg::argument_parser class.
+command line using the sharg library’s sharg::argument_parser class.
 
 This class will give you the following functionality:
 
@@ -57,7 +57,7 @@ Seasons ([by Wikipedia](https://en.wikipedia.org/wiki/List_of_Game_of_Thrones_ep
 We want to build an application that is able to read the file with or without a header line, select certain seasons and
 compute the average or median from the "Avg. U.S. viewers (millions)" of the selected seasons.
 
-# The SeqAn argument parser class
+# The sharg argument parser class
 
 Before we add any of the options, flags, and positional options, we will take a look at the sharg::argument_parser
 class itself. It is constructed by giving a program's name and passing the parameters `argc` and `argv` from main.
@@ -190,7 +190,7 @@ So how does this look like? The following code snippet adds a positional option 
 In addition to the variable that will store the value, you need to pass a description. This description will help users
 of your application to understand how the option is affecting your program.
 
-\note As the name suggests, positional options are identified by their position. In SeqAn, the first
+\note As the name suggests, positional options are identified by their position. In sharg, the first
 `add_positional_option()` will be linked to the first command line argument that is neither an option-value pair nor a
 flag. So the order of initialising your parser determines the order of assigning command line arguments to the
 respective variables.
@@ -427,9 +427,9 @@ which we hope cover most of the use cases, but you can always create your own va
 \attention You can pass a validator to the sharg::argument_parser::add_option function only after passing the
 sharg::option_spec parameter. Pass the sharg::option_spec::standard tag if there are no further restrictions on your option.
 
-## SeqAn validators
+## Sharg validators
 
-The following validators are provided in the SeqAn library and can be included with the following header:
+The following validators are provided in the sharg library and can be included with the following header:
 
 \snippet doc/tutorial/argument_parser/small_snippets.cpp validator_include
 
@@ -473,7 +473,7 @@ Add a sharg::value_list_validator to the `-a/--aggregate-by` option that sets th
 
 ### The file validator
 
-SeqAn offers two file validator types: the sharg::input_file_validator and the sharg::output_file_validator.
+Sharg offers two file validator types: the sharg::input_file_validator and the sharg::output_file_validator.
 On construction, the validator receives a list (vector) of valid file extensions that are tested against the extension
 of the parsed option value.
 The validator throws a sharg::validation_error exception whenever a given filename's extension is not in the
@@ -494,7 +494,7 @@ Using the sharg::output_file_validator:
 
 ### The directory validator
 
-In addition to the file validator types, SeqAn offers directory validator types. These are useful if one needs
+In addition to the file validator types, sharg offers directory validator types. These are useful if one needs
 to provide an input directory (using the sharg::input_directory_validator) or output directory
 (using the sharg::output_directory_validator) where multiple files need to be read from or written to.
 The sharg::input_directory_validator checks whether the specified path is a directory and is readable.
@@ -570,9 +570,9 @@ take a look at our \link subcommand_arg_parse HowTo\endlink.
 
 # Update Notifications
 
-When you run a SeqAn-based application for the first time, you will likely be asked about "update notifications".
+When you run a sharg-based application for the first time, you will likely be asked about "update notifications".
 This is a feature that helps inform users about updates
-and helps the SeqAn project get a rough estimate on which SeqAn-based apps are popular.
+and helps the sharg project get a rough estimate on which sharg-based apps are popular.
 
 See the API documentation of sharg::argument_parser for information on how to configure (or turn off) this feature.
 See our [wiki entry](https://github.com/seqan/seqan3/wiki/Update-Notifications) for more information on how it works and
