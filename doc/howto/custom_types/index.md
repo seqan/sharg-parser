@@ -1,4 +1,4 @@
-# How to make your custom type model harg::argument_parser_compatible_option {#fulfil_argument_parser_compatible_option}
+# How to make your custom type model sharg::argument_parser_compatible_option {#fulfil_argument_parser_compatible_option}
 
 [TOC]
 
