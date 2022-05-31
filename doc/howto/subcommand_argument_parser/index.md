@@ -2,7 +2,7 @@
 
 [TOC]
 
-This HowTo shows you how to write an argument parser with subcommand like `git push` using SeqAn.
+This HowTo shows you how to write an argument parser with subcommand like `git push` using Sharg.
 
 \tutorial_head{Easy, 15 min, \ref tutorial_argument_parser, }
 
@@ -11,7 +11,7 @@ This HowTo shows you how to write an argument parser with subcommand like `git p
 A common use case for command line tools, e.g. `git`, is to have multiple subcommands, e.g. `git fetch` or `git push`.
 Each subcommand has its own set of options and its own help page.
 This HowTo explains how this can be done with the sharg::argument_parser and serves as a copy'n'paste source.
-If you are new to SeqAn, we recommend to do the basic
+If you are new to Sharg, we recommend to do the basic
 \link tutorial_argument_parser argument parser tutorial \endlink before you read further.
 
 # A subcommand argument parser

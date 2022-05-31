@@ -14,6 +14,7 @@
       <tab type="usergroup" visible="yes" title="How-To" intro="">
       <tab type="user" visible="yes" title="Subcommand argument parsing" url="\ref subcommand_arg_parse" intro=""/>
       <tab type="user" visible="yes" title="Make custom types comptabile" url="\ref fulfil_argument_parser_compatible_option" intro=""/>
+      <tab type="user" visible="yes" title="Make custom validator" url="\ref custom_validator" intro=""/>
     </tab>
     <tab type="user" visible="yes" title="Cookbook" url="\ref cookbook" intro=""/>
     <tab type="usergroup" visible="yes" title="About" intro="">
