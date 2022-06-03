@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <array>
 #include <sharg/std/charconv>
 #include <fstream>
 #include <future>
