@@ -50,8 +50,7 @@ public:
     ~format_man() = default;                                 //!< Defaulted.
 
     //!\copydoc format_help_base(std::vector<std::string> const &, bool const)
-    format_man(std::vector<std::string> const & names, bool const advanced = false) : base_type{names, advanced}
-    {};
+    format_man(std::vector<std::string> const & names, bool const advanced = false) : base_type{names, advanced} {};
     //!\}
 
 private:
@@ -62,14 +61,25 @@ private:
 
         // Print .TH line.
         std::cout << ".TH ";
-        std::transform(meta.app_name.begin(), meta.app_name.end(), out, [] (unsigned char c) { return std::toupper(c); });
+        std::transform(meta.app_name.begin(),
+                       meta.app_name.end(),
+                       out,
+                       [](unsigned char c)
+                       {
+                           return std::toupper(c);
+                       });
         std::cout << " " << std::to_string(meta.man_page_section) << " \"" << meta.date << "\" \"";
-        std::transform(meta.app_name.begin(), meta.app_name.end(), out, [] (unsigned char c) { return std::tolower(c); });
+        std::transform(meta.app_name.begin(),
+                       meta.app_name.end(),
+                       out,
+                       [](unsigned char c)
+                       {
+                           return std::tolower(c);
+                       });
         std::cout << " " << meta.version << "\" \"" << meta.man_page_title << "\"\n";
 
         // Print NAME section.
-        std::cout << ".SH NAME\n"
-                  << meta.app_name << " \\- " << meta.short_description << std::endl;
+        std::cout << ".SH NAME\n" << meta.app_name << " \\- " << meta.short_description << std::endl;
     }
 
     /*!\brief Prints a section title in man page format to std::cout.
@@ -79,7 +89,13 @@ private:
     {
         std::ostream_iterator<char> out(std::cout);
         std::cout << ".SH ";
-        std::transform(title.begin(), title.end(), out, [] (unsigned char c) { return std::toupper(c); });
+        std::transform(title.begin(),
+                       title.end(),
+                       out,
+                       [](unsigned char c)
+                       {
+                           return std::toupper(c);
+                       });
         std::cout << "\n";
         is_first_in_section = true;
     }
@@ -89,8 +105,8 @@ private:
      */
     void print_subsection(std::string const & title)
     {
-            std::cout << ".SS " << title << "\n";
-            is_first_in_section = true;
+        std::cout << ".SS " << title << "\n";
+        is_first_in_section = true;
     }
 
     /*!\brief Prints a help page section in man page format to std::cout.
@@ -121,10 +137,8 @@ private:
      */
     void print_list_item(std::string const & term, std::string const & desc)
     {
-            std::cout << ".TP\n"
-                   << term << "\n"
-                   << desc << "\n";
-            is_first_in_section = false;
+        std::cout << ".TP\n" << term << "\n" << desc << "\n";
+        is_first_in_section = false;
     }
 
     //!\brief Prints a help page footer in man page format.
@@ -146,4 +160,4 @@ private:
     bool is_first_in_section{true};
 };
 
-} // namespace sharg
+} // namespace sharg::detail

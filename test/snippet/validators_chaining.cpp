@@ -1,6 +1,6 @@
 #include <sharg/all.hpp>
 
-int main(int argc, const char ** argv)
+int main(int argc, char const ** argv)
 {
     sharg::parser myparser{"Test", argc, argv}; // initialize
 
@@ -10,8 +10,12 @@ int main(int argc, const char ** argv)
     sharg::regex_validator absolute_path_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"};
     sharg::input_file_validator my_file_ext_validator{{"sa", "so"}};
 
-    myparser.add_option(file_name, 'f', "file","Give me a file name with an absolute path.",
-                        sharg::option_spec::standard, absolute_path_validator | my_file_ext_validator);
+    myparser.add_option(file_name,
+                        'f',
+                        "file",
+                        "Give me a file name with an absolute path.",
+                        sharg::option_spec::standard,
+                        absolute_path_validator | my_file_ext_validator);
     //![validator_call]
 
     // an exception will be thrown if the user specifies a file name

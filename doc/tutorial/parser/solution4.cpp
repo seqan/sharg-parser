@@ -6,7 +6,13 @@
 template <typename number_type, typename range_type>
 number_type to_number(range_type && range)
 {
-    std::string str = [&range] () { std::string s; for (auto c : range) s.push_back(c); return s; }();
+    std::string str = [&range]()
+    {
+        std::string s;
+        for (auto c : range)
+            s.push_back(c);
+        return s;
+    }();
     number_type num;
     auto res = std::from_chars(&str[0], &str[0] + str.size(), num);
 
@@ -77,25 +83,28 @@ void initialise_parser(sharg::parser & parser, cmd_arguments & args)
 
     parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation: mean or median.");
 
-    parser.add_flag(args.header_is_set, 'H', "header-is-set", "Let us know whether your data file contains a "
-                                                              "header to ensure correct parsing.");
+    parser.add_flag(args.header_is_set,
+                    'H',
+                    "header-is-set",
+                    "Let us know whether your data file contains a "
+                    "header to ensure correct parsing.");
 }
 //![solution]
 
 int main(int argc, char ** argv)
 {
-    sharg::parser myparser{"Game-of-Parsing", argc, argv};                  // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv}; // initialise myparser
     cmd_arguments args{};
 
     initialise_parser(myparser, args);
 
     try
     {
-         myparser.parse();                                                  // trigger command line parsing
+        myparser.parse(); // trigger command line parsing
     }
-    catch (sharg::parser_error const & ext)                                 // catch user errors
+    catch (sharg::parser_error const & ext) // catch user errors
     {
-        std::cerr << "[Winter has come] " << ext.what() << "\n";            // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
         return -1;
     }
 

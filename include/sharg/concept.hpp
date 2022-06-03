@@ -32,11 +32,13 @@ namespace sharg
  *
  * `std::istream` must support the (un)formatted input function (`operator>>`) for an l-value of a given `value_type`.
  */
+// clang-format off
 template <typename value_type>
 concept istreamable = requires (std::istream & is, value_type & val)
 {
     {is >> val} -> std::same_as<std::istream&>;
 };
+// clang-format on
 
 /*!\concept sharg::ostreamable
  * \ingroup parser
@@ -52,15 +54,18 @@ concept istreamable = requires (std::istream & is, value_type & val)
  * `std::ostream` must support the (un)formatted output function (`operator<<`) for an l-value of a given `type` or
  * for an l-value of `type::reference`.
  */
+// clang-format off
 template <typename type>
 concept ostreamable = requires (std::ostream & os, type & val)
-{
-    {os << val} -> std::same_as<std::ostream&>;
-} ||
-requires (std::ostream & os, type & con)
-{
-    {os << con[0]} -> std::same_as<std::ostream&>;
-};
+                      {
+                          {os << val} -> std::same_as<std::ostream&>;
+                      }
+                    ||
+                      requires (std::ostream & os, type & con)
+                      {
+                          {os << con[0]} -> std::same_as<std::ostream&>;
+                      };
+// clang-format on
 
 /*!\concept sharg::parser_compatible_option
  * \brief Checks whether the the type can be used in an add_(positional_)option call on the parser.
@@ -79,7 +84,7 @@ requires (std::ostream & os, type & con)
  * \remark For a complete overview, take a look at \ref parser
  */
 template <typename option_type>
-concept parser_compatible_option = (sharg::istreamable<option_type> && sharg::ostreamable<option_type>) ||
-                                    named_enumeration<option_type>;
+concept parser_compatible_option =
+    (sharg::istreamable<option_type> && sharg::ostreamable<option_type>) || named_enumeration<option_type>;
 
 } // namespace sharg

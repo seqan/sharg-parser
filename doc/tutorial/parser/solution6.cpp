@@ -6,7 +6,13 @@
 template <typename number_type, typename range_type>
 number_type to_number(range_type && range)
 {
-    std::string str = [&range] () { std::string s; for (auto c : range) s.push_back(c); return s; }();
+    std::string str = [&range]()
+    {
+        std::string s;
+        for (auto c : range)
+            s.push_back(c);
+        return s;
+    }();
     number_type num;
     auto res = std::from_chars(&str[0], &str[0] + str.size(), num);
 
@@ -69,38 +75,50 @@ void initialise_parser(sharg::parser & parser, cmd_arguments & args)
     parser.info.version = "1.0.0";
 
     //![file_validator]
-    parser.add_positional_option(args.file_path, "Please provide a tab separated seasons file.",
-                                 sharg::regex_validator{".*seasons\\..+$"} | sharg::input_file_validator{{"tsv"}} );
+    parser.add_positional_option(args.file_path,
+                                 "Please provide a tab separated seasons file.",
+                                 sharg::regex_validator{".*seasons\\..+$"} | sharg::input_file_validator{{"tsv"}});
     //![file_validator]
 
     //![arithmetic_range_validator]
-    parser.add_option(args.seasons, 's', "season", "Choose the seasons to aggregate.",
-                      sharg::option_spec::required, sharg::arithmetic_range_validator{1, 7});
+    parser.add_option(args.seasons,
+                      's',
+                      "season",
+                      "Choose the seasons to aggregate.",
+                      sharg::option_spec::required,
+                      sharg::arithmetic_range_validator{1, 7});
     //![arithmetic_range_validator]
 
     //![value_list_validator]
-    parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation.",
-                      sharg::option_spec::standard, sharg::value_list_validator{"median", "mean"});
+    parser.add_option(args.aggregate_by,
+                      'a',
+                      "aggregate-by",
+                      "Choose your method of aggregation.",
+                      sharg::option_spec::standard,
+                      sharg::value_list_validator{"median", "mean"});
     //![value_list_validator]
 
-    parser.add_flag(args.header_is_set, 'H', "header-is-set", "Let us know whether your data file contains a "
-                                                              "header to ensure correct parsing.");
+    parser.add_flag(args.header_is_set,
+                    'H',
+                    "header-is-set",
+                    "Let us know whether your data file contains a "
+                    "header to ensure correct parsing.");
 }
 
 int main(int argc, char ** argv)
 {
-    sharg::parser myparser{"Game-of-Parsing", argc, argv};          // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv}; // initialise myparser
     cmd_arguments args{};
 
     initialise_parser(myparser, args);
 
     try
     {
-         myparser.parse();                                          // trigger command line parsing
+        myparser.parse(); // trigger command line parsing
     }
-    catch (sharg::parser_error const & ext)                         // catch user errors
+    catch (sharg::parser_error const & ext) // catch user errors
     {
-        std::cerr << "[Winter has come] " << ext.what() << "\n";    // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
         return -1;
     }
 

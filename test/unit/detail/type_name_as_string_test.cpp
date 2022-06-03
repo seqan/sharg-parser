@@ -14,7 +14,7 @@
 // Some test namespace to check if namespace information are preserved within the naming.
 namespace foo
 {
-template <typename ...type>
+template <typename... type>
 struct bar
 {};
 } // namespace foo
@@ -22,8 +22,13 @@ struct bar
 // Some types to test if type inspection works as expected.
 // Note that the returned name might differ between compiler vendors and thus must be adapted accordingly
 // in case this tests fails for those vendors.
-using reflection_types = ::testing::Types<char, char16_t const, char32_t &, short *, double const * const,
-                                          foo::bar<char> const &, foo::bar<foo::bar<char, double>>>;
+using reflection_types = ::testing::Types<char,
+                                          char16_t const,
+                                          char32_t &,
+                                          short *,
+                                          double const * const,
+                                          foo::bar<char> const &,
+                                          foo::bar<foo::bar<char, double>>>;
 
 template <typename param_type>
 class type_inspection : public ::testing::Test

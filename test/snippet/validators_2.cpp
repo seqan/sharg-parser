@@ -1,6 +1,6 @@
 #include <sharg/all.hpp>
 
-int main(int argc, const char ** argv)
+int main(int argc, char const ** argv)
 {
     sharg::parser myparser{"Test", argc, argv}; // initialize
 
@@ -8,8 +8,7 @@ int main(int argc, const char ** argv)
     int myint;
     sharg::value_list_validator my_validator{2, 4, 6, 8, 10};
 
-    myparser.add_option(myint,'i',"integer","Give me a number.",
-                        sharg::option_spec::standard, my_validator);
+    myparser.add_option(myint, 'i', "integer", "Give me a number.", sharg::option_spec::standard, my_validator);
     //![validator_call]
 
     // an exception will be thrown if the user specifies an integer

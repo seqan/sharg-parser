@@ -43,16 +43,17 @@ namespace sharg
  *
  * To implement your own validator please refer to the detailed concept description below.
  */
+// clang-format off
 template <typename validator_type>
 concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
+                    requires { typename std::remove_reference_t<validator_type>::option_value_type; } &&
                     requires(validator_type validator,
                              typename std::remove_reference_t<validator_type>::option_value_type value)
-{
-    typename std::remove_reference_t<validator_type>::option_value_type;
-
-    {validator(value)} -> std::same_as<void>;
-    {validator.get_help_page_message()} -> std::same_as<std::string>;
-};
+                    {
+                        {validator(value)} -> std::same_as<void>;
+                        {validator.get_help_page_message()} -> std::same_as<std::string>;
+                    };
+// clang-format on
 
 /*!\brief A validator that checks whether a number is inside a given range.
  * \ingroup parser
@@ -84,7 +85,9 @@ public:
      * \param[in] max_ Maximum set for the range to test.
      */
     arithmetic_range_validator(option_value_type const min_, option_value_type const max_) :
-        min{min_}, max{max_}, valid_range_str{"[" + std::to_string(min_) + "," + std::to_string(max_) + "]"}
+        min{min_},
+        max{max_},
+        valid_range_str{"[" + std::to_string(min_) + "," + std::to_string(max_) + "]"}
     {}
 
     /*!\brief Tests whether cmp lies inside [`min`, `max`].
@@ -109,7 +112,12 @@ public:
     //!\endcond
     void operator()(range_type const & range) const
     {
-        std::for_each(range.begin(), range.end(), [&] (auto cmp) { (*this)(cmp); });
+        std::for_each(range.begin(),
+                      range.end(),
+                      [&](auto cmp)
+                      {
+                          (*this)(cmp);
+                      });
     }
 
     //!\brief Returns a message that can be appended to the (positional) options help page info.
@@ -185,11 +193,11 @@ public:
      *                      be constructible from each type in the parameter pack.
      * \param[in] opts The parameter pack values.
      */
-    template <typename ...option_types>
+    template <typename... option_types>
     //!\cond
         requires ((std::constructible_from<option_value_type, option_types> && ...))
     //!\endcond
-    value_list_validator(option_types && ...opts)
+    value_list_validator(option_types &&... opts)
     {
         (values.emplace_back(std::forward<option_types>(opts)), ...);
     }
@@ -202,7 +210,7 @@ public:
     void operator()(option_value_type const & cmp) const
     {
         if (!(std::find(values.begin(), values.end(), cmp) != values.end()))
-            throw validation_error{detail::to_string("Value ", cmp, " is not one of ", values,".")};
+            throw validation_error{detail::to_string("Value ", cmp, " is not one of ", values, ".")};
     }
 
     /*!\brief Tests whether every element in \p range lies inside values.
@@ -216,7 +224,12 @@ public:
     //!\endcond
     void operator()(range_type const & range) const
     {
-        std::for_each(std::ranges::begin(range), std::ranges::end(range), [&] (auto cmp) { (*this)(cmp); });
+        std::for_each(std::ranges::begin(range),
+                      std::ranges::end(range),
+                      [&](auto cmp)
+                      {
+                          (*this)(cmp);
+                      });
     }
 
     //!\brief Returns a message that can be appended to the (positional) options help page info.
@@ -235,31 +248,31 @@ private:
  * \{
  */
 //!\brief Given a parameter pack of types that are convertible to std::string, delegate to value type std::string.
-template <typename option_type, typename ...option_types>
+template <typename option_type, typename... option_types>
 //!\cond
-    requires (std::constructible_from<std::string, std::decay_t<option_types>> && ... &&
-              std::constructible_from<std::string, std::decay_t<option_type>>)
+    requires (std::constructible_from<std::string, std::decay_t<option_types>> && ...
+              && std::constructible_from<std::string, std::decay_t<option_type>>)
 //!\endcond
-value_list_validator(option_type, option_types...) -> value_list_validator<std::string>;
+value_list_validator(option_type, option_types...)->value_list_validator<std::string>;
 
 //!\brief Deduction guide for ranges over a value type convertible to std::string.
 template <typename range_type>
 //!\cond
-    requires (std::ranges::forward_range<std::decay_t<range_type>> &&
-              std::constructible_from<std::string, std::ranges::range_value_t<range_type>>)
+    requires (std::ranges::forward_range<std::decay_t<range_type>>
+              && std::constructible_from<std::string, std::ranges::range_value_t<range_type>>)
 //!\endcond
-value_list_validator(range_type && rng) -> value_list_validator<std::string>;
+value_list_validator(range_type && rng)->value_list_validator<std::string>;
 
 //!\brief Deduction guide for a parameter pack.
-template <typename option_type, typename ...option_types>
-value_list_validator(option_type, option_types ...) -> value_list_validator<option_type>;
+template <typename option_type, typename... option_types>
+value_list_validator(option_type, option_types...) -> value_list_validator<option_type>;
 
 //!\brief Deduction guide for ranges.
 template <typename range_type>
 //!\cond
     requires (std::ranges::forward_range<std::decay_t<range_type>>)
 //!\endcond
-value_list_validator(range_type && rng) -> value_list_validator<std::ranges::range_value_t<range_type>>;
+value_list_validator(range_type && rng)->value_list_validator<std::ranges::range_value_t<range_type>>;
 //!\}
 
 /*!\brief An abstract base class for the file and directory validators.
@@ -278,7 +291,6 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
 class file_validator_base
 {
 public:
-
     //!\brief Type of values that are tested by validator.
     using option_value_type = std::string;
 
@@ -312,11 +324,16 @@ public:
     template <std::ranges::forward_range range_type>
     //!\cond
         requires (std::convertible_to<std::ranges::range_value_t<range_type>, std::filesystem::path const &>
-                 && !std::convertible_to<range_type, std::filesystem::path const &>)
+                  && !std::convertible_to<range_type, std::filesystem::path const &>)
     //!\endcond
     void operator()(range_type const & v) const
     {
-         std::for_each(v.begin(), v.end(), [&] (auto cmp) { this->operator()(cmp); });
+        std::for_each(v.begin(),
+                      v.end(),
+                      [&](auto cmp)
+                      {
+                          this->operator()(cmp);
+                      });
     }
 
 protected:
@@ -334,8 +351,10 @@ protected:
         // Check if extension is available.
         if (!path.has_extension())
         {
-            throw validation_error{"The given filename " + path.string() + " has no extension. Expected one of the "
-                                   "following valid extensions:" + extensions_str + "!"};
+            throw validation_error{"The given filename " + path.string()
+                                   + " has no extension. Expected one of the "
+                                     "following valid extensions:"
+                                   + extensions_str + "!"};
         }
 
         std::string file_path{path.filename().string()};
@@ -348,7 +367,7 @@ protected:
         std::string const all_extensions{file_path.substr(file_path.find(".") + 1)};
 
         // Compares the extensions in lower case.
-        auto case_insensitive_ends_with = [&] (std::string const & ext)
+        auto case_insensitive_ends_with = [&](std::string const & ext)
         {
             return case_insensitive_string_ends_with(file_path, ext);
         };
@@ -356,8 +375,8 @@ protected:
         // Check if requested extension is present.
         if (std::find_if(extensions.begin(), extensions.end(), case_insensitive_ends_with) == extensions.end())
         {
-            throw validation_error{"Expected one of the following valid extensions: " + extensions_str + "! Got " +
-                                    all_extensions + " instead!"};
+            throw validation_error{"Expected one of the following valid extensions: " + extensions_str + "! Got "
+                                   + all_extensions + " instead!"};
         }
     }
 
@@ -372,7 +391,7 @@ protected:
         if (std::filesystem::is_directory(path))
         {
             std::error_code ec{};
-            std::filesystem::directory_iterator{path, ec};  // if directory iterator cannot be created, ec will be set.
+            std::filesystem::directory_iterator{path, ec}; // if directory iterator cannot be created, ec will be set.
             if (static_cast<bool>(ec))
                 throw validation_error{"Cannot read the directory \"" + path.string() + "\"!"};
         }
@@ -468,7 +487,6 @@ protected:
 class input_file_validator : public file_validator_base
 {
 public:
-
     // Import from base class.
     using typename file_validator_base::option_value_type;
 
@@ -532,9 +550,9 @@ public:
     //!\brief Returns a message that can be appended to the (positional) options help page info.
     std::string get_help_page_message() const
     {
-        return "The input file must exist and read permissions must be granted." +
-               ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
-               valid_extensions_help_page_message();
+        return "The input file must exist and read permissions must be granted."
+             + ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "})
+             + valid_extensions_help_page_message();
     }
 };
 
@@ -575,7 +593,6 @@ enum class output_file_open_options
 class output_file_validator : public file_validator_base
 {
 public:
-
     // Import from base class.
     using typename file_validator_base::option_value_type;
 
@@ -583,20 +600,20 @@ public:
      * \{
      */
 
-    output_file_validator() = default; //!< Defaulted.
-    output_file_validator(output_file_validator const &) = default; //!< Defaulted.
-    output_file_validator(output_file_validator &&) = default; //!< Defaulted.
+    output_file_validator() = default;                                          //!< Defaulted.
+    output_file_validator(output_file_validator const &) = default;             //!< Defaulted.
+    output_file_validator(output_file_validator &&) = default;                  //!< Defaulted.
     output_file_validator & operator=(output_file_validator const &) = default; //!< Defaulted.
-    output_file_validator & operator=(output_file_validator &&) = default; //!< Defaulted.
-    virtual ~output_file_validator() = default; //!< Virtual Destructor.
+    output_file_validator & operator=(output_file_validator &&) = default;      //!< Defaulted.
+    virtual ~output_file_validator() = default;                                 //!< Virtual Destructor.
 
     /*!\brief Constructs from a given overwrite mode and a list of valid extensions.
      * \param[in] mode A sharg::output_file_open_options indicating whether the validator throws if a file already
      *                 exists.
      * \param[in] extensions The valid extensions to validate for.
      */
-    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> const & extensions)
-        : open_mode{mode}
+    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> const & extensions) :
+        open_mode{mode}
     {
         file_validator_base::extensions_str = detail::to_string(extensions);
         file_validator_base::extensions = std::move(extensions);
@@ -608,25 +625,25 @@ public:
      * \param[in] extensions Parameter pack representing valid extensions. std::string must be constructible from each
      *                       argument. The pack may be empty ( → all extensions are valid).
      */
-    explicit output_file_validator(output_file_open_options const mode, auto && ...extensions)
+    explicit output_file_validator(output_file_open_options const mode, auto &&... extensions)
         requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
-        : output_file_validator{mode, std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
+    : output_file_validator{mode, std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
     {}
 
     /*!\brief Constructs from a list of valid extensions.
      * \param[in] extensions The valid extensions to validate for.
      */
-    explicit output_file_validator(std::vector<std::string> const & extensions)
-        : output_file_validator{output_file_open_options::create_new, extensions}
+    explicit output_file_validator(std::vector<std::string> const & extensions) :
+        output_file_validator{output_file_open_options::create_new, extensions}
     {}
 
     /*!\brief Constructs from a parameter pack of valid extensions.
      * \param[in] extensions Parameter pack representing valid extensions. std::string must be constructible from each
      *                       argument. The pack may be empty ( → all extensions are valid).
      */
-    explicit output_file_validator(auto && ...extensions)
+    explicit output_file_validator(auto &&... extensions)
         requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
-        : output_file_validator{std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
+    : output_file_validator{std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
     {}
 
     // Import base constructor.
@@ -670,17 +687,15 @@ public:
     {
         if (open_mode == output_file_open_options::open_or_create)
         {
-            return "Write permissions must be granted." +
-                   ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
-                   valid_extensions_help_page_message();
-
+            return "Write permissions must be granted."
+                 + ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "})
+                 + valid_extensions_help_page_message();
         }
         else // open_mode == create_new
         {
-            return "The output file must not exist already and write permissions must be granted." +
-                   ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "}) +
-                   valid_extensions_help_page_message();
-
+            return "The output file must not exist already and write permissions must be granted."
+                 + ((valid_extensions_help_page_message().empty()) ? std::string{} : std::string{" "})
+                 + valid_extensions_help_page_message();
         }
     }
 
@@ -879,8 +894,7 @@ public:
     /*!\brief Constructing from a vector.
      * \param[in] pattern_ The pattern to match.
      */
-    regex_validator(std::string const & pattern_) :
-        pattern{pattern_}
+    regex_validator(std::string const & pattern_) : pattern{pattern_}
     {}
 
     /*!\brief Tests whether cmp lies inside values.
@@ -976,8 +990,8 @@ class validator_chain_adaptor
 {
 public:
     //!\brief The underlying type in both validators.
-    using option_value_type = std::common_type_t<typename validator1_type::option_value_type,
-                                                 typename validator2_type::option_value_type>;
+    using option_value_type =
+        std::common_type_t<typename validator1_type::option_value_type, typename validator2_type::option_value_type>;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -993,7 +1007,8 @@ public:
      * \param[in] vali2_ Another validator to be chained to vali1_.
      */
     validator_chain_adaptor(validator1_type vali1_, validator2_type vali2_) :
-        vali1{std::move(vali1_)}, vali2{std::move(vali2_)}
+        vali1{std::move(vali1_)},
+        vali2{std::move(vali2_)}
     {}
 
     //!\brief The destructor.
@@ -1069,8 +1084,7 @@ template <validator validator1_type, validator validator2_type>
 //!\endcond
 auto operator|(validator1_type && vali1, validator2_type && vali2)
 {
-    return detail::validator_chain_adaptor{std::forward<validator1_type>(vali1),
-                                           std::forward<validator2_type>(vali2)};
+    return detail::validator_chain_adaptor{std::forward<validator1_type>(vali1), std::forward<validator2_type>(vali2)};
 }
 
 } // namespace sharg

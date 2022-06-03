@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include <sharg/parser.hpp>
 #include <sharg/auxiliary.hpp>
 #include <sharg/exceptions.hpp>
+#include <sharg/parser.hpp>
 #include <sharg/validators.hpp>

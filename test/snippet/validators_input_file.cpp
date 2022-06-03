@@ -1,14 +1,18 @@
 #include <sharg/all.hpp>
 
-int main(int argc, const char ** argv)
+int main(int argc, char const ** argv)
 {
     sharg::parser myparser{"Test", argc, argv}; // initialize
 
     //! [validator_call]
     std::filesystem::path myfile{};
 
-    myparser.add_option(myfile,'f',"file","The input file containing the sequences.",
-                        sharg::option_spec::standard, sharg::input_file_validator{{"fa","fasta"}});
+    myparser.add_option(myfile,
+                        'f',
+                        "file",
+                        "The input file containing the sequences.",
+                        sharg::option_spec::standard,
+                        sharg::input_file_validator{{"fa", "fasta"}});
     //! [validator_call]
 
     // an exception will be thrown if the user specifies a filename

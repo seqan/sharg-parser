@@ -13,7 +13,6 @@
 #pragma once
 
 #include <array>
-#include <sharg/std/charconv>
 #include <fstream>
 #include <future>
 #include <iostream>
@@ -23,6 +22,7 @@
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/detail/terminal.hpp>
+#include <sharg/std/charconv>
 
 namespace sharg::detail
 {
@@ -136,11 +136,11 @@ public:
             std::string line{};
             std::getline(version_file, line); // get first line which should only contain the version number of the app
 
-        if (line != unregistered_app)
-            srv_app_version = get_numbers_from_version_string(line);
+            if (line != unregistered_app)
+                srv_app_version = get_numbers_from_version_string(line);
 #if !defined(NDEBUG)
-        else
-            std::cerr << message_unregistered_app;
+            else
+                std::cerr << message_unregistered_app;
 #endif // !defined(NDEBUG)
 
             std::getline(version_file, line); // get second line which should only contain the version number of sharg
@@ -186,11 +186,9 @@ public:
         std::filesystem::path out_file = cookie_path / (name + ".version");
 
         // build up command for server call
-        std::string command = program +              // no user defined input
-                              " " +
-                              out_file.string() +
-                              " " +
-                              std::string{"https://seqan-update.informatik.uni-tuebingen.de/check/SeqAn-Sharg_"} +
+        std::string command = program + // no user defined input
+                              " " + out_file.string() + " "
+                            + std::string{"https://seqan-update.informatik.uni-tuebingen.de/check/SeqAn-Sharg_"} +
 #ifdef __linux
                               "Linux" +
 #elif __APPLE__
@@ -209,9 +207,8 @@ public:
 #else
                               "_32_" +
 #endif
-                              name +                 // !user input! escaped on construction of the parser
-                              "_" +
-                              version +              // !user input! escaped on construction of the version_checker
+                              name +          // !user input! escaped on construction of the parser
+                              "_" + version + // !user input! escaped on construction of the version_checker
 #if defined(_WIN32)
                               "; exit  [int] -not $?}\" > nul 2>&1";
 #else
@@ -311,7 +308,7 @@ public:
             {
                 std::getline(timestamp_file, cookie_line); // first line contains the timestamp
 
-                if (get_time_diff_to_current(cookie_line) < 86400/*one day in seconds*/)
+                if (get_time_diff_to_current(cookie_line) < 86400 /*one day in seconds*/)
                 {
                     return false;
                 }
@@ -365,24 +362,24 @@ public:
 
             switch (line[0])
             {
-                case 'y':
-                {
-                    return true;
-                }
-                case 's':
-                {
-                    return false;
-                }
-                case 'n':
-                {
-                    write_cookie(std::string{"NEVER"}); // overwrite cookie
-                    return false;
-                }
-                default:
-                {
-                    write_cookie(std::string{"ALWAYS"}); // overwrite cookie
-                    return true;
-                }
+            case 'y':
+            {
+                return true;
+            }
+            case 's':
+            {
+                return false;
+            }
+            case 'n':
+            {
+                write_cookie(std::string{"NEVER"}); // overwrite cookie
+                return false;
+            }
+            default:
+            {
+                write_cookie(std::string{"ALWAYS"}); // overwrite cookie
+                return true;
+            }
             }
         }
         else // if !detail::is_terminal()
@@ -417,12 +414,13 @@ public:
     //!\brief The message directed to the developer if the application is registered but under a lower version.
     static constexpr std::string_view message_registered_app_update =
         "[APP VERSION INFO] :: We noticed the app version you use is newer than the one registered with us.\n"
-        "[APP VERSION INFO] :: Please send us an email with the new version so we can correct it (support@seqan.de)\n\n";
+        "[APP VERSION INFO] :: Please send us an email with the new version so we can correct it "
+        "(support@seqan.de)\n\n";
     //!\brief The message directed to the user of the app if a new app version is available.
     std::string message_app_update =
         "[APP VERSION INFO] :: A new version of this application is now available.\n"
         "[APP VERSION INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
-        /*Will be extended if a url is given on construction of version_check.*/
+    /*Will be extended if a url is given on construction of version_check.*/
 
     //!\brief The environment name of the home environment used by getenv()
     static constexpr char const * home_env_name
@@ -450,22 +448,23 @@ private:
     static std::string get_program()
     {
 #if defined(_WIN32)
-        return "powershell.exe -NoLogo -NonInteractive -Command \"& {Invoke-WebRequest -erroraction 'silentlycontinue' -OutFile";
-#else  // Unix based platforms.
+        return "powershell.exe -NoLogo -NonInteractive -Command \"& {Invoke-WebRequest -erroraction 'silentlycontinue' "
+               "-OutFile";
+#else // Unix based platforms.
         if (!system("/usr/bin/env -i wget --version > /dev/null 2>&1"))
             return "/usr/bin/env -i wget --timeout=10 --tries=1 -q -O";
         else if (!system("/usr/bin/env -i curl --version > /dev/null 2>&1"))
             return "/usr/bin/env -i curl --connect-timeout 10 -o";
-    // In case neither wget nor curl is available try ftp/fetch if system is OpenBSD/FreeBSD.
-    // Note, both systems have ftp/fetch command installed by default so we do not guard against it.
-    #if defined(__OpenBSD__)
+// In case neither wget nor curl is available try ftp/fetch if system is OpenBSD/FreeBSD.
+// Note, both systems have ftp/fetch command installed by default so we do not guard against it.
+#    if defined(__OpenBSD__)
         return "/usr/bin/env -i ftp -w10 -Vo";
-    #elif defined(__FreeBSD__)
+#    elif defined(__FreeBSD__)
         return "/usr/bin/env -i fetch --timeout=10 -o";
-    #else
+#    else
         return "";
-    #endif // __OpenBSD__
-#endif  // defined(_WIN32)
+#    endif // __OpenBSD__
+#endif     // defined(_WIN32)
     }
 
     //!\brief Reads the timestamp file if possible and returns the time difference to the current time.
@@ -518,4 +517,4 @@ private:
     }
 };
 
-} // namespace sharg
+} // namespace sharg::detail

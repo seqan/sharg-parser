@@ -1,13 +1,16 @@
 #include <sharg/all.hpp>
 
-int main(int argc, const char ** argv)
+int main(int argc, char const ** argv)
 {
     sharg::parser myparser{"Test", argc, argv}; // initialize
 
     //! [validator_call]
     std::filesystem::path mydir{};
 
-    myparser.add_option(mydir, 'd', "dir", "The output directory for storing the files.",
+    myparser.add_option(mydir,
+                        'd',
+                        "dir",
+                        "The output directory for storing the files.",
                         sharg::option_spec::standard,
                         sharg::output_directory_validator{});
     //! [validator_call]

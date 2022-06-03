@@ -23,4 +23,4 @@ namespace sharg::detail
  */
 struct test_accessor;
 
-} // sharg::detail
+} // namespace sharg::detail

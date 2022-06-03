@@ -1,7 +1,6 @@
 #include <sharg/all.hpp>
 
-void run_program(std::filesystem::path const & reference_path,
-                 std::filesystem::path const & index_path)
+void run_program(std::filesystem::path const & reference_path, std::filesystem::path const & index_path)
 {
     std::cerr << "reference_file_path: " << reference_path << '\n';
     std::cerr << "index_path           " << index_path << '\n';
@@ -18,10 +17,16 @@ void initialise_parser(sharg::parser & parser, cmd_arguments & args)
     parser.info.author = "E. coli";
     parser.info.short_description = "Creates an index over a reference.";
     parser.info.version = "1.0.0";
-    parser.add_option(args.reference_path, 'r', "reference", "The path to the reference.",
+    parser.add_option(args.reference_path,
+                      'r',
+                      "reference",
+                      "The path to the reference.",
                       sharg::option_spec::required,
-                      sharg::input_file_validator{{"fa","fasta"}});
-    parser.add_option(args.index_path, 'o', "output", "The output index file path.",
+                      sharg::input_file_validator{{"fa", "fasta"}});
+    parser.add_option(args.index_path,
+                      'o',
+                      "output",
+                      "The output index file path.",
                       sharg::option_spec::standard,
                       sharg::output_file_validator{sharg::output_file_open_options::create_new, {"index"}});
 }

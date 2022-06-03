@@ -16,12 +16,12 @@
 
 // Add support for Windows platforms, when we support it.
 #if defined(__APPLE__)
-#include <unistd.h>
+#    include <unistd.h>
 #elif defined(_WIN32)
-#include <cstring>
-#include <io.h>
-#else  // other unix systems
-#include <stdlib.h>
+#    include <cstring>
+#    include <io.h>
+#else // other unix systems
+#    include <stdlib.h>
 #endif
 
 #include <filesystem>
@@ -71,15 +71,14 @@ inline char * mkdtemp(char * template_name)
 class tmp_filename
 {
 public:
-
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    tmp_filename() = delete; //!< Deleted.
-    tmp_filename(tmp_filename const &) = delete; //!< Deleted.
-    tmp_filename(tmp_filename &&) = default; //!< Defaulted.
+    tmp_filename() = delete;                                 //!< Deleted.
+    tmp_filename(tmp_filename const &) = delete;             //!< Deleted.
+    tmp_filename(tmp_filename &&) = default;                 //!< Defaulted.
     tmp_filename & operator=(tmp_filename const &) = delete; //!< Deleted.
-    tmp_filename & operator=(tmp_filename &&) = default; //!< Defaulted.
+    tmp_filename & operator=(tmp_filename &&) = default;     //!< Defaulted.
 
     /*!\brief Constructs temp path with given file name.
      * \param f_name The name of the file.
@@ -89,18 +88,19 @@ public:
      * ###Exceptions
      * Might throw std::filesystem::filesystem_error.
      */
-    explicit tmp_filename(const char * f_name)
+    explicit tmp_filename(char const * f_name)
     {
         if (f_name == nullptr)
-            throw std::filesystem::filesystem_error("Empty file name!", std::make_error_code(std::errc::invalid_argument));
+            throw std::filesystem::filesystem_error("Empty file name!",
+                                                    std::make_error_code(std::errc::invalid_argument));
 
         auto tmp_base_dir = std::filesystem::temp_directory_path();
         tmp_base_dir /= std::filesystem::path{"seqan_test_XXXXXXXX"};
         // We have to use mkdtemp, which is not deprecated. We place it into the dedicated tmp_dir
         // returned by temp_directory_path. Within this path we can safely create files, that would be
         // unique per test instance as the parent directory is.
-        auto path_str = tmp_base_dir.string();  // Copy the underlying path to get access to the raw char *.
-        if (char * f = mkdtemp(path_str.data()); f != nullptr)  // mkdtemp replaces XXXXXXXX in a safe and unique way.
+        auto path_str = tmp_base_dir.string(); // Copy the underlying path to get access to the raw char *.
+        if (char * f = mkdtemp(path_str.data()); f != nullptr) // mkdtemp replaces XXXXXXXX in a safe and unique way.
         {
             directory_path = f;
             file_path = directory_path / std::filesystem::path{f_name};
