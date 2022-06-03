@@ -1,4 +1,4 @@
-#include <sharg/argument_parser.hpp>
+#include <sharg/parser.hpp>
 //![validator]
 #include <cmath>
 
@@ -27,7 +27,7 @@ static_assert(sharg::validator<custom_validator>);
 //![main]
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser("Test-Parser", argc, argv);
+    sharg::parser myparser("Test-Parser", argc, argv);
 
     int32_t variable{};
     int16_t variable2{};
@@ -42,7 +42,7 @@ int main(int argc, char ** argv)
     {
          myparser.parse(); // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cout << ext.what() << '\n';
         return -1;

@@ -12,7 +12,7 @@ have fewer bugs, and we receive fewer bug reports on outdated versions.
 
 ## How it works
 
-Upon starting an application using the `sharg::argument_parser`, it is determined whether the app was built in release
+Upon starting an application using the `sharg::parser`, it is determined whether the app was built in release
 mode (we assume a user is running it) or in debug mode (we assume the developer is running it).
 
 We then send a web-request to our server with the following information:
@@ -38,7 +38,7 @@ verified at any time.
 
 The server does a simple form of non-personalised data aggregation that gives us a better overview of which apps are
 most commonly used and how well new Sharg versions are picked up. This helps the [SeqAn project](https://www.seqan.de)
-a lot, for example, in acquiring funding. The web server that receives the requests currently logs IP addresses as 
+a lot, for example, in acquiring funding. The web server that receives the requests currently logs IP addresses as
 part of its standard behaviour. However, we are working on removing this behaviour.
 
 We may publish aggregated and anonymised usage data irregularly, but the original data is never shared with a third
@@ -55,5 +55,5 @@ Users may opt out of the version check globally, i.e., for all apps on their com
 variable `SHARG_NO_VERSION_CHECK` to any value.
 
 Application developers may opt out of the version check for their app permanently (independent of user choice) by
-passing `sharg::update_notifications::off` as the fourth argument to sharg::argument_parser.
-See the respective API documentation of the `sharg::argument_parser`.
+passing `sharg::update_notifications::off` as the fourth argument to sharg::parser.
+See the respective API documentation of the `sharg::parser`.

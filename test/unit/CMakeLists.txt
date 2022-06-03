@@ -46,7 +46,7 @@ sharg_require_test ()
 sharg_test(enumeration_names_test.cpp)
 sharg_test(format_parse_test.cpp)
 sharg_test(format_parse_validators_test.cpp)
-sharg_test(argument_parser_design_error_test.cpp)
+sharg_test(parser_design_error_test.cpp)
 add_subdirectories ()
 
 list_missing_unit_tests()

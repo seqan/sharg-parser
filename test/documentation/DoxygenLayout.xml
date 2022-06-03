@@ -9,11 +9,11 @@
       <tab type="user" visible="yes" title="Library tests" url="\ref setup_tests" intro=""/>
     </tab>
     <tab type="usergroup" visible="yes" title="Tutorial" intro="">
-      <tab type="user" visible="yes" title="Parsing command line arguments" url="@ref tutorial_argument_parser" intro=""/>
+      <tab type="user" visible="yes" title="Parsing command line arguments" url="@ref tutorial_parser" intro=""/>
     </tab>
       <tab type="usergroup" visible="yes" title="How-To" intro="">
-      <tab type="user" visible="yes" title="Subcommand argument parsing" url="\ref subcommand_arg_parse" intro=""/>
-      <tab type="user" visible="yes" title="Make custom types comptabile" url="\ref fulfil_argument_parser_compatible_option" intro=""/>
+      <tab type="user" visible="yes" title="Subcommand parsing" url="\ref subcommand_parse" intro=""/>
+      <tab type="user" visible="yes" title="Make custom types compatible" url="\ref fulfil_parser_compatible_option" intro=""/>
       <tab type="user" visible="yes" title="Make custom validator" url="\ref custom_validator" intro=""/>
     </tab>
     <tab type="user" visible="yes" title="Cookbook" url="\ref cookbook" intro=""/>

@@ -22,7 +22,7 @@ int main(int argc, char const * argv[])
 {
     foo::bar value{};
 
-    sharg::argument_parser parser{"my_program", argc, argv};
+    sharg::parser parser{"my_program", argc, argv};
 
     // Because of the enumeration_names function
     // you can now add an option that takes a value of type bar:
@@ -33,7 +33,7 @@ int main(int argc, char const * argv[])
     {
         parser.parse();
     }
-    catch (sharg::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << "\n"; // customize your error message
         return -1;

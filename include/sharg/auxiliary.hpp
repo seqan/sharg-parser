@@ -20,24 +20,24 @@
 namespace sharg
 {
 
-/*!\brief Used to further specify argument_parser options/flags.
- * \ingroup argument_parser
+/*!\brief Used to further specify parser options/flags.
+ * \ingroup parser
  *
  * \details
  *
  * All options and flags are set to option_spec::standard unless specified
- * otherwise by the developer, e.g. when calling argument_parser::add_option().
+ * otherwise by the developer, e.g. when calling parser::add_option().
  *
  * \include test/snippet/auxiliary.cpp
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 enum option_spec
 {
     standard = 0, //!< The default were no checking or special displaying is happening.
     required = 1, /*!< Set an option as required if you want to enforce that the user
                    * supplies this option when calling the program via the command line.
-                   * If the option is missing, the argument_parser will automatically
+                   * If the option is missing, the parser will automatically
                    * detect this and throw a invalid_argument exception.
                    */
     advanced = 2, /*!< Set an option/flag to advanced if you do not want the option to
@@ -50,15 +50,15 @@ enum option_spec
                    */
 };
 
-//!\brief Indicates whether application allows automatic update notifications by the sharg::argument_parser.
+//!\brief Indicates whether application allows automatic update notifications by the sharg::parser.
 enum class update_notifications
 {
     on, //!< Automatic update notifications should be enabled.
     off //!< Automatic update notifications should be disabled.
 };
 
-/*!\brief Stores all parser related meta information of the sharg::argument_parser.
- * \ingroup argument_parser
+/*!\brief Stores all parser related meta information of the sharg::parser.
+ * \ingroup parser
  *
  * \attention You should supply as much information as possible to help the users
  * of your application.
@@ -68,9 +68,9 @@ enum class update_notifications
  * The meta information is assembled in a struct to provide a central access
  * point that can be easily extended.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
-struct argument_parser_meta_data // holds all meta information
+struct parser_meta_data // holds all meta information
 {
     /*!\brief The application name that will be displayed on the help page.
      *

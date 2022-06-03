@@ -22,8 +22,8 @@ namespace sharg::detail
 {
 
 /*!\brief The format that contains all helper functions needed in all formats.
- * \ingroup argument_parser
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_base
 {
@@ -182,8 +182,8 @@ protected:
 
 /*!\brief The format that contains all helper functions needed in all formats for
  *        printing the interface description of the application (to std::cout).
- * \ingroup argument_parser
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 template <typename derived_type>
 class format_help_base : public format_base
@@ -200,7 +200,7 @@ private:
     ~format_help_base() = default;                                       //!< Defaulted.
 
     /*!\brief Initializes a format_help_base object.
-     * \param[in] names    A list of subcommands (see \link subcommand_arg_parse subcommand parsing \endlink).
+     * \param[in] names    A list of subcommands (see \link subcommand_parse subcommand parsing \endlink).
      * \param[in] advanced Set to `true` to show advanced options.
      */
     format_help_base(std::vector<std::string> const & names, bool const advanced) :
@@ -210,7 +210,7 @@ private:
 
 public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
-     * \copydetails sharg::argument_parser::add_option
+     * \copydetails sharg::parser::add_option
      */
     template <typename option_type, typename validator_type>
     void add_option(option_type & value,
@@ -228,7 +228,7 @@ public:
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
-     * \copydetails sharg::argument_parser::add_flag
+     * \copydetails sharg::parser::add_flag
      */
     void add_flag(bool & SHARG_DOXYGEN_ONLY(value),
                   char const short_id,
@@ -241,7 +241,7 @@ public:
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
-     * \copydetails sharg::argument_parser::add_positional_option
+     * \copydetails sharg::parser::add_positional_option
      */
     template <typename option_type, typename validator_type>
     void add_positional_option(option_type & value,
@@ -267,7 +267,7 @@ public:
     /*!\brief Initiates the printing of the help page to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed help page.
      */
-    void parse(argument_parser_meta_data & parser_meta)
+    void parse(parser_meta_data & parser_meta)
     {
         meta = parser_meta;
 
@@ -332,7 +332,7 @@ public:
     }
 
     /*!\brief Adds a print_section call to parser_set_up_calls.
-     * \copydetails sharg::argument_parser::add_section
+     * \copydetails sharg::parser::add_section
      */
     void add_section(std::string const & title, option_spec const spec)
     {
@@ -340,7 +340,7 @@ public:
     }
 
     /*!\brief Adds a print_subsection call to parser_set_up_calls.
-     * \copydetails sharg::argument_parser::add_subsection
+     * \copydetails sharg::parser::add_subsection
      */
     void add_subsection(std::string const & title, option_spec const spec)
     {
@@ -348,7 +348,7 @@ public:
     }
 
     /*!\brief Adds a print_line call to parser_set_up_calls.
-     * \copydetails sharg::argument_parser::add_line
+     * \copydetails sharg::parser::add_line
      */
     void add_line(std::string const & text, bool is_paragraph, option_spec const spec)
     {
@@ -356,7 +356,7 @@ public:
     }
 
     /*!\brief Adds a sharg::print_list_item call to parser_set_up_calls.
-     * \copydetails sharg::argument_parser::add_list_item
+     * \copydetails sharg::parser::add_list_item
      */
     void add_list_item(std::string const & key, std::string const & desc, option_spec const spec)
     {
@@ -370,14 +370,14 @@ public:
      * This needs to be a member of format_parse, because it needs to present
      * (not filled) when the parser_set_up_calls vector is filled, since all
      * printing functions need some meta information.
-     * The member variable itself is filled when copied over from the argument_parser
+     * The member variable itself is filled when copied over from the parser
      * when calling format_parse::parse. That way all the information needed are
      * there, when the actual printing starts.
      *
      * This function is not private because it is needed for short but nicely
      * formatted (error) output to the command line.
      */
-    argument_parser_meta_data meta;
+    parser_meta_data meta;
 
     //!\brief Befriend the derived type so it can access private functions.
     friend derived_type;

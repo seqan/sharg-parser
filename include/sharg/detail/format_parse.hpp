@@ -21,7 +21,7 @@ namespace sharg::detail
 {
 
 /*!\brief The format that organizes the actual parsing of command line arguments.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
@@ -44,7 +44,7 @@ namespace sharg::detail
  * the vector format_parse::argv. That way, options that are specified multiple times,
  * but are no container type, can be identified and an error is reported.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_parse : public format_base
 {
@@ -69,7 +69,7 @@ public:
     //!\}
 
     /*!\brief Adds an sharg::detail::get_option call to be evaluated later on.
-     * \copydetails sharg::argument_parser::add_option
+     * \copydetails sharg::parser::add_option
      */
     template <typename option_type, typename validator_type>
     void add_option(option_type & value,
@@ -86,7 +86,7 @@ public:
     }
 
     /*!\brief Adds a get_flag call to be evaluated later on.
-     * \copydetails sharg::argument_parser::add_flag
+     * \copydetails sharg::parser::add_flag
      */
     void add_flag(bool & value,
                   char const short_id,
@@ -101,7 +101,7 @@ public:
     }
 
     /*!\brief Adds a get_positional_option call to be evaluated later on.
-     * \copydetails sharg::argument_parser::add_positional_option
+     * \copydetails sharg::parser::add_positional_option
      */
     template <typename option_type, typename validator_type>
     void add_positional_option(option_type & value,
@@ -115,7 +115,7 @@ public:
     }
 
     //!\brief Initiates the actual command line parsing.
-    void parse(argument_parser_meta_data const & /*meta*/)
+    void parse(parser_meta_data const & /*meta*/)
     {
         end_of_options_it = std::find(argv.begin(), argv.end(), "--");
 
@@ -734,7 +734,7 @@ private:
      * \param[out] value     The variable in which to store the given command line argument.
      * \param[in]  validator The validator applied to the value after parsing (callable).
      *
-     * \throws sharg::argument_parser_error
+     * \throws sharg::parser_error
      * \throws sharg::too_few_arguments
      * \throws sharg::validation_error
      * \throws sharg::design_error

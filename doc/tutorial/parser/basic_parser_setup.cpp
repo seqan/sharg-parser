@@ -2,7 +2,7 @@
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Game-of-Parsing", argc, argv};        // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv};        // initialise myparser
 
     // ... add information, options, flags and positional options
 
@@ -10,7 +10,7 @@ int main(int argc, char ** argv)
     {
          myparser.parse();                                                  // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext)                     // catch user errors
+    catch (sharg::parser_error const & ext)                     // catch user errors
     {
         std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
         return -1;

@@ -18,13 +18,13 @@
 
 namespace sharg
 {
-/*!\brief Argument parser exception that is thrown whenever there is an error
+/*!\brief Parser exception that is thrown whenever there is an error
  * while parsing the command line arguments.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
- * Errors caught by the argument_parser:
+ * Errors caught by the parser:
  *
  * - Unknown option/flag (not specified by developer but set by user)
  * - Too many positional options
@@ -34,119 +34,119 @@ namespace sharg
  * - Type conversion failed
  * - Validation failed (as defined by the developer)
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
-class argument_parser_error : public std::runtime_error
+class parser_error : public std::runtime_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    argument_parser_error(std::string const & s) : std::runtime_error(s) {}
+    parser_error(std::string const & s) : std::runtime_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when encountering unknown option.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class unknown_option : public argument_parser_error
+//!\brief Parser exception thrown when encountering unknown option.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class unknown_option : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    unknown_option(std::string const & s) : argument_parser_error(s) {}
+    unknown_option(std::string const & s) : parser_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when too many arguments are provided.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class too_many_arguments : public argument_parser_error
+//!\brief Parser exception thrown when too many arguments are provided.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class too_many_arguments : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    too_many_arguments(std::string const & s) : argument_parser_error(s) {}
+    too_many_arguments(std::string const & s) : parser_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when too few arguments are provided.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class too_few_arguments : public argument_parser_error
+//!\brief Parser exception thrown when too few arguments are provided.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class too_few_arguments : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    too_few_arguments(std::string const & s) : argument_parser_error(s) {}
+    too_few_arguments(std::string const & s) : parser_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when a required option is missing.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class required_option_missing : public argument_parser_error
+//!\brief Parser exception thrown when a required option is missing.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class required_option_missing : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    required_option_missing(std::string const & s) : argument_parser_error(s) {}
+    required_option_missing(std::string const & s) : parser_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when a non-list option is declared multiple times.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class option_declared_multiple_times : public argument_parser_error
+//!\brief Parser exception thrown when a non-list option is declared multiple times.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class option_declared_multiple_times : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    option_declared_multiple_times(std::string const & s) : argument_parser_error(s) {}
+    option_declared_multiple_times(std::string const & s) : parser_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when an incorrect argument is given as (positional) option value.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class user_input_error : public argument_parser_error
+//!\brief Parser exception thrown when an incorrect argument is given as (positional) option value.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class user_input_error : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    user_input_error(std::string const & s) : argument_parser_error(s) {}
+    user_input_error(std::string const & s) : parser_error(s) {}
 };
 
-//!\brief Argument parser exception thrown when an argument could not be casted to the according type.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
-class validation_error : public argument_parser_error
+//!\brief Parser exception thrown when an argument could not be casted to the according type.
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
+class validation_error : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    validation_error(std::string const & s) : argument_parser_error(s) {}
+    validation_error(std::string const & s) : parser_error(s) {}
 };
 
-/*!\brief Argument parser exception that is thrown whenever there is an design
+/*!\brief Parser exception that is thrown whenever there is an design
  * error directed at the developer of the application (e.g. Reuse of option).
  *
  * \details
  *
- * Errors caught by the argument_parser:
+ * Errors caught by the parser:
  *
  * - Reuse of a short or long identifier (must be unique)
  * - Both identifiers must not be empty (one is ok)
  * - Flag default value must be false
  */
-class design_error : public argument_parser_error
+class design_error : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
      */
-    design_error(std::string const & s) : argument_parser_error(s) {}
+    design_error(std::string const & s) : parser_error(s) {}
 };
 
 } // namespace sharg

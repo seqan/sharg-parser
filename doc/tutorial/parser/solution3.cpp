@@ -1,3 +1,4 @@
+//![program]
 #include <sharg/all.hpp> // includes all necessary headers
 
 // This is the program!
@@ -18,7 +19,7 @@ number_type to_number(range_type && range)
     return num;
 }
 
-void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::string & aggr_by, bool hd_is_set)
+void run_program(std::filesystem::path & path, uint32_t yr, std::string & aggr_by, bool hd_is_set)
 {
     std::ifstream file{path.string()};
 
@@ -30,16 +31,14 @@ void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::str
         if (hd_is_set)
             std::getline(file, line); // ignore first line
 
-        //![altered_while]
         while (std::getline(file, line))
         {
             auto splitted_line = line | std::views::split('\t');
-            auto it = splitted_line.begin(); // move to 1rst column
+            auto it = std::next(splitted_line.begin(), 3); // move to 4th column
 
-            if (std::find(sn.begin(), sn.end(), to_number<uint8_t>(*it)) != sn.end())
-                v.push_back(to_number<double>(*std::next(it, 4)));
+            if (to_number<uint32_t>(*it) >= yr)
+                v.push_back(to_number<double>(*std::next(it)));
         }
-        //![altered_while]
 
         if (aggr_by == "median")
             std::cerr << ([&v] () { std::sort(v.begin(), v.end()); return v[v.size()/2]; })() << '\n';
@@ -56,16 +55,17 @@ void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::str
 }
 // -----------------------------------------------------------------------------
 
-//![solution]
 struct cmd_arguments
 {
     std::filesystem::path file_path{};
-    std::vector<uint8_t> seasons{};
+    uint32_t year{};
     std::string aggregate_by{"mean"};
     bool header_is_set{false};
 };
+//![program]
 
-void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments & args)
+//![solution]
+void initialise_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "Cercei";
     parser.info.short_description = "Aggregate average Game of Thrones viewers by season.";
@@ -73,7 +73,7 @@ void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments &
 
     parser.add_positional_option(args.file_path, "Please provide a tab separated data file.");
 
-    parser.add_option(args.seasons, 's', "season", "Choose the seasons to aggregate.");
+    parser.add_option(args.year, 'y', "year", "Only data entries that are newer than `year` are considered.");
 
     parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation: mean or median.");
 
@@ -84,24 +84,24 @@ void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments &
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Game-of-Parsing", argc, argv};        // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv};          // initialise myparser
     cmd_arguments args{};
 
-    initialise_argument_parser(myparser, args);
+    initialise_parser(myparser, args);
 
     try
     {
-         myparser.parse();                                                  // trigger command line parsing
+         myparser.parse();                                          // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext)                     // catch user errors
+    catch (sharg::parser_error const & ext)                         // catch user errors
     {
-        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n";    // customise your error message
         return -1;
     }
 
     // parsing was successful !
     // we can start running our program
-    run_program(args.file_path, args.seasons, args.aggregate_by, args.header_is_set);
+    run_program(args.file_path, args.year, args.aggregate_by, args.header_is_set);
 
     return 0;
 }

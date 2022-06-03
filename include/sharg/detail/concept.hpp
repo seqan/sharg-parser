@@ -20,7 +20,7 @@ namespace sharg::detail
 {
 
 /*!\concept sharg::detail::is_container_option
- * \ingroup argument_parser
+ * \ingroup parser
  * \brief Whether the option type is considered to be a container.
  * \details
  *

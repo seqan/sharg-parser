@@ -4,9 +4,9 @@
 
 namespace sharg::custom
 {
-// Specialise the sharg::custom::argument_parsing data structure to enable parsing of std::errc.
+// Specialise the sharg::custom::parsing data structure to enable parsing of std::errc.
 template <>
-struct argument_parsing<std::errc>
+struct parsing<std::errc>
 {
     // Specialise a mapping from an identifying string to the respective value of your type Foo.
     static inline std::unordered_map<std::string_view, std::errc> const enumeration_names
@@ -24,9 +24,9 @@ int main(int argc, char const * argv[])
 {
     std::errc value{};
 
-    sharg::argument_parser parser{"my_program", argc, argv};
+    sharg::parser parser{"my_program", argc, argv};
 
-    // Because of the argument_parsing struct and
+    // Because of the parsing struct and
     // the static member function enumeration_names
     // you can now add an option that takes a value of type std::errc:
     parser.add_option(value, 'e', "errc", "Give me a std::errc value.", sharg::option_spec::standard,
@@ -36,7 +36,7 @@ int main(int argc, char const * argv[])
     {
         parser.parse();
     }
-    catch (sharg::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << "\n"; // customize your error message
         return -1;

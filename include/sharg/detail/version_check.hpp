@@ -72,7 +72,7 @@ public:
     version_checker(std::string name_, std::string const & version_, std::string const & app_url = std::string{}) :
         name{std::move(name_)}
     {
-        assert(std::regex_match(name, std::regex{"^[a-zA-Z0-9_-]+$"})); // check on construction of the argument parser
+        assert(std::regex_match(name, std::regex{"^[a-zA-Z0-9_-]+$"})); // check on construction of the parser
 
         if (!app_url.empty())
         {
@@ -181,7 +181,7 @@ public:
             return;
         }
 
-        // 'cookie_path' is no user input and `name` is escaped on construction of the argument parser.
+        // 'cookie_path' is no user input and `name` is escaped on construction of the parser.
         std::filesystem::path out_file = cookie_path / (name + ".version");
 
         // build up command for server call
@@ -208,7 +208,7 @@ public:
 #else
                               "_32_" +
 #endif
-                              name +                 // !user input! escaped on construction of the argument parser
+                              name +                 // !user input! escaped on construction of the parser
                               "_" +
                               version +              // !user input! escaped on construction of the version_checker
 #if defined(_WIN32)

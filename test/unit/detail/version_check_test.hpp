@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <sharg/argument_parser.hpp>
+#include <sharg/parser.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
 //------------------------------------------------------------------------------
@@ -18,14 +18,14 @@ namespace sharg::detail
 {
 struct test_accessor
 {
-    static auto & version_check_future(sharg::argument_parser & parser)
+    static auto & version_check_future(sharg::parser & parser)
     {
         return parser.version_check_future;
     }
 };
 } // sharg::detail
 
-bool wait_for(sharg::argument_parser & parser)
+bool wait_for(sharg::parser & parser)
 {
     auto & future = sharg::detail::test_accessor::version_check_future(parser);
 
@@ -98,7 +98,7 @@ struct version_check : public ::testing::Test
 
     std::regex timestamp_regex{"^[[:digit:]]+$"}; // only digits
 
-    std::tuple<std::string, std::string, bool> simulate_argument_parser(int argc, const char ** argv)
+    std::tuple<std::string, std::string, bool> simulate_parser(int argc, const char ** argv)
     {
         // make sure that the environment variable is not set
         std::string previous_value{};
@@ -110,7 +110,7 @@ struct version_check : public ::testing::Test
 
         bool app_call_succeeded{false};
 
-        sharg::argument_parser parser{app_name, argc, argv};
+        sharg::parser parser{app_name, argc, argv};
         parser.info.version = "2.3.4";
 
         // In case we don't want to specify --version-check but avoid that short help format will be set (no arguments)
@@ -199,7 +199,7 @@ TEST_F(sanity_checks, create_and_delete_files)
 TEST_F(sanity_checks, cookie)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
 
     if (app_call_succeeded)
     {
@@ -232,7 +232,7 @@ TEST_F(version_check, option_on)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "");
@@ -256,7 +256,7 @@ TEST_F(version_check, option_implicitely_on)
 {
     const char * argv[2] = {app_name.c_str(), "-f"};
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "\n#######################################################################\n"
@@ -289,7 +289,7 @@ TEST_F(version_check, time_out) // while implicitly on
     // create timestamp files
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp()));
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -311,7 +311,7 @@ TEST_F(version_check, environment_variable_set)
 
     const char * argv[2] = {app_name.c_str(), "-f"};
 
-    sharg::argument_parser parser{app_name, 2, argv};
+    sharg::parser parser{app_name, 2, argv};
     parser.info.version = "2.3.4";
     bool dummy{false};
     parser.add_flag(dummy, 'f', "dummy-flag", "A dummy flag.");
@@ -345,7 +345,7 @@ TEST_F(version_check, option_off)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_OFF};
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -370,7 +370,7 @@ TEST_F(version_check, option_off_with_help_page)
         unsetenv("SHARG_NO_VERSION_CHECK");
     }
 
-    sharg::argument_parser parser{app_name, 4, argv};
+    sharg::parser parser{app_name, 4, argv};
     parser.info.version = "2.3.4";
 
     EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -388,7 +388,7 @@ TEST_F(version_check, option_off_with_help_page)
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-// case: the current argument parser has a smaller Sharg version than is present in the version file
+// case: the current parser has a smaller Sharg version than is present in the version file
 #if !defined(NDEBUG)
 TEST_F(version_check, smaller_sharg_version)
 {
@@ -400,7 +400,7 @@ TEST_F(version_check, smaller_sharg_version)
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -411,7 +411,7 @@ TEST_F(version_check, smaller_sharg_version)
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-// case: the current argument parser has a greater app version than is present in the version file
+// case: the current parser has a greater app version than is present in the version file
 TEST_F(version_check, greater_app_version)
 {
     const char * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
@@ -422,7 +422,7 @@ TEST_F(version_check, greater_app_version)
     // create timestamp file that dates one day before current to trigger a message
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401)); // one day = 86400 seconds
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -443,7 +443,7 @@ TEST_F(version_check, unregistered_app)
     // create timestamp file that dates one day before current to trigger a message
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401)); // one day = 86400 seconds
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -455,7 +455,7 @@ TEST_F(version_check, unregistered_app)
 }
 #endif // !defined(NDEBUG)
 
-// case: the current argument parser has a smaller app version than is present in the version file
+// case: the current parser has a smaller app version than is present in the version file
 #if defined(NDEBUG)
 TEST_F(version_check, smaller_app_version)
 {
@@ -467,7 +467,7 @@ TEST_F(version_check, smaller_app_version)
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -495,7 +495,7 @@ TEST_F(version_check, smaller_app_version_custom_url)
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    sharg::argument_parser parser{app_name, 3, argv};
+    sharg::parser parser{app_name, 3, argv};
     parser.info.version = "2.3.4";
     parser.info.url = "https//foo.de";
 
@@ -529,7 +529,7 @@ TEST_F(version_check, user_specified_never)
     // create timestamp files
     ASSERT_TRUE(create_file(app_timestamp_filename(), "NEVER"));
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -548,7 +548,7 @@ TEST_F(version_check, user_specified_always)
     // create timestamp files
     ASSERT_TRUE(create_file(app_timestamp_filename(), "ALWAYS"));
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "");
@@ -576,7 +576,7 @@ TEST_F(version_check, wrong_version_string)
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.wrong.9\nalso.wrong.4"}));
     ASSERT_TRUE(create_file(app_timestamp_filename(), "ALWAYS"));
 
-    auto [out, err, app_call_succeeded] = simulate_argument_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
     (void) app_call_succeeded;
 
     EXPECT_EQ(out, "");

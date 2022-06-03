@@ -1,10 +1,10 @@
 # Welcome {#mainpage}
 
-Welcome to the documentation of the Sharg argument parser.
+Welcome to the documentation of the Sharg parser.
 This web-site contains the API reference (documentation of our interfaces) and more elaborate Tutorials and
 How-Tos.
 
-If you are new to [SeqAn](https://github.com/seqan/seqan3) or the Sharg argument parser, we recommend that you begin by reading \ref setup.
+If you are new to [SeqAn](https://github.com/seqan/seqan3) or the Sharg parser, we recommend that you begin by reading \ref setup.
 
 In contrast to the Tutorials (which are expected to be useful for all developers), the How-Tos contain more advanced
 or specific guides.

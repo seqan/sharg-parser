@@ -30,6 +30,7 @@ void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::str
         if (hd_is_set)
             std::getline(file, line); // ignore first line
 
+        //![altered_while]
         while (std::getline(file, line))
         {
             auto splitted_line = line | std::views::split('\t');
@@ -38,6 +39,7 @@ void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::str
             if (std::find(sn.begin(), sn.end(), to_number<uint8_t>(*it)) != sn.end())
                 v.push_back(to_number<double>(*std::next(it, 4)));
         }
+        //![altered_while]
 
         if (aggr_by == "median")
             std::cerr << ([&v] () { std::sort(v.begin(), v.end()); return v[v.size()/2]; })() << '\n';
@@ -54,6 +56,7 @@ void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::str
 }
 // -----------------------------------------------------------------------------
 
+//![solution]
 struct cmd_arguments
 {
     std::filesystem::path file_path{};
@@ -62,45 +65,37 @@ struct cmd_arguments
     bool header_is_set{false};
 };
 
-void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments & args)
+void initialise_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "Cercei";
     parser.info.short_description = "Aggregate average Game of Thrones viewers by season.";
     parser.info.version = "1.0.0";
 
-    //![file_validator]
-    parser.add_positional_option(args.file_path, "Please provide a tab separated seasons file.",
-                                 sharg::regex_validator{".*seasons\\..+$"} | sharg::input_file_validator{{"tsv"}} );
-    //![file_validator]
+    parser.add_positional_option(args.file_path, "Please provide a tab separated data file.");
 
-    //![arithmetic_range_validator]
-    parser.add_option(args.seasons, 's', "season", "Choose the seasons to aggregate.",
-                      sharg::option_spec::required, sharg::arithmetic_range_validator{1, 7});
-    //![arithmetic_range_validator]
+    parser.add_option(args.seasons, 's', "season", "Choose the seasons to aggregate.");
 
-    //![value_list_validator]
-    parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation.",
-                      sharg::option_spec::standard, sharg::value_list_validator{"median", "mean"});
-    //![value_list_validator]
+    parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation: mean or median.");
 
     parser.add_flag(args.header_is_set, 'H', "header-is-set", "Let us know whether your data file contains a "
                                                               "header to ensure correct parsing.");
 }
+//![solution]
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Game-of-Parsing", argc, argv};        // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv};                  // initialise myparser
     cmd_arguments args{};
 
-    initialise_argument_parser(myparser, args);
+    initialise_parser(myparser, args);
 
     try
     {
          myparser.parse();                                                  // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext)                     // catch user errors
+    catch (sharg::parser_error const & ext)                                 // catch user errors
     {
-        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n";            // customise your error message
         return -1;
     }
 

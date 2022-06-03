@@ -2,7 +2,7 @@
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Grade-Average", argc, argv}; // initialize
+    sharg::parser myparser{"Grade-Average", argc, argv}; // initialize
 
     std::string name{"Max Muster"}; // define default values directly in the variable.
     bool bonus{false};
@@ -16,7 +16,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
     }
-    catch (sharg::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << '\n'; // customize your error message
         return -1;
