@@ -14,7 +14,7 @@ for your code.
 
 # sharg::validator
 
-Remember the tutorial on \ref tutorial_argument_parser ? Let's implement our own validator that checks
+Remember the tutorial on \ref tutorial_parser ? Let's implement our own validator that checks
 if a numeric argument is an integral square (i.e. the user shall only be allowed to enter 0, 1, 4, 9...).
 
 ## Understanding the requirements

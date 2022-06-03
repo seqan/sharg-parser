@@ -1,6 +1,6 @@
 #include <sharg/all.hpp> // includes all necessary headers
 
-void initialise_argument_parser(sharg::argument_parser & parser)
+void initialise_parser(sharg::parser & parser)
 {
     parser.info.author = "Cersei";
     parser.info.short_description = "Aggregate average Game of Thrones viewers by season.";
@@ -9,7 +9,7 @@ void initialise_argument_parser(sharg::argument_parser & parser)
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Game-of-Parsing", argc, argv};
-    initialise_argument_parser(myparser);
+    sharg::parser myparser{"Game-of-Parsing", argc, argv};
+    initialise_parser(myparser);
     // code from assignment 1
 }

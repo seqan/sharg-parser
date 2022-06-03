@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
- * \brief Provides sharg::argument_parser class.
+ * \brief Provides sharg::parser class.
  */
 
 #pragma once
@@ -25,11 +25,11 @@ namespace sharg
 {
 
 /*!\brief The Sharg command line parser.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
- * The sharg::argument_parser is a general purpose argument parser that provides
+ * The sharg::parser is a general purpose argument parser that provides
  * convenient access to the command line arguments passed to the program.
  * It automatically generates a help page and can export manual-pages as well
  * as HTML documentation.
@@ -57,9 +57,9 @@ namespace sharg
  * need to provide a predeclared variable and some additional information like
  * the identifier, description or advanced restrictions. To actually retrieve
  * the value from the command line and enable every other mechanism you need
- * to call the sharg::argument_parser::parse function in the end.
+ * to call the sharg::parser::parse function in the end.
  *
- * \include test/snippet/argument_parser_1.cpp
+ * \include test/snippet/parser_1.cpp
  *
  * Now you can call your application via the command line:
  *
@@ -93,7 +93,7 @@ namespace sharg
  *
  * ###  The POSIX conventions
  *
- * The sharg::argument_parser follows the
+ * The sharg::parser follows the
  * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). Note that this means
  * among others:
  *
@@ -102,22 +102,22 @@ namespace sharg
  * 3. `--` terminates the options and signals that only positional options follow. This enables the user to
  * use a positional option beginning with `-` without it being misinterpreted as an option identifier.
  *
- * \attention Currently, the sharg::argument_parser is in disagreement with one of the
+ * \attention Currently, the sharg::parser is in disagreement with one of the
  * [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). It does not
  * interpret a single hyphen character as an ordinary non-option argument that may be used for in-/output from
  * standard streams.
  *
- * ### Errors that are caught by the argument_parser
+ * ### Errors that are caught by the parser
  *
  * There are two different kinds of errors: Developer errors and user errors.
  *
- * Developer errors are those that violate the sharg::argument_parser design
- * (e.g. calling the sharg::argument_parser::parse function twice or specifying
+ * Developer errors are those that violate the sharg::parser design
+ * (e.g. calling the sharg::parser::parse function twice or specifying
  * two different options with the same identifier.)
  * In this case, a sharg::design_error is thrown.
  *
  * The second kind are user errors, due to invalid command line calls. In this
- * case a sharg::argument_parser_error is thrown.
+ * case a sharg::parser_error is thrown.
  *
  * For example:
  *
@@ -126,12 +126,12 @@ namespace sharg
  * [PARSER ERROR] Value cast failed for positional option 2: Argument abc could not be casted to type DOUBLE.
  * ```
  *
- * See the sharg::argument_parser::parse documentation for a detailed list of
+ * See the sharg::parser::parse documentation for a detailed list of
  * which exceptions are caught.
  *
  * ### Update Notifications
  *
- * SeqAn applications that are using the sharg::argument_parser can check SeqAn servers for version updates.
+ * SeqAn applications that are using the sharg::parser can check SeqAn servers for version updates.
  * The functionality helps getting new versions out to users faster.
  * It is also used to inform application developers of new versions of the SeqAn library
  * which means that applications ship with less bugs.
@@ -139,7 +139,7 @@ namespace sharg
  *
  * Developers that wish to disable this feature permanently can pass an extra constructor argument:
  *
- * \include doc/tutorial/argument_parser/disable_version_check.cpp
+ * \include doc/tutorial/parser/disable_version_check.cpp
  *
  * Users of applications that have this feature activated can opt-out, by either:
  *
@@ -150,46 +150,46 @@ namespace sharg
  * then the developer already disabled the version check functionality.
  *
  */
-class argument_parser
+class parser
 {
 public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    argument_parser() = delete;                                     //!< Deleted.
-    argument_parser(argument_parser const &) = default;             //!< Defaulted.
-    argument_parser & operator=(argument_parser const &) = default; //!< Defaulted.
-    argument_parser(argument_parser &&) = default;                  //!< Defaulted.
-    argument_parser & operator=(argument_parser &&) = default;      //!< Defaulted.
+    parser() = delete;                            //!< Deleted.
+    parser(parser const &) = default;             //!< Defaulted.
+    parser & operator=(parser const &) = default; //!< Defaulted.
+    parser(parser &&) = default;                  //!< Defaulted.
+    parser & operator=(parser &&) = default;      //!< Defaulted.
 
-    /*!\brief Initializes an sharg::argument_parser object from the command line arguments.
+    /*!\brief Initializes an sharg::parser object from the command line arguments.
      *
      * \param[in] app_name The name of the app that is displayed on the help page.
      * \param[in] argc The number of command line arguments.
      * \param[in] argv The command line arguments to parse.
      * \param[in] version_updates Notify users about version updates (default sharg::update_notifications::on).
-     * \param[in] subcommands A list of subcommands (see \link subcommand_arg_parse subcommand parsing \endlink).
+     * \param[in] subcommands A list of subcommands (see \link subcommand_parse subcommand parsing \endlink).
      *
      * \throws sharg::design_error if the application name contains illegal characters.
      *
      * The application name must only contain alpha-numeric characters, `_` or `-` ,
      * i.e. the following regex must evaluate to true: `"^[a-zA-Z0-9_-]+$"` .
      *
-     * See the [argument parser tutorial](https://docs.seqan.de/seqan/3-master-dev/tutorial_argument_parser.html)
+     * See the [parser tutorial](https://docs.seqan.de/seqan/3-master-dev/tutorial_parser.html)
      * for more information about the version check functionality.
      */
-    argument_parser(std::string const app_name,
-                    int const argc,
-                    char const * const * const argv,
-                    update_notifications version_updates = update_notifications::on,
-                    std::vector<std::string> subcommands = {}) :
+    parser(std::string const app_name,
+           int const argc,
+           char const * const * const argv,
+           update_notifications version_updates = update_notifications::on,
+           std::vector<std::string> subcommands = {}) :
         version_check_dev_decision{version_updates},
         subcommands{std::move(subcommands)}
     {
         if (!std::regex_match(app_name, app_name_regex))
         {
             throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
-                               "(regex: \"^[a-zA-Z0-9_-]+$\").")};
+                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
         }
 
         for (auto & sub : this->subcommands)
@@ -207,7 +207,7 @@ public:
     }
 
     //!\brief The destructor.
-    ~argument_parser()
+    ~parser()
     {
         // wait for another 3 seconds
         if (version_check_future.valid())
@@ -219,13 +219,14 @@ public:
      * \brief Add (positional) options and flags to the parser.
      * \{
      */
-    /*!\brief Adds an option to the sharg::argument_parser.
+    /*!\brief Adds an option to the sharg::parser.
      *
      * \tparam option_type Must have a formatted input function (stream >> value).
      *                     If option_type is a container, its value type must have the
      *                     formatted input function (exception: std::string is not
      *                     regarded as a container).
-     *                     See <a href="https://en.cppreference.com/w/cpp/named_req/FormattedInputFunction"> FormattedInputFunction </a>.
+     *                     See <a href="https://en.cppreference.com/w/cpp/named_req/FormattedInputFunction">
+     *                     FormattedInputFunction </a>.
      * \tparam validator_type The type of validator to be applied to the option
      *                        value. Must model sharg::validator.
      *
@@ -240,8 +241,8 @@ public:
      */
     template <typename option_type, validator validator_type = detail::default_validator>
     //!\cond
-        requires (argument_parser_compatible_option<option_type> ||
-                  argument_parser_compatible_option<std::ranges::range_value_t<option_type>>) &&
+        requires (parser_compatible_option<option_type> ||
+                  parser_compatible_option<std::ranges::range_value_t<option_type>>) &&
                   std::invocable<validator_type, option_type>
     //!\endcond
     void add_option(option_type & value,
@@ -261,7 +262,7 @@ public:
                    format);
     }
 
-    /*!\brief Adds a flag to the sharg::argument_parser.
+    /*!\brief Adds a flag to the sharg::parser.
      *
      * \param[in, out] value     The variable which shows if the flag is turned off (default) or on.
      * \param[in]      short_id  The short identifier for the flag (e.g. 'i').
@@ -287,13 +288,14 @@ public:
         std::visit([=, &value] (auto & f) { f.add_flag(value, short_id, long_id, desc, spec); }, format);
     }
 
-    /*!\brief Adds a positional option to the sharg::argument_parser.
+    /*!\brief Adds a positional option to the sharg::parser.
      *
      * \tparam option_type Must have a formatted input function (stream >> value).
      *                     If option_type is a container, its value type must have the
      *                     formatted input function (exception: std::string is not
      *                     regarded as a container).
-     *                     See <a href="https://en.cppreference.com/w/cpp/named_req/FormattedInputFunction"> FormattedInputFunction </a>.
+     *                     See <a href="https://en.cppreference.com/w/cpp/named_req/FormattedInputFunction">
+     *                     FormattedInputFunction </a>.
      * \tparam validator_type The type of validator to be applied to the option
      *                        value. Must model sharg::validator.
      *
@@ -309,8 +311,8 @@ public:
      */
     template <typename option_type, validator validator_type = detail::default_validator>
     //!\cond
-        requires (argument_parser_compatible_option<option_type> ||
-                  argument_parser_compatible_option<std::ranges::range_value_t<option_type>>) &&
+        requires (parser_compatible_option<option_type> ||
+                  parser_compatible_option<std::ranges::range_value_t<option_type>>) &&
                   std::invocable<validator_type, option_type>
     //!\endcond
     void add_positional_option(option_type & value,
@@ -336,7 +338,7 @@ public:
     /*!\brief Initiates the actual command line parsing.
      *
      * \attention The function must be called at the very end of all parser
-     * related code and should be enclosed in a try catch block as the argument parser may throw.
+     * related code and should be enclosed in a try catch block as the parser may throw.
      *
      * \throws sharg::design_error if this function was already called before.
      *
@@ -349,7 +351,7 @@ public:
      *
      * \details
      *
-     * When no specific key words are supplied, the sharg::argument_parser
+     * When no specific key words are supplied, the sharg::parser
      * starts to process the command line for specified options, flags and
      * positional options.
      *
@@ -364,7 +366,7 @@ public:
      *
      * Example:
      *
-     * \include test/snippet/argument_parser_2.cpp
+     * \include test/snippet/parser_2.cpp
      *
      * The code above gives the following output when calling `--help`:
      *
@@ -431,8 +433,8 @@ public:
     }
 
     //!\brief Returns a reference to the sub-parser instance if
-    //!       \link subcommand_arg_parse subcommand parsing \endlink was enabled.
-    argument_parser & get_sub_parser()
+    //!       \link subcommand_parse subcommand parsing \endlink was enabled.
+    parser & get_sub_parser()
     {
         if (sub_parser == nullptr)
         {
@@ -451,8 +453,8 @@ public:
      * \details
      *
      * You can only ask for option identifiers that were added to the parser beforehand via
-     * `sharg::argument_parser::add_option`.
-     * As in the `sharg::argument_parser::add_option` call, pass short identifiers as a `char` and long identifiers
+     * `sharg::parser::add_option`.
+     * As in the `sharg::parser::add_option` call, pass short identifiers as a `char` and long identifiers
      * as a `std::string` or a type that a `std::string` is constructible from (e.g. a `const char *`).
      *
      * ### Example
@@ -462,11 +464,11 @@ public:
      * ### Exceptions
      *
      * This function throws a sharg::design_error if
-     * * `sharg::argument_parser::parse()` was not called before.
+     * * `sharg::parser::parse()` was not called before.
      * * a long identifier was passed (e.g. a `std::string`) that only consists of a single character. If you mean to
      *   pass a short identifier, please pass it as a `char` not a `std::string`.
      * * the option identifier cannot be found in the list of valid option identifiers that were added to the parser
-     *   via `sharg::argument_parser::add_option()` calls beforehand.
+     *   via `sharg::parser::add_option()` calls beforehand.
      */
     template <typename id_type>
     //!\cond
@@ -503,7 +505,7 @@ public:
     //!\name Structuring the Help Page
     //!\{
 
-    /*!\brief Adds an help page section to the sharg::argument_parser.
+    /*!\brief Adds an help page section to the sharg::parser.
      * \param[in] title The title of the section.
      * \param[in] spec Whether to always display this section title (sharg::option_spec::standard), only when showing
      *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
@@ -514,7 +516,7 @@ public:
         std::visit([&] (auto & f) { f.add_section(title, spec); }, format);
     }
 
-    /*!\brief Adds an help page subsection to the sharg::argument_parser.
+    /*!\brief Adds an help page subsection to the sharg::parser.
      * \param[in] title The title of the subsection.
      * \param[in] spec Whether to always display this subsection title (sharg::option_spec::standard), only when showing
      *                 the advanced help page (sharg::option_spec::advanced) or never (sharg::option_spec::hidden).
@@ -525,7 +527,7 @@ public:
         std::visit([&] (auto & f) { f.add_subsection(title, spec); }, format);
     }
 
-    /*!\brief Adds an help page text line to the sharg::argument_parser.
+    /*!\brief Adds an help page text line to the sharg::parser.
      * \param[in] text The text to print.
      * \param[in] is_paragraph Whether to insert as paragraph or just a line (Default: false).
      * \param[in] spec Whether to always display this line (sharg::option_spec::standard), only when showing
@@ -539,7 +541,7 @@ public:
         std::visit([&] (auto & f) { f.add_line(text, is_paragraph, spec); }, format);
     }
 
-    /*!\brief Adds an help page list item (key-value) to the sharg::argument_parser.
+    /*!\brief Adds an help page list item (key-value) to the sharg::parser.
      * \param[in] key  The key of the key-value pair of the list item.
      * \param[in] desc The value of the key-value pair of the list item.
      * \param[in] spec Whether to always display this list item (sharg::option_spec::standard), only when showing
@@ -565,7 +567,7 @@ public:
     }
     //!\}
 
-    /*!\brief Aggregates all parser related meta data (see sharg::argument_parser_meta_data struct).
+    /*!\brief Aggregates all parser related meta data (see sharg::parser_meta_data struct).
      *
      * \attention You should supply as much information as possible to help users
      * of the application.
@@ -576,9 +578,9 @@ public:
      * point that can be easily extended.
      *
      * You can access the members directly:
-     * (see sharg::argument_parser_meta_data for a list of the info members)
+     * (see sharg::parser_meta_data for a list of the info members)
      *
-     * \include test/snippet/argument_parser_3.cpp
+     * \include test/snippet/parser_3.cpp
      *
      * This will produce a nice help page when the user calls `-h` or `--help`:
      *
@@ -613,7 +615,7 @@ public:
      *     Sharg version: 0.1.0
      * ```
      */
-    argument_parser_meta_data info;
+    parser_meta_data info;
 
 private:
     //!\brief Keeps track of whether the parse function has been called already.
@@ -637,21 +639,21 @@ private:
     //!\brief Validates the application name to ensure an escaped server call.
     std::regex app_name_regex{"^[a-zA-Z0-9_-]+$"};
 
-    //!\brief Signals the argument parser that no options follow this string but only positional arguments.
+    //!\brief Signals the parser that no options follow this string but only positional arguments.
     static constexpr std::string_view const end_of_options_indentifier{"--"};
 
-    //!\brief Stores the sub-parser in case \link subcommand_arg_parse subcommand parsing \endlink is enabled.
-    std::unique_ptr<argument_parser> sub_parser{nullptr};
+    //!\brief Stores the sub-parser in case \link subcommand_parse subcommand parsing \endlink is enabled.
+    std::unique_ptr<parser> sub_parser{nullptr};
 
-    //!\brief Stores the sub-parser names in case \link subcommand_arg_parse subcommand parsing \endlink is enabled.
+    //!\brief Stores the sub-parser names in case \link subcommand_parse subcommand parsing \endlink is enabled.
     std::vector<std::string> subcommands{};
 
-    /*!\brief The format of the argument parser that decides the behavior when
-     *        calling the sharg::argument_parser::parse function.
+    /*!\brief The format of the parser that decides the behavior when
+     *        calling the sharg::parser::parse function.
      *
      * \details
      *
-     * The format is set in the function argument_parser::init.
+     * The format is set in the function parser::init.
      */
     std::variant<detail::format_parse,
                  detail::format_help,
@@ -668,7 +670,7 @@ private:
     //!\brief The command line arguments.
     std::vector<std::string> cmd_arguments{};
 
-    /*!\brief Initializes the sharg::argument_parser class on construction.
+    /*!\brief Initializes the sharg::parser class on construction.
      *
      * \param[in] argc        The number of command line arguments.
      * \param[in] argv        The command line arguments.
@@ -698,7 +700,7 @@ private:
      * - else the format is that to sharg::detail::format_parse
      *
      * If `--export-help` is specified with a value other than html/man or ctd
-     * an sharg::argument_parser_error is thrown.
+     * an sharg::parser_error is thrown.
      */
     void init(int argc, char const * const * const argv)
     {
@@ -717,10 +719,10 @@ private:
 
             if (std::find(subcommands.begin(), subcommands.end(), arg) != subcommands.end())
             {
-                sub_parser = std::make_unique<argument_parser>(info.app_name + "-" + arg,
-                                                               argc - i,
-                                                               argv + i,
-                                                               update_notifications::off);
+                sub_parser = std::make_unique<parser>(info.app_name + "-" + arg,
+                                                      argc - i,
+                                                      argv + i,
+                                                      update_notifications::off);
                 break;
             }
 

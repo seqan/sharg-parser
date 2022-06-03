@@ -10,13 +10,13 @@ It will take some time, but we hope to expand this document into containing nume
 If you have suggestions for how to improve the Cookbook and/or examples you would like included,
 please feel free to contact us.
 
-# Constructing a basic argument parser
+# Constructing a basic parser
 
 \include doc/cookbook/basic_arg_parse.cpp
 
-# Constructing a subcommand argument parser
+# Constructing a subcommand parser
 
-\include doc/howto/subcommand_argument_parser/subcommand_arg_parse.cpp
+\include doc/howto/subcommand_parser/subcommand_parse.cpp
 
 # Write a custom validator {#cookbook_custom_validator}
 This recipe implements a validator that checks whether a numeric argument is an integral square (i.e. 0, 1, 4, 9...).

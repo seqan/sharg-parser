@@ -33,7 +33,7 @@ istream & operator>>(istream & input, external::bar & ext_bar)
 
 int main(int argc, char const ** argv)
 {
-    sharg::argument_parser parser{"my_ext_bar_parser", argc, argv, sharg::update_notifications::off};
+    sharg::parser parser{"my_ext_bar_parser", argc, argv, sharg::update_notifications::off};
 
     external::bar ext_bar{};
     parser.add_option(ext_bar, 'f', "external-bar", "Please supply an integer for member external::bar::a");
@@ -42,7 +42,7 @@ int main(int argc, char const ** argv)
     {
         parser.parse(); // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext) // catch user errors
+    catch (sharg::parser_error const & ext) // catch user errors
     {
         std::cerr << "[Error] " << ext.what() << "\n"; // customise your error message
         return -1;

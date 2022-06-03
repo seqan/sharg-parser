@@ -83,7 +83,7 @@
 -->
 [twitter_link]: https://twitter.com/seqanlib
 
-The Sharg argument parser offers a neat and easy-to-use library for argument parsing in C++. With Sharg, your command
+The Sharg parser offers a neat and easy-to-use library for argument parsing in C++. With Sharg, your command
 line interface can be customized to your specific needs and validated in a single line. Furthermore, the library provides
 helpful templates and makes even subcommands feel effortless. For more information, details, and a tutorial on how to
 use our features, please see our [online documentation](https://sharg.vercel.app/usr/html/index.html).

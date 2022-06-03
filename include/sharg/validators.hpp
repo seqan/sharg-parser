@@ -27,19 +27,19 @@ namespace sharg
 
 /*!\concept sharg::validator
  * \brief The concept for option validators passed to add_option/positional_option.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
- * When adding (positional) options to the sharg::argument_parser you may pass a
+ * When adding (positional) options to the sharg::parser you may pass a
  * [function object](https://en.cppreference.com/w/cpp/named_req/FunctionObject) that models
  * sharg::validator which checks the option value provided by the user for some constraint.
  *
- * SeqAn provides several common-use-case validators, e.g. the sharg::arithmetic_range_validator.
+ * Sharg provides several common-use-case validators, e.g. the sharg::arithmetic_range_validator.
  *
  * \include test/snippet/validators_2.cpp
  *
- * You can learn more about SeqAn validators in our tutorial \ref section_validation.
+ * You can learn more about Sharg validators in our tutorial \ref section_validation.
  *
  * To implement your own validator please refer to the detailed concept description below.
  */
@@ -55,7 +55,7 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
 };
 
 /*!\brief A validator that checks whether a number is inside a given range.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  * \tparam option_value_t The value type of the range; must model std::is_arithmetic_v.
  *
@@ -67,7 +67,7 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
  *
  * \include test/snippet/validators_1.cpp
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 template <typename option_value_t>
 //!\cond
@@ -130,9 +130,9 @@ private:
 };
 
 /*!\brief A validator that checks whether a value is inside a list of valid values.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
- * \tparam option_value_t The type the validator is called on. Must model sharg::argument_parser_compatible_option.
+ * \tparam option_value_t The type the validator is called on. Must model sharg::parser_compatible_option.
  *
  * \details
  *
@@ -146,9 +146,9 @@ private:
  *
  * \include test/snippet/validators_2.cpp
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
-template <argument_parser_compatible_option option_value_t>
+template <parser_compatible_option option_value_t>
 class value_list_validator
 {
 public:
@@ -263,7 +263,7 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
 //!\}
 
 /*!\brief An abstract base class for the file and directory validators.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
@@ -273,7 +273,7 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
  * The type can be further specialised for the sharg::input_file_validator and the sharg::output_file_validator
  * using the template argument to determine the valid extensions from the given file type.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class file_validator_base
 {
@@ -445,7 +445,7 @@ protected:
 };
 
 /*!\brief A validator that checks if a given path is a valid input file.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  *
  * \details
@@ -463,7 +463,7 @@ protected:
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class input_file_validator : public file_validator_base
 {
@@ -548,7 +548,7 @@ enum class output_file_open_options
 };
 
 /*!\brief A validator that checks if a given path is a valid output file.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  *
  * \details
@@ -570,7 +570,7 @@ enum class output_file_open_options
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class output_file_validator : public file_validator_base
 {
@@ -690,7 +690,7 @@ private:
 };
 
 /*!\brief A validator that checks if a given path is a valid input directory.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  *
  * \details
@@ -703,7 +703,7 @@ private:
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class input_directory_validator : public file_validator_base
 {
@@ -766,7 +766,7 @@ public:
 };
 
 /*!\brief A validator that checks if a given path is a valid output directory.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  *
  * \details
@@ -779,7 +779,7 @@ public:
  *
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class output_directory_validator : public file_validator_base
 {
@@ -852,7 +852,7 @@ public:
 };
 
 /*!\brief A validator that checks if a matches a regular expression pattern.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  *
  * \details
@@ -868,7 +868,7 @@ public:
  *
  * \include test/snippet/validators_4.cpp
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class regex_validator
 {
@@ -928,15 +928,15 @@ namespace detail
 {
 
 /*!\brief Validator that always returns true.
- * \ingroup argument_parser
+ * \ingroup parser
  * \implements sharg::validator
  *
  * \details
  *
  * The default validator is needed to make the validator parameter of
- * argument_parser::add_option and argument_parser::add_option optional.
+ * parser::add_option and parser::add_option optional.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 struct default_validator
 {
@@ -956,17 +956,17 @@ struct default_validator
 };
 
 /*!\brief A helper struct to chain validators recursively via the pipe operator.
- *\ingroup argument_parser
+ *\ingroup parser
  *\implements sharg::validator
  *
  *\details
  *
  * Note that both validators must operate on the same option_value_type in order to
- * avoid unexpected behaviour and ensure that the sharg::argument_parser::add_option
+ * avoid unexpected behaviour and ensure that the sharg::parser::add_option
  * call is well-formed. (add_option(val, ...., validator) requires
  * that val is of same type as validator::option_value_type).
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 template <validator validator1_type, validator validator2_type>
 //!\cond
@@ -1034,7 +1034,7 @@ private:
 } // namespace detail
 
 /*!\brief Enables the chaining of validators.
- * \ingroup argument_parser
+ * \ingroup parser
  * \tparam validator1_type The type of the fist validator;
  *                         Must satisfy the sharg::validator and the
  *                         same option_value_type as the second validator type.
@@ -1060,7 +1060,7 @@ private:
  * You can chain as many validators as you want which will be evaluated one after
  * the other from left to right (first to last).
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 template <validator validator1_type, validator validator2_type>
 //!\cond

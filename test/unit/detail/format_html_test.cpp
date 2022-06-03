@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <sharg/argument_parser.hpp>
+#include <sharg/parser.hpp>
 
 TEST(html_format, empty_information)
 {
@@ -16,7 +16,7 @@ TEST(html_format, empty_information)
 
     // Empty html help page.
     const char * argv0[] = {"./help_add_test --version-check false", "--export-help", "html"};
-    sharg::argument_parser parser0{"empty_options", 3, argv0};
+    sharg::parser parser0{"empty_options", 3, argv0};
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser0.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     my_stdout = testing::internal::GetCapturedStdout();
@@ -58,7 +58,7 @@ TEST(html_format, empty_information)
     EXPECT_EQ(my_stdout, expected);
 
     const char * argv1[] = {"./help_add_test --version-check false", "--export-help=html"};
-    sharg::argument_parser parser1{"empty_options", 2, argv1};
+    sharg::parser parser1{"empty_options", 2, argv1};
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     my_stdout = testing::internal::GetCapturedStdout();
@@ -76,7 +76,7 @@ TEST(html_format, full_information_information)
 
    // Full html help page.
    const char * argv0[] = {"./help_add_test --version-check false", "--export-help", "html"};
-   sharg::argument_parser parser1{"program_full_options", 3, argv0};
+   sharg::parser parser1{"program_full_options", 3, argv0};
    parser1.info.synopsis.push_back("./some_binary_name synopsis");
    parser1.info.synopsis.push_back("./some_binary_name synopsis2");
    parser1.info.description.push_back("description");
@@ -201,11 +201,11 @@ TEST(export_help, parse_error)
     const char * argv3[] = {"./help_add_test --version-check false", "--export-help", "atml"};
 
     // no value after --export-help
-    EXPECT_THROW((sharg::argument_parser{"test_parser", 2, argv}), sharg::argument_parser_error);
+    EXPECT_THROW((sharg::parser{"test_parser", 2, argv}), sharg::parser_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::argument_parser{"test_parser", 2, argv2}), sharg::validation_error);
+    EXPECT_THROW((sharg::parser{"test_parser", 2, argv2}), sharg::validation_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::argument_parser{"test_parser", 3, argv3}), sharg::validation_error);
+    EXPECT_THROW((sharg::parser{"test_parser", 3, argv3}), sharg::validation_error);
 }

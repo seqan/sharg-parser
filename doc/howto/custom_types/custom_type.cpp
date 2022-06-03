@@ -28,7 +28,7 @@ public:
 
 int main(int argc, char const ** argv)
 {
-    sharg::argument_parser parser{"my_foobar_parser", argc, argv, sharg::update_notifications::off};
+    sharg::parser parser{"my_foobar_parser", argc, argv, sharg::update_notifications::off};
 
     foo::bar my_bar{};
     parser.add_option(my_bar, 'f', "foo-bar", "Please supply an integer for member foo::bar::a");
@@ -37,7 +37,7 @@ int main(int argc, char const ** argv)
     {
         parser.parse(); // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext) // catch user errors
+    catch (sharg::parser_error const & ext) // catch user errors
     {
         std::cerr << "[Error] " << ext.what() << "\n"; // customise your error message
         return -1;

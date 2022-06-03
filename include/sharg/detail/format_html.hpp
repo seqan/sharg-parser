@@ -18,7 +18,7 @@ namespace sharg::detail
 {
 
 /*!\brief The format that prints the help page as html to std::cout.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  * The help page printing is not done immediately, because the user might not
@@ -27,7 +27,7 @@ namespace sharg::detail
  * Thus the calls are stored (parser_set_up_calls and positional_option_calls)
  * and only evaluated when calling format_help::parse().
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_html : public format_help_base<format_html>
 {

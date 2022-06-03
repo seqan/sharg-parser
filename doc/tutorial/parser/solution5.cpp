@@ -62,7 +62,7 @@ struct cmd_arguments
     bool header_is_set{false};
 };
 
-void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments & args)
+void initialise_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "Cercei";
     parser.info.short_description = "Aggregate average Game of Thrones viewers by season.";
@@ -82,18 +82,18 @@ void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments &
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Game-of-Parsing", argc, argv};        // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv};          // initialise myparser
     cmd_arguments args{};
 
-    initialise_argument_parser(myparser, args);
+    initialise_parser(myparser, args);
 
     try
     {
-         myparser.parse();                                                  // trigger command line parsing
+         myparser.parse();                                          // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext)                     // catch user errors
+    catch (sharg::parser_error const & ext)                         // catch user errors
     {
-        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n";    // customise your error message
         return -1;
     }
 

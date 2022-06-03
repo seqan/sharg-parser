@@ -11,7 +11,7 @@ struct pull_arguments
     bool progress{false};
 };
 
-int run_git_pull(sharg::argument_parser & parser)
+int run_git_pull(sharg::parser & parser)
 {
     pull_arguments args{};
 
@@ -22,7 +22,7 @@ int run_git_pull(sharg::argument_parser & parser)
     {
         parser.parse();
     }
-    catch (sharg::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error git pull] " << ext.what() << "\n";
         return -1;
@@ -44,7 +44,7 @@ struct push_arguments
     bool push_all{false};
 };
 
-int run_git_push(sharg::argument_parser & parser)
+int run_git_push(sharg::parser & parser)
 {
     push_arguments args{};
 
@@ -55,7 +55,7 @@ int run_git_push(sharg::argument_parser & parser)
     {
         parser.parse();
     }
-    catch (sharg::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error git push] " << ext.what() << "\n";
         return -1;
@@ -76,7 +76,7 @@ int run_git_push(sharg::argument_parser & parser)
 int main(int argc, char const ** argv)
 {
     //![construction]
-    sharg::argument_parser top_level_parser{"mygit",
+    sharg::parser top_level_parser{"mygit",
                                              argc,
                                              argv,
                                              sharg::update_notifications::on,
@@ -93,14 +93,14 @@ int main(int argc, char const ** argv)
     {
         top_level_parser.parse(); // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext) // catch user errors
+    catch (sharg::parser_error const & ext) // catch user errors
     {
         std::cerr << "[Error] " << ext.what() << "\n"; // customise your error message
         return -1;
     }
 
     //![get_sub_parser]
-    sharg::argument_parser & sub_parser = top_level_parser.get_sub_parser(); // hold a reference to the sub_parser
+    sharg::parser & sub_parser = top_level_parser.get_sub_parser(); // hold a reference to the sub_parser
     //![get_sub_parser]
 
     std::cout << "Proceed to sub parser.\n";

@@ -1,7 +1,7 @@
-# Parsing command line arguments with Sharg {#tutorial_argument_parser}
+# Parsing command line arguments with Sharg {#tutorial_parser}
 
 <b>Learning Objective:</b> <br>
-You will learn how to use the sharg::argument_parser class to parse command line arguments. This tutorial is a
+You will learn how to use the sharg::parser class to parse command line arguments. This tutorial is a
 walkthrough with links to the API documentation and is also meant as a source for copy-and-paste code.
 
 \tutorial_head{Easy, 30-60 min, \ref setup, [POSIX conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html)}
@@ -13,7 +13,7 @@ walkthrough with links to the API documentation and is also meant as a source fo
 # Introduction
 
 An easy and very flexible interface to a program is through the command line. This tutorial explains how to parse the
-command line using the Sharg library’s sharg::argument_parser class.
+command line using the Sharg library’s sharg::parser class.
 
 This class will give you the following functionality:
 
@@ -48,35 +48,35 @@ article the following holds: value="argument", option="option", flag = "option t
 positional option ="non-option").
 
 ## A continuous example
-We will get to know the wide functionality of the argument parser by writing a little application and extending it step
+We will get to know the wide functionality of the parser by writing a little application and extending it step
 by step.  Let's say we have a tab separated file `data.tsv` with information on the Game of Thrones
 Seasons ([by Wikipedia](https://en.wikipedia.org/wiki/List_of_Game_of_Thrones_episodes)):
 
-\include doc/tutorial/argument_parser/data.tsv
+\include doc/tutorial/parser/data.tsv
 
 We want to build an application that is able to read the file with or without a header line, select certain seasons and
 compute the average or median from the "Avg. U.S. viewers (millions)" of the selected seasons.
 
-# The Sharg argument parser class
+# The Sharg parser class
 
-Before we add any of the options, flags, and positional options, we will take a look at the sharg::argument_parser
+Before we add any of the options, flags, and positional options, we will take a look at the sharg::parser
 class itself. It is constructed by giving a program's name and passing the parameters `argc` and `argv` from main.
 Note that no command line arguments have been parsed so far, but we can now add more information to the parser.
-After adding all desired information, the parsing is triggered by calling the sharg::argument_parser::parse member
+After adding all desired information, the parsing is triggered by calling the sharg::parser::parse member
 function. Since the function throws in case any errors occur, we need to wrap it into a try-catch block. Here is a
 first working example:
 
-\include doc/tutorial/argument_parser/basic_parser_setup.cpp
+\include doc/tutorial/parser/basic_parser_setup.cpp
 
 There are two types of exceptions: The sharg::design_error which indicates that the parser setup was wrong
 (directed to the developer of the program, not the user!) and any other exception derived from
-sharg::argument_parser_error, which detects corrupted user input. Additionally, there are special user requests that
-are handled by the argument parser by exiting the program via std::exit, e.g. calling `--help` that prints a help page
+sharg::parser_error, which detects corrupted user input. Additionally, there are special user requests that
+are handled by the parser by exiting the program via std::exit, e.g. calling `--help` that prints a help page
 screen.
 
 ## Design restrictions (sharg::design_error)
 
-The argument parser checks the following restrictions and throws a sharg::design_error if they are not satisfied:
+The parser checks the following restrictions and throws a sharg::design_error if they are not satisfied:
 
 * **Long identifiers**: must be unique, more than one character long, may only contain alphanumeric characters, as well
 as `_`, `-`, or `@`, but never start with `-`.
@@ -86,11 +86,11 @@ Either the short or long id may be empty but not both at the same time.
 * The flag identifiers `-h`, `--help`, `--advanced-help`, `--advanced-help`, `--export-help`, `--version`, `--copyright`
 are predefined and cannot be specified manually or used otherwise.
 * **Flags**: value must be false by default. Passing the flag identifier on the command line marks it as true.
-* The sharg::argument_parser::parse function may only be called once (per parser).
+* The sharg::parser::parse function may only be called once (per parser).
 
 ## Input restrictions
 
-When calling the sharg::argument_parser::parse function, the following potential user errors are caught (and handled
+When calling the sharg::parser::parse function, the following potential user errors are caught (and handled
 by throwing a corresponding exception):
 
 <table border="0">
@@ -106,7 +106,7 @@ by throwing a corresponding exception):
 
 We define "special requests" as command line inputs that do not aim to execute your program but rather display
 information about your program. Because we do not expect the program to be executed in the case of a special request,
-we exit the program at the end of the sharg::argument_parser::parse call via std::exit.
+we exit the program at the end of the sharg::parser::parse call via std::exit.
 
 Currently we support the following *special requests*:
 
@@ -126,40 +126,40 @@ Play around with the binary, e.g. requesting special behaviour like printing the
 ## Meta data {#section_meta_data}
 
 Of course there is not much information to display yet, since we did not provide any. Let's improve this by modifying
-the sharg::argument_parser::info member of our parser. The sharg::argument_parser::info member is a struct of type
-sharg::argument_parser_meta_data and contains the following members that can be customised:
+the sharg::parser::info member of our parser. The sharg::parser::info member is a struct of type
+sharg::parser_meta_data and contains the following members that can be customised:
 
-- **app_name**, which is already set on construction (sharg::argument_parser_meta_data::app_name)
-- **author** (sharg::argument_parser_meta_data::author)
-- **citation** (sharg::argument_parser_meta_data::citation)
-- **date** (sharg::argument_parser_meta_data::date)
-- **description** (sharg::argument_parser_meta_data::description)
-- **email** (sharg::argument_parser_meta_data::email)
-- **examples** (sharg::argument_parser_meta_data::examples)
-- **long_copyright** (sharg::argument_parser_meta_data::long_copyright)
-- **man_page_title** (sharg::argument_parser_meta_data::man_page_title)
-- **short_copyright** (sharg::argument_parser_meta_data::short_copyright)
-- **short_description** (sharg::argument_parser_meta_data::short_description)
-- **synopsis** (sharg::argument_parser_meta_data::synopsis)
-- **url** (sharg::argument_parser_meta_data::url)
-- **version** (sharg::argument_parser_meta_data::version)
+- **app_name**, which is already set on construction (sharg::parser_meta_data::app_name)
+- **author** (sharg::parser_meta_data::author)
+- **citation** (sharg::parser_meta_data::citation)
+- **date** (sharg::parser_meta_data::date)
+- **description** (sharg::parser_meta_data::description)
+- **email** (sharg::parser_meta_data::email)
+- **examples** (sharg::parser_meta_data::examples)
+- **long_copyright** (sharg::parser_meta_data::long_copyright)
+- **man_page_title** (sharg::parser_meta_data::man_page_title)
+- **short_copyright** (sharg::parser_meta_data::short_copyright)
+- **short_description** (sharg::parser_meta_data::short_description)
+- **synopsis** (sharg::parser_meta_data::synopsis)
+- **url** (sharg::parser_meta_data::url)
+- **version** (sharg::parser_meta_data::version)
 
 \assignment{Assignment 2}
 
 1. Extend the minimal example from assignment 1 by a function
-   `void initialise_argument_parser(sharg::argument_parser & parser)`.
+   `void initialise_parser(sharg::parser & parser)`.
 2. Within this function, customise the parser with the following information:
    * Set the author to your favourite Game of Thrones character (Don't have one? Really? Take "Cersei").
    * Set the short description to "Aggregate average US. Game of Thrones viewers by season.".
    * Set the version to 1.0.0 .
    * Set some more, if you want to.
-   Hint: Check out the API documentation for sharg::argument_parser_meta_data and sharg::argument_parser::info.
+   Hint: Check out the API documentation for sharg::parser_meta_data and sharg::parser::info.
 3. Try calling `--help` again and see the results.
 
 \endassignment
 \solution
 
-\include doc/tutorial/argument_parser/solution1.cpp
+\include doc/tutorial/parser/solution1.cpp
 
 \endsolution
 
@@ -168,24 +168,24 @@ sharg::argument_parser_meta_data and contains the following members that can be 
 Now that we're done with the meta information, we will learn how to add the actual functionality of options, flags and
 positional options. For each of these three there is a respective member function:
 
-* sharg::argument_parser::add_option
-* sharg::argument_parser::add_flag
-* sharg::argument_parser::add_positional_option
+* sharg::parser::add_option
+* sharg::parser::add_flag
+* sharg::parser::add_positional_option
 
 Each of the functions above take a variable by reference as the first parameter, which will directly store the
 corresponding parsed value from the command line. This has two advantages compared to other command line parsers:
 (1) There is no need for a getter function after parsing and (2) the type is automatically deduced
 (e.g. with boost::program_options you would need to access `parser["file_path"].as<std::filesystem::path>()` afterwards).
 
-The sharg::argument_parser::add_flag only allows boolean variables while sharg::argument_parser::add_option and
-sharg::argument_parser::add_positional_option allow **any type that is convertible from a std::string via std::from_chars** or
-a container of the former (see \ref tutorial_argument_parser_list_options). Besides accepting generic types, the parser
+The sharg::parser::add_flag only allows boolean variables while sharg::parser::add_option and
+sharg::parser::add_positional_option allow **any type that is convertible from a std::string via std::from_chars** or
+a container of the former (see \ref tutorial_parser_list_options). Besides accepting generic types, the parser
 will **automatically check if the given command line argument can be converted into the desired type** and otherwise
 throw a sharg::type_conversion_error exception.
 
 So how does this look like? The following code snippet adds a positional option to `parser`.
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp add_positional_option
+\snippet doc/tutorial/parser/small_snippets.cpp add_positional_option
 
 In addition to the variable that will store the value, you need to pass a description. This description will help users
 of your application to understand how the option is affecting your program.
@@ -199,7 +199,7 @@ to spot errors.
 
 You can add an option like this:
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp add_option
+\snippet doc/tutorial/parser/small_snippets.cpp add_option
 
 Additionally to the variable that will store the value and the description, you need to specify a short and long
 identifier. The example above will recognize an option `-n` or `--my-number` given on the command line and expect it to
@@ -210,7 +210,7 @@ to a flag must be false by default and is switched to true when the flag is pres
 
 Finally, you can add a flag with the following call:
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp add_flag
+\snippet doc/tutorial/parser/small_snippets.cpp add_flag
 
 Note that you can omit either the short identifier by passing <code>'\0'</code> or the long identifier by passing `""`
 but you can never omit both at the same time.
@@ -231,16 +231,16 @@ a struct and pass this struct to your parser initialisation function. You can us
 the code of `run_program()`, it is only so that we have a working program.
 
 \htmlonly <details> <summary>Copy and paste this code into the beginning of your application: </summary>  \endhtmlonly
-\snippet doc/tutorial/argument_parser/solution3.cpp program
+\snippet doc/tutorial/parser/solution3.cpp program
 \htmlonly </details> \endhtmlonly
 
 Your task is now to extend the initialisation function by the following:
 
-1. Extend your `initialise_argument_parser` function by a parameter that takes a `cmd_arguments` object and adapt the
+1. Extend your `initialise_parser` function by a parameter that takes a `cmd_arguments` object and adapt the
 2. function call in your main function to pass on `args`;
 3. Set the default value of `aggregate_by` to `"mean"`.
 
-You can now use the variables from `args` to add the following inside of the `initialise_argument_parser` function:
+You can now use the variables from `args` to add the following inside of the `initialise_parser` function:
 
 3. Add a positional option to the parser that sets the variable `file_path` so our program knows the location of the data file to read in.
 4. Add an option `-y/--year` that sets the variable `year`, which will enable our program to filter the data by only including a season if it got released after the value `year`.
@@ -262,25 +262,25 @@ correctly by trying the following few calls:
 ```
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/solution3.cpp solution
+\snippet doc/tutorial/parser/solution3.cpp solution
 
 \htmlonly <div class=\"assignment\"> <details><summary>In case you are stuck, the complete program now looks
 like this:</summary> \endhtmlonly
-\include doc/tutorial/argument_parser/solution3.cpp
+\include doc/tutorial/parser/solution3.cpp
 \htmlonly </details> </div> \endhtmlonly
 
 \endsolution
 
-# List options {#tutorial_argument_parser_list_options}
+# List options {#tutorial_parser_list_options}
 
 In some use cases you may want to allow the user to specify an option multiple times and store the values in a list.
-With the sharg::argument_parser this behaviour can be achieved simply by choosing your input variable to be of a
+With the sharg::parser this behaviour can be achieved simply by choosing your input variable to be of a
 container type (e.g. std::vector). The parser registers the container type through sharg::container and will adapt the
 parsing of command line arguments accordingly.
 
 Example:
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp option_list
+\snippet doc/tutorial/parser/small_snippets.cpp option_list
 
 Adding this option to a parser will allow you to call the program like this:
 
@@ -298,7 +298,7 @@ list option which is not the last positional option, a sharg::design_error will 
 
 Example:
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp positional_option_list
+\snippet doc/tutorial/parser/small_snippets.cpp positional_option_list
 
 Adding these positional options to a parser will allow you to call the program like this:
 
@@ -322,7 +322,7 @@ We extend the solution from assignment 3:
 
 5. [BONUS] If you have some spare time, try to adjust the program code to aggregate by season. Hint: Use std::find.
 \htmlonly <details> <summary>Otherwise just replace the while loop with the following: </summary>  \endhtmlonly
-\snippet doc/tutorial/argument_parser/solution4.cpp altered_while
+\snippet doc/tutorial/parser/solution4.cpp altered_while
 \htmlonly </details> \endhtmlonly
 
 Take a look at the help page again after you've done all of the above. You will notice that your option `-s/--season`
@@ -340,11 +340,11 @@ the following few calls:
 ```
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/solution4.cpp solution
+\snippet doc/tutorial/parser/solution4.cpp solution
 
 \htmlonly <div class=\"assignment\"> <details><summary>In case you are stuck, the complete program now looks like
 this:</summary> \endhtmlonly
-\include doc/tutorial/argument_parser/solution4.cpp
+\include doc/tutorial/parser/solution4.cpp
 \htmlonly </details> </div> \endhtmlonly
 
 \endsolution
@@ -354,7 +354,7 @@ this:</summary> \endhtmlonly
 ## Required options {#section_required_option}
 
 There is a flaw in the example application we have programmed in assignment 4, did you notice? You can make it
-misbehave by not giving it any option `-s` (which is technically correct for the sharg::argument_parser because a list
+misbehave by not giving it any option `-s` (which is technically correct for the sharg::parser because a list
 may be empty). You could of course handle this in the program itself by checking whether the vector `seasons` is empty,
 but since supplying no season is not expected we can force the user to supply the option at least once by **declaring an
 option as required**.
@@ -362,7 +362,7 @@ option as required**.
 For this purpose we need to use the sharg::option_spec enum interface that is accepted as an additional argument by all
 of the `add_[positional_option/option/flag]` calls:
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp required_option
+\snippet doc/tutorial/parser/small_snippets.cpp required_option
 
 If the user does **not** supply the required option via the command line, they will now get the following error:
 
@@ -406,10 +406,10 @@ Check if your options are set correctly by trying the following call:
 ```
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/solution5.cpp solution
+\snippet doc/tutorial/parser/solution5.cpp solution
 
 \htmlonly <div class=\"assignment\"> <details><summary>In case you are stuck, the complete program now looks like this:</summary> \endhtmlonly
-\include doc/tutorial/argument_parser/solution5.cpp
+\include doc/tutorial/parser/solution5.cpp
 \htmlonly </details> </div> \endhtmlonly
 \endsolution
 
@@ -417,21 +417,21 @@ Check if your options are set correctly by trying the following call:
 
 Our applications often do not allow just any value to be passed as input arguments and if we do not check for them,
 the program may exhibit undefined behaviour. The best way to carefully restrict user input is to directly check the
-input when parsing the command line. The sharg::argument_parser provides **validators** for a given (positional) option.
+input when parsing the command line. The sharg::parser provides **validators** for a given (positional) option.
 
 A *validator* is a [functor](https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses) that is
-called within the argument parser after retrieving and converting a command line argument. We provide several validators,
+called within the parser after retrieving and converting a command line argument. We provide several validators,
 which we hope cover most of the use cases, but you can always create your own validator
 (see section [Create your own validator](#cookbook_custom_validator)).
 
-\attention You can pass a validator to the sharg::argument_parser::add_option function only after passing the
+\attention You can pass a validator to the sharg::parser::add_option function only after passing the
 sharg::option_spec parameter. Pass the sharg::option_spec::standard tag if there are no further restrictions on your option.
 
 ## Sharg validators
 
 The following validators are provided in the Sharg library and can be included with the following header:
 
-\snippet doc/tutorial/argument_parser/small_snippets.cpp validator_include
+\snippet doc/tutorial/parser/small_snippets.cpp validator_include
 
 All the validators below work on single values or a container of values. In case the variable is a container,
 the validator is called **on each element** separately.
@@ -454,7 +454,7 @@ file, the program will again misbehave. Instead of fixing the program, let's res
 Add a sharg::arithmetic_range_validator to the `-s/--season` option that sets the range to `[1,7]`.
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/solution6.cpp arithmetic_range_validator
+\snippet doc/tutorial/parser/solution6.cpp arithmetic_range_validator
 \endsolution
 
 ### The sharg::value_list_validator
@@ -468,7 +468,7 @@ The validator throws a sharg::validation_error exception whenever a given value 
 Add a sharg::value_list_validator to the `-a/--aggregate-by` option that sets the list of valid values to `["median", "mean"]`.
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/solution6.cpp value_list_validator
+\snippet doc/tutorial/parser/solution6.cpp value_list_validator
 \endsolution
 
 ### The file validator
@@ -516,7 +516,7 @@ Add a validator to the first positional option that expects a file formatted wit
 Store the result in `file_path`.
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/small_snippets.cpp input_file_validator
+\snippet doc/tutorial/parser/small_snippets.cpp input_file_validator
 \endsolution
 
 ### The sharg::regex_validator
@@ -549,7 +549,7 @@ Add a sharg::regex_validator to the first positional option that expects the `fi
 present sharg::input_file_validator. The parsed file name should have a suffix called `seasons`.
 \endassignment
 \solution
-\snippet doc/tutorial/argument_parser/solution6.cpp file_validator
+\snippet doc/tutorial/parser/solution6.cpp file_validator
 \endsolution
 
 # Full solution
@@ -558,15 +558,15 @@ The following solution shows the complete code including all the little assignme
 that can serve as a copy'n'paste source for your application.
 
 \solution
-\include doc/tutorial/argument_parser/solution6.cpp
+\include doc/tutorial/parser/solution6.cpp
 \endsolution
 
 # Subcommand argument parsing
 
 Many applications provide several sub programs, e.g. `git` comes with many functionalities like `git push`,
 `git pull`, `git checkout`, etc. each having their own help page.
-If you are interested in how this subcommand parsing can be done with the sharg::argument_parser,
-take a look at our \link subcommand_arg_parse HowTo\endlink.
+If you are interested in how this subcommand parsing can be done with the sharg::parser,
+take a look at our \link subcommand_parse HowTo\endlink.
 
 # Update Notifications
 
@@ -574,6 +574,6 @@ When you run a Sharg-based application for the first time, you will likely be as
 This is a feature that helps inform users about updates
 and helps the Sharg project get a rough estimate on which Sharg-based apps are popular.
 
-See the API documentation of sharg::argument_parser for information on how to configure (or turn off) this feature.
+See the API documentation of sharg::parser for information on how to configure (or turn off) this feature.
 See our [wiki entry](https://github.com/seqan/seqan3/wiki/Update-Notifications) for more information on how it works and
 our privacy policy.

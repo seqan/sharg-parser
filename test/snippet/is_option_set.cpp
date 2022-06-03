@@ -2,7 +2,7 @@
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"awesome-app", argc, argv}; // initialize
+    sharg::parser myparser{"awesome-app", argc, argv}; // initialize
 
     int a{3};
     myparser.add_option(a, 'a', "awesome-parameter", "Please specify an integer.");
@@ -11,7 +11,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
     }
-    catch (sharg::argument_parser_error const & ext) // the user did something wrong
+    catch (sharg::parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << '\n'; // customize your error message
         return -1;

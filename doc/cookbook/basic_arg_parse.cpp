@@ -13,7 +13,7 @@ struct cmd_arguments
     std::filesystem::path index_path{"out.index"};
 };
 
-void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments & args)
+void initialise_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "E. coli";
     parser.info.short_description = "Creates an index over a reference.";
@@ -29,16 +29,16 @@ void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments &
 //![main]
 int main(int argc, char const ** argv)
 {
-    sharg::argument_parser parser("Indexer", argc, argv);
+    sharg::parser parser("Indexer", argc, argv);
     cmd_arguments args{};
 
-    initialise_argument_parser(parser, args);
+    initialise_parser(parser, args);
 
     try
     {
         parser.parse();
     }
-    catch (sharg::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[PARSER ERROR] " << ext.what() << '\n';
         return -1;

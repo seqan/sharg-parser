@@ -21,43 +21,43 @@
 namespace sharg::custom
 {
 
-/*!\brief A type that can be specialised to provide customisation point implementations for the sharg::argument_parser
+/*!\brief A type that can be specialised to provide customisation point implementations for the sharg::parser
  *        such that third party types may be adapted.
  * \tparam t The type you wish to specialise for.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
  * ### Named Enumerations
  *
- * In order to use a third party type within the sharg::argument_parser::add_option or
- * sharg::argument_parser::add_positional_option call, you can specialise this struct in the following way:
+ * In order to use a third party type within the sharg::parser::add_option or
+ * sharg::parser::add_positional_option call, you can specialise this struct in the following way:
  *
- * \include test/snippet/custom_argument_parsing_enumeration.cpp
+ * \include test/snippet/custom_parsing_enumeration.cpp
  *
  * Please note that by default the `t const`, `t &` and `t const &` specialisations of this class inherit the
  * specialisation for `t` so you usually only need to provide a specialisation for `t`.
  *
  * \note Only use this if you cannot provide respective functions in your namespace. See the tutorial
- * \ref tutorial_argument_parser for an example of customising a type within your own namespace.
+ * \ref tutorial_parser for an example of customising a type within your own namespace.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 template <typename t>
-struct argument_parsing
+struct parsing
 {}; // forward
 
 //!\cond
 template <typename t>
-struct argument_parsing<t const> : argument_parsing<t>
+struct parsing<t const> : parsing<t>
 {};
 
 template <typename t>
-struct argument_parsing<t &> : argument_parsing<t>
+struct parsing<t &> : parsing<t>
 {};
 
 template <typename t>
-struct argument_parsing<t const &> : argument_parsing<t>
+struct parsing<t const &> : parsing<t>
 {};
 //!\endcond
 
@@ -90,8 +90,8 @@ template <typename t>
 std::unordered_map<std::string_view, t> enumeration_names(t) = delete;
 
 //!\brief Customization Point Object (CPO) definition for sharg::enumeration_names.
-//!\ingroup argument_parser
-//!\remark For a complete overview, take a look at \ref argument_parser
+//!\ingroup parser
+//!\remark For a complete overview, take a look at \ref parser
 template <typename option_t>
 struct enumeration_names_cpo
 {
@@ -114,15 +114,15 @@ struct enumeration_names_cpo
                              std::remove_cvref_t<option_type>,
                              std::type_identity<option_type>>;
 
-    /*!\brief CPO overload (check 1 out of 2): explicit customisation via `sharg::custom::argument_parsing`
+    /*!\brief CPO overload (check 1 out of 2): explicit customisation via `sharg::custom::parsing`
      * \tparam option_type The type of the option. (Needed to defer instantiation for incomplete types.)
      */
     template <typename option_type = option_t>
     static constexpr auto cpo_overload(sharg::detail::priority_tag<1>)
-    noexcept(noexcept(sharg::custom::argument_parsing<option_type>::enumeration_names)) \
-      -> decltype(sharg::custom::argument_parsing<option_type>::enumeration_names) \
+    noexcept(noexcept(sharg::custom::parsing<option_type>::enumeration_names)) \
+      -> decltype(sharg::custom::parsing<option_type>::enumeration_names) \
     {
-        return sharg::custom::argument_parsing<option_type>::enumeration_names;
+        return sharg::custom::parsing<option_type>::enumeration_names;
     }
 
     /*!\brief CPO overload (check 2 out of 2): argument dependent lookup (ADL), i.e.
@@ -175,14 +175,14 @@ namespace sharg
  * \tparam your_type Type of the value to retrieve the conversion map for.
  * \param value The value is not accessed, only its type is used.
  * \returns A std::unordered_map<std::string_view, your_type> that maps a string identifier to a value of your_type.
- * \ingroup argument_parser
+ * \ingroup parser
  * \details
  *
  * This is a function object. Invoke it with the parameter(s) specified above.
  *
  * It acts as a wrapper and looks for two possible implementations (in this order):
  *
- *   1. A static member `enumeration_names` in `sharg::custom::argument_parsing<your_type>` that is of type
+ *   1. A static member `enumeration_names` in `sharg::custom::parsing<your_type>` that is of type
  *      `std::unordered_map<std::string_view, your_type>>`.
  *   2. A free function `enumeration_names(your_type const a)` in the namespace of your type (or as `friend`) which
  *      returns a `std::unordered_map<std::string_view, your_type>>`.
@@ -194,11 +194,11 @@ namespace sharg
  * \include test/snippet/custom_enumeration.cpp
  *
  * **Only if you cannot access the namespace of your type to customize** you may specialize
- * the sharg::custom::argument_parsing struct like this:
+ * the sharg::custom::parsing struct like this:
  *
- * \include test/snippet/custom_argument_parsing_enumeration.cpp
+ * \include test/snippet/custom_parsing_enumeration.cpp
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  *
  * ### Customisation point
  *
@@ -214,7 +214,7 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
 
 /*!\concept sharg::named_enumeration
  * \brief Checks whether the free function sharg::enumeration_names can be called on the type.
- * \ingroup argument_parser
+ * \ingroup parser
  * \tparam option_type The type to check.
  *
  * ### Requirements
@@ -222,7 +222,7 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
  * * An instance of sharg::enumeration_names<option_type> must exist and be of the type
  *   `std::unordered_map<std::string, option_type>`.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 template <typename option_type>
 concept named_enumeration = requires

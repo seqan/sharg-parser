@@ -1,4 +1,3 @@
-//![program]
 #include <sharg/all.hpp> // includes all necessary headers
 
 // This is the program!
@@ -19,7 +18,7 @@ number_type to_number(range_type && range)
     return num;
 }
 
-void run_program(std::filesystem::path & path, uint32_t yr, std::string & aggr_by, bool hd_is_set)
+void run_program(std::filesystem::path & path, std::vector<uint8_t> sn, std::string & aggr_by, bool hd_is_set)
 {
     std::ifstream file{path.string()};
 
@@ -34,10 +33,10 @@ void run_program(std::filesystem::path & path, uint32_t yr, std::string & aggr_b
         while (std::getline(file, line))
         {
             auto splitted_line = line | std::views::split('\t');
-            auto it = std::next(splitted_line.begin(), 3); // move to 4th column
+            auto it = splitted_line.begin(); // move to 1rst column
 
-            if (to_number<uint32_t>(*it) >= yr)
-                v.push_back(to_number<double>(*std::next(it)));
+            if (std::find(sn.begin(), sn.end(), to_number<uint8_t>(*it)) != sn.end())
+                v.push_back(to_number<double>(*std::next(it, 4)));
         }
 
         if (aggr_by == "median")
@@ -58,50 +57,56 @@ void run_program(std::filesystem::path & path, uint32_t yr, std::string & aggr_b
 struct cmd_arguments
 {
     std::filesystem::path file_path{};
-    uint32_t year{};
+    std::vector<uint8_t> seasons{};
     std::string aggregate_by{"mean"};
     bool header_is_set{false};
 };
-//![program]
 
-//![solution]
-void initialise_argument_parser(sharg::argument_parser & parser, cmd_arguments & args)
+void initialise_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "Cercei";
     parser.info.short_description = "Aggregate average Game of Thrones viewers by season.";
     parser.info.version = "1.0.0";
 
-    parser.add_positional_option(args.file_path, "Please provide a tab separated data file.");
+    //![file_validator]
+    parser.add_positional_option(args.file_path, "Please provide a tab separated seasons file.",
+                                 sharg::regex_validator{".*seasons\\..+$"} | sharg::input_file_validator{{"tsv"}} );
+    //![file_validator]
 
-    parser.add_option(args.year, 'y', "year", "Only data entries that are newer than `year` are considered.");
+    //![arithmetic_range_validator]
+    parser.add_option(args.seasons, 's', "season", "Choose the seasons to aggregate.",
+                      sharg::option_spec::required, sharg::arithmetic_range_validator{1, 7});
+    //![arithmetic_range_validator]
 
-    parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation: mean or median.");
+    //![value_list_validator]
+    parser.add_option(args.aggregate_by, 'a', "aggregate-by", "Choose your method of aggregation.",
+                      sharg::option_spec::standard, sharg::value_list_validator{"median", "mean"});
+    //![value_list_validator]
 
     parser.add_flag(args.header_is_set, 'H', "header-is-set", "Let us know whether your data file contains a "
                                                               "header to ensure correct parsing.");
 }
-//![solution]
 
 int main(int argc, char ** argv)
 {
-    sharg::argument_parser myparser{"Game-of-Parsing", argc, argv};        // initialise myparser
+    sharg::parser myparser{"Game-of-Parsing", argc, argv};          // initialise myparser
     cmd_arguments args{};
 
-    initialise_argument_parser(myparser, args);
+    initialise_parser(myparser, args);
 
     try
     {
-         myparser.parse();                                                  // trigger command line parsing
+         myparser.parse();                                          // trigger command line parsing
     }
-    catch (sharg::argument_parser_error const & ext)                     // catch user errors
+    catch (sharg::parser_error const & ext)                         // catch user errors
     {
-        std::cerr << "[Winter has come] " << ext.what() << "\n"; // customise your error message
+        std::cerr << "[Winter has come] " << ext.what() << "\n";    // customise your error message
         return -1;
     }
 
     // parsing was successful !
     // we can start running our program
-    run_program(args.file_path, args.year, args.aggregate_by, args.header_is_set);
+    run_program(args.file_path, args.seasons, args.aggregate_by, args.header_is_set);
 
     return 0;
 }

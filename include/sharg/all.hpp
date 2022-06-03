@@ -7,24 +7,24 @@
 
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
- * \brief Meta-header for the \link argument_parser Argument Parser module \endlink.
+ * \brief Meta-header for the \link parser Parser module \endlink.
  */
 
 /*!\file
- * \brief The Argument Parser Module
- * \defgroup argument_parser Argument Parser
+ * \brief The Parser Module
+ * \defgroup parser Parser
  *
- * # The Argument Parser Class
+ * # The Parser Class
  *
- * \copydetails sharg::argument_parser
+ * \copydetails sharg::parser
  *
  * # Parsing Command Line Arguments
  *
- * \copydetails sharg::argument_parser::parse
+ * \copydetails sharg::parser::parse
  *
  * # Argument Validation
  *
- * The SeqAn 3 Argument Parser offers a validation mechanism for (positional_)options
+ * The Sharg Parser offers a validation mechanism for (positional_)options
  * via callables. You can pass any functor that fulfils the sharg::validator
  * and takes the value passed to the add_(positional_)option function call as
  * a parameter. We provide some commonly used functor that might come in handy:
@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include <sharg/argument_parser.hpp>
+#include <sharg/parser.hpp>
 #include <sharg/auxiliary.hpp>
 #include <sharg/exceptions.hpp>
 #include <sharg/validators.hpp>

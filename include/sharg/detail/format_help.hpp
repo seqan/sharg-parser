@@ -22,7 +22,7 @@ namespace sharg::detail
 {
 
 /*!\brief The format that prints the help page to std::cout.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  * The help page printing is not done immediately, because the user might not
@@ -31,7 +31,7 @@ namespace sharg::detail
  * Thus the calls are stored (parser_set_up_calls and positional_option_calls)
  * and only evaluated when calling format_help::parse().
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_help : public format_help_base<format_help>
 {
@@ -379,7 +379,7 @@ protected:
 };
 
 /*!\brief The format that prints a short help message to std::cout.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
@@ -387,7 +387,7 @@ protected:
  * meta information (e.g. app_name) on construction of the parser. Thus the meta information is collected
  * and only evaluated when calling sharg::detail::format_version::parse.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_short_help : public format_help
 {
@@ -395,7 +395,7 @@ public:
     /*!\brief Initiates the printing of a short help message to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed version information.
      */
-    void parse(argument_parser_meta_data const & parser_meta)
+    void parse(parser_meta_data const & parser_meta)
     {
         meta = parser_meta;
 
@@ -411,7 +411,7 @@ public:
 };
 
 /*!\brief The format that prints the version to std::cout.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
@@ -419,7 +419,7 @@ public:
  * meta information on construction of the parser. Thus the meta information is collected
  * and only evaluated when calling format_version::parse().
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_version : public format_help
 {
@@ -427,7 +427,7 @@ public:
     /*!\brief Initiates the printing of the version information to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed version information.
      */
-    void parse(argument_parser_meta_data & parser_meta)
+    void parse(parser_meta_data & parser_meta)
     {
         meta = parser_meta;
 
@@ -439,7 +439,7 @@ public:
 };
 
 /*!\brief The format that prints the copyright information to std::cout.
- * \ingroup argument_parser
+ * \ingroup parser
  *
  * \details
  *
@@ -447,7 +447,7 @@ public:
  * meta information (e.g. long_copyright) on construction of the parser. Thus the meta information is collected
  * and only evaluated when calling sharg::detail::format_version::parse.
  *
- * \remark For a complete overview, take a look at \ref argument_parser
+ * \remark For a complete overview, take a look at \ref parser
  */
 class format_copyright : public format_help
 {
@@ -455,7 +455,7 @@ public:
     /*!\brief Initiates the printing of the copyright message to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed version information.
      */
-    void parse(argument_parser_meta_data const & parser_meta)
+    void parse(parser_meta_data const & parser_meta)
     {
         meta = parser_meta;
         std::string seqan_license{
