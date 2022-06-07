@@ -240,11 +240,9 @@ public:
      * \throws sharg::design_error
      */
     template <typename option_type, validator validator_type = detail::default_validator>
-    //!\cond
         requires (parser_compatible_option<option_type>
                   || parser_compatible_option<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
-    //!\endcond
     void add_option(option_type & value,
                     char const short_id,
                     std::string const & long_id,
@@ -319,11 +317,9 @@ public:
      * The validator must be applicable to the given output variable (\p value).
      */
     template <typename option_type, validator validator_type = detail::default_validator>
-    //!\cond
         requires (parser_compatible_option<option_type>
                   || parser_compatible_option<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
-    //!\endcond
     void add_positional_option(option_type & value,
                                std::string const & desc,
                                validator_type option_validator = validator_type{}) // copy to bind rvalues
@@ -491,13 +487,11 @@ public:
      * * the option identifier cannot be found in the list of valid option identifiers that were added to the parser
      *   via `sharg::parser::add_option()` calls beforehand.
      */
+    // clang-format off
     template <typename id_type>
-    //!\cond
-        requires std::same_as<id_type, char>
-              || std::constructible_from<std::string, id_type>
-                 //!\endcond
-                 bool
-    is_option_set(id_type const & id) const
+        requires std::same_as<id_type, char> || std::constructible_from<std::string, id_type>
+    bool is_option_set(id_type const & id) const
+    // clang-format on
     {
         if (!parse_was_called)
             throw design_error{"You can only ask which options have been set after calling the function `parse()`."};

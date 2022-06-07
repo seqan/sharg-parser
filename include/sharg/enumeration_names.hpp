@@ -205,15 +205,11 @@ namespace sharg
  * This is a customisation point (see \ref about_customisation). To specify the behaviour for your type,
  * simply provide one of the two functions specified above.
  */
+// clang-format off
 template <typename option_type>
-//!\cond
-    requires requires {
-                 {
-                     detail::adl_only::enumeration_names_cpo<option_type>{}()
-                 };
-             }
-//!\endcond
+    requires requires { { detail::adl_only::enumeration_names_cpo<option_type>{}() }; }
 inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<option_type>{}();
+// clang-format on
 //!\}
 
 /*!\concept sharg::named_enumeration
@@ -228,13 +224,13 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
  *
  * \remark For a complete overview, take a look at \ref parser
  */
+// clang-format off
 template <typename option_type>
-concept named_enumeration = requires {
-                                {
-                                    sharg::enumeration_names<option_type>
-                                };
-                            };
-
+concept named_enumeration = requires
+{
+    { sharg::enumeration_names<option_type> };
+};
+// clang-format on
 } // namespace sharg
 
 //!\cond

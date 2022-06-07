@@ -15,7 +15,6 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
-
 #include <sharg/std/charconv>
 
 // =============================================================================

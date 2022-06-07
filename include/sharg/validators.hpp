@@ -71,9 +71,7 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
  * \remark For a complete overview, take a look at \ref parser
  */
 template <typename option_value_t>
-//!\cond
     requires std::is_arithmetic_v<option_value_t>
-//!\endcond
 class arithmetic_range_validator
 {
 public:
@@ -107,9 +105,7 @@ public:
      * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
-    //!\cond
         requires std::is_arithmetic_v<std::ranges::range_value_t<range_type>>
-    //!\endcond
     void operator()(range_type const & range) const
     {
         std::for_each(range.begin(),
@@ -179,9 +175,7 @@ public:
      * \param[in] rng The range of valid values to test.
      */
     template <std::ranges::forward_range range_type>
-    //!\cond
         requires std::constructible_from<option_value_type, std::ranges::range_rvalue_reference_t<range_type>>
-    //!\endcond
     value_list_validator(range_type rng)
     {
         values.clear();
@@ -194,9 +188,7 @@ public:
      * \param[in] opts The parameter pack values.
      */
     template <typename... option_types>
-    //!\cond
         requires ((std::constructible_from<option_value_type, option_types> && ...))
-    //!\endcond
     value_list_validator(option_types &&... opts)
     {
         (values.emplace_back(std::forward<option_types>(opts)), ...);
@@ -219,9 +211,7 @@ public:
      * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
-    //!\cond
         requires std::convertible_to<std::ranges::range_value_t<range_type>, option_value_type>
-    //!\endcond
     void operator()(range_type const & range) const
     {
         std::for_each(std::ranges::begin(range),
@@ -249,19 +239,15 @@ private:
  */
 //!\brief Given a parameter pack of types that are convertible to std::string, delegate to value type std::string.
 template <typename option_type, typename... option_types>
-//!\cond
     requires (std::constructible_from<std::string, std::decay_t<option_types>> && ...
               && std::constructible_from<std::string, std::decay_t<option_type>>)
-//!\endcond
-value_list_validator(option_type, option_types...)->value_list_validator<std::string>;
+value_list_validator(option_type, option_types...) -> value_list_validator<std::string>;
 
 //!\brief Deduction guide for ranges over a value type convertible to std::string.
 template <typename range_type>
-//!\cond
     requires (std::ranges::forward_range<std::decay_t<range_type>>
               && std::constructible_from<std::string, std::ranges::range_value_t<range_type>>)
-//!\endcond
-value_list_validator(range_type && rng)->value_list_validator<std::string>;
+value_list_validator(range_type && rng) -> value_list_validator<std::string>;
 
 //!\brief Deduction guide for a parameter pack.
 template <typename option_type, typename... option_types>
@@ -269,10 +255,8 @@ value_list_validator(option_type, option_types...) -> value_list_validator<optio
 
 //!\brief Deduction guide for ranges.
 template <typename range_type>
-//!\cond
     requires (std::ranges::forward_range<std::decay_t<range_type>>)
-//!\endcond
-value_list_validator(range_type && rng)->value_list_validator<std::ranges::range_value_t<range_type>>;
+value_list_validator(range_type && rng) -> value_list_validator<std::ranges::range_value_t<range_type>>;
 //!\}
 
 /*!\brief An abstract base class for the file and directory validators.
@@ -322,10 +306,8 @@ public:
      * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
-    //!\cond
         requires (std::convertible_to<std::ranges::range_value_t<range_type>, std::filesystem::path const &>
                   && !std::convertible_to<range_type, std::filesystem::path const &>)
-    //!\endcond
     void operator()(range_type const & v) const
     {
         std::for_each(v.begin(),
@@ -915,9 +897,7 @@ public:
      * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
-    //!\cond
         requires std::convertible_to<std::ranges::range_reference_t<range_type>, option_value_type const &>
-    //!\endcond
     void operator()(range_type const & v) const
     {
         for (auto && file_name : v)
@@ -983,9 +963,7 @@ struct default_validator
  * \remark For a complete overview, take a look at \ref parser
  */
 template <validator validator1_type, validator validator2_type>
-//!\cond
     requires std::common_with<typename validator1_type::option_value_type, typename validator2_type::option_value_type>
-//!\endcond
 class validator_chain_adaptor
 {
 public:
@@ -1024,9 +1002,7 @@ public:
      * the chained validators which may throw on input error.
      */
     template <typename cmp_type>
-    //!\cond
         requires std::invocable<validator1_type, cmp_type const> && std::invocable<validator2_type, cmp_type const>
-    //!\endcond
     void operator()(cmp_type const & cmp) const
     {
         vali1(cmp);
@@ -1078,10 +1054,8 @@ private:
  * \remark For a complete overview, take a look at \ref parser
  */
 template <validator validator1_type, validator validator2_type>
-//!\cond
     requires std::common_with<typename std::remove_reference_t<validator1_type>::option_value_type,
                               typename std::remove_reference_t<validator2_type>::option_value_type>
-//!\endcond
 auto operator|(validator1_type && vali1, validator2_type && vali2)
 {
     return detail::validator_chain_adaptor{std::forward<validator1_type>(vali1), std::forward<validator2_type>(vali2)};

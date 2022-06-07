@@ -12,9 +12,10 @@
 
 #pragma once
 
+#include <sharg/std/charconv>
+
 #include <sharg/concept.hpp>
 #include <sharg/detail/format_base.hpp>
-#include <sharg/std/charconv>
 
 namespace sharg::detail
 {
@@ -299,9 +300,7 @@ private:
      *          operator and otherwise sharg::option_parse_result::success.
      */
     template <typename option_t>
-    //!\cond
         requires istreamable<option_t>
-    //!\endcond
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
         std::istringstream stream{in};
@@ -380,16 +379,15 @@ private:
      * \param[in] in The input argument to be parsed.
      * \returns A sharg::option_parse_result whether parsing was successful or not.
      */
+    // clang-format off
     template <detail::is_container_option container_option_t, typename format_parse_t = format_parse>
-    //!\cond
         requires requires (format_parse_t fp,
                            typename container_option_t::value_type & container_value,
-                           std::string const & in) {
-                     {
-                         fp.parse_option_value(container_value, in)
-                         } -> std::same_as<option_parse_result>;
-                 }
-    //!\endcond
+                           std::string const & in)
+        {
+            {fp.parse_option_value(container_value, in)} -> std::same_as<option_parse_result>;
+        }
+    // clang-format on
     option_parse_result parse_option_value(container_option_t & value, std::string const & in)
     {
         typename container_option_t::value_type tmp{};
@@ -415,9 +413,7 @@ private:
      * This function delegates to std::from_chars.
      */
     template <typename option_t>
-    //!\cond
         requires std::is_arithmetic_v<option_t> && istreamable<option_t>
-    //!\endcond
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
         auto res = std::from_chars(&in[0], &in[in.size()], value);
