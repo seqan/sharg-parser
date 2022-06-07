@@ -82,11 +82,11 @@ IncludeBlocks:   Regroup
 IncludeCategories:
   - Regex:           '(<gtest/.*|<benchmark/.*)'
     Priority:        1
-  - Regex:           '(<[[:alnum:]._]+>|<seqan3/std/.*>)'
+  - Regex:           '(<[[:alnum:]._]+>|<sharg/std/.*>)'
     Priority:        2
   - Regex:           '<sdsl/'
     Priority:        3
-  - Regex:           '<seqan3/'
+  - Regex:           '<sharg/'
     Priority:        4
   - Regex:           '<cereal/'
     Priority:        5
