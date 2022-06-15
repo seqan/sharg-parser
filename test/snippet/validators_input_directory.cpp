@@ -1,14 +1,18 @@
 #include <sharg/all.hpp>
 
-int main(int argc, const char ** argv)
+int main(int argc, char const ** argv)
 {
     sharg::parser myparser{"Test", argc, argv}; // initialize
 
     //! [validator_call]
     std::filesystem::path mydir{};
 
-    myparser.add_option(mydir, 'd', "dir", "The directory containing the input files.",
-                        sharg::option_spec::standard, sharg::input_directory_validator{});
+    myparser.add_option(mydir,
+                        'd',
+                        "dir",
+                        "The directory containing the input files.",
+                        sharg::option_spec::standard,
+                        sharg::input_directory_validator{});
     //! [validator_call]
 
     // an exception will be thrown if the user specifies a directory that does not exists or has insufficient

@@ -10,7 +10,7 @@ public:
     int a;
 
     // Make foo::bar satisfy sharg::ostreamable
-    friend std::ostream & operator<<(std::ostream & output, const bar & my_bar)
+    friend std::ostream & operator<<(std::ostream & output, bar const & my_bar)
     {
         output << my_bar.a; // Adapt this for your type
         return output;
@@ -19,7 +19,7 @@ public:
     // Make foo::bar satisfy sharg::istreamable
     friend std::istream & operator>>(std::istream & input, bar & my_bar)
     {
-        input >> my_bar.a;  // Adapt this for your type
+        input >> my_bar.a; // Adapt this for your type
         return input;
     }
 };

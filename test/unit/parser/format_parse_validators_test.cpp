@@ -30,7 +30,8 @@ std::string const basic_options_str = "OPTIONS\n"
 std::string const basic_version_str = "VERSION\n"
                                       "    Last update:\n"
                                       "    test_parser version:\n"
-                                      "    Sharg version: " + std::string{sharg::sharg_version_cstring} + "\n";
+                                      "    Sharg version: "
+                                    + std::string{sharg::sharg_version_cstring} + "\n";
 
 namespace sharg::detail
 {
@@ -38,14 +39,16 @@ struct test_accessor
 {
     static void set_terminal_width(sharg::parser & parser, unsigned terminal_width)
     {
-        std::visit([terminal_width](auto & f)
-        {
-            if constexpr(std::is_same_v<decltype(f), sharg::detail::format_help &>)
-                f.layout = sharg::detail::format_help::console_layout_struct{terminal_width};
-        }, parser.format);
+        std::visit(
+            [terminal_width](auto & f)
+            {
+                if constexpr (std::is_same_v<decltype(f), sharg::detail::format_help &>)
+                    f.layout = sharg::detail::format_help::console_layout_struct{terminal_width};
+            },
+            parser.format);
     }
 };
-} // sharg::detail
+} // namespace sharg::detail
 
 TEST(validator_test, fullfill_concept)
 {
@@ -119,11 +122,15 @@ TEST(validator_test, input_file)
 
         // option
         std::string const & path = tmp_name.get_path().string();
-        const char * argv[] = {"./parser_test", "-i", path.c_str()};
+        char const * argv[] = {"./parser_test", "-i", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(file_in_path, 'i', "int-option", "desc",
-                          sharg::option_spec::standard, sharg::input_file_validator{formats});
+        parser.add_option(file_in_path,
+                          'i',
+                          "int-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          sharg::input_file_validator{formats});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(file_in_path.string(), path);
@@ -136,7 +143,7 @@ TEST(validator_test, input_file)
         std::string const & path = tmp_name.get_path().string();
         std::string const & path_2 = tmp_name_2.get_path().string();
 
-        const char * argv[] = {"./parser_test", path.c_str(), path_2.c_str()};
+        char const * argv[] = {"./parser_test", path.c_str(), path_2.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_positional_option(input_files, "desc", sharg::input_file_validator{formats});
@@ -149,7 +156,7 @@ TEST(validator_test, input_file)
 
     { // get help page message
         std::filesystem::path path;
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_positional_option(path, "desc", sharg::input_file_validator{formats});
@@ -157,27 +164,28 @@ TEST(validator_test, input_file)
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
         std::string my_stdout = testing::internal::GetCapturedStdout();
-        std::string expected = std::string{"test_parser\n"
-                               "===========\n"
-                               "\n"
-                               "POSITIONAL ARGUMENTS\n"
-                               "    ARGUMENT-1 (std::filesystem::path)\n"
-                               "          desc The input file must exist and read permissions must be granted.\n"
-                               "          Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
-                               "\n"} +
-                               basic_options_str +
-                               "\n" +
-                               basic_version_str;
+        std::string expected =
+            std::string{"test_parser\n"
+                        "===========\n"
+                        "\n"
+                        "POSITIONAL ARGUMENTS\n"
+                        "    ARGUMENT-1 (std::filesystem::path)\n"
+                        "          desc The input file must exist and read permissions must be granted.\n"
+                        "          Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
+                        "\n"}
+            + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 
     { // get help page message (file extensions)
         sharg::input_file_validator validator1{formats};
-        EXPECT_EQ(validator1.get_help_page_message(), "The input file must exist and read permissions must be granted. "
-                                                      "Valid file extensions are: [fa, sam, fasta, fasta.txt].");
+        EXPECT_EQ(validator1.get_help_page_message(),
+                  "The input file must exist and read permissions must be granted. "
+                  "Valid file extensions are: [fa, sam, fasta, fasta.txt].");
 
-        sharg::input_file_validator validator2{std::vector<std::string> {}};
-        EXPECT_EQ(validator2.get_help_page_message(), "The input file must exist and read permissions must be granted.");
+        sharg::input_file_validator validator2{std::vector<std::string>{}};
+        EXPECT_EQ(validator2.get_help_page_message(),
+                  "The input file must exist and read permissions must be granted.");
     }
 }
 
@@ -186,7 +194,7 @@ TEST(validator_test, output_file)
     sharg::test::tmp_filename tmp_name{"testbox.fasta"};
     std::filesystem::path not_existing_path{tmp_name.get_path()};
     sharg::test::tmp_filename tmp_name_2{"testbox_2.fasta"};
-    std::ofstream tmp_file_2(tmp_name_2.get_path());    // create file
+    std::ofstream tmp_file_2(tmp_name_2.get_path()); // create file
     std::filesystem::path existing_path{tmp_name_2.get_path()};
     sharg::test::tmp_filename tmp_name_3{"testbox_3.fa"};
     sharg::test::tmp_filename hidden_name{".testbox.fasta"};
@@ -220,7 +228,7 @@ TEST(validator_test, output_file)
 
         { // file has wrong format.
             sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new,
-                                                       std::vector{std::string{"sam"}}};
+                                                      std::vector{std::string{"sam"}}};
             EXPECT_THROW(my_validator(tmp_name.get_path()), sharg::validation_error);
         }
 
@@ -254,10 +262,13 @@ TEST(validator_test, output_file)
 
         // option
         std::string const & path = tmp_name.get_path().string();
-        const char * argv[] = {"./parser_test", "-o", path.c_str()};
+        char const * argv[] = {"./parser_test", "-o", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(file_out_path, 'o', "out-option", "desc",
+        parser.add_option(file_out_path,
+                          'o',
+                          "out-option",
+                          "desc",
                           sharg::option_spec::standard,
                           sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
 
@@ -272,11 +283,13 @@ TEST(validator_test, output_file)
         std::string const & path = tmp_name.get_path().string();
         std::string const & path_3 = tmp_name_3.get_path().string();
 
-        const char * argv[] = {"./parser_test", path.c_str(), path_3.c_str()};
+        char const * argv[] = {"./parser_test", path.c_str(), path_3.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(output_files, "desc",
-                                     sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
+        parser.add_positional_option(
+            output_files,
+            "desc",
+            sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(output_files.size(), 2u);
@@ -287,66 +300,70 @@ TEST(validator_test, output_file)
     // get help page message (overwriting prohibited)
     {
         std::filesystem::path path;
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(path, "desc",
-                                     sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
+        parser.add_positional_option(
+            path,
+            "desc",
+            sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
         std::string my_stdout = testing::internal::GetCapturedStdout();
-        std::string expected = std::string{"test_parser\n"
-                               "===========\n"
-                               "\n"
-                               "POSITIONAL ARGUMENTS\n"
-                               "    ARGUMENT-1 (std::filesystem::path)\n"
-                               "          desc The output file must not exist already and write permissions\n"
-                               "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
-                               "          fasta.txt].\n"
-                               "\n"} +
-                               basic_options_str +
-                               "\n" +
-                               basic_version_str;
+        std::string expected =
+            std::string{"test_parser\n"
+                        "===========\n"
+                        "\n"
+                        "POSITIONAL ARGUMENTS\n"
+                        "    ARGUMENT-1 (std::filesystem::path)\n"
+                        "          desc The output file must not exist already and write permissions\n"
+                        "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
+                        "          fasta.txt].\n"
+                        "\n"}
+            + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 
     // get help page message (overwriting allowed)
     {
         std::filesystem::path path;
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(path, "desc",
-                                     sharg::output_file_validator{sharg::output_file_open_options::open_or_create,
-                                                                   formats});
+        parser.add_positional_option(
+            path,
+            "desc",
+            sharg::output_file_validator{sharg::output_file_open_options::open_or_create, formats});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
         std::string my_stdout = testing::internal::GetCapturedStdout();
-        std::string expected = std::string{"test_parser\n"
-                               "===========\n"
-                               "\n"
-                               "POSITIONAL ARGUMENTS\n"
-                               "    ARGUMENT-1 (std::filesystem::path)\n"
-                               "          desc Write permissions must be granted. Valid file extensions are:\n"
-                               "          [fa, sam, fasta, fasta.txt].\n"
-                               "\n"} +
-                               basic_options_str +
-                               "\n" +
-                               basic_version_str;
+        std::string expected =
+            std::string{"test_parser\n"
+                        "===========\n"
+                        "\n"
+                        "POSITIONAL ARGUMENTS\n"
+                        "    ARGUMENT-1 (std::filesystem::path)\n"
+                        "          desc Write permissions must be granted. Valid file extensions are:\n"
+                        "          [fa, sam, fasta, fasta.txt].\n"
+                        "\n"}
+            + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 
     { // get help page message (file extensions)
         sharg::output_file_validator validator1{sharg::output_file_open_options::create_new, formats};
-        EXPECT_EQ(validator1.get_help_page_message(), "The output file must not exist already and write permissions "
-                                                      "must be granted. Valid file extensions are: "
-                                                      "[fa, sam, fasta, fasta.txt].");
+        EXPECT_EQ(validator1.get_help_page_message(),
+                  "The output file must not exist already and write permissions "
+                  "must be granted. Valid file extensions are: "
+                  "[fa, sam, fasta, fasta.txt].");
 
-        sharg::output_file_validator validator2{sharg::output_file_open_options::create_new, std::vector<std::string> {}};
-        EXPECT_EQ(validator2.get_help_page_message(), "The output file must not exist already and write permissions "
-                                                      "must be granted.");
+        sharg::output_file_validator validator2{sharg::output_file_open_options::create_new,
+                                                std::vector<std::string>{}};
+        EXPECT_EQ(validator2.get_help_page_message(),
+                  "The output file must not exist already and write permissions "
+                  "must be granted.");
     }
 
     { // parameter pack constructor - extensions only
@@ -359,7 +376,10 @@ TEST(validator_test, output_file)
 
     { // parameter pack constructor - mode + extensions
         sharg::output_file_validator validator1{sharg::output_file_open_options::open_or_create,
-                                                "fa", "sam", "fasta", "fasta.txt"};
+                                                "fa",
+                                                "sam",
+                                                "fasta",
+                                                "fasta.txt"};
         sharg::output_file_validator validator2{sharg::output_file_open_options::open_or_create, formats};
         EXPECT_EQ(validator1.get_help_page_message(), validator2.get_help_page_message());
     }
@@ -369,61 +389,63 @@ TEST(validator_test, input_directory)
 {
     sharg::test::tmp_filename tmp_name{"testbox.fasta"};
 
-    { // directory
+    {// directory
 
-        { // has filename
-            std::ofstream tmp_dir(tmp_name.get_path());
-            sharg::input_directory_validator my_validator{};
-            EXPECT_THROW(my_validator(tmp_name.get_path()), sharg::validation_error);
-        }
+     {// has filename
+      std::ofstream tmp_dir(tmp_name.get_path());
+    sharg::input_directory_validator my_validator{};
+    EXPECT_THROW(my_validator(tmp_name.get_path()), sharg::validation_error);
+}
 
-        { // read directory
-            std::filesystem::path p = tmp_name.get_path();
-            p.remove_filename();
-            std::ofstream tmp_dir(p);
-            sharg::input_directory_validator my_validator{};
-            my_validator(p);
-            EXPECT_NO_THROW(my_validator(p));
+{ // read directory
+    std::filesystem::path p = tmp_name.get_path();
+    p.remove_filename();
+    std::ofstream tmp_dir(p);
+    sharg::input_directory_validator my_validator{};
+    my_validator(p);
+    EXPECT_NO_THROW(my_validator(p));
 
-            std::filesystem::path dir_in_path;
+    std::filesystem::path dir_in_path;
 
-            // option
-            std::string const & path = p.string();
-            const char * argv[] = {"./parser_test", "-i", path.c_str()};
-            sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-            sharg::detail::test_accessor::set_terminal_width(parser, 80);
-            parser.add_option(dir_in_path, 'i', "input-option", "desc",
-                              sharg::option_spec::standard, sharg::input_directory_validator{});
+    // option
+    std::string const & path = p.string();
+    char const * argv[] = {"./parser_test", "-i", path.c_str()};
+    sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
+    sharg::detail::test_accessor::set_terminal_width(parser, 80);
+    parser.add_option(dir_in_path,
+                      'i',
+                      "input-option",
+                      "desc",
+                      sharg::option_spec::standard,
+                      sharg::input_directory_validator{});
 
-            EXPECT_NO_THROW(parser.parse());
-            EXPECT_EQ(path, dir_in_path.string());
-        }
-    }
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(path, dir_in_path.string());
+}
+}
 
-    {
-        // get help page message
-        std::filesystem::path path;
-        const char * argv[] = {"./parser_test", "-h"};
-        sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
-        sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(path, "desc", sharg::input_directory_validator{});
+{
+    // get help page message
+    std::filesystem::path path;
+    char const * argv[] = {"./parser_test", "-h"};
+    sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
+    sharg::detail::test_accessor::set_terminal_width(parser, 80);
+    parser.add_positional_option(path, "desc", sharg::input_directory_validator{});
 
-        testing::internal::CaptureStdout();
-        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-        std::string my_stdout = testing::internal::GetCapturedStdout();
-        std::string expected = std::string{"test_parser\n"
-                               "===========\n"
-                               "\n"
-                               "POSITIONAL ARGUMENTS\n"
-                               "    ARGUMENT-1 (std::filesystem::path)\n"
-                               "          desc An existing, readable path for the input directory.\n"
-                               "\n"} +
-                               basic_options_str +
-                               "\n" +
-                               basic_version_str;
+    testing::internal::CaptureStdout();
+    EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+    std::string my_stdout = testing::internal::GetCapturedStdout();
+    std::string expected = std::string{"test_parser\n"
+                                       "===========\n"
+                                       "\n"
+                                       "POSITIONAL ARGUMENTS\n"
+                                       "    ARGUMENT-1 (std::filesystem::path)\n"
+                                       "          desc An existing, readable path for the input directory.\n"
+                                       "\n"}
+                         + basic_options_str + "\n" + basic_version_str;
 
-        EXPECT_EQ(my_stdout, expected);
-    }
+    EXPECT_EQ(my_stdout, expected);
+}
 }
 
 TEST(validator_test, output_directory)
@@ -441,10 +463,13 @@ TEST(validator_test, output_directory)
 
         // option
         std::string const & path = p.string();
-        const char * argv[] = {"./parser_test", "-o", path.c_str()};
+        char const * argv[] = {"./parser_test", "-o", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(dir_out_path, 'o', "output-option", "desc",
+        parser.add_option(dir_out_path,
+                          'o',
+                          "output-option",
+                          "desc",
                           sharg::option_spec::standard,
                           sharg::output_directory_validator{});
 
@@ -466,7 +491,7 @@ TEST(validator_test, output_directory)
     {
         // get help page message
         std::filesystem::path path;
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_positional_option(path, "desc", sharg::output_directory_validator{});
@@ -480,10 +505,8 @@ TEST(validator_test, output_directory)
                                            "POSITIONAL ARGUMENTS\n"
                                            "    ARGUMENT-1 (std::filesystem::path)\n"
                                            "          desc A valid path for the output directory.\n"
-                                           "\n"} +
-                                           basic_options_str +
-                                           "\n" +
-                                           basic_version_str;
+                                           "\n"}
+                             + basic_options_str + "\n" + basic_version_str;
 
         EXPECT_EQ(my_stdout, expected);
     }
@@ -498,8 +521,8 @@ TEST(validator_test, inputfile_not_readable)
     EXPECT_NO_THROW(sharg::input_file_validator{}(tmp_file));
 
     std::filesystem::permissions(tmp_file,
-                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read |
-                                 std::filesystem::perms::others_read,
+                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read
+                                     | std::filesystem::perms::others_read,
                                  std::filesystem::perm_options::remove);
 
     if (!sharg::test::read_access(tmp_file)) // Do not execute with root permissions.
@@ -508,8 +531,8 @@ TEST(validator_test, inputfile_not_readable)
     }
 
     std::filesystem::permissions(tmp_file,
-                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read |
-                                 std::filesystem::perms::others_read,
+                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read
+                                     | std::filesystem::perms::others_read,
                                  std::filesystem::perm_options::add);
 }
 
@@ -540,8 +563,8 @@ TEST(validator_test, inputdir_not_readable)
     EXPECT_NO_THROW(sharg::input_directory_validator{}(tmp_dir));
 
     std::filesystem::permissions(tmp_dir,
-                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read |
-                                 std::filesystem::perms::others_read,
+                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read
+                                     | std::filesystem::perms::others_read,
                                  std::filesystem::perm_options::remove);
 
     if (!sharg::test::read_access(tmp_dir)) // Do not execute with root permissions.
@@ -550,8 +573,8 @@ TEST(validator_test, inputdir_not_readable)
     }
 
     std::filesystem::permissions(tmp_dir,
-                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read |
-                                 std::filesystem::perms::others_read,
+                                 std::filesystem::perms::owner_read | std::filesystem::perms::group_read
+                                     | std::filesystem::perms::others_read,
                                  std::filesystem::perm_options::add);
 }
 
@@ -564,8 +587,8 @@ TEST(validator_test, outputfile_not_writable)
 
     // Parent path is not writable.
     std::filesystem::permissions(tmp_file.parent_path(),
-                                 std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                 std::filesystem::perms::others_write,
+                                 std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                     | std::filesystem::perms::others_write,
                                  std::filesystem::perm_options::remove);
 
     if (!sharg::test::write_access(tmp_file)) // Do not execute with root permissions.
@@ -576,8 +599,8 @@ TEST(validator_test, outputfile_not_writable)
 
     // make sure we can remove the directory.
     std::filesystem::permissions(tmp_file.parent_path(),
-                                 std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                 std::filesystem::perms::others_write,
+                                 std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                     | std::filesystem::perms::others_write,
                                  std::filesystem::perm_options::add);
 }
 
@@ -600,8 +623,8 @@ TEST(validator_test, outputdir_not_writable)
         // Directory exists but is not writable.
         std::filesystem::create_directory(tmp_dir);
         std::filesystem::permissions(tmp_dir,
-                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                     std::filesystem::perms::others_write,
+                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                         | std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::remove);
 
         EXPECT_TRUE(std::filesystem::exists(tmp_dir));
@@ -612,8 +635,8 @@ TEST(validator_test, outputdir_not_writable)
 
         // Parent path is not writable.
         std::filesystem::permissions(tmp_dir.parent_path(),
-                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                     std::filesystem::perms::others_write,
+                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                         | std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::remove);
 
         if (!sharg::test::write_access(tmp_dir)) // Do not execute with root permissions.
@@ -624,16 +647,16 @@ TEST(validator_test, outputdir_not_writable)
 
         // make sure we can remove the directories.
         std::filesystem::permissions(tmp_dir,
-                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                     std::filesystem::perms::others_write,
+                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                         | std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::add);
         std::filesystem::permissions(tmp_dir.parent_path(),
-                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                     std::filesystem::perms::others_write,
+                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                         | std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::add);
     }
 
-    {  // this dir is not writable
+    { // this dir is not writable
         sharg::test::tmp_filename tmp_name{"dir"};
         std::filesystem::path tmp_dir{tmp_name.get_path()};
 
@@ -642,8 +665,8 @@ TEST(validator_test, outputdir_not_writable)
 
         // This path exists but is not writable.
         std::filesystem::permissions(tmp_dir,
-                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                     std::filesystem::perms::others_write,
+                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                         | std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::remove);
 
         if (!sharg::test::write_access(tmp_dir)) // Do not execute with root permissions.
@@ -654,8 +677,8 @@ TEST(validator_test, outputdir_not_writable)
 
         // make sure we can remove the directory.
         std::filesystem::permissions(tmp_dir,
-                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write |
-                                     std::filesystem::perms::others_write,
+                                     std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                         | std::filesystem::perms::others_write,
                                      std::filesystem::perm_options::add);
     }
 }
@@ -666,11 +689,15 @@ TEST(validator_test, arithmetic_range_validator_success)
     std::vector<int> option_vector{};
 
     // option
-    const char * argv[] = {"./parser_test", "-i", "10"};
+    char const * argv[] = {"./parser_test", "-i", "10"};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_option(option_value, 'i', "int-option", "desc",
-                      sharg::option_spec::standard, sharg::arithmetic_range_validator{1, 20});
+    parser.add_option(option_value,
+                      'i',
+                      "int-option",
+                      "desc",
+                      sharg::option_spec::standard,
+                      sharg::arithmetic_range_validator{1, 20});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser.parse());
@@ -678,11 +705,15 @@ TEST(validator_test, arithmetic_range_validator_success)
     EXPECT_EQ(option_value, 10);
 
     // option - negative values
-    const char * argv2[] = {"./parser_test", "-i", "-10"};
+    char const * argv2[] = {"./parser_test", "-i", "-10"};
     sharg::parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
-    parser2.add_option(option_value, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::arithmetic_range_validator{-20, 20});
+    parser2.add_option(option_value,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::arithmetic_range_validator{-20, 20});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser2.parse());
@@ -690,7 +721,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     EXPECT_EQ(option_value, -10);
 
     // positional option
-    const char * argv3[] = {"./parser_test", "10"};
+    char const * argv3[] = {"./parser_test", "10"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
     parser3.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{1, 20});
@@ -701,7 +732,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     EXPECT_EQ(option_value, 10);
 
     // positional option - negative values
-    const char * argv4[] = {"./parser_test", "--", "-10"};
+    char const * argv4[] = {"./parser_test", "--", "-10"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
     parser4.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{-20, 20});
@@ -712,11 +743,15 @@ TEST(validator_test, arithmetic_range_validator_success)
     EXPECT_EQ(option_value, -10);
 
     // option - vector
-    const char * argv5[] = {"./parser_test", "-i", "-10", "-i", "48"};
+    char const * argv5[] = {"./parser_test", "-i", "-10", "-i", "48"};
     sharg::parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
-    parser5.add_option(option_vector, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::arithmetic_range_validator{-50,50});
+    parser5.add_option(option_vector,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::arithmetic_range_validator{-50, 50});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser5.parse());
@@ -726,10 +761,10 @@ TEST(validator_test, arithmetic_range_validator_success)
 
     // positional option - vector
     option_vector.clear();
-    const char * argv6[] = {"./parser_test", "--", "-10", "1"};
+    char const * argv6[] = {"./parser_test", "--", "-10", "1"};
     sharg::parser parser6{"test_parser", 4, argv6, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser6, 80);
-    parser6.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20,20});
+    parser6.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20, 20});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser6.parse());
@@ -739,33 +774,35 @@ TEST(validator_test, arithmetic_range_validator_success)
 
     // get help page message
     option_vector.clear();
-    const char * argv7[] = {"./parser_test", "-h"};
+    char const * argv7[] = {"./parser_test", "-h"};
     sharg::parser parser7{"test_parser", 2, argv7, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
-    parser7.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20,20});
+    parser7.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20, 20});
 
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser7.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     std::string my_stdout = testing::internal::GetCapturedStdout();
     std::string expected = std::string("test_parser\n"
-                           "===========\n"
-                           "\n"
-                           "POSITIONAL ARGUMENTS\n"
-                           "    ARGUMENT-1 (List of signed 32 bit integer)\n"
-                           "          desc Default: []. Value must be in range [-20,20].\n"
-                           "\n" +
-                           basic_options_str +
-                           "\n" +
-                           basic_version_str);
+                                       "===========\n"
+                                       "\n"
+                                       "POSITIONAL ARGUMENTS\n"
+                                       "    ARGUMENT-1 (List of signed 32 bit integer)\n"
+                                       "          desc Default: []. Value must be in range [-20,20].\n"
+                                       "\n"
+                                       + basic_options_str + "\n" + basic_version_str);
     EXPECT_EQ(my_stdout, expected);
 
     // option - double value
     double double_option_value;
-    const char * argv8[] = {"./parser_test", "-i", "10.9"};
+    char const * argv8[] = {"./parser_test", "-i", "10.9"};
     sharg::parser parser8{"test_parser", 3, argv8, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser8, 80);
-    parser8.add_option(double_option_value, 'i', "double-option", "desc",
-                       sharg::option_spec::standard, sharg::arithmetic_range_validator{1, 20});
+    parser8.add_option(double_option_value,
+                       'i',
+                       "double-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::arithmetic_range_validator{1, 20});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser8.parse());
@@ -779,25 +816,33 @@ TEST(validator_test, arithmetic_range_validator_error)
     std::vector<int> option_vector;
 
     // option - above max
-    const char * argv[] = {"./parser_test", "-i", "30"};
+    char const * argv[] = {"./parser_test", "-i", "30"};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_option(option_value, 'i', "int-option", "desc",
-                      sharg::option_spec::standard, sharg::arithmetic_range_validator{1, 20});
+    parser.add_option(option_value,
+                      'i',
+                      "int-option",
+                      "desc",
+                      sharg::option_spec::standard,
+                      sharg::arithmetic_range_validator{1, 20});
 
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
     // option - below min
-    const char * argv2[] = {"./parser_test", "-i", "-21"};
+    char const * argv2[] = {"./parser_test", "-i", "-21"};
     sharg::parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
-    parser2.add_option(option_value, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::arithmetic_range_validator{-20, 20});
+    parser2.add_option(option_value,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::arithmetic_range_validator{-20, 20});
 
     EXPECT_THROW(parser2.parse(), sharg::validation_error);
 
     // positional option - above max
-    const char * argv3[] = {"./parser_test", "30"};
+    char const * argv3[] = {"./parser_test", "30"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
     parser3.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{1, 20});
@@ -805,7 +850,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     EXPECT_THROW(parser3.parse(), sharg::validation_error);
 
     // positional option - below min
-    const char * argv4[] = {"./parser_test", "--", "-21"};
+    char const * argv4[] = {"./parser_test", "--", "-21"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
     parser4.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{-20, 20});
@@ -813,17 +858,21 @@ TEST(validator_test, arithmetic_range_validator_error)
     EXPECT_THROW(parser4.parse(), sharg::validation_error);
 
     // option - vector
-    const char * argv5[] = {"./parser_test", "-i", "-100"};
+    char const * argv5[] = {"./parser_test", "-i", "-100"};
     sharg::parser parser5{"test_parser", 3, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
-    parser5.add_option(option_vector, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::arithmetic_range_validator{-50, 50});
+    parser5.add_option(option_vector,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::arithmetic_range_validator{-50, 50});
 
     EXPECT_THROW(parser5.parse(), sharg::validation_error);
 
     // positional option - vector
     option_vector.clear();
-    const char * argv6[] = {"./parser_test", "--", "-10", "100"};
+    char const * argv6[] = {"./parser_test", "--", "-10", "100"};
     sharg::parser parser6{"test_parser", 4, argv6, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser6, 80);
     parser6.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20, 20});
@@ -832,11 +881,15 @@ TEST(validator_test, arithmetic_range_validator_error)
 
     // option - double value
     double double_option_value;
-    const char * argv7[] = {"./parser_test", "-i", "0.9"};
+    char const * argv7[] = {"./parser_test", "-i", "0.9"};
     sharg::parser parser7{"test_parser", 3, argv7, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
-    parser7.add_option(double_option_value, 'i', "double-option", "desc",
-                       sharg::option_spec::standard, sharg::arithmetic_range_validator{1, 20});
+    parser7.add_option(double_option_value,
+                       'i',
+                       "double-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::arithmetic_range_validator{1, 20});
 
     EXPECT_THROW(parser7.parse(), sharg::validation_error);
 }
@@ -858,35 +911,29 @@ TEST(validator_test, value_list_validator_success)
     // type deduction
     // --------------
     // all arithmetic types are deduced to their common type in order to easily allow chaining of arithmetic validators
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<int>,
-                 decltype(sharg::value_list_validator{1})>));
+    EXPECT_TRUE((std::same_as<sharg::value_list_validator<int>, decltype(sharg::value_list_validator{1})>));
     // except char
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<char>,
-                 decltype(sharg::value_list_validator{'c'})>));
+    EXPECT_TRUE((std::same_as<sharg::value_list_validator<char>, decltype(sharg::value_list_validator{'c'})>));
     // The same holds for a range of arithmetic types
     std::vector v{1, 2, 3};
+    EXPECT_TRUE((std::same_as<sharg::value_list_validator<int>, decltype(sharg::value_list_validator{v})>));
     EXPECT_TRUE((std::same_as<sharg::value_list_validator<int>,
-                 decltype(sharg::value_list_validator{v})>));
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<int>,
-                 decltype(sharg::value_list_validator{v | std::views::take(2)})>));
+                              decltype(sharg::value_list_validator{v | std::views::take(2)})>));
     std::vector v_char{'1', '2', '3'};
+    EXPECT_TRUE((std::same_as<sharg::value_list_validator<char>, decltype(sharg::value_list_validator{v_char})>));
     EXPECT_TRUE((std::same_as<sharg::value_list_validator<char>,
-                 decltype(sharg::value_list_validator{v_char})>));
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<char>,
-                 decltype(sharg::value_list_validator{v_char | std::views::take(2)})>));
+                              decltype(sharg::value_list_validator{v_char | std::views::take(2)})>));
     // const char * is deduced to std::string
     std::vector v2{"ha", "ba", "ma"};
+    EXPECT_TRUE((std::same_as<sharg::value_list_validator<std::string>, decltype(sharg::value_list_validator{"ha"})>));
     EXPECT_TRUE((std::same_as<sharg::value_list_validator<std::string>,
-                 decltype(sharg::value_list_validator{"ha"})>));
+                              decltype(sharg::value_list_validator{"ha", "ba", "ma"})>));
+    EXPECT_TRUE((std::same_as<sharg::value_list_validator<std::string>, decltype(sharg::value_list_validator{v2})>));
     EXPECT_TRUE((std::same_as<sharg::value_list_validator<std::string>,
-                 decltype(sharg::value_list_validator{"ha", "ba", "ma"})>));
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<std::string>,
-                 decltype(sharg::value_list_validator{v2})>));
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<std::string>,
-                 decltype(sharg::value_list_validator{v2 | std::views::take(2)})>));
+                              decltype(sharg::value_list_validator{v2 | std::views::take(2)})>));
     // custom types are used as is
-    EXPECT_TRUE((std::same_as<sharg::value_list_validator<foo>,
-                              decltype(sharg::value_list_validator{foo::one, foo::two})>));
+    EXPECT_TRUE(
+        (std::same_as<sharg::value_list_validator<foo>, decltype(sharg::value_list_validator{foo::one, foo::two})>));
 
     // usage
     // -----
@@ -897,10 +944,13 @@ TEST(validator_test, value_list_validator_success)
 
     // option
     std::vector<std::string> valid_str_values{"ha", "ba", "ma"};
-    const char * argv[] = {"./parser_test", "-s", "ba"};
+    char const * argv[] = {"./parser_test", "-s", "ba"};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_option(option_value, 's', "string-option", "desc",
+    parser.add_option(option_value,
+                      's',
+                      "string-option",
+                      "desc",
                       sharg::option_spec::standard,
                       sharg::value_list_validator{valid_str_values | std::views::take(2)});
 
@@ -910,11 +960,15 @@ TEST(validator_test, value_list_validator_success)
     EXPECT_EQ(option_value, "ba");
 
     // option with integers
-    const char * argv2[] = {"./parser_test", "-i", "-21"};
+    char const * argv2[] = {"./parser_test", "-i", "-21"};
     sharg::parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
-    parser2.add_option(option_value_int, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::value_list_validator<int>{0, -21, 10});
+    parser2.add_option(option_value_int,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::value_list_validator<int>{0, -21, 10});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser2.parse());
@@ -922,7 +976,7 @@ TEST(validator_test, value_list_validator_success)
     EXPECT_EQ(option_value_int, -21);
 
     // positional option
-    const char * argv3[] = {"./parser_test", "ma"};
+    char const * argv3[] = {"./parser_test", "ma"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
     parser3.add_positional_option(option_value, "desc", sharg::value_list_validator{valid_str_values});
@@ -933,7 +987,7 @@ TEST(validator_test, value_list_validator_success)
     EXPECT_EQ(option_value, "ma");
 
     // positional option - vector
-    const char * argv4[] = {"./parser_test", "ha", "ma"};
+    char const * argv4[] = {"./parser_test", "ha", "ma"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
     parser4.add_positional_option(option_vector, "desc", sharg::value_list_validator{"ha", "ba", "ma"});
@@ -945,11 +999,15 @@ TEST(validator_test, value_list_validator_success)
     EXPECT_EQ(option_vector[1], "ma");
 
     // option - vector
-    const char * argv5[] = {"./parser_test", "-i", "-10", "-i", "48"};
+    char const * argv5[] = {"./parser_test", "-i", "-10", "-i", "48"};
     sharg::parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
-    parser5.add_option(option_vector_int, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::value_list_validator<int>{-10, 48, 50});
+    parser5.add_option(option_vector_int,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::value_list_validator<int>{-10, 48, 50});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser5.parse());
@@ -959,23 +1017,27 @@ TEST(validator_test, value_list_validator_success)
 
     // get help page message
     option_vector_int.clear();
-    const char * argv7[] = {"./parser_test", "-h"};
+    char const * argv7[] = {"./parser_test", "-h"};
     sharg::parser parser7{"test_parser", 2, argv7, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
-    parser7.add_option(option_vector_int, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::value_list_validator<int>{-10, 48, 50});
+    parser7.add_option(option_vector_int,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::value_list_validator<int>{-10, 48, 50});
 
     option_vector_int.clear();
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser7.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     std::string my_stdout = testing::internal::GetCapturedStdout();
     std::string expected = std::string("test_parser\n"
-                           "===========\n"
-                           "\n" +
-                           basic_options_str +
-                           "    -i, --int-option (List of signed 32 bit integer)\n"
-                           "          desc Default: []. Value must be one of [-10, 48, 50].\n\n" +
-                           basic_version_str);
+                                       "===========\n"
+                                       "\n"
+                                       + basic_options_str
+                                       + "    -i, --int-option (List of signed 32 bit integer)\n"
+                                         "          desc Default: []. Value must be one of [-10, 48, 50].\n\n"
+                                       + basic_version_str);
     EXPECT_EQ(my_stdout, expected);
 }
 
@@ -987,16 +1049,20 @@ TEST(validator_test, value_list_validator_error)
     std::vector<int> option_vector_int;
 
     // option
-    const char * argv[] = {"./parser_test", "-s", "sa"};
+    char const * argv[] = {"./parser_test", "-s", "sa"};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_option(option_value, 's', "string-option", "desc",
-                      sharg::option_spec::standard, sharg::value_list_validator{"ha", "ba", "ma"});
+    parser.add_option(option_value,
+                      's',
+                      "string-option",
+                      "desc",
+                      sharg::option_spec::standard,
+                      sharg::value_list_validator{"ha", "ba", "ma"});
 
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
     // positional option
-    const char * argv3[] = {"./parser_test", "30"};
+    char const * argv3[] = {"./parser_test", "30"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
     parser3.add_positional_option(option_value_int, "desc", sharg::value_list_validator{0, 5, 10});
@@ -1004,20 +1070,23 @@ TEST(validator_test, value_list_validator_error)
     EXPECT_THROW(parser3.parse(), sharg::validation_error);
 
     // positional option - vector
-    const char * argv4[] = {"./parser_test", "fo", "ma"};
+    char const * argv4[] = {"./parser_test", "fo", "ma"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_positional_option(option_vector, "desc",
-                                  sharg::value_list_validator{"ha", "ba", "ma"});
+    parser4.add_positional_option(option_vector, "desc", sharg::value_list_validator{"ha", "ba", "ma"});
 
     EXPECT_THROW(parser4.parse(), sharg::validation_error);
 
     // option - vector
-    const char * argv5[] = {"./parser_test", "-i", "-10", "-i", "488"};
+    char const * argv5[] = {"./parser_test", "-i", "-10", "-i", "488"};
     sharg::parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
-    parser5.add_option(option_vector_int, 'i', "int-option", "desc",
-                       sharg::option_spec::standard, sharg::value_list_validator<int>{-10, 48, 50});
+    parser5.add_option(option_vector_int,
+                       'i',
+                       "int-option",
+                       "desc",
+                       sharg::option_spec::standard,
+                       sharg::value_list_validator<int>{-10, 48, 50});
 
     EXPECT_THROW(parser5.parse(), sharg::validation_error);
 }
@@ -1030,11 +1099,10 @@ TEST(validator_test, regex_validator_success)
     sharg::regex_validator email_vector_validator("[a-zA-Z]+@[a-zA-Z]+\\.com");
 
     { // option
-        const char * argv[] = {"./parser_test", "-s", "ballo@rollo.com"};
+        char const * argv[] = {"./parser_test", "-s", "ballo@rollo.com"};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard, email_validator);
+        parser.add_option(option_value, 's', "string-option", "desc", sharg::option_spec::standard, email_validator);
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1043,11 +1111,10 @@ TEST(validator_test, regex_validator_success)
     }
 
     { // positional option
-        const char * argv[] = {"./parser_test", "chr1"};
+        char const * argv[] = {"./parser_test", "chr1"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(option_value, "desc",
-                                      sharg::regex_validator{"^chr[0-9]+"});
+        parser.add_positional_option(option_value, "desc", sharg::regex_validator{"^chr[0-9]+"});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1056,11 +1123,10 @@ TEST(validator_test, regex_validator_success)
     }
 
     { // positional option - vector
-        const char * argv[] = {"./parser_test", "rollo", "bollo", "lollo"};
+        char const * argv[] = {"./parser_test", "rollo", "bollo", "lollo"};
         sharg::parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(option_vector, "desc",
-                                      sharg::regex_validator{".*oll.*"});
+        parser.add_positional_option(option_vector, "desc", sharg::regex_validator{".*oll.*"});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1072,11 +1138,15 @@ TEST(validator_test, regex_validator_success)
 
     { // option - vector
         option_vector.clear();
-        const char * argv[] = {"./parser_test", "-s", "rita@rambo.com", "-s", "tina@rambo.com"};
+        char const * argv[] = {"./parser_test", "-s", "rita@rambo.com", "-s", "tina@rambo.com"};
         sharg::parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_vector, 's', "string-option", "desc",
-                           sharg::option_spec::standard, email_vector_validator);
+        parser.add_option(option_vector,
+                          's',
+                          "string-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          email_vector_validator);
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1087,11 +1157,15 @@ TEST(validator_test, regex_validator_success)
 
     { // option - std::filesystem::path
         std::filesystem::path path_option;
-        const char * argv[] = {"./parser_test", "-s", "rita@rambo.com"};
+        char const * argv[] = {"./parser_test", "-s", "rita@rambo.com"};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(path_option, 's', "string-option", "desc",
-                          sharg::option_spec::standard, email_vector_validator);
+        parser.add_option(path_option,
+                          's',
+                          "string-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          email_vector_validator);
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1101,25 +1175,29 @@ TEST(validator_test, regex_validator_success)
 
     { // get help page message
         option_vector.clear();
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_vector, 's', "string-option", "desc",
-                           sharg::option_spec::standard, email_vector_validator);
+        parser.add_option(option_vector,
+                          's',
+                          "string-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          email_vector_validator);
 
         option_vector.clear();
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
         std::string my_stdout = testing::internal::GetCapturedStdout();
         std::string expected = std::string("test_parser\n"
-                               "===========\n"
-                               "\n" +
-                               basic_options_str +
-                               "    -s, --string-option (List of std::string)\n"
-                               "          desc Default: []. Value must match the pattern\n"
-                               "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
-                               "\n" +
-                               basic_version_str);
+                                           "===========\n"
+                                           "\n"
+                                           + basic_options_str
+                                           + "    -s, --string-option (List of std::string)\n"
+                                             "          desc Default: []. Value must match the pattern\n"
+                                             "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
+                                             "\n"
+                                           + basic_version_str);
         EXPECT_EQ(my_stdout, expected);
     }
 }
@@ -1130,39 +1208,40 @@ TEST(validator_test, regex_validator_error)
     std::vector<std::string> option_vector;
 
     // option
-    const char * argv[] = {"./parser_test", "--string-option", "sally"};
+    char const * argv[] = {"./parser_test", "--string-option", "sally"};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_option(option_value, '\0', "string-option", "desc",
-                      sharg::option_spec::standard, sharg::regex_validator{"tt"});
+    parser.add_option(option_value,
+                      '\0',
+                      "string-option",
+                      "desc",
+                      sharg::option_spec::standard,
+                      sharg::regex_validator{"tt"});
 
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
     // positional option
-    const char * argv2[] = {"./parser_test", "jessy"};
+    char const * argv2[] = {"./parser_test", "jessy"};
     sharg::parser parser2{"test_parser", 2, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
-    parser2.add_positional_option(option_value, "desc",
-                                  sharg::regex_validator{"[0-9]"});
+    parser2.add_positional_option(option_value, "desc", sharg::regex_validator{"[0-9]"});
 
     EXPECT_THROW(parser2.parse(), sharg::validation_error);
 
     // positional option - vector
-    const char * argv3[] = {"./parser_test", "rollo", "bttllo", "lollo"};
+    char const * argv3[] = {"./parser_test", "rollo", "bttllo", "lollo"};
     sharg::parser parser3{"test_parser", 4, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
-    parser3.add_positional_option(option_vector, "desc",
-                                  sharg::regex_validator{".*oll.*"});
+    parser3.add_positional_option(option_vector, "desc", sharg::regex_validator{".*oll.*"});
 
     EXPECT_THROW(parser3.parse(), sharg::validation_error);
 
     // option - vector
     option_vector.clear();
-    const char * argv4[] = {"./parser_test", "-s", "gh", "-s", "tt"};
+    char const * argv4[] = {"./parser_test", "-s", "gh", "-s", "tt"};
     sharg::parser parser4{"test_parser", 5, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_option(option_vector, 's', "", "desc",
-                       sharg::option_spec::standard, sharg::regex_validator{"tt"});
+    parser4.add_option(option_vector, 's', "", "desc", sharg::option_spec::standard, sharg::regex_validator{"tt"});
 
     EXPECT_THROW(parser4.parse(), sharg::validation_error);
 }
@@ -1259,11 +1338,15 @@ TEST(validator_test, chaining_validators)
     // option
     {
         std::string const & path = tmp_name.get_path().string();
-        const char * argv[] = {"./parser_test", "-s", path.c_str()};
+        char const * argv[] = {"./parser_test", "-s", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard, absolute_path_validator | my_file_ext_validator);
+        parser.add_option(option_value,
+                          's',
+                          "string-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          absolute_path_validator | my_file_ext_validator);
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1273,22 +1356,30 @@ TEST(validator_test, chaining_validators)
 
     {
         auto rel_path = tmp_name.get_path().relative_path().string();
-        const char * argv[] = {"./parser_test", "-s", rel_path.c_str()};
+        char const * argv[] = {"./parser_test", "-s", rel_path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard, absolute_path_validator | my_file_ext_validator);
+        parser.add_option(option_value,
+                          's',
+                          "string-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          absolute_path_validator | my_file_ext_validator);
 
         EXPECT_THROW(parser.parse(), sharg::validation_error);
     }
 
     {
         std::string const & path = invalid_extension.string();
-        const char * argv[] = {"./parser_test", "-s", path.c_str()};
+        char const * argv[] = {"./parser_test", "-s", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard, absolute_path_validator | my_file_ext_validator);
+        parser.add_option(option_value,
+                          's',
+                          "string-option",
+                          "desc",
+                          sharg::option_spec::standard,
+                          absolute_path_validator | my_file_ext_validator);
 
         EXPECT_THROW(parser.parse(), sharg::validation_error);
     }
@@ -1296,13 +1387,17 @@ TEST(validator_test, chaining_validators)
     // with temporary validators
     {
         std::string const & path = tmp_name.get_path().string();
-        const char * argv[] = {"./parser_test", "-s", path.c_str()};
+        char const * argv[] = {"./parser_test", "-s", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"} |
-                          sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}});
+        parser.add_option(
+            option_value,
+            's',
+            "string-option",
+            "desc",
+            sharg::option_spec::standard,
+            sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1313,14 +1408,17 @@ TEST(validator_test, chaining_validators)
     // three validators
     {
         std::string const & path = tmp_name.get_path().string();
-        const char * argv[] = {"./parser_test", "-s", path.c_str()};
+        char const * argv[] = {"./parser_test", "-s", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
+        parser.add_option(option_value,
+                          's',
+                          "string-option",
+                          "desc",
                           sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"} |
-                          sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}} |
-                          sharg::regex_validator{".*"});
+                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                              | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}}
+                              | sharg::regex_validator{".*"});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1331,57 +1429,66 @@ TEST(validator_test, chaining_validators)
     // help page message
     {
         option_value.clear();
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
+        parser.add_option(option_value,
+                          's',
+                          "string-option",
+                          "desc",
                           sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"} |
-                          sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}} |
-                          sharg::regex_validator{".*"});
+                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                              | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}}
+                              | sharg::regex_validator{".*"});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
         std::string my_stdout = testing::internal::GetCapturedStdout();
-        std::string expected = std::string{"test_parser\n"
-                               "===========\n"
-                               "\n" +
-                               basic_options_str +
-                               "    -s, --string-option (std::string)\n"
-                               "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
-                               "          The output file must not exist already and write permissions must be\n"
-                               "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
-                               "          pattern '.*'.\n"
-                               "\n"} +
-                               basic_version_str;
+        std::string expected =
+            std::string{"test_parser\n"
+                        "===========\n"
+                        "\n"
+                        + basic_options_str
+                        + "    -s, --string-option (std::string)\n"
+                          "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+                          "          The output file must not exist already and write permissions must be\n"
+                          "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
+                          "          pattern '.*'.\n"
+                          "\n"}
+            + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 
     // help page message (allow overwriting)
     {
         option_value.clear();
-        const char * argv[] = {"./parser_test", "-h"};
+        char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"} |
-                          sharg::output_file_validator{sharg::output_file_open_options::open_or_create, {"sa", "so"}} |
-                          sharg::regex_validator{".*"});
+        parser.add_option(
+            option_value,
+            's',
+            "string-option",
+            "desc",
+            sharg::option_spec::standard,
+            sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                | sharg::output_file_validator{sharg::output_file_open_options::open_or_create, {"sa", "so"}}
+                | sharg::regex_validator{".*"});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
         std::string my_stdout = testing::internal::GetCapturedStdout();
-        std::string expected = std::string{"test_parser\n"
-                               "===========\n"
-                               "\n" +
-                               basic_options_str +
-                               "    -s, --string-option (std::string)\n"
-                               "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
-                               "          Write permissions must be granted. Valid file extensions are: [sa,\n"
-                               "          so]. Value must match the pattern '.*'.\n"
-                               "\n"} +
-                               basic_version_str;
+        std::string expected =
+            std::string{"test_parser\n"
+                        "===========\n"
+                        "\n"
+                        + basic_options_str
+                        + "    -s, --string-option (std::string)\n"
+                          "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+                          "          Write permissions must be granted. Valid file extensions are: [sa,\n"
+                          "          so]. Value must match the pattern '.*'.\n"
+                          "\n"}
+            + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 
@@ -1389,13 +1496,17 @@ TEST(validator_test, chaining_validators)
     {
         std::vector<std::string> option_list_value{};
         std::string const & path = tmp_name.get_path().string();
-        const char * argv[] = {"./parser_test", "-s", path.c_str()};
+        char const * argv[] = {"./parser_test", "-s", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_list_value, 's', "string-option", "desc",
-                          sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"} |
-                          sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}});
+        parser.add_option(
+            option_list_value,
+            's',
+            "string-option",
+            "desc",
+            sharg::option_spec::standard,
+            sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());

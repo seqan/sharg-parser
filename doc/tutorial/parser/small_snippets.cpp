@@ -14,6 +14,7 @@ struct cmd_arguments
 
 cmd_arguments args{};
 
+// clang-format off
 int main(int argc, char ** argv)
 {
 
@@ -70,9 +71,10 @@ parser.add_option(required_variable, 'n', "name", "I really need a name.", sharg
 {
 sharg::parser parser{"Example-Parser", argc, argv};
 //![input_file_validator]
-parser.add_positional_option(args.file_path, "Please provide a tab separated data file.",
+parser.add_positional_option(args.file_path,
+                             "Please provide a tab separated data file.",
                              sharg::input_file_validator{{"tsv"}});
 //![input_file_validator]
 }
-
 }
+// clang-format on

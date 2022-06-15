@@ -13,7 +13,7 @@
 #pragma once
 
 #if defined(__GNUC__) || defined(__clang__)
-#include <cxxabi.h>
+#    include <cxxabi.h>
 #endif // defined(__GNUC__) || defined(__clang__)
 
 #include <functional>
@@ -40,7 +40,7 @@ namespace sharg::detail
  * \note The returned name is implementation defined and might change between different tool chains.
  */
 template <typename type>
-inline std::string const type_name_as_string = [] ()
+inline std::string const type_name_as_string = []()
 {
     std::string demangled_name{};
 #if defined(__GNUC__) || defined(__clang__) // clang and gcc only return a mangled name.
@@ -49,21 +49,26 @@ inline std::string const type_name_as_string = [] ()
     // https://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.3/a01696.html
     int status{};
     safe_ptr_t demangled_name_ptr{abi::__cxa_demangle(typeid(type).name(), 0, 0, &status),
-                                  [] (char * name_ptr) { free(name_ptr); }};
+                                  [](char * name_ptr)
+                                  {
+                                      free(name_ptr);
+                                  }};
 
     // We exclude status != 0, because this code can't be reached normally, only if there is a defect in the compiler
     // itself, since the type is directly given by the compiler. See https://github.com/seqan/seqan3/pull/2311.
     // LCOV_EXCL_START
+    // clang-format off
     if (status != 0)
         return std::string{typeid(type).name()} +
                " (abi::__cxa_demangle error status (" + std::to_string(status) + "): " +
                (status == -1 ? "A memory allocation failure occurred." :
-               (status == -2 ? "mangled_name is not a valid name under the C++ ABI mangling rules." :
-               (status == -3 ? "One of the arguments is invalid." : "Unknown Error"))) + ")";
+                   (status == -2 ? "mangled_name is not a valid name under the C++ ABI mangling rules." :
+                       (status == -3 ? "One of the arguments is invalid." : "Unknown Error"))) + ")";
+    // clang-format on
     // LCOV_EXCL_STOP
 
     demangled_name = std::string{std::addressof(*demangled_name_ptr)};
-#else // e.g. MSVC
+#else  // e.g. MSVC
     demangled_name = typeid(type).name();
 #endif // defined(__GNUC__) || defined(__clang__)
 
@@ -77,4 +82,4 @@ inline std::string const type_name_as_string = [] ()
     return demangled_name;
 }();
 
-}  // namespace sharg::detail
+} // namespace sharg::detail

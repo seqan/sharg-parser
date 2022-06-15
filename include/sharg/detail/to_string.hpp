@@ -14,8 +14,8 @@
 
 #include <sstream>
 
-#include <sharg/detail/concept.hpp>
 #include <sharg/concept.hpp>
+#include <sharg/detail/concept.hpp>
 
 namespace sharg::detail
 {
@@ -25,13 +25,13 @@ namespace sharg::detail
  * \param[in] values     Variable number of parameters of any type that implement the stream operator.
  * \returns A concatenated string of all values (no separator in between is added).
  */
-template <typename ...value_types>
+template <typename... value_types>
     requires (ostreamable<value_types> && ...)
-std::string to_string(value_types && ...values)
+std::string to_string(value_types &&... values)
 {
     std::stringstream stream;
 
-    auto print = [&stream] (auto val)
+    auto print = [&stream](auto val)
     {
         if constexpr (is_container_option<decltype(val)>)
         {
@@ -48,8 +48,8 @@ std::string to_string(value_types && ...values)
                 stream << ']';
             }
         }
-        else if constexpr (std::is_same_v<std::remove_cvref_t<decltype(val)>, int8_t> ||
-                           std::is_same_v<std::remove_cvref_t<decltype(val)>, uint8_t>)
+        else if constexpr (std::is_same_v<std::remove_cvref_t<decltype(val)>, int8_t>
+                           || std::is_same_v<std::remove_cvref_t<decltype(val)>, uint8_t>)
         {
             stream << static_cast<int16_t>(val);
         }
@@ -59,7 +59,7 @@ std::string to_string(value_types && ...values)
         }
     };
 
-    (print(std::forward<value_types>(values)),...);
+    (print(std::forward<value_types>(values)), ...);
 
     return stream.str();
 }

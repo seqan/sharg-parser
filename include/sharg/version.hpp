@@ -30,12 +30,13 @@
 #define SHARG_VERSION_CSTRING_HELPER_STR(str) #str
 
 //!\brief Converts version numbers to string.
-#define SHARG_VERSION_CSTRING_HELPER_FUNC(MAJOR, MINOR, PATCH)                                                           \
-    SHARG_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                              \
+#define SHARG_VERSION_CSTRING_HELPER_FUNC(MAJOR, MINOR, PATCH)                                                         \
+    SHARG_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                            \
     "." SHARG_VERSION_CSTRING_HELPER_STR(MINOR) "." SHARG_VERSION_CSTRING_HELPER_STR(PATCH)
 
 //!\brief The full version as null terminated string.
-#define SHARG_VERSION_CSTRING SHARG_VERSION_CSTRING_HELPER_FUNC(SHARG_VERSION_MAJOR, SHARG_VERSION_MINOR, SHARG_VERSION_PATCH)
+#define SHARG_VERSION_CSTRING                                                                                          \
+    SHARG_VERSION_CSTRING_HELPER_FUNC(SHARG_VERSION_MAJOR, SHARG_VERSION_MINOR, SHARG_VERSION_PATCH)
 
 namespace sharg
 {

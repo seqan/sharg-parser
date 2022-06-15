@@ -61,7 +61,7 @@ struct parsing<t const &> : parsing<t>
 {};
 //!\endcond
 
-} // sharg::custom
+} // namespace sharg::custom
 
 namespace sharg::detail
 {
@@ -69,9 +69,9 @@ namespace sharg::detail
 //!\ingroup core
 template <size_t I>
 struct priority_tag
-//!\cond
-// Doxygen fail
-: priority_tag<I-1>
+    //!\cond
+    // Doxygen fail
+    : priority_tag<I - 1>
 //!\endcond
 {};
 
@@ -80,7 +80,7 @@ template <>
 struct priority_tag<0>
 {};
 
-} // sharg::detail
+} // namespace sharg::detail
 
 namespace sharg::detail::adl_only
 {
@@ -98,10 +98,10 @@ struct enumeration_names_cpo
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    constexpr enumeration_names_cpo() = default; //!< Defaulted.
-    constexpr enumeration_names_cpo(enumeration_names_cpo &&) = default; //!< Defaulted.
-    constexpr enumeration_names_cpo(enumeration_names_cpo const &) = default; //!< Defaulted.
-    constexpr enumeration_names_cpo & operator=(enumeration_names_cpo &&) = default; //!< Defaulted.
+    constexpr enumeration_names_cpo() = default;                                          //!< Defaulted.
+    constexpr enumeration_names_cpo(enumeration_names_cpo &&) = default;                  //!< Defaulted.
+    constexpr enumeration_names_cpo(enumeration_names_cpo const &) = default;             //!< Defaulted.
+    constexpr enumeration_names_cpo & operator=(enumeration_names_cpo &&) = default;      //!< Defaulted.
     constexpr enumeration_names_cpo & operator=(enumeration_names_cpo const &) = default; //!< Defaulted.
     //!\}
 
@@ -109,18 +109,18 @@ struct enumeration_names_cpo
      *        std::type_identity instead of a default constructed alphabet.
      */
     template <typename option_type>
-    using option_or_type_identity
-        = std::conditional_t<std::is_nothrow_default_constructible_v<std::remove_cvref_t<option_type>>,
-                             std::remove_cvref_t<option_type>,
-                             std::type_identity<option_type>>;
+    using option_or_type_identity =
+        std::conditional_t<std::is_nothrow_default_constructible_v<std::remove_cvref_t<option_type>>,
+                           std::remove_cvref_t<option_type>,
+                           std::type_identity<option_type>>;
 
     /*!\brief CPO overload (check 1 out of 2): explicit customisation via `sharg::custom::parsing`
      * \tparam option_type The type of the option. (Needed to defer instantiation for incomplete types.)
      */
     template <typename option_type = option_t>
-    static constexpr auto cpo_overload(sharg::detail::priority_tag<1>)
-    noexcept(noexcept(sharg::custom::parsing<option_type>::enumeration_names)) \
-      -> decltype(sharg::custom::parsing<option_type>::enumeration_names) \
+    static constexpr auto cpo_overload(sharg::detail::priority_tag<1>) noexcept(
+        noexcept(sharg::custom::parsing<option_type>::enumeration_names))
+        -> decltype(sharg::custom::parsing<option_type>::enumeration_names)
     {
         return sharg::custom::parsing<option_type>::enumeration_names;
     }
@@ -135,9 +135,9 @@ struct enumeration_names_cpo
      * `enumeration_names(std::type_identity<option_t>{})` will be called.
      */
     template <typename option_type = option_t>
-    static constexpr auto cpo_overload(sharg::detail::priority_tag<0>)
-    noexcept(noexcept(enumeration_names(option_or_type_identity<option_type>{})))
-      -> decltype(enumeration_names(option_or_type_identity<option_type>{}))
+    static constexpr auto cpo_overload(sharg::detail::priority_tag<0>) noexcept(
+        noexcept(enumeration_names(option_or_type_identity<option_type>{})))
+        -> decltype(enumeration_names(option_or_type_identity<option_type>{}))
     {
         return enumeration_names(option_or_type_identity<option_type>{});
     }
@@ -153,10 +153,10 @@ struct enumeration_names_cpo
      * If any matching overload is found, this operator perfectly forwards the result and noexcept-property of the
      * `cpo_overload`.
      */
-    template <typename ...args_t, typename option_type = option_t /*circumvent incomplete types*/>
-    constexpr auto operator()(args_t && ...args) const
-    noexcept(noexcept(cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...)))
-      -> decltype(cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...))
+    template <typename... args_t, typename option_type = option_t /*circumvent incomplete types*/>
+    constexpr auto operator()(args_t &&... args) const
+        noexcept(noexcept(cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...)))
+            -> decltype(cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...))
     {
         return cpo_overload(sharg::detail::priority_tag<1>{}, std::forward<args_t>(args)...);
     }
@@ -205,11 +205,11 @@ namespace sharg
  * This is a customisation point (see \ref about_customisation). To specify the behaviour for your type,
  * simply provide one of the two functions specified above.
  */
+// clang-format off
 template <typename option_type>
-//!\cond
     requires requires { { detail::adl_only::enumeration_names_cpo<option_type>{}() }; }
-//!\endcond
 inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<option_type>{}();
+// clang-format on
 //!\}
 
 /*!\concept sharg::named_enumeration
@@ -224,12 +224,13 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
  *
  * \remark For a complete overview, take a look at \ref parser
  */
+// clang-format off
 template <typename option_type>
 concept named_enumeration = requires
 {
     { sharg::enumeration_names<option_type> };
 };
-
+// clang-format on
 } // namespace sharg
 
 //!\cond

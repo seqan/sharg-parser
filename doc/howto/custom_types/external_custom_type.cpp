@@ -16,7 +16,7 @@ namespace std
 {
 
 // Make external::bar satisfy sharg::ostreamable
-ostream & operator<<(ostream & output, const external::bar & ext_bar)
+ostream & operator<<(ostream & output, external::bar const & ext_bar)
 {
     output << ext_bar.a; // Adapt this for your type
     return output;
@@ -25,7 +25,7 @@ ostream & operator<<(ostream & output, const external::bar & ext_bar)
 // Make external::bar satisfy sharg::istreamable
 istream & operator>>(istream & input, external::bar & ext_bar)
 {
-    input >> ext_bar.a;  // Adapt this for your type
+    input >> ext_bar.a; // Adapt this for your type
     return input;
 }
 
