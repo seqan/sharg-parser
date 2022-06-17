@@ -244,10 +244,8 @@ public:
               && std::invocable<validator_type, option_type>
     void add_option(option_type & value, config<validator_type> const & config)
     {
-        if (sub_parser != nullptr)
-            throw design_error{"You may only specify flags for the top-level parser."};
+        verify_option_config(config);
 
-        verify_identifiers(config.short_id, config.long_id);
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
@@ -270,10 +268,11 @@ public:
         requires std::invocable<validator_type, bool>
     void add_flag(bool & value, config<validator_type> const & config)
     {
+        verify_flag_config(config);
+
         if (value)
             throw design_error("A flag's default value must be false.");
 
-        verify_identifiers(config.short_id, config.long_id);
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
@@ -310,12 +309,7 @@ public:
               && std::invocable<validator_type, option_type>
     void add_positional_option(option_type & value, config<validator_type> const & config)
     {
-        if (sub_parser != nullptr)
-            throw design_error{"You may only specify flags for the top-level parser."};
-
-        if (has_positional_list_option)
-            throw design_error{"You added a positional option with a list value before so you cannot add "
-                               "any other positional options."};
+        verify_positional_option_config(config);
 
         if constexpr (detail::is_container_option<option_type>)
             has_positional_list_option = true; // keep track of a list option because there must be only one!
@@ -883,6 +877,35 @@ private:
                       });
         if (detail::format_parse::is_empty_id(short_id) && detail::format_parse::is_empty_id(long_id))
             throw design_error("Option Identifiers cannot both be empty.");
+    }
+
+    //!brief Verify if the configuration given to an sharg::parser::add_option call is valid.
+    template <typename config_type>
+    void verify_option_config(config_type const & config)
+    {
+        if (sub_parser != nullptr)
+            throw design_error{"You may only specify flags for the top-level parser."};
+
+        verify_identifiers(config.short_id, config.long_id);
+    }
+
+    //!brief Verify if the configuration given to an sharg::parser::add_flag call is valid.
+    template <typename config_type>
+    void verify_flag_config(config_type const & config)
+    {
+        verify_identifiers(config.short_id, config.long_id);
+    }
+
+    //!brief Verify if the configuration given to an sharg::parser::add_positional_option call is valid.
+    template <typename config_type>
+    void verify_positional_option_config(config_type const & /* config */)
+    {
+        if (sub_parser != nullptr)
+            throw design_error{"You may only specify flags for the top-level parser."};
+
+        if (has_positional_list_option)
+            throw design_error{"You added a positional option with a list value before so you cannot add "
+                               "any other positional options."};
     }
 };
 
