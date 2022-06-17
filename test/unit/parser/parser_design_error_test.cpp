@@ -153,6 +153,42 @@ TEST(verify_positional_option_config_test, list_option_not_the_very_last_option)
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{}), sharg::design_error);
 }
 
+TEST(verify_positional_option_config_test, short_id_set)
+{
+    int option_value;
+
+    char const * argv[] = {"./parser_test", "arg1"};
+    sharg::parser parser{"test_parser", 2, argv};
+    EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.short_id = 'a'}), sharg::design_error);
+}
+
+TEST(verify_positional_option_config_test, long_id_set)
+{
+    int option_value;
+
+    char const * argv[] = {"./parser_test", "arg1"};
+    sharg::parser parser{"test_parser", 2, argv};
+    EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.long_id = "abc"}), sharg::design_error);
+}
+
+TEST(verify_positional_option_config_test, advanced_config_set)
+{
+    int option_value;
+
+    char const * argv[] = {"./parser_test", "arg1"};
+    sharg::parser parser{"test_parser", 2, argv};
+    EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.advanced = true}), sharg::design_error);
+}
+
+TEST(verify_positional_option_config_test, hidden_config_set)
+{
+    int option_value;
+
+    char const * argv[] = {"./parser_test", "arg1"};
+    sharg::parser parser{"test_parser", 2, argv};
+    EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.hidden = true}), sharg::design_error);
+}
+
 // -----------------------------------------------------------------------------
 // general
 // -----------------------------------------------------------------------------

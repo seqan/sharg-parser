@@ -898,8 +898,15 @@ private:
 
     //!brief Verify if the configuration given to an sharg::parser::add_positional_option call is valid.
     template <typename config_type>
-    void verify_positional_option_config(config_type const & /* config */)
+    void verify_positional_option_config(config_type const & config)
     {
+        if (config.short_id != '\0' || config.long_id != "")
+            throw design_error{"Positional options are identified by their position on the command line. "
+                               "Short or long ids are not permitted!"};
+
+        if (config.advanced || config.hidden)
+            throw design_error{"Positional options are always required and therefore cannot be advanced nor hidden!"};
+
         if (sub_parser != nullptr)
             throw design_error{"You may only specify flags for the top-level parser."};
 
