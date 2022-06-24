@@ -40,6 +40,8 @@ namespace sharg
 template <typename validator_t = detail::default_validator>
 struct config
 {
+    static_assert(sharg::validator<validator_t>, "The validator passed to sharg:;config must model sharg::validator");
+
     /*!\brief The short identifier for the option (e.g. 'a', making the option callable via `-a`).
      *
      * \attention This parameter cannot be set for positional options added with
