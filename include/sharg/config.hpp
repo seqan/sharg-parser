@@ -54,9 +54,7 @@ struct config
      */
     std::string long_id{};
 
-    /*!\brief The description of the option to be shown on any help page.
-     *
-     */
+    //!\brief The description to be shown on any (exported) help page.
     std::string description{};
 
     /*!\brief Whether the option should only be displayed on the advanced help page.
@@ -95,9 +93,7 @@ struct config
      */
     bool required{false};
 
-    /*!\brief A sharg::validator that verifies the value after parsing (callable).
-     *
-     */
+    //!\brief A sharg::validator that verifies the value after parsing (callable).
     validator_t validator{};
 };
 

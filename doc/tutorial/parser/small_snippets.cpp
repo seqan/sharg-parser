@@ -64,7 +64,8 @@ parser.add_positional_option(list_variable, sharg::config{.description = "Give m
 sharg::parser parser{"Example-Parser", argc, argv};
 //![required_option]
 std::string required_variable{};
-parser.add_option(required_variable, sharg::config{.short_id = 'n', .long_id = "name", .description = "I really need a name.", .required = true});
+parser.add_option(required_variable, sharg::config{.short_id = 'n', .long_id = "name", 
+                                                   .description = "I really need a name.", .required = true});
 //![required_option]
 }
 

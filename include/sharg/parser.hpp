@@ -249,7 +249,7 @@ public:
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
-            [=, &value, &config](auto & f)
+            [&value, &config](auto & f)
             {
                 f.add_option(value, config);
             },
@@ -276,7 +276,7 @@ public:
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
-            [=, &value](auto & f)
+            [&value, &config](auto & f)
             {
                 f.add_flag(value, config);
             },
@@ -317,7 +317,7 @@ public:
         // copy variables into the lambda because the calls are pushed to a stack
         // and the references would go out of scope.
         std::visit(
-            [=, &value, &config](auto & f)
+            [&value, &config](auto & f)
             {
                 f.add_positional_option(value, config);
             },
@@ -510,7 +510,7 @@ public:
     void add_section(std::string const & title, bool const advanced_only = false)
     {
         std::visit(
-            [&](auto & f)
+            [&title, advanced_only](auto & f)
             {
                 f.add_section(title, advanced_only);
             },
@@ -525,7 +525,7 @@ public:
     void add_subsection(std::string const & title, bool const advanced_only = false)
     {
         std::visit(
-            [&](auto & f)
+            [&title, advanced_only](auto & f)
             {
                 f.add_subsection(title, advanced_only);
             },
@@ -543,7 +543,7 @@ public:
     void add_line(std::string const & text, bool is_paragraph = false, bool const advanced_only = false)
     {
         std::visit(
-            [&](auto & f)
+            [&text, is_paragraph, advanced_only](auto & f)
             {
                 f.add_line(text, is_paragraph, advanced_only);
             },
@@ -570,7 +570,7 @@ public:
     void add_list_item(std::string const & key, std::string const & desc, bool const advanced_only = false)
     {
         std::visit(
-            [&](auto & f)
+            [&key, &desc, advanced_only](auto & f)
             {
                 f.add_list_item(key, desc, advanced_only);
             },
@@ -879,9 +879,9 @@ private:
             throw design_error("Option Identifiers cannot both be empty.");
     }
 
-    //!brief Verify if the configuration given to an sharg::parser::add_option call is valid.
+    //!brief Verify the configuration given to a sharg::parser::add_option call.
     template <typename config_type>
-    void verify_option_config(config_type const & config)
+    void verify_option_config(config_type const & config) const
     {
         if (sub_parser != nullptr)
             throw design_error{"You may only specify flags for the top-level parser."};
@@ -889,16 +889,16 @@ private:
         verify_identifiers(config.short_id, config.long_id);
     }
 
-    //!brief Verify if the configuration given to an sharg::parser::add_flag call is valid.
+    //!brief Verify the configuration given to a sharg::parser::add_flag call.
     template <typename config_type>
-    void verify_flag_config(config_type const & config)
+    void verify_flag_config(config_type const & config) const
     {
         verify_identifiers(config.short_id, config.long_id);
     }
 
-    //!brief Verify if the configuration given to an sharg::parser::add_positional_option call is valid.
+    //!brief Verify the configuration given to a sharg::parser::add_positional_option call.
     template <typename config_type>
-    void verify_positional_option_config(config_type const & config)
+    void verify_positional_option_config(config_type const & config) const
     {
         if (config.short_id != '\0' || config.long_id != "")
             throw design_error{"Positional options are identified by their position on the command line. "
