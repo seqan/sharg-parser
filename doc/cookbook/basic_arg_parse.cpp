@@ -18,17 +18,18 @@ void initialise_parser(sharg::parser & parser, cmd_arguments & args)
     parser.info.short_description = "Creates an index over a reference.";
     parser.info.version = "1.0.0";
     parser.add_option(args.reference_path,
-                      'r',
-                      "reference",
-                      "The path to the reference.",
-                      sharg::option_spec::required,
-                      sharg::input_file_validator{{"fa", "fasta"}});
-    parser.add_option(args.index_path,
-                      'o',
-                      "output",
-                      "The output index file path.",
-                      sharg::option_spec::standard,
-                      sharg::output_file_validator{sharg::output_file_open_options::create_new, {"index"}});
+                      sharg::config{.short_id = 'r',
+                                    .long_id = "reference",
+                                    .description = "The path to the reference.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{{"fa", "fasta"}}});
+    parser.add_option(
+        args.index_path,
+        sharg::config{.short_id = 'o',
+                      .long_id = "output",
+                      .description = "The output index file path.",
+                      .validator =
+                          sharg::output_file_validator{sharg::output_file_open_options::create_new, {"index"}}});
 }
 
 //![main]

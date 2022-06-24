@@ -8,11 +8,10 @@ int main(int argc, char const ** argv)
     std::filesystem::path myfile{};
 
     myparser.add_option(myfile,
-                        'f',
-                        "file",
-                        "The input file containing the sequences.",
-                        sharg::option_spec::standard,
-                        sharg::input_file_validator{{"fa", "fasta"}});
+                        sharg::config{.short_id = 'f',
+                                      .long_id = "file",
+                                      .description = "The input file containing the sequences.",
+                                      .validator = sharg::input_file_validator{{"fa", "fasta"}}});
     //! [validator_call]
 
     // an exception will be thrown if the user specifies a filename

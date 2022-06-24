@@ -15,13 +15,13 @@ int main(int argc, char ** argv)
     int m{01};   // month
     int y{2050}; // year
 
-    myparser.add_option(d, 'd', "day", "Please specify your preferred day.");
-    myparser.add_option(m, 'm', "month", "Please specify your preferred month.");
-    myparser.add_option(y, 'y', "year", "Please specify your preferred year.");
+    myparser.add_option(d, sharg::config{.short_id = 'd', .long_id = "day", .description = "Your preferred day."});
+    myparser.add_option(m, sharg::config{.short_id = 'm', .long_id = "month", .description = "Your preferred month."});
+    myparser.add_option(y, sharg::config{.short_id = 'y', .long_id = "year", .description = "Your preferred year."});
 
     std::vector<std::string> penguin_names;
 
-    myparser.add_positional_option(penguin_names, "Specify the names of the penguins.");
+    myparser.add_positional_option(penguin_names, sharg::config{.description = "Specify the names of the penguins."});
 
     try
     {

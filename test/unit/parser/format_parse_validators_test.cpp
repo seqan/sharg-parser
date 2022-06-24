@@ -126,11 +126,7 @@ TEST(validator_test, input_file)
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(file_in_path,
-                          'i',
-                          "int-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          sharg::input_file_validator{formats});
+                          sharg::config{.short_id = 'i', .validator = sharg::input_file_validator{formats}});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(file_in_path.string(), path);
@@ -146,7 +142,7 @@ TEST(validator_test, input_file)
         char const * argv[] = {"./parser_test", path.c_str(), path_2.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(input_files, "desc", sharg::input_file_validator{formats});
+        parser.add_positional_option(input_files, sharg::config{.validator = sharg::input_file_validator{formats}});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(input_files.size(), 2u);
@@ -159,7 +155,9 @@ TEST(validator_test, input_file)
         char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(path, "desc", sharg::input_file_validator{formats});
+        parser.add_positional_option(
+            path,
+            sharg::config{.description = "desc", .validator = sharg::input_file_validator{formats}});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -265,12 +263,11 @@ TEST(validator_test, output_file)
         char const * argv[] = {"./parser_test", "-o", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(file_out_path,
-                          'o',
-                          "out-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
+        parser.add_option(
+            file_out_path,
+            sharg::config{.short_id = 'o',
+                          .validator =
+                              sharg::output_file_validator{sharg::output_file_open_options::create_new, formats}});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(file_out_path.string(), path);
@@ -288,8 +285,8 @@ TEST(validator_test, output_file)
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_positional_option(
             output_files,
-            "desc",
-            sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
+            sharg::config{.validator =
+                              sharg::output_file_validator{sharg::output_file_open_options::create_new, formats}});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(output_files.size(), 2u);
@@ -305,8 +302,9 @@ TEST(validator_test, output_file)
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_positional_option(
             path,
-            "desc",
-            sharg::output_file_validator{sharg::output_file_open_options::create_new, formats});
+            sharg::config{.description = "desc",
+                          .validator =
+                              sharg::output_file_validator{sharg::output_file_open_options::create_new, formats}});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -333,8 +331,9 @@ TEST(validator_test, output_file)
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_positional_option(
             path,
-            "desc",
-            sharg::output_file_validator{sharg::output_file_open_options::open_or_create, formats});
+            sharg::config{.description = "desc",
+                          .validator =
+                              sharg::output_file_validator{sharg::output_file_open_options::open_or_create, formats}});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -412,12 +411,7 @@ TEST(validator_test, input_directory)
     char const * argv[] = {"./parser_test", "-i", path.c_str()};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_option(dir_in_path,
-                      'i',
-                      "input-option",
-                      "desc",
-                      sharg::option_spec::standard,
-                      sharg::input_directory_validator{});
+    parser.add_option(dir_in_path, sharg::config{.short_id = 'i', .validator = sharg::input_directory_validator{}});
 
     EXPECT_NO_THROW(parser.parse());
     EXPECT_EQ(path, dir_in_path.string());
@@ -430,7 +424,8 @@ TEST(validator_test, input_directory)
     char const * argv[] = {"./parser_test", "-h"};
     sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
-    parser.add_positional_option(path, "desc", sharg::input_directory_validator{});
+    parser.add_positional_option(path,
+                                 sharg::config{.description = "desc", .validator = sharg::input_directory_validator{}});
 
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -467,11 +462,7 @@ TEST(validator_test, output_directory)
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(dir_out_path,
-                          'o',
-                          "output-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          sharg::output_directory_validator{});
+                          sharg::config{.short_id = 'o', .validator = sharg::output_directory_validator{}});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_EQ(path, dir_out_path.string());
@@ -494,7 +485,9 @@ TEST(validator_test, output_directory)
         char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(path, "desc", sharg::output_directory_validator{});
+        parser.add_positional_option(
+            path,
+            sharg::config{.description = "desc", .validator = sharg::output_directory_validator{}});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -693,11 +686,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
     parser.add_option(option_value,
-                      'i',
-                      "int-option",
-                      "desc",
-                      sharg::option_spec::standard,
-                      sharg::arithmetic_range_validator{1, 20});
+                      sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{1, 20}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser.parse());
@@ -709,11 +698,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     sharg::parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
     parser2.add_option(option_value,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::arithmetic_range_validator{-20, 20});
+                       sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{-20, 20}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser2.parse());
@@ -724,7 +709,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     char const * argv3[] = {"./parser_test", "10"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
-    parser3.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{1, 20});
+    parser3.add_positional_option(option_value, sharg::config{.validator = sharg::arithmetic_range_validator{1, 20}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser3.parse());
@@ -735,7 +720,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     char const * argv4[] = {"./parser_test", "--", "-10"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{-20, 20});
+    parser4.add_positional_option(option_value, sharg::config{.validator = sharg::arithmetic_range_validator{-20, 20}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser4.parse());
@@ -747,11 +732,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     sharg::parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
     parser5.add_option(option_vector,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::arithmetic_range_validator{-50, 50});
+                       sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{-50, 50}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser5.parse());
@@ -764,7 +745,8 @@ TEST(validator_test, arithmetic_range_validator_success)
     char const * argv6[] = {"./parser_test", "--", "-10", "1"};
     sharg::parser parser6{"test_parser", 4, argv6, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser6, 80);
-    parser6.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20, 20});
+    parser6.add_positional_option(option_vector,
+                                  sharg::config{.validator = sharg::arithmetic_range_validator{-20, 20}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser6.parse());
@@ -777,7 +759,9 @@ TEST(validator_test, arithmetic_range_validator_success)
     char const * argv7[] = {"./parser_test", "-h"};
     sharg::parser parser7{"test_parser", 2, argv7, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
-    parser7.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20, 20});
+    parser7.add_positional_option(
+        option_vector,
+        sharg::config{.description = "desc", .validator = sharg::arithmetic_range_validator{-20, 20}});
 
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser7.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -798,11 +782,7 @@ TEST(validator_test, arithmetic_range_validator_success)
     sharg::parser parser8{"test_parser", 3, argv8, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser8, 80);
     parser8.add_option(double_option_value,
-                       'i',
-                       "double-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::arithmetic_range_validator{1, 20});
+                       sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{1, 20}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser8.parse());
@@ -820,11 +800,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
     parser.add_option(option_value,
-                      'i',
-                      "int-option",
-                      "desc",
-                      sharg::option_spec::standard,
-                      sharg::arithmetic_range_validator{1, 20});
+                      sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{1, 20}});
 
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
@@ -833,11 +809,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     sharg::parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
     parser2.add_option(option_value,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::arithmetic_range_validator{-20, 20});
+                       sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{-20, 20}});
 
     EXPECT_THROW(parser2.parse(), sharg::validation_error);
 
@@ -845,7 +817,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     char const * argv3[] = {"./parser_test", "30"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
-    parser3.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{1, 20});
+    parser3.add_positional_option(option_value, sharg::config{.validator = sharg::arithmetic_range_validator{1, 20}});
 
     EXPECT_THROW(parser3.parse(), sharg::validation_error);
 
@@ -853,7 +825,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     char const * argv4[] = {"./parser_test", "--", "-21"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_positional_option(option_value, "desc", sharg::arithmetic_range_validator{-20, 20});
+    parser4.add_positional_option(option_value, sharg::config{.validator = sharg::arithmetic_range_validator{-20, 20}});
 
     EXPECT_THROW(parser4.parse(), sharg::validation_error);
 
@@ -862,11 +834,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     sharg::parser parser5{"test_parser", 3, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
     parser5.add_option(option_vector,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::arithmetic_range_validator{-50, 50});
+                       sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{-50, 50}});
 
     EXPECT_THROW(parser5.parse(), sharg::validation_error);
 
@@ -875,7 +843,8 @@ TEST(validator_test, arithmetic_range_validator_error)
     char const * argv6[] = {"./parser_test", "--", "-10", "100"};
     sharg::parser parser6{"test_parser", 4, argv6, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser6, 80);
-    parser6.add_positional_option(option_vector, "desc", sharg::arithmetic_range_validator{-20, 20});
+    parser6.add_positional_option(option_vector,
+                                  sharg::config{.validator = sharg::arithmetic_range_validator{-20, 20}});
 
     EXPECT_THROW(parser6.parse(), sharg::validation_error);
 
@@ -885,11 +854,7 @@ TEST(validator_test, arithmetic_range_validator_error)
     sharg::parser parser7{"test_parser", 3, argv7, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
     parser7.add_option(double_option_value,
-                       'i',
-                       "double-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::arithmetic_range_validator{1, 20});
+                       sharg::config{.short_id = 'i', .validator = sharg::arithmetic_range_validator{1, 20}});
 
     EXPECT_THROW(parser7.parse(), sharg::validation_error);
 }
@@ -948,11 +913,8 @@ TEST(validator_test, value_list_validator_success)
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
     parser.add_option(option_value,
-                      's',
-                      "string-option",
-                      "desc",
-                      sharg::option_spec::standard,
-                      sharg::value_list_validator{valid_str_values | std::views::take(2)});
+                      sharg::config{.short_id = 's',
+                                    .validator = sharg::value_list_validator{valid_str_values | std::views::take(2)}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser.parse());
@@ -964,11 +926,7 @@ TEST(validator_test, value_list_validator_success)
     sharg::parser parser2{"test_parser", 3, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
     parser2.add_option(option_value_int,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::value_list_validator<int>{0, -21, 10});
+                       sharg::config{.short_id = 'i', .validator = sharg::value_list_validator<int>{0, -21, 10}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser2.parse());
@@ -979,7 +937,8 @@ TEST(validator_test, value_list_validator_success)
     char const * argv3[] = {"./parser_test", "ma"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
-    parser3.add_positional_option(option_value, "desc", sharg::value_list_validator{valid_str_values});
+    parser3.add_positional_option(option_value,
+                                  sharg::config{.validator = sharg::value_list_validator{valid_str_values}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser3.parse());
@@ -990,7 +949,8 @@ TEST(validator_test, value_list_validator_success)
     char const * argv4[] = {"./parser_test", "ha", "ma"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_positional_option(option_vector, "desc", sharg::value_list_validator{"ha", "ba", "ma"});
+    parser4.add_positional_option(option_vector,
+                                  sharg::config{.validator = sharg::value_list_validator{"ha", "ba", "ma"}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser4.parse());
@@ -1003,11 +963,7 @@ TEST(validator_test, value_list_validator_success)
     sharg::parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
     parser5.add_option(option_vector_int,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::value_list_validator<int>{-10, 48, 50});
+                       sharg::config{.short_id = 'i', .validator = sharg::value_list_validator<int>{-10, 48, 50}});
 
     testing::internal::CaptureStderr();
     EXPECT_NO_THROW(parser5.parse());
@@ -1021,11 +977,10 @@ TEST(validator_test, value_list_validator_success)
     sharg::parser parser7{"test_parser", 2, argv7, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
     parser7.add_option(option_vector_int,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::value_list_validator<int>{-10, 48, 50});
+                       sharg::config{.short_id = 'i',
+                                     .long_id = "int-option",
+                                     .description = "desc",
+                                     .validator = sharg::value_list_validator<int>{-10, 48, 50}});
 
     option_vector_int.clear();
     testing::internal::CaptureStdout();
@@ -1053,11 +1008,7 @@ TEST(validator_test, value_list_validator_error)
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
     parser.add_option(option_value,
-                      's',
-                      "string-option",
-                      "desc",
-                      sharg::option_spec::standard,
-                      sharg::value_list_validator{"ha", "ba", "ma"});
+                      sharg::config{.short_id = 's', .validator = sharg::value_list_validator{"ha", "ba", "ma"}});
 
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
@@ -1065,7 +1016,7 @@ TEST(validator_test, value_list_validator_error)
     char const * argv3[] = {"./parser_test", "30"};
     sharg::parser parser3{"test_parser", 2, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
-    parser3.add_positional_option(option_value_int, "desc", sharg::value_list_validator{0, 5, 10});
+    parser3.add_positional_option(option_value_int, sharg::config{.validator = sharg::value_list_validator{0, 5, 10}});
 
     EXPECT_THROW(parser3.parse(), sharg::validation_error);
 
@@ -1073,7 +1024,8 @@ TEST(validator_test, value_list_validator_error)
     char const * argv4[] = {"./parser_test", "fo", "ma"};
     sharg::parser parser4{"test_parser", 3, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_positional_option(option_vector, "desc", sharg::value_list_validator{"ha", "ba", "ma"});
+    parser4.add_positional_option(option_vector,
+                                  sharg::config{.validator = sharg::value_list_validator{"ha", "ba", "ma"}});
 
     EXPECT_THROW(parser4.parse(), sharg::validation_error);
 
@@ -1082,11 +1034,7 @@ TEST(validator_test, value_list_validator_error)
     sharg::parser parser5{"test_parser", 5, argv5, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
     parser5.add_option(option_vector_int,
-                       'i',
-                       "int-option",
-                       "desc",
-                       sharg::option_spec::standard,
-                       sharg::value_list_validator<int>{-10, 48, 50});
+                       sharg::config{.short_id = 'i', .validator = sharg::value_list_validator<int>{-10, 48, 50}});
 
     EXPECT_THROW(parser5.parse(), sharg::validation_error);
 }
@@ -1102,7 +1050,7 @@ TEST(validator_test, regex_validator_success)
         char const * argv[] = {"./parser_test", "-s", "ballo@rollo.com"};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value, 's', "string-option", "desc", sharg::option_spec::standard, email_validator);
+        parser.add_option(option_value, sharg::config{.short_id = 's', .validator = email_validator});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1114,7 +1062,7 @@ TEST(validator_test, regex_validator_success)
         char const * argv[] = {"./parser_test", "chr1"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(option_value, "desc", sharg::regex_validator{"^chr[0-9]+"});
+        parser.add_positional_option(option_value, sharg::config{.validator = sharg::regex_validator{"^chr[0-9]+"}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1126,7 +1074,7 @@ TEST(validator_test, regex_validator_success)
         char const * argv[] = {"./parser_test", "rollo", "bollo", "lollo"};
         sharg::parser parser{"test_parser", 4, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_positional_option(option_vector, "desc", sharg::regex_validator{".*oll.*"});
+        parser.add_positional_option(option_vector, sharg::config{.validator = sharg::regex_validator{".*oll.*"}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1141,12 +1089,7 @@ TEST(validator_test, regex_validator_success)
         char const * argv[] = {"./parser_test", "-s", "rita@rambo.com", "-s", "tina@rambo.com"};
         sharg::parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_vector,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          email_vector_validator);
+        parser.add_option(option_vector, sharg::config{.short_id = 's', .validator = email_vector_validator});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1160,12 +1103,7 @@ TEST(validator_test, regex_validator_success)
         char const * argv[] = {"./parser_test", "-s", "rita@rambo.com"};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(path_option,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          email_vector_validator);
+        parser.add_option(path_option, sharg::config{.short_id = 's', .validator = email_vector_validator});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1179,11 +1117,10 @@ TEST(validator_test, regex_validator_success)
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(option_vector,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          email_vector_validator);
+                          sharg::config{.short_id = 's',
+                                        .long_id = "string-option",
+                                        .description = "desc",
+                                        .validator = email_vector_validator});
 
         option_vector.clear();
         testing::internal::CaptureStdout();
@@ -1212,11 +1149,7 @@ TEST(validator_test, regex_validator_error)
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser, 80);
     parser.add_option(option_value,
-                      '\0',
-                      "string-option",
-                      "desc",
-                      sharg::option_spec::standard,
-                      sharg::regex_validator{"tt"});
+                      sharg::config{.long_id = "string-option", .validator = sharg::regex_validator{"tt"}});
 
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
@@ -1224,7 +1157,7 @@ TEST(validator_test, regex_validator_error)
     char const * argv2[] = {"./parser_test", "jessy"};
     sharg::parser parser2{"test_parser", 2, argv2, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
-    parser2.add_positional_option(option_value, "desc", sharg::regex_validator{"[0-9]"});
+    parser2.add_positional_option(option_value, sharg::config{.validator = sharg::regex_validator{"[0-9]"}});
 
     EXPECT_THROW(parser2.parse(), sharg::validation_error);
 
@@ -1232,7 +1165,7 @@ TEST(validator_test, regex_validator_error)
     char const * argv3[] = {"./parser_test", "rollo", "bttllo", "lollo"};
     sharg::parser parser3{"test_parser", 4, argv3, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
-    parser3.add_positional_option(option_vector, "desc", sharg::regex_validator{".*oll.*"});
+    parser3.add_positional_option(option_vector, sharg::config{.validator = sharg::regex_validator{".*oll.*"}});
 
     EXPECT_THROW(parser3.parse(), sharg::validation_error);
 
@@ -1241,7 +1174,7 @@ TEST(validator_test, regex_validator_error)
     char const * argv4[] = {"./parser_test", "-s", "gh", "-s", "tt"};
     sharg::parser parser4{"test_parser", 5, argv4, sharg::update_notifications::off};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
-    parser4.add_option(option_vector, 's', "", "desc", sharg::option_spec::standard, sharg::regex_validator{"tt"});
+    parser4.add_option(option_vector, sharg::config{.short_id = 's', .validator = sharg::regex_validator{"tt"}});
 
     EXPECT_THROW(parser4.parse(), sharg::validation_error);
 }
@@ -1342,11 +1275,7 @@ TEST(validator_test, chaining_validators)
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(option_value,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          absolute_path_validator | my_file_ext_validator);
+                          sharg::config{.short_id = 's', .validator = absolute_path_validator | my_file_ext_validator});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1360,11 +1289,7 @@ TEST(validator_test, chaining_validators)
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(option_value,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          absolute_path_validator | my_file_ext_validator);
+                          sharg::config{.short_id = 's', .validator = absolute_path_validator | my_file_ext_validator});
 
         EXPECT_THROW(parser.parse(), sharg::validation_error);
     }
@@ -1375,11 +1300,7 @@ TEST(validator_test, chaining_validators)
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(option_value,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          absolute_path_validator | my_file_ext_validator);
+                          sharg::config{.short_id = 's', .validator = absolute_path_validator | my_file_ext_validator});
 
         EXPECT_THROW(parser.parse(), sharg::validation_error);
     }
@@ -1392,12 +1313,10 @@ TEST(validator_test, chaining_validators)
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(
             option_value,
-            's',
-            "string-option",
-            "desc",
-            sharg::option_spec::standard,
-            sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
-                | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}});
+            sharg::config{
+                .short_id = 's',
+                .validator = sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                           | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1411,14 +1330,13 @@ TEST(validator_test, chaining_validators)
         char const * argv[] = {"./parser_test", "-s", path.c_str()};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+        parser.add_option(
+            option_value,
+            sharg::config{.short_id = 's',
+                          .validator =
+                              sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
                               | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}}
-                              | sharg::regex_validator{".*"});
+                              | sharg::regex_validator{".*"}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());
@@ -1432,14 +1350,15 @@ TEST(validator_test, chaining_validators)
         char const * argv[] = {"./parser_test", "-h"};
         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
-        parser.add_option(option_value,
-                          's',
-                          "string-option",
-                          "desc",
-                          sharg::option_spec::standard,
-                          sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+        parser.add_option(
+            option_value,
+            sharg::config{.short_id = 's',
+                          .long_id = "string-option",
+                          .description = "desc",
+                          .validator =
+                              sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
                               | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}}
-                              | sharg::regex_validator{".*"});
+                              | sharg::regex_validator{".*"}});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -1467,13 +1386,13 @@ TEST(validator_test, chaining_validators)
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(
             option_value,
-            's',
-            "string-option",
-            "desc",
-            sharg::option_spec::standard,
-            sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
-                | sharg::output_file_validator{sharg::output_file_open_options::open_or_create, {"sa", "so"}}
-                | sharg::regex_validator{".*"});
+            sharg::config{
+                .short_id = 's',
+                .long_id = "string-option",
+                .description = "desc",
+                .validator = sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                           | sharg::output_file_validator{sharg::output_file_open_options::open_or_create, {"sa", "so"}}
+                           | sharg::regex_validator{".*"}});
 
         testing::internal::CaptureStdout();
         EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -1501,12 +1420,10 @@ TEST(validator_test, chaining_validators)
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.add_option(
             option_list_value,
-            's',
-            "string-option",
-            "desc",
-            sharg::option_spec::standard,
-            sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
-                | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}});
+            sharg::config{
+                .short_id = 's',
+                .validator = sharg::regex_validator{"(/[^/]+)+/.*\\.[^/\\.]+$"}
+                           | sharg::output_file_validator{sharg::output_file_open_options::create_new, {"sa", "so"}}});
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(parser.parse());

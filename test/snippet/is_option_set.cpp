@@ -5,7 +5,7 @@ int main(int argc, char ** argv)
     sharg::parser myparser{"awesome-app", argc, argv}; // initialize
 
     int a{3};
-    myparser.add_option(a, 'a', "awesome-parameter", "Please specify an integer.");
+    myparser.add_option(a, sharg::config{.short_id = 'a', .long_id = "aint", .description = "Specify an integer."});
 
     try
     {

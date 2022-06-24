@@ -70,49 +70,39 @@ public:
     /*!\brief Adds an sharg::detail::get_option call to be evaluated later on.
      * \copydetails sharg::parser::add_option
      */
-    template <typename option_type, typename validator_type>
-    void add_option(option_type & value,
-                    char const short_id,
-                    std::string const & long_id,
-                    std::string const & SHARG_DOXYGEN_ONLY(desc),
-                    option_spec const spec,
-                    validator_type && option_validator)
+    template <typename option_type, typename config_type>
+    void add_option(option_type & value, config_type const & config)
     {
         option_calls.push_back(
-            [this, &value, short_id, long_id, spec, option_validator]()
+            [this, &value, config]()
             {
-                get_option(value, short_id, long_id, spec, option_validator);
+                get_option(value, config);
             });
     }
 
     /*!\brief Adds a get_flag call to be evaluated later on.
      * \copydetails sharg::parser::add_flag
      */
-    void add_flag(bool & value,
-                  char const short_id,
-                  std::string const & long_id,
-                  std::string const & SHARG_DOXYGEN_ONLY(desc),
-                  option_spec const & SHARG_DOXYGEN_ONLY(spec))
+    template <typename config_type>
+    void add_flag(bool & value, config_type const & config)
     {
         flag_calls.push_back(
-            [this, &value, short_id, long_id]()
+            [this, &value, config]()
             {
-                get_flag(value, short_id, long_id);
+                get_flag(value, config.short_id, config.long_id);
             });
     }
 
     /*!\brief Adds a get_positional_option call to be evaluated later on.
      * \copydetails sharg::parser::add_positional_option
      */
-    template <typename option_type, typename validator_type>
-    void add_positional_option(option_type & value,
-                               std::string const & SHARG_DOXYGEN_ONLY(desc),
-                               validator_type && option_validator)
+    template <typename option_type, typename config_type>
+    void add_positional_option(option_type & value, config_type const & config)
     {
         positional_option_calls.push_back(
-            [this, &value, option_validator]()
+            [this, &value, config]()
             {
-                get_positional_option(value, option_validator);
+                get_positional_option(value, config.validator);
             });
     }
 
@@ -140,15 +130,15 @@ public:
         check_for_left_over_args();
     }
 
-    // functions are not needed for command line parsing but are part of the format interface.
+    // functions are not needed for command line parsing but are part of the format help interface.
     //!\cond
-    void add_section(std::string const &, option_spec const)
+    void add_section(std::string const &, bool const)
     {}
-    void add_subsection(std::string const &, option_spec const)
+    void add_subsection(std::string const &, bool const)
     {}
-    void add_line(std::string const &, bool, option_spec const)
+    void add_line(std::string const &, bool, bool const)
     {}
-    void add_list_item(std::string const &, std::string const &, option_spec const)
+    void add_list_item(std::string const &, std::string const &, bool const)
     {}
     //!\endcond
 
@@ -673,11 +663,8 @@ private:
 
     /*!\brief Handles command line option retrieval.
      *
-     * \param[out] value     The variable in which to store the given command line argument.
-     * \param[in]  short_id  The short identifier for the option (e.g. 'i').
-     * \param[in]  long_id   The long identifier for the option (e.g. "integer").
-     * \param[in]  spec      Advanced option specification, see sharg::option_spec.
-     * \param[in]  validator The validator applied to the value after parsing (callable).
+     * \param[out] value The variable in which to store the given command line argument.
+     * \param[in] config A configuration object to customise the sharg::parser behaviour. See sharg::config.
      *
      * \throws sharg::option_declared_multiple_times
      * \throws sharg::validation_error
@@ -691,38 +678,34 @@ private:
      * - throws on (mis)use of both identifiers for non-container type values,
      * - re-throws the validation exception with appended option information.
      */
-    template <typename option_type, typename validator_type>
-    void get_option(option_type & value,
-                    char const short_id,
-                    std::string const & long_id,
-                    option_spec const spec,
-                    validator_type && validator)
+    template <typename option_type, typename config_type>
+    void get_option(option_type & value, config_type const & config)
     {
-        bool short_id_is_set{get_option_by_id(value, short_id)};
-        bool long_id_is_set{get_option_by_id(value, long_id)};
+        bool short_id_is_set{get_option_by_id(value, config.short_id)};
+        bool long_id_is_set{get_option_by_id(value, config.long_id)};
 
         // if value is no container we need to check for multiple declarations
         if (short_id_is_set && long_id_is_set && !detail::is_container_option<option_type>)
-            throw option_declared_multiple_times("Option " + combine_option_names(short_id, long_id)
+            throw option_declared_multiple_times("Option " + combine_option_names(config.short_id, config.long_id)
                                                  + " is no list/container but specified multiple times");
 
         if (short_id_is_set || long_id_is_set)
         {
             try
             {
-                validator(value);
+                config.validator(value);
             }
             catch (std::exception & ex)
             {
                 throw validation_error(std::string("Validation failed for option ")
-                                       + combine_option_names(short_id, long_id) + ": " + ex.what());
+                                       + combine_option_names(config.short_id, config.long_id) + ": " + ex.what());
             }
         }
         else // option is not set
         {
             // check if option is required
-            if (spec & option_spec::required)
-                throw required_option_missing("Option " + combine_option_names(short_id, long_id)
+            if (config.required)
+                throw required_option_missing("Option " + combine_option_names(config.short_id, config.long_id)
                                               + " is required but not set.");
         }
     }

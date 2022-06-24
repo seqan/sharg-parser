@@ -54,7 +54,7 @@ TEST(parse_type_test, parse_success_enum_option)
 
         char const * argv[] = {"./parser_test", "-e", "two"};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
+        parser.add_option(option_value, sharg::config{.short_id = 'e'});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_TRUE(option_value == foo::bar::two);
@@ -65,7 +65,7 @@ TEST(parse_type_test, parse_success_enum_option)
 
         char const * argv[] = {"./parser_test", "-e", "two"};
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
+        parser.add_option(option_value, sharg::config{.short_id = 'e'});
 
         EXPECT_NO_THROW(parser.parse());
         EXPECT_TRUE(option_value == Other::bar::two);
@@ -78,7 +78,7 @@ TEST(parse_type_test, parse_error_enum_option)
 
     char const * argv[] = {"./parser_test", "-e", "four"};
     sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-    parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
+    parser.add_option(option_value, sharg::config{.short_id = 'e'});
 
     EXPECT_THROW(parser.parse(), sharg::user_input_error);
 }
@@ -94,7 +94,7 @@ TEST(parse_test, issue2464)
         option_t option_value{};
 
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
+        parser.add_option(option_value, sharg::config{.short_id = 'e'});
         EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
     {
@@ -103,7 +103,7 @@ TEST(parse_test, issue2464)
         std::vector<option_t> option_values{};
 
         sharg::parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
-        parser.add_option(option_values, 'e', "enum-option", "this is an enum option.");
+        parser.add_option(option_values, sharg::config{.short_id = 'e'});
         EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
 
@@ -116,12 +116,7 @@ TEST(parse_test, issue2464)
         option_t option_value{};
 
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value,
-                          'e',
-                          "enum-option",
-                          "this is an enum option.",
-                          sharg::option_spec::advanced,
-                          enum_validator);
+        parser.add_option(option_value, sharg::config{.short_id = 'e', .advanced = true, .validator = enum_validator});
         EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
     {
@@ -131,12 +126,7 @@ TEST(parse_test, issue2464)
         std::vector<option_t> option_values{};
 
         sharg::parser parser{"test_parser", 5, argv, sharg::update_notifications::off};
-        parser.add_option(option_values,
-                          'e',
-                          "enum-option",
-                          "this is an enum option.",
-                          sharg::option_spec::advanced,
-                          enum_validator);
+        parser.add_option(option_values, sharg::config{.short_id = 'e', .advanced = true, .validator = enum_validator});
         EXPECT_THROW(parser.parse(), sharg::user_input_error);
     }
 }
@@ -150,7 +140,7 @@ TEST(parse_test, enum_error_message)
         foo::bar option_value{};
 
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
+        parser.add_option(option_value, sharg::config{.short_id = 'e'});
 
         std::string expected_message{"You have chosen an invalid input value: nine. "
                                      "Please use one of: [one, two, three]"};
@@ -176,7 +166,7 @@ TEST(parse_test, enum_error_message)
         Other::bar option_value{};
 
         sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, 'e', "enum-option", "this is an enum option.");
+        parser.add_option(option_value, sharg::config{.short_id = 'e'});
 
         std::string expected_message{"You have chosen an invalid input value: nine. "
                                      "Please use one of: [1, one, 2, two]"};
@@ -204,7 +194,7 @@ TEST(parse_test, container_options)
 
     char const * argv[] = {"./parser_test", "-e", "two", "-e", "one", "-e", "three"};
     sharg::parser parser{"test_parser", 7, argv, sharg::update_notifications::off};
-    parser.add_option(option_values, 'e', "enum-option", "this is an enum option.");
+    parser.add_option(option_values, sharg::config{.short_id = 'e'});
 
     EXPECT_NO_THROW(parser.parse());
 

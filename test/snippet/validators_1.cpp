@@ -8,7 +8,11 @@ int main(int argc, char const ** argv)
     int myint;
     sharg::arithmetic_range_validator my_validator{2, 10};
 
-    myparser.add_option(myint, 'i', "integer", "Give me a number.", sharg::option_spec::standard, my_validator);
+    myparser.add_option(myint,
+                        sharg::config{.short_id = 'i',
+                                      .long_id = "integer",
+                                      .description = "Give me a number.",
+                                      .validator = my_validator});
     //![validator_call]
 
     // an exception will be thrown if the user specifies an integer

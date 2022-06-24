@@ -8,7 +8,11 @@ int main(int argc, char const ** argv)
     std::string my_string;
     sharg::regex_validator my_validator{"[a-zA-Z]+@[a-zA-Z]+\\.com"};
 
-    myparser.add_option(my_string, 's', "str", "Give me a string.", sharg::option_spec::standard, my_validator);
+    myparser.add_option(my_string,
+                        sharg::config{.short_id = 's',
+                                      .long_id = "str",
+                                      .description = "Give me a string.",
+                                      .validator = my_validator});
     //![validator_call]
 
     // an exception will be thrown if the user specifies a string

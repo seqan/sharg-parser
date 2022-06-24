@@ -33,18 +33,15 @@ int main(int argc, char ** argv)
     int16_t variable2{};
 
     myparser.add_option(variable,
-                        'i',
-                        "",
-                        "An int that is a square",
-                        sharg::option_spec::standard,
-                        custom_validator{}); // ← your validator is used!
+                        sharg::config{.short_id = 'i',
+                                      .description = "An int that is a square",
+                                      .validator = custom_validator{}}); // ← your validator is used!
 
     myparser.add_option(variable2,
-                        'j',
-                        "",
-                        "An int that is a square and within [0,20].",
-                        sharg::option_spec::standard,
-                        custom_validator{} | sharg::arithmetic_range_validator{0, 20}); // ← now it's chained
+                        sharg::config{.short_id = 'j',
+                                      .description = "An int that is a square and within [0,20].",
+                                      .validator = custom_validator{}
+                                                 | sharg::arithmetic_range_validator{0, 20}}); // ← now it's chained
 
     try
     {

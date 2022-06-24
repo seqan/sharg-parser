@@ -20,37 +20,7 @@
 namespace sharg
 {
 
-/*!\brief Used to further specify parser options/flags.
- * \ingroup parser
- *
- * \details
- *
- * All options and flags are set to option_spec::standard unless specified
- * otherwise by the developer, e.g. when calling parser::add_option().
- *
- * \include test/snippet/auxiliary.cpp
- *
- * \remark For a complete overview, take a look at \ref parser
- */
-enum option_spec
-{
-    standard = 0, //!< The default were no checking or special displaying is happening.
-    required = 1, /*!< Set an option as required if you want to enforce that the user
-                   * supplies this option when calling the program via the command line.
-                   * If the option is missing, the parser will automatically
-                   * detect this and throw a invalid_argument exception.
-                   */
-    advanced = 2, /*!< Set an option/flag to advanced if you do not want the option to
-                   * be displayed in the normal help page (`-h/--help`). Instead, the
-                   * advanced options are only displayed when calling `-hh/--advanced-help`
-                   */
-    hidden = 4    /*!< Set an option/flag to hidden, if you want to completely hide it from
-                   * the user. It will never appear on the help page nor any export format.
-                   * For example, this can be useful for debugging reasons.
-                   */
-};
-
-//!\brief Indicates whether application allows automatic update notifications by the sharg::parser.
+//!\brief Indicates whether application allows automatic update notifications by the sharg::argument_parser.
 enum class update_notifications
 {
     on, //!< Automatic update notifications should be enabled.

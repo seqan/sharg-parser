@@ -14,6 +14,7 @@
 #pragma once
 
 #include <sharg/auxiliary.hpp>
+#include <sharg/config.hpp>
 #include <sharg/detail/concept.hpp>
 #include <sharg/detail/type_name_as_string.hpp>
 #include <sharg/validators.hpp>
@@ -213,65 +214,57 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_option
      */
-    template <typename option_type, typename validator_type>
-    void add_option(option_type & value,
-                    char const short_id,
-                    std::string const & long_id,
-                    std::string const & desc,
-                    option_spec const spec,
-                    validator_type && option_validator)
+    template <typename option_type, typename config_type>
+    void add_option(option_type & value, config_type const & config)
     {
-        std::string id = prep_id_for_help(short_id, long_id) + " " + option_type_and_list_info(value);
-        std::string info{desc};
-        info += ((spec & option_spec::required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
-        info += option_validator.get_help_page_message();
+        std::string id = prep_id_for_help(config.short_id, config.long_id) + " " + option_type_and_list_info(value);
+        std::string info{config.description};
+        info += ((config.required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
+        info += config.validator.get_help_page_message();
+
         store_help_page_element(
             [this, id, info]()
             {
                 derived_t().print_list_item(id, info);
             },
-            spec);
+            config);
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_flag
      */
-    void add_flag(bool & SHARG_DOXYGEN_ONLY(value),
-                  char const short_id,
-                  std::string const & long_id,
-                  std::string const & desc,
-                  option_spec const spec)
+    template <typename config_type>
+    void add_flag(bool & SHARG_DOXYGEN_ONLY(value), config_type const & config)
     {
-        std::string id = prep_id_for_help(short_id, long_id);
         store_help_page_element(
-            [this, id, desc]()
+            [this, id = prep_id_for_help(config.short_id, config.long_id), description = config.description]()
             {
-                derived_t().print_list_item(id, desc);
+                derived_t().print_list_item(id, description);
             },
-            spec);
+            config);
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_positional_option
      */
-    template <typename option_type, typename validator_type>
-    void add_positional_option(option_type & value, std::string const & desc, validator_type & option_validator)
+    template <typename option_type, typename config_type>
+    void add_positional_option(option_type & value, config_type const & config)
     {
-        std::string msg = option_validator.get_help_page_message();
-
-        // clang-format off
-        positional_option_calls.push_back([this, &value, desc, msg] ()
-        {
-            ++positional_option_count;
-            derived_t().print_list_item(detail::to_string("\\fBARGUMENT-", positional_option_count, "\\fP ",
-                                                          option_type_and_list_info(value)),
-                                        desc +
-                                        // a list at the end may be empty and thus have a default value
-                                        ((detail::is_container_option<option_type>)
-                                            ? detail::to_string(" Default: ", value, ". ")
-                                            : std::string{" "}) +
-                                        msg);
-        });
+        positional_option_calls.push_back(
+            [this, &value, description = config.description, validator = config.validator]()
+            {
+                ++positional_option_count;
+                derived_t().print_list_item(detail::to_string("\\fBARGUMENT-",
+                                                              positional_option_count,
+                                                              "\\fP ",
+                                                              option_type_and_list_info(value)),
+                                            description +
+                                                // a list at the end may be empty and thus have a default value
+                                                ((detail::is_container_option<option_type>)
+                                                     ? detail::to_string(" Default: ", value, ". ")
+                                                     : std::string{" "})
+                                                + validator.get_help_page_message());
+            });
         // clang-format on
     }
 
@@ -347,53 +340,57 @@ public:
     /*!\brief Adds a print_section call to parser_set_up_calls.
      * \copydetails sharg::parser::add_section
      */
-    void add_section(std::string const & title, option_spec const spec)
+    void add_section(std::string const & title, bool const advanced_only)
     {
         store_help_page_element(
             [this, title]()
             {
                 derived_t().print_section(title);
             },
-            spec);
+            advanced_only,
+            false /* never hidden */);
     }
 
     /*!\brief Adds a print_subsection call to parser_set_up_calls.
      * \copydetails sharg::parser::add_subsection
      */
-    void add_subsection(std::string const & title, option_spec const spec)
+    void add_subsection(std::string const & title, bool const advanced_only)
     {
         store_help_page_element(
             [this, title]()
             {
                 derived_t().print_subsection(title);
             },
-            spec);
+            advanced_only,
+            false /* never hidden */);
     }
 
     /*!\brief Adds a print_line call to parser_set_up_calls.
      * \copydetails sharg::parser::add_line
      */
-    void add_line(std::string const & text, bool is_paragraph, option_spec const spec)
+    void add_line(std::string const & text, bool is_paragraph, bool const advanced_only)
     {
         store_help_page_element(
             [this, text, is_paragraph]()
             {
                 derived_t().print_line(text, is_paragraph);
             },
-            spec);
+            advanced_only,
+            false /* never hidden */);
     }
 
     /*!\brief Adds a sharg::print_list_item call to parser_set_up_calls.
      * \copydetails sharg::parser::add_list_item
      */
-    void add_list_item(std::string const & key, std::string const & desc, option_spec const spec)
+    void add_list_item(std::string const & key, std::string const & desc, bool const advanced_only)
     {
         store_help_page_element(
             [this, key, desc]()
             {
                 derived_t().print_list_item(key, desc);
             },
-            spec);
+            advanced_only,
+            false /* never hidden */);
     }
 
     /*!\brief Stores all meta information about the application
@@ -517,19 +514,36 @@ protected:
     bool show_advanced_options{true};
 
 private:
-    /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `spec` does not prevent it.
+    /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `config` does not prevent it.
      * \param[in] printer The invokable that, if added to `parser_set_up_calls`, prints information to the help page.
-     * \param[in] spec The option specification deciding whether to add the information to the help page.
+     * \param[in] advanced Whether the help page element was configured to be hidden.
+     * \param[in] hidden Whether the help page element was configured to be hidden.
      *
      * \details
      *
-     * If `spec` equals `sharg::option_spec::hidden`, the information is never added to the help page.
-     * If `spec` equals `sharg::option_spec::advanced`, the information is only added to the help page if
+     * If `hidden = true`, the information is never added to the help page.
+     * If `advanced = true`, the information is only added to the help page if
      * the advanced help page has been queried on the command line (`show_advanced_options == true`).
      */
-    void store_help_page_element(std::function<void()> printer, option_spec const spec)
+    void store_help_page_element(std::function<void()> printer, bool const advanced, bool const hidden)
     {
-        if (!(spec & option_spec::hidden) && (!(spec & option_spec::advanced) || show_advanced_options))
+        if (!(hidden) && (!(advanced) || show_advanced_options))
+            parser_set_up_calls.push_back(std::move(printer));
+    }
+
+    /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `config` does not prevent it.
+     * \param[in] printer The invokable that, if added to `parser_set_up_calls`, prints information to the help page.
+     * \param[in] config The sharg::config object to access `config.advanced` and  `config.hidden`.
+     *
+     * \details
+     *
+     * If `config.hidden = true`, the information is never added to the help page.
+     * If `config.advanced = true`, the information is only added to the help page if
+     * the advanced help page has been queried on the command line (`show_advanced_options == true`).
+     */
+    void store_help_page_element(std::function<void()> printer, config<auto> const & config)
+    {
+        if (!(config.hidden) && (!(config.advanced) || show_advanced_options))
             parser_set_up_calls.push_back(std::move(printer));
     }
 };
