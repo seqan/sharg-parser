@@ -18,6 +18,7 @@ namespace sharg
 {
 
 /*!\brief Option struct that is passed to the `sharg::parser::add_option()` function.
+ * \ingroup parser
  *
  * The following table gives an overview about which parameters are valid for which type of option added to the parser.
  * Please see the individual entities for detailed documentation.
