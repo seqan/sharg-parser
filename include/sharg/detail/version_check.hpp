@@ -1,9 +1,9 @@
-// -----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 // Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
-// -----------------------------------------------------------------------------------------------------------
+// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/main/LICENSE.md
+// --------------------------------------------------------------------------------------------------------
 
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
@@ -27,9 +27,9 @@
 namespace sharg::detail
 {
 
-// ---------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 // function call_server()
-// ---------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 
 /*!\brief Writes a timestamp file and performs the server call to get the newest version information.
  * \param[in] command  The system command as a string. See sharg::detail::version_checker::command for details.
@@ -46,9 +46,9 @@ inline void call_server(std::string const & command, std::promise<bool> prom)
         prom.set_value(true);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 // version_checker
-// ---------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
 
 //!\brief A functor whose operator() performs the server http request and version checks.
 class version_checker

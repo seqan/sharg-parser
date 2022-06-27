@@ -4,10 +4,10 @@ labels: [bug]
 body:
 - type: checkboxes
   attributes:
-    label: Does this problem persist on the current master?
-    description: Update to the latest master branch of Sharg and see if the issue persists.
+    label: Does this problem persist on the current main?
+    description: Update to the latest main branch of Sharg and see if the issue persists.
     options:
-    - label: I have verified the issue on the current master
+    - label: I have verified the issue on the current main
       required: true
 - type: checkboxes
   attributes:
