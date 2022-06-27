@@ -32,18 +32,18 @@
         `https://img.shields.io/github/workflow/status/` - we do not use GitHub's badges as they are not customisable.
         `/seqan/sharg-parser/` - owner/repository
         `CI%20on%20Linux` - name of the workflow as encoded URL (e.g., whitespace = %20)
-        `master` - branch to show
+        `main` - branch to show
         `?style=flat&logo=github` - use a GitHub-style badge
         `&label=sharg-parser%20CI` - text on the badge
         `"Open GitHub actions page"` - this text will be shown on hover
 -->
-[ci_badge]: https://img.shields.io/github/workflow/status/seqan/sharg-parser/CI%20on%20Linux/master?style=flat&logo=github&label=Sharg%20CI "Open GitHub actions page"
+[ci_badge]: https://img.shields.io/github/workflow/status/seqan/sharg-parser/CI%20on%20Linux/main?style=flat&logo=github&label=Sharg%20CI "Open GitHub actions page"
 <!--
     This is the CI badge link:
         `https://github.com/seqan/sharg-parser/actions` - actions page of owner(seqan)/repository(sharg-parser)
-        `?query=branch%3Amaster` - only show actions that ran on the mater branch
+        `?query=branch%3Amain` - only show actions that ran on the mater branch
 -->
-[github_actions]: https://github.com/seqan/sharg-parser/actions?query=branch%3Amaster
+[github_actions]: https://github.com/seqan/sharg-parser/actions?query=branch%3Amain
 <!--
     This is the Codecov badge image:
         Codecov offers badges: https://app.codecov.io/gh/seqan/sharg-parser/settings/badge
@@ -51,7 +51,7 @@
         Copy the image part of the markdown badge here.
     `"Open Codecov page"` - this text will be shown on hover
 -->
-[codecov_badge]: https://codecov.io/gh/seqan/sharg-parser/branch/master/graph/badge.svg?token=KIdo8b91jb "Open Codecov page"
+[codecov_badge]: https://codecov.io/gh/seqan/sharg-parser/branch/main/graph/badge.svg?token=KIdo8b91jb "Open Codecov page"
 <!--
     This is the Codecov badge link:
         Codecov offers badges: https://app.codecov.io/gh/seqan/sharg-parser/settings/badge
@@ -104,7 +104,7 @@ bioinformatics-related C++ features.
 
 [![Vercel][vercel_badge]][vercel_website]
 
-[vercel_badge]: https://raw.githubusercontent.com/seqan/sharg-parser/master/test/documentation/.vercel/powered-by-vercel.svg "Powered by Vercel"
+[vercel_badge]: https://raw.githubusercontent.com/seqan/sharg-parser/main/test/documentation/.vercel/powered-by-vercel.svg "Powered by Vercel"
 [vercel_website]: https://vercel.com/?utm_source=seqan&utm_campaign=oss
 
 Vercel is kind enough to build and host our documentation and even provide preview-builds within our pull requests.

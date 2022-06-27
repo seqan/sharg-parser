@@ -1,6 +1,6 @@
 # Contributing {#about_contributing}
 
-First of all, thanks for wanting to contribute to the SeqAn's Sharg-parser! Community is important to us and we strive 
+First of all, thanks for wanting to contribute to the SeqAn's Sharg-parser! Community is important to us and we strive
 to maintain a great culture and atmosphere. Please have a look at our [Code of Conduct](\ref about_code_of_conduct).
 
 The following is a guide that helps stream-line the process of adding changes. If you haven't contributed to Sharg/SeqAn
@@ -15,13 +15,13 @@ The overall workflow of contributing changes to this repository is:
   2. Wait for comments from the team and then collectively decide on the best way to solve the issue.
   3. Fork the repository and create a branch on your fork.
   4. Commit the solution to your local branch.
-  5. Create a pull-request to our master branch from your branch.
+  5. Create a pull-request to our main branch from your branch.
   6. Wait for reviews and resolve reviewer comments.
   7. Wait for the PR to be merged.
 
 ## Creating an issue
 
-Go to https://github.com/seqan/sharg-parser/issues and check if someone else has already reported the same issue. If 
+Go to https://github.com/seqan/sharg-parser/issues and check if someone else has already reported the same issue. If
 not, create a new issue and follow the template.
 
 We usually reply quickly to issues; if there is no reply within a week (and it's not prime vacation season in Europe)
@@ -82,7 +82,7 @@ point. Always only request review from one person at a time.
 
 If you have not contributed to SeqAn before, you will likely receive a lot of comments on the style of your code. This
 is not a sign that we don't appreciate your contribution, but we have high code quality standards and everything
-must conform to our [style guide](https://github.com/seqan/seqan3/wiki#library-coding-guide). In the future we hope 
+must conform to our [style guide](https://github.com/seqan/seqan3/wiki#library-coding-guide). In the future we hope
 to automate this step.
 After you have received the first review, go through all comments and clarify any suggestions and requests. When
 you are confident that you know how to address all comments, implement the changes and update your PR.

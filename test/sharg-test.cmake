@@ -1,9 +1,9 @@
-# -----------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
 # Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/sharg/blob/master/LICENSE.md
-# -----------------------------------------------------------------------------------------------------
+# shipped with this file and also available at:https://github.com/seqan/sharg-parser/blob/main/LICENSE.md
+# -------------------------------------------------------------------------------------------------------
 
 # This file provides functionality common to the different test modules used by
 # SeqAn3. To build tests, run cmake on one of the sub-folders in this directory
