@@ -397,7 +397,10 @@ TEST(help_page_printing, full_information)
     parser6.info.description.push_back("description2");
     parser6.info.short_description = "so short";
     parser6.add_option(option_value,
-                       sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option.", .default_message = "A number"});
+                       sharg::config{.short_id = 'i',
+                                     .long_id = "int",
+                                     .description = "this is a int option.",
+                                     .default_message = "A number"});
     parser6.add_option(
         enum_option_value,
         sharg::config{.short_id = 'e',

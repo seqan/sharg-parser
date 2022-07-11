@@ -92,7 +92,10 @@ TEST(html_format, full_information_information)
     parser1.info.author = "author";
     parser1.info.email = "email";
     parser1.add_option(option_value,
-                       sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option.", .default_message = "A number"});
+                       sharg::config{.short_id = 'i',
+                                     .long_id = "int",
+                                     .description = "this is a int option.",
+                                     .default_message = "A number"});
     parser1.add_option(option_value,
                        sharg::config{.short_id = 'j',
                                      .long_id = "jint",

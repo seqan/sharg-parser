@@ -158,7 +158,10 @@ struct format_man_test : public ::testing::Test
         parser.info.description.push_back("description");
         parser.info.description.push_back("description2");
         parser.add_option(option_value,
-                          sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option.", .default_message = "A number"});
+                          sharg::config{.short_id = 'i',
+                                        .long_id = "int",
+                                        .description = "this is a int option.",
+                                        .default_message = "A number"});
         parser.add_option(option_value,
                           sharg::config{.short_id = 'j',
                                         .long_id = "jint",
