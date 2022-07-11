@@ -886,12 +886,18 @@ private:
             throw design_error{"You may only specify flags for the top-level parser."};
 
         verify_identifiers(config.short_id, config.long_id);
+
+        if (config.required && !config.default_message.empty())
+            throw design_error{"A required option not have a default message."};
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_flag call.
     void verify_flag_config(config<auto> const & config)
     {
         verify_identifiers(config.short_id, config.long_id);
+
+        if (!config.default_message.empty())
+            throw design_error{"A flag may not have a default message."};
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_positional_option call.
@@ -910,6 +916,9 @@ private:
         if (has_positional_list_option)
             throw design_error{"You added a positional option with a list value before so you cannot add "
                                "any other positional options."};
+
+        if (!config.default_message.empty())
+            throw design_error{"A positional option may not have a default message."};
     }
 };
 

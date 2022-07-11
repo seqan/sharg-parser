@@ -28,13 +28,14 @@ namespace sharg
  *
  * | Parameter                           | option ( `-a/--all`) | flag (`-f`) | positional_option (`foo`) |
  * |-------------------------------------|----------------------|-------------|---------------------------|
- * | sharg::config::description          |           ✓          |      ✓      |              ✓            |
  * | sharg::config::short_id             |           ✓          |      ✓      |              X            |
  * | sharg::config::long_id              |           ✓          |      ✓      |              X            |
- * | sharg::config::validator            |           ✓          |     (✓)     |              ✓            |
+ * | sharg::config::description          |           ✓          |      ✓      |              ✓            |
+ * | sharg::config::default_message      |           ✓          |      X      |              X            |
  * | sharg::config::advanced             |           ✓          |      ✓      |              X            |
  * | sharg::config::hidden               |           ✓          |      ✓      |              X            |
  * | sharg::config::required             |           ✓          |      ✓      |             (✓)           |
+ * | sharg::config::validator            |           ✓          |     (✓)     |              ✓            |
  *
  */
 template <typename validator_t = detail::default_validator>
@@ -58,6 +59,18 @@ struct config
 
     //!\brief The description to be shown on any (exported) help page.
     std::string description{};
+
+    /*!\brief The default message to be shown on any (exported) help page.
+     *
+     * "Default: " will be prepended. "." will be appended.
+     *
+     * ### Example
+     *
+     * A default_message of "Same as --i", will result in "Default: Same as --i.".
+     *
+     * \attention Not allowed for required options, flags, and positional options.
+     */
+    std::string default_message{};
 
     /*!\brief Whether the option should only be displayed on the advanced help page.
      *
