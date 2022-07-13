@@ -888,7 +888,7 @@ private:
         verify_identifiers(config.short_id, config.long_id);
 
         if (config.required && !config.default_message.empty())
-            throw design_error{"A required option not have a default message."};
+            throw design_error{"A required option cannot have a default message."};
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_flag call.
@@ -897,7 +897,7 @@ private:
         verify_identifiers(config.short_id, config.long_id);
 
         if (!config.default_message.empty())
-            throw design_error{"A flag may not have a default message."};
+            throw design_error{"A flag may not have a default message because the default is always `false`."};
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_positional_option call.
@@ -918,7 +918,7 @@ private:
                                "any other positional options."};
 
         if (!config.default_message.empty())
-            throw design_error{"A positional option may not have a default message."};
+            throw design_error{"A positional option may not have a default message because it is always required."};
     }
 };
 

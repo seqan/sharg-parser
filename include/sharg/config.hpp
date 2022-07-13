@@ -66,7 +66,12 @@ struct config
      *
      * ### Example
      *
-     * A default_message of "Same as --i", will result in "Default: Same as --i.".
+     * `parser.add_option(j, sharg::config{.short_id = 'j'. default_message = "Same as -i"})`
+     * will result in the help page looking like this:
+     * ```
+     * -j (signed 32 bit integer)
+     *     Default: Same as -i.
+     * ```
      *
      * \attention Not allowed for required options, flags, and positional options.
      */
