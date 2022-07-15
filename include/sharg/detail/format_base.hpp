@@ -219,7 +219,11 @@ public:
     {
         std::string id = prep_id_for_help(config.short_id, config.long_id) + " " + option_type_and_list_info(value);
         std::string info{config.description};
-        info += ((config.required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
+        if (config.default_message.empty())
+            info += ((config.required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
+        else
+            info += detail::to_string(" Default: ", config.default_message, ". ");
+
         info += config.validator.get_help_page_message();
 
         store_help_page_element(

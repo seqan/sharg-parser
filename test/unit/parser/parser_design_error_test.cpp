@@ -190,6 +190,41 @@ TEST(verify_positional_option_config_test, hidden_config_set)
 }
 
 // -----------------------------------------------------------------------------
+// default_message config verification
+// -----------------------------------------------------------------------------
+
+TEST(verify_default_message_config_test, required_option_set)
+{
+    int option_value;
+
+    char const * argv[] = {"./parser_test", "arg1"};
+    sharg::parser parser{"test_parser", 2, argv};
+    EXPECT_THROW(parser.add_option(option_value,
+                                   sharg::config{.long_id = "int", .default_message = "Some number", .required = true}),
+                 sharg::design_error);
+}
+
+TEST(verify_default_message_config_test, positional_option_set)
+{
+    int option_value;
+
+    char const * argv[] = {"./parser_test", "arg1"};
+    sharg::parser parser{"test_parser", 2, argv};
+    EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.default_message = "Some number"}),
+                 sharg::design_error);
+}
+
+TEST(verify_default_message_config_test, flag_set)
+{
+    bool value{};
+
+    char const * argv[] = {"./parser_test"};
+    sharg::parser parser{"test_parser", 1, argv};
+    EXPECT_THROW(parser.add_flag(value, sharg::config{.short_id = 'i', .default_message = "false"}),
+                 sharg::design_error);
+}
+
+// -----------------------------------------------------------------------------
 // general
 // -----------------------------------------------------------------------------
 

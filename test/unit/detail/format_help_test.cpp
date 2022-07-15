@@ -397,7 +397,10 @@ TEST(help_page_printing, full_information)
     parser6.info.description.push_back("description2");
     parser6.info.short_description = "so short";
     parser6.add_option(option_value,
-                       sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option."});
+                       sharg::config{.short_id = 'i',
+                                     .long_id = "int",
+                                     .description = "this is a int option.",
+                                     .default_message = "A number"});
     parser6.add_option(
         enum_option_value,
         sharg::config{.short_id = 'e',
@@ -440,7 +443,7 @@ TEST(help_page_printing, full_information)
                "\n"
              + basic_options_str
              + "    -i, --int (signed 32 bit integer)\n"
-               "          this is a int option. Default: 5.\n"
+               "          this is a int option. Default: A number.\n"
                "    -e, --enum (foo)\n"
                "          this is an enum option. Default: one. Value must be one of [three,\n"
                "          two, one].\n"

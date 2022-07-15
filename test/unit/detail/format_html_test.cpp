@@ -92,7 +92,10 @@ TEST(html_format, full_information_information)
     parser1.info.author = "author";
     parser1.info.email = "email";
     parser1.add_option(option_value,
-                       sharg::config{.short_id = 'i', .long_id = "int", .description = "this is a int option."});
+                       sharg::config{.short_id = 'i',
+                                     .long_id = "int",
+                                     .description = "this is a int option.",
+                                     .default_message = "A number"});
     parser1.add_option(option_value,
                        sharg::config{.short_id = 'j',
                                      .long_id = "jint",
@@ -155,7 +158,7 @@ TEST(html_format, full_information_information)
         "<dt><strong>--version-check</strong> (bool)</dt>\n"
         "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
         "<dt><strong>-i</strong>, <strong>--int</strong> (<em>signed 32 bit integer</em>)</dt>\n"
-        "<dd>this is a int option. Default: 5. </dd>\n"
+        "<dd>this is a int option. Default: A number. </dd>\n"
         "<dt><strong>-j</strong>, <strong>--jint</strong> (<em>signed 32 bit integer</em>)</dt>\n"
         "<dd>this is a required int option. </dd>\n"
         "<dt><strong>-f</strong>, <strong>--flag</strong></dt>\n"
