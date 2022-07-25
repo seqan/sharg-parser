@@ -19,6 +19,10 @@
 #include <sharg/detail/type_name_as_string.hpp>
 #include <sharg/validators.hpp>
 
+#if __has_include(<seqan3/version.hpp>)
+#    include <seqan3/version.hpp>
+#endif
+
 namespace sharg::detail
 {
 
@@ -454,6 +458,11 @@ protected:
         derived_t().print_line(derived_t().in_bold("Last update: ") + meta.date, false);
         derived_t().print_line(derived_t().in_bold(meta.app_name + " version: ") + meta.version, false);
         derived_t().print_line(derived_t().in_bold("Sharg version: ") + version_str, false);
+
+#ifdef SEQAN3_VERSION_CSTRING
+        std::string const seqan3_version_str{seqan3::seqan3_version_cstring};
+        derived_t().print_line(derived_t().in_bold("SeqAn version: ") + seqan3_version_str, false);
+#endif
 
         if (!empty(meta.url))
         {
