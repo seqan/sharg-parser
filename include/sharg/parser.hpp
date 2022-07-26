@@ -715,12 +715,6 @@ private:
      */
     void init(int argc, char const * const * const argv)
     {
-        if (argc <= 1) // no arguments provided
-        {
-            format = detail::format_short_help{};
-            return;
-        }
-
         bool special_format_was_set{false};
 
         for (int i = 1, argv_len = argc; i < argv_len; ++i) // start at 1 to skip binary name
@@ -805,6 +799,14 @@ private:
             {
                 cmd_arguments.push_back(std::move(arg));
             }
+        }
+
+        // all special options have been identified, which might involve deleting them from argv (e.g. version-check)
+        // check if no actual options remain and then call the short help page.
+        if (argc <= 1) // no arguments provided
+        {
+            format = detail::format_short_help{};
+            return;
         }
 
         if (!special_format_was_set)

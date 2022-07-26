@@ -77,19 +77,33 @@ struct test_accessor
 
 TEST(help_page_printing, short_help)
 {
-    // Empty call with no options given. For sharg::detail::format_short_help
-    sharg::parser parser0{"empty_options", 1, argv_without_any_options};
-    sharg::detail::test_accessor::set_terminal_width(parser0, 80);
-    parser0.info.synopsis.push_back("./some_binary_name synopsis");
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser0.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-    std_cout = testing::internal::GetCapturedStdout();
-
     expected = "empty_options\n"
                "=============\n"
                "    ./some_binary_name synopsis\n"
                "    Try -h or --help for more information.\n";
-    EXPECT_EQ(std_cout, expected);
+
+    // Empty call with no options given. For sharg::detail::format_short_help
+    // even if required options exist.
+
+    auto check_expected_short_help = [&](auto && argv)
+    {
+        int const argc = sizeof(argv) / sizeof(*argv);
+        sharg::parser parser{"empty_options", 1, argv};
+        sharg::detail::test_accessor::set_terminal_width(parser, 80);
+        parser.info.synopsis.push_back("./some_binary_name synopsis");
+        int option_value{};
+        parser.add_option(option_value, sharg::config{.short_id = 'i', .required = true});
+
+        testing::internal::CaptureStdout();
+        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+        std_cout = testing::internal::GetCapturedStdout();
+        EXPECT_EQ(std_cout, expected);
+    };
+
+    char const * argv_with_version_check[] = {"./help_add_test", "--version-check", "0"};
+
+    check_expected_short_help(argv_without_any_options);
+    check_expected_short_help(argv_with_version_check);
 }
 
 TEST(help_page_printing, no_information)
