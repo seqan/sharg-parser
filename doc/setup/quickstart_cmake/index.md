@@ -74,12 +74,14 @@ the steps listed for Linux-based systems.
 
 \endcollapsible
 
-\startcollapsible{Browser-based}
+<!-- \startcollapsible{Browser-based} -->
 
-#### Using [gitpod.io](https://gitpod.io/#https://github.com/seqan/sharg/)
+<!-- Needs further work (https://github.com/seqan/sharg-parser/issues/115)
+#### Using [gitpod.io](https://gitpod.io/#https://github.com/seqan/sharg-parser/)
 [gitpod.io](https://gitpod.io) allows you to edit, compile and run code from within your browser. The free version includes 50
 hours of use per month, which is plenty for our tutorials. A GitHub account is required.
 [Click here](https://gitpod.io/#https://github.com/seqan/sharg/) to open sharg in gitpod.
+-->
 
 <!-- Codespaces are currently not free. Revisit in the future.
 #### Using [GitHub codespaces](https://github.com/codespaces)
@@ -89,7 +91,7 @@ everyone. [Click here](https://github.com/codespaces) to check for availability.
 Please note that you may have to manually clone the submodules by running `git submodule update --init`.
 -->
 
-\endcollapsible
+<!-- \endcollapsible -->
 
 \attention After installing, `g++ --version` should print the desired version.
            If not, you may have to use, for example, `g++-11 --version` or even specify the full path to your compiler.
