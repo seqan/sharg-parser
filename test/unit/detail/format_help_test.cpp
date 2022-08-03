@@ -17,10 +17,10 @@ std::string expected;
 int option_value{5};
 bool flag_value{false};
 std::vector<std::string> pos_opt_value{};
-char const * argv0[] = {"./help_add_test --version-check false"};
-char const * argv1[] = {"./help_add_test --version-check false", "-h"};
-char const * argv2[] = {"./help_add_test --version-check false", "-hh"};
-char const * argv3[] = {"./help_add_test --version-check false", "--version"};
+char const * argv_without_any_options[] = {"./help_add_test"};
+char const * argv_with_h[] = {"./help_add_test", "-h"};
+char const * argv_with_hh[] = {"./help_add_test", "-hh"};
+char const * argv_with_version[] = {"./help_add_test", "--version"};
 
 std::string const basic_options_str = "OPTIONS\n"
                                       "\n"
@@ -78,7 +78,7 @@ struct test_accessor
 TEST(help_page_printing, short_help)
 {
     // Empty call with no options given. For sharg::detail::format_short_help
-    sharg::parser parser0{"empty_options", 1, argv0};
+    sharg::parser parser0{"empty_options", 1, argv_without_any_options};
     sharg::detail::test_accessor::set_terminal_width(parser0, 80);
     parser0.info.synopsis.push_back("./some_binary_name synopsis");
     testing::internal::CaptureStdout();
@@ -95,7 +95,7 @@ TEST(help_page_printing, short_help)
 TEST(help_page_printing, no_information)
 {
     // Empty help call with -h
-    sharg::parser parser1{"test_parser", 2, argv1};
+    sharg::parser parser1{"test_parser", 2, argv_with_h};
     sharg::detail::test_accessor::set_terminal_width(parser1, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -110,7 +110,7 @@ TEST(help_page_printing, no_information)
 TEST(help_page_printing, with_short_copyright)
 {
     // Again, but with short copyright, long copyright, and citation.
-    sharg::parser short_copy("test_parser", 2, argv1);
+    sharg::parser short_copy("test_parser", 2, argv_with_h);
     sharg::detail::test_accessor::set_terminal_width(short_copy, 80);
     short_copy.info.short_copyright = "short";
     testing::internal::CaptureStdout();
@@ -129,7 +129,7 @@ TEST(help_page_printing, with_short_copyright)
 
 TEST(help_page_printing, with_long_copyright)
 {
-    sharg::parser long_copy("test_parser", 2, argv1);
+    sharg::parser long_copy("test_parser", 2, argv_with_h);
     sharg::detail::test_accessor::set_terminal_width(long_copy, 80);
     long_copy.info.long_copyright = "long";
     testing::internal::CaptureStdout();
@@ -148,7 +148,7 @@ TEST(help_page_printing, with_long_copyright)
 
 TEST(help_page_printing, with_citation)
 {
-    sharg::parser citation("test_parser", 2, argv1);
+    sharg::parser citation("test_parser", 2, argv_with_h);
     sharg::detail::test_accessor::set_terminal_width(citation, 80);
     citation.info.citation = "citation";
     testing::internal::CaptureStdout();
@@ -167,7 +167,7 @@ TEST(help_page_printing, with_citation)
 
 TEST(help_page_printing, with_author)
 {
-    sharg::parser author("test_parser", 2, argv1);
+    sharg::parser author("test_parser", 2, argv_with_h);
     sharg::detail::test_accessor::set_terminal_width(author, 80);
     author.info.author = "author";
     testing::internal::CaptureStdout();
@@ -186,7 +186,7 @@ TEST(help_page_printing, with_author)
 
 TEST(help_page_printing, with_email)
 {
-    sharg::parser email("test_parser", 2, argv1);
+    sharg::parser email("test_parser", 2, argv_with_h);
     sharg::detail::test_accessor::set_terminal_width(email, 80);
     email.info.email = "email";
     testing::internal::CaptureStdout();
@@ -206,7 +206,7 @@ TEST(help_page_printing, with_email)
 TEST(help_page_printing, empty_advanced_help)
 {
     // Empty help call with -hh
-    sharg::parser parser2{"test_parser", 2, argv2};
+    sharg::parser parser2{"test_parser", 2, argv_with_hh};
     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser2.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -221,7 +221,7 @@ TEST(help_page_printing, empty_advanced_help)
 TEST(help_page_printing, empty_version_call)
 {
     // Empty version call
-    sharg::parser parser3{"test_parser", 2, argv3};
+    sharg::parser parser3{"test_parser", 2, argv_with_version};
     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser3.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
@@ -236,7 +236,7 @@ TEST(help_page_printing, empty_version_call)
 TEST(help_page_printing, version_call)
 {
     // Version call with url and options.
-    sharg::parser parser4{"test_parser", 2, argv3};
+    sharg::parser parser4{"test_parser", 2, argv_with_version};
     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
     parser4.info.url = "https://seqan.de";
     parser4.add_option(option_value, sharg::config{.short_id = 'i'});
@@ -257,7 +257,7 @@ TEST(help_page_printing, version_call)
 TEST(help_page_printing, do_not_print_hidden_options)
 {
     // Add an option and request help.
-    sharg::parser parser5{"test_parser", 2, argv1};
+    sharg::parser parser5{"test_parser", 2, argv_with_h};
     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
     parser5.add_option(option_value, sharg::config{.short_id = 'i', .hidden = true});
     parser5.add_flag(flag_value, sharg::config{.short_id = 'f', .hidden = true});
@@ -307,7 +307,7 @@ TEST(help_page_printing, advanced_options)
     };
 
     // without -hh, only the non/advanced information are shown
-    sharg::parser parser_normal_help{"test_parser", 2, argv1};
+    sharg::parser parser_normal_help{"test_parser", 2, argv_with_h};
     sharg::detail::test_accessor::set_terminal_width(parser_normal_help, 80);
     set_up(parser_normal_help);
     testing::internal::CaptureStdout();
@@ -333,7 +333,7 @@ TEST(help_page_printing, advanced_options)
     EXPECT_EQ(std_cout, expected);
 
     // with -hh everything is shown
-    sharg::parser parser_advanced_help{"test_parser", 2, argv2};
+    sharg::parser parser_advanced_help{"test_parser", 2, argv_with_hh};
     sharg::detail::test_accessor::set_terminal_width(parser_advanced_help, 80);
     set_up(parser_advanced_help);
     testing::internal::CaptureStdout();
@@ -389,7 +389,7 @@ TEST(help_page_printing, full_information)
     foo enum_option_value{};
 
     // Add synopsis, description, short description, positional option, option, flag, and example.
-    sharg::parser parser6{"test_parser", 2, argv1};
+    sharg::parser parser6{"test_parser", 2, argv_with_h};
     sharg::detail::test_accessor::set_terminal_width(parser6, 80);
     parser6.info.synopsis.push_back("./some_binary_name synopsis");
     parser6.info.synopsis.push_back("./some_binary_name synopsis2");
