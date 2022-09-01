@@ -88,7 +88,7 @@ TEST(help_page_printing, short_help)
     auto check_expected_short_help = [&](auto && argv)
     {
         int const argc = sizeof(argv) / sizeof(*argv);
-        sharg::parser parser{"empty_options", 1, argv};
+        sharg::parser parser{"empty_options", argc, argv};
         sharg::detail::test_accessor::set_terminal_width(parser, 80);
         parser.info.synopsis.push_back("./some_binary_name synopsis");
         int option_value{};
