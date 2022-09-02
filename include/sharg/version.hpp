@@ -20,6 +20,8 @@
 #define SHARG_VERSION_MINOR 1
 //!\brief The patch version as MACRO.
 #define SHARG_VERSION_PATCH 0
+//!\brief The release candidate number. 0 means stable release, >= 1 means release candidate.
+#define SHARG_RELEASE_CANDIDATE 0
 
 //!\brief The full version as MACRO (number).
 #define SHARG_VERSION (SHARG_VERSION_MAJOR * 10000 + SHARG_VERSION_MINOR * 100 + SHARG_VERSION_PATCH)
@@ -34,9 +36,18 @@
     SHARG_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                            \
     "." SHARG_VERSION_CSTRING_HELPER_STR(MINOR) "." SHARG_VERSION_CSTRING_HELPER_STR(PATCH)
 
+#if (SHARG_RELEASE_CANDIDATE > 0)
+//!\brief A helper function that expands to a suitable release candidate suffix.
+#    define SHARG_RELEASE_CANDIDATE_HELPER(RC) "-rc." SHARG_VERSION_CSTRING_HELPER_STR(RC)
+#else
+//!\brief A helper function that expands to a suitable release candidate suffix.
+#    define SHARG_RELEASE_CANDIDATE_HELPER(RC) ""
+#endif
+
 //!\brief The full version as null terminated string.
 #define SHARG_VERSION_CSTRING                                                                                          \
-    SHARG_VERSION_CSTRING_HELPER_FUNC(SHARG_VERSION_MAJOR, SHARG_VERSION_MINOR, SHARG_VERSION_PATCH)
+    SHARG_VERSION_CSTRING_HELPER_FUNC(SHARG_VERSION_MAJOR, SHARG_VERSION_MINOR, SHARG_VERSION_PATCH)                   \
+    SHARG_RELEASE_CANDIDATE_HELPER(SHARG_RELEASE_CANDIDATE)
 
 namespace sharg
 {
@@ -58,3 +69,4 @@ constexpr char const * sharg_version_cstring = SHARG_VERSION_CSTRING;
 
 #undef SHARG_VERSION_CSTRING_HELPER_STR
 #undef SHARG_VERSION_CSTRING_HELPER_FUNC
+#undef SHARG_RELEASE_CANDIDATE_HELPER
