@@ -26,7 +26,7 @@ namespace sharg
  *
  * Read up on how to make a type model this concept here:
  *
- * \ref fulfil_parser_compatible_option.
+ * \ref fulfil_parsable.
  *
  * ### Requirements
  *
@@ -47,7 +47,7 @@ concept istreamable = requires (std::istream & is, value_type & val)
  *
  * Read up on how to make a type model this concept here:
  *
- * \ref fulfil_parser_compatible_option.
+ * \ref fulfil_parsable.
  *
  * ### Requirements
  *
@@ -67,14 +67,14 @@ concept ostreamable = requires (std::ostream & os, type & val)
                       };
 // clang-format on
 
-/*!\concept sharg::parser_compatible_option
+/*!\concept sharg::parsable
  * \brief Checks whether the the type can be used in an add_(positional_)option call on the parser.
  * \ingroup parser
  * \tparam option_type The type to check.
  *
  * Read up on how to make a type model this concept here:
  *
- * \ref fulfil_parser_compatible_option.
+ * \ref fulfil_parsable.
  *
  * ### Requirements
  *
@@ -84,7 +84,7 @@ concept ostreamable = requires (std::ostream & os, type & val)
  * \remark For a complete overview, take a look at \ref parser
  */
 template <typename option_type>
-concept parser_compatible_option =
+concept parsable =
     (sharg::istreamable<option_type> && sharg::ostreamable<option_type>) || named_enumeration<option_type>;
 
 } // namespace sharg

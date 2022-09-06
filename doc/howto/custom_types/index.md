@@ -1,21 +1,21 @@
-# How to make your custom type model sharg::parser_compatible_option {#fulfil_parser_compatible_option}
+# How to make your custom type model sharg::parsable {#fulfil_parsable}
 
 [TOC]
 
-This HowTo guides you through satisfying the requirements of sharg::parser_compatible_option.
+This HowTo guides you through satisfying the requirements of sharg::parsable.
 
 \tutorial_head{Easy, 10 min, , }
 
 # Motivation
 
 To use a custom type with `sharg::parser::add_option` or
-`sharg::parser::add_positional_option`, the type must satisfy `sharg::parser_compatible_option`.
+`sharg::parser::add_positional_option`, the type must satisfy `sharg::parsable`.
 This tutorial shows you what requirements must be met and supplies you with a copy and paste source
 for your code.
 
-# Concept sharg::parser_compatible_option
+# Concept sharg::parsable
 
-As you can see in the API documentation of `sharg::parser_compatible_option`, the type must model either both
+As you can see in the API documentation of `sharg::parsable`, the type must model either both
 `sharg::istreamable` and `sharg::ostreamable` or `sharg::named_enumeration`.
 
 **If your type is an enum, refer to `sharg::enumeration_names` on how to make it compatible with the

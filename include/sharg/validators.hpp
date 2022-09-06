@@ -136,7 +136,7 @@ private:
 /*!\brief A validator that checks whether a value is inside a list of valid values.
  * \ingroup parser
  * \implements sharg::validator
- * \tparam option_value_t The type the validator is called on. Must model sharg::parser_compatible_option.
+ * \tparam option_value_t The type the validator is called on. Must model sharg::parsable.
  *
  * \details
  *
@@ -152,7 +152,7 @@ private:
  *
  * \remark For a complete overview, take a look at \ref parser
  */
-template <parser_compatible_option option_value_t>
+template <parsable option_value_t>
 class value_list_validator
 {
 public:

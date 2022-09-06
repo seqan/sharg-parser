@@ -239,8 +239,7 @@ public:
      * \throws sharg::design_error
      */
     template <typename option_type, typename validator_type>
-        requires (parser_compatible_option<option_type>
-                  || parser_compatible_option<std::ranges::range_value_t<option_type>>)
+        requires (parsable<option_type> || parsable<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
     void add_option(option_type & value, config<validator_type> const & config)
     {
@@ -304,8 +303,7 @@ public:
      * The `config.validator` must be applicable to the given output variable (\p value).
      */
     template <typename option_type, typename validator_type>
-        requires (parser_compatible_option<option_type>
-                  || parser_compatible_option<std::ranges::range_value_t<option_type>>)
+        requires (parsable<option_type> || parsable<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
     void add_positional_option(option_type & value, config<validator_type> const & config)
     {
