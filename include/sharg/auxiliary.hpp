@@ -20,7 +20,11 @@
 namespace sharg
 {
 
-//!\brief Indicates whether application allows automatic update notifications by the sharg::argument_parser.
+/*!\brief Indicates whether application allows automatic update notifications by the sharg::argument_parser.
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 enum class update_notifications
 {
     on, //!< Automatic update notifications should be enabled.
@@ -39,6 +43,9 @@ enum class update_notifications
  * point that can be easily extended.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
  */
 struct parser_meta_data // holds all meta information
 {

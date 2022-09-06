@@ -35,103 +35,158 @@ namespace sharg
  * - Validation failed (as defined by the developer)
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
  */
 class parser_error : public std::runtime_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     parser_error(std::string const & s) : std::runtime_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when encountering unknown option.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when encountering unknown option.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class unknown_option : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     unknown_option(std::string const & s) : parser_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when too many arguments are provided.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when too many arguments are provided.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class too_many_arguments : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     too_many_arguments(std::string const & s) : parser_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when too few arguments are provided.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when too few arguments are provided.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class too_few_arguments : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     too_few_arguments(std::string const & s) : parser_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when a required option is missing.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when a required option is missing.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class required_option_missing : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     required_option_missing(std::string const & s) : parser_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when a non-list option is declared multiple times.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when a non-list option is declared multiple times.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class option_declared_multiple_times : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     option_declared_multiple_times(std::string const & s) : parser_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when an incorrect argument is given as (positional) option value.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when an incorrect argument is given as (positional) option value.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class user_input_error : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     user_input_error(std::string const & s) : parser_error(s)
     {}
 };
 
-//!\brief Parser exception thrown when an argument could not be casted to the according type.
-//!\ingroup parser
-//!\remark For a complete overview, take a look at \ref parser
+/*!\brief Parser exception thrown when an argument could not be casted to the according type.
+ * \ingroup parser
+ * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
+ */
 class validation_error : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     validation_error(std::string const & s) : parser_error(s)
     {}
@@ -147,12 +202,18 @@ public:
  * - Reuse of a short or long identifier (must be unique)
  * - Both identifiers must not be empty (one is ok)
  * - Flag default value must be false
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
  */
 class design_error : public parser_error
 {
 public:
     /*!\brief The constructor.
      * \param[in] s The error message.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     design_error(std::string const & s) : parser_error(s)
     {}

@@ -31,6 +31,9 @@ namespace sharg
  * ### Requirements
  *
  * `std::istream` must support the (un)formatted input function (`operator>>`) for an l-value of a given `value_type`.
+ *
+ * \details
+ * \stableapi{Since version 1.0.}
  */
 // clang-format off
 template <typename value_type>
@@ -53,6 +56,8 @@ concept istreamable = requires (std::istream & is, value_type & val)
  *
  * `std::ostream` must support the (un)formatted output function (`operator<<`) for an l-value of a given `type` or
  * for an l-value of `type::reference`.
+ *
+ * \stableapi{Since version 1.0.}
  */
 // clang-format off
 template <typename type>
@@ -82,6 +87,8 @@ concept ostreamable = requires (std::ostream & os, type & val)
  * model sharg::named_enumeration<option_type>.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \stableapi{Since version 1.0.}
  */
 template <typename option_type>
 concept parsable =
