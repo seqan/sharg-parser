@@ -61,9 +61,9 @@ concept ostreamable = requires (std::ostream & os, type & val)
                           {os << val} -> std::same_as<std::ostream&>;
                       }
                     ||
-                      requires (std::ostream & os, type & con)
+                      requires (std::ostream & os, std::ranges::range_reference_t<type> val)
                       {
-                          {os << con[0]} -> std::same_as<std::ostream&>;
+                          {os << val} -> std::same_as<std::ostream&>;
                       };
 // clang-format on
 
