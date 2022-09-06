@@ -178,7 +178,6 @@ public:
         requires std::constructible_from<option_value_type, std::ranges::range_rvalue_reference_t<range_type>>
     value_list_validator(range_type rng)
     {
-        values.clear();
         std::move(rng.begin(), rng.end(), std::back_inserter(values));
     }
 
@@ -609,7 +608,7 @@ public:
      */
     explicit output_file_validator(output_file_open_options const mode, auto &&... extensions)
         requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
-    : output_file_validator{mode, std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
+        : output_file_validator{mode, std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
     {}
 
     /*!\brief Constructs from a list of valid extensions.
@@ -625,7 +624,7 @@ public:
      */
     explicit output_file_validator(auto &&... extensions)
         requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
-    : output_file_validator{std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
+        : output_file_validator{std::vector<std::string>{std::forward<decltype(extensions)>(extensions)...}}
     {}
 
     // Import base constructor.
