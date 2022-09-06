@@ -176,7 +176,7 @@ public:
      * The application name must only contain alpha-numeric characters, `_` or `-` ,
      * i.e. the following regex must evaluate to true: `"^[a-zA-Z0-9_-]+$"` .
      *
-     * See the [parser tutorial](https://docs.seqan.de/seqan/3-master-dev/tutorial_parser.html)
+     * See the [parser tutorial](https://sharg.vercel.app/usr/html/tutorial_parser.html)
      * for more information about the version check functionality.
      */
     parser(std::string const & app_name,

@@ -141,8 +141,8 @@ private:
  * \details
  *
  * On construction, the validator must receive a range or parameter pack of valid values.
- * The class than acts as a functor, that throws a sharg::validation_error
- * exception whenever a given value is not in the given list.
+ * The class then acts as a functor that throws a sharg::validation_error
+ * exception whenever a given value is not in the list.
  *
  * \note In order to simplify the chaining of validators, the option value type is deduced to `std::string` if the
  *       range's value type is convertible to it. Otherwise, the option value type is deduced to the value type of the
@@ -176,7 +176,7 @@ public:
      */
     template <std::ranges::forward_range range_type>
         requires std::constructible_from<option_value_type, std::ranges::range_rvalue_reference_t<range_type>>
-    value_list_validator(range_type rng)
+    value_list_validator(range_type rng) // No &&, because rng will be moved.
     {
         std::move(rng.begin(), rng.end(), std::back_inserter(values));
     }
@@ -889,20 +889,20 @@ public:
             throw validation_error{"Value " + cmp + " did not match the pattern " + pattern + "."};
     }
 
-    /*!\brief Tests whether every filename in list v matches the pattern.
+    /*!\brief Tests whether every entry in list v matches the pattern.
      * \tparam range_type The type of range to check; must model std::ranges::forward_range and the value type must
      *                    be convertible to std::string.
      * \param  v          The input range to iterate over and check every element.
      * \throws sharg::validation_error
      */
     template <std::ranges::forward_range range_type>
-        requires std::convertible_to<std::ranges::range_reference_t<range_type>, option_value_type const &>
+        requires std::convertible_to<std::ranges::range_reference_t<range_type>, std::string const &>
     void operator()(range_type const & v) const
     {
-        for (auto && file_name : v)
+        for (auto && entry : v)
         {
             // note: we explicitly copy/construct any reference type other than `std::string &`
-            (*this)(static_cast<option_value_type const &>(file_name));
+            (*this)(static_cast<std::string const &>(entry));
         }
     }
 

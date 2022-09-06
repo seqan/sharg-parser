@@ -31,9 +31,9 @@ std::string to_string(value_types &&... values)
 {
     std::stringstream stream;
 
-    auto print = [&stream](auto val)
+    auto print = [&stream](auto && val)
     {
-        if constexpr (is_container_option<decltype(val)>)
+        if constexpr (is_container_option<std::remove_cvref_t<decltype(val)>>)
         {
             if (val.empty())
             {
@@ -42,9 +42,10 @@ std::string to_string(value_types &&... values)
             else
             {
                 stream << '[';
-                stream << val[0];
-                for (size_t i = 1; i < val.size(); ++i)
-                    stream << ", " << val[i];
+                auto it = val.begin();
+                stream << *it++;
+                for (; it != val.end(); ++it)
+                    stream << ", " << *it;
                 stream << ']';
             }
         }
