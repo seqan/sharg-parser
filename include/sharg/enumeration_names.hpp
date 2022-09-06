@@ -234,11 +234,9 @@ concept named_enumeration = requires
 } // namespace sharg
 
 //!\cond
-namespace std
-{
 template <typename option_type>
     requires sharg::named_enumeration<std::remove_cvref_t<option_type>>
-inline ostream & operator<<(ostream & s, option_type && op)
+inline std::ostream & std::operator<<(std::ostream & s, option_type && op)
 {
     for (auto & [key, value] : sharg::enumeration_names<option_type>)
     {
@@ -248,5 +246,4 @@ inline ostream & operator<<(ostream & s, option_type && op)
 
     return s << "<UNKNOWN_VALUE>";
 }
-} // namespace std
 //!\endcond
