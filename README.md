@@ -95,7 +95,7 @@ If you are working in the field of sequence analysis, we recommend using the
 
 An application with one option parsing an integer from the command line can be written in only 5 lines of code:
 
-\include test/snippets/readme_sneak_peak.cpp
+\include test/snippets/readme_sneak_peek.cpp
 
 Done. `val` is automatically filled with the value provided by `-i` or `--int`.
 
