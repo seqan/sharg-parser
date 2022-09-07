@@ -83,14 +83,54 @@
 -->
 [twitter_link]: https://twitter.com/seqanlib
 
-The Sharg parser offers a neat and easy-to-use library for argument parsing in C++. With Sharg, your command
+The Sharg parser offers a neat and easy-to-use header-only library for argument parsing in C++. With Sharg, your command
 line interface can be customized to your specific needs and validated in a single line. Furthermore, the library provides
 helpful templates and makes even subcommands feel effortless. For more information, details, and a tutorial on how to
 use our features, please see our [online documentation](https://sharg.vercel.app/usr/html/index.html).
 
 If you are working in the field of sequence analysis, we recommend using the
-[SeqAn3 library](https://github.com/seqan/seqan3), which does not only contain Sharg, but also offers a wide range of
-bioinformatics-related C++ features.
+[SeqAn3 library](https://github.com/seqan/seqan3), which offers a wide range of bioinformatics-related C++ features.
+
+## Sneak Peek:
+
+An application with one option parsing an integer from the command line can be written in only 5 lines of code:
+
+\include test/snippets/readme_sneak_peek.cpp
+
+Done. `val` is automatically filled with the value provided by `-i` or `--int`.
+
+You also have a pretty help page and many more features:
+
+```
+user$ ./Eat-Me-App -h
+Eat-Me-App
+==========
+
+OPTIONS
+
+  Basic options:
+    -h, --help
+          Prints the help page.
+    -hh, --advanced-help
+          Prints the help page including advanced options.
+    --version
+          Prints the version information.
+    --copyright
+          Prints the copyright/license information.
+    --export-help (std::string)
+          Export the help page information. Value must be one of [html, man].
+    --version-check (bool)
+          Whether to check for the newest app version. Default: true.
+
+  Eating Numbers
+    -i, --int (signed 32 bit integer)
+          Desc. Default: 0.
+
+VERSION
+    Last update:
+    Eat-Me-App version:
+    Sharg version: 0.1.0
+```
 
 ## Dependencies
 
