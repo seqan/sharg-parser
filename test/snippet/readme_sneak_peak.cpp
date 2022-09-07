@@ -2,7 +2,7 @@
 
 int main(int argc, char ** argv)
 {
-    int val;
+    int val{};
 
     sharg::parser parser{"Eat-Me-App", argc, argv};
     parser.add_subsection("Eating Numbers");

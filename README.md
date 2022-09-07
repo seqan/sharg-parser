@@ -91,7 +91,7 @@ use our features, please see our [online documentation](https://sharg.vercel.app
 If you are working in the field of sequence analysis, we recommend using the
 [SeqAn3 library](https://github.com/seqan/seqan3), which offers a wide range of bioinformatics-related C++ features.
 
-## Sneak Peak:
+## Sneak Peek:
 
 An application with one option parsing an integer from the command line can be written in only 5 lines of code:
 
