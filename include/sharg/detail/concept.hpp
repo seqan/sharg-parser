@@ -40,7 +40,7 @@ namespace sharg::detail
 template <typename option_type>
 concept is_container_option = (!std::is_same_v<std::remove_cvref_t<option_type>, std::string>) &&
                               requires (option_type container,
-                                        typename std::remove_reference_t<option_type>::value_type value)
+                                        typename std::ranges::range_value_t<option_type> value)
                               {
                                   { container.push_back(value) };
                               };

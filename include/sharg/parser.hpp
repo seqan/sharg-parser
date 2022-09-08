@@ -176,10 +176,10 @@ public:
      * The application name must only contain alpha-numeric characters, `_` or `-` ,
      * i.e. the following regex must evaluate to true: `"^[a-zA-Z0-9_-]+$"` .
      *
-     * See the [parser tutorial](https://docs.seqan.de/seqan/3-master-dev/tutorial_parser.html)
+     * See the [parser tutorial](https://sharg.vercel.app/usr/html/tutorial_parser.html)
      * for more information about the version check functionality.
      */
-    parser(std::string const app_name,
+    parser(std::string const & app_name,
            int const argc,
            char const * const * const argv,
            update_notifications version_updates = update_notifications::on,
@@ -202,7 +202,7 @@ public:
             }
         }
 
-        info.app_name = std::move(app_name);
+        info.app_name = app_name;
 
         init(argc, argv);
     }
@@ -239,8 +239,7 @@ public:
      * \throws sharg::design_error
      */
     template <typename option_type, typename validator_type>
-        requires (parser_compatible_option<option_type>
-                  || parser_compatible_option<std::ranges::range_value_t<option_type>>)
+        requires (parsable<option_type> || parsable<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
     void add_option(option_type & value, config<validator_type> const & config)
     {
@@ -304,8 +303,7 @@ public:
      * The `config.validator` must be applicable to the given output variable (\p value).
      */
     template <typename option_type, typename validator_type>
-        requires (parser_compatible_option<option_type>
-                  || parser_compatible_option<std::ranges::range_value_t<option_type>>)
+        requires (parsable<option_type> || parsable<std::ranges::range_value_t<option_type>>)
               && std::invocable<validator_type, option_type>
     void add_positional_option(option_type & value, config<validator_type> const & config)
     {

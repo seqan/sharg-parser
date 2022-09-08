@@ -13,7 +13,7 @@
     </tab>
       <tab type="usergroup" visible="yes" title="How-To" intro="">
       <tab type="user" visible="yes" title="Subcommand parsing" url="\ref subcommand_parse" intro=""/>
-      <tab type="user" visible="yes" title="Make custom types compatible" url="\ref fulfil_parser_compatible_option" intro=""/>
+      <tab type="user" visible="yes" title="Make custom types compatible" url="\ref fulfil_parsable" intro=""/>
       <tab type="user" visible="yes" title="Make custom validator" url="\ref custom_validator" intro=""/>
     </tab>
     <tab type="user" visible="yes" title="Cookbook" url="\ref cookbook" intro=""/>
