@@ -44,7 +44,7 @@ jobs:
             build_threads: 2
             test_threads: 1 # snippets create and delete files and some separate tests create/delete the same files
             cxx_flags: "-std=c++20"
-            cmake: 3.10.3
+            cmake: 3.15.7
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false
@@ -57,7 +57,7 @@ jobs:
             build_type: Debug
             build_threads: 2
             test_threads: 2
-            cmake: 3.10.3
+            cmake: 3.15.7
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false
@@ -70,7 +70,7 @@ jobs:
             build_type: Debug
             build_threads: 2
             test_threads: 2
-            cmake: 3.10.3
+            cmake: 3.15.7
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false
@@ -80,7 +80,7 @@ jobs:
             build: documentation
             build_threads: 2
             test_threads: 2
-            cmake: 3.10.3
+            cmake: 3.15.7
             doxygen: 1.9.4
             requires_toolchain: false
             requires_ccache: false

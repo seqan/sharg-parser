@@ -137,7 +137,7 @@ VERSION
 |                   | requirement                                          | version  | comment                                     |
 |-------------------|------------------------------------------------------|----------|---------------------------------------------|
 |**compiler**       | [GCC](https://gcc.gnu.org)                           | ≥ 10     | no other compiler is currently supported!   |
-|**build system**   | [CMake](https://cmake.org)                           | ≥ 3.4    | optional, but recommended                   |
+|**build system**   | [CMake](https://cmake.org)                           | ≥ 3.15   | optional, but recommended                   |
 
 
 ## Sponsorships
