@@ -32,11 +32,25 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
 
+      # - name: Update README
+      #   uses: dineshsonachalam/markdown-autodocs@v1.0.7
+      #   with:
+      #     commit_author: seqan-actions[bot] <seqan-actions@users.noreply.github.com>
+      #     commit_user_email: seqan-actions@users.noreply.github.com
+      #     commit_message: "[MISC] Update README.md"
+      #     output_file_paths: '[./README.md]'
+      #     categories: '[code-block]'
+
       - name: Update README
-        uses: dineshsonachalam/markdown-autodocs@v1.0.7
-        with:
-          commit_author: seqan-actions[bot] <seqan-actions@users.noreply.github.com>
-          commit_user_email: seqan-actions@users.noreply.github.com
-          commit_message: "[MISC] Update README.md"
-          output_file_paths: '[./README.md]'
-          categories: '[code-block]'
+        run: |
+          npm i -g doctoc@2.1.0 markdown-autodocs
+          wget https://raw.githubusercontent.com/dineshsonachalam/markdown-autodocs/v1.0.7/action.py
+          python3 action.py \
+            -repo '${{ github.repository }}' \
+            -access_token '${{ secrets.SEQAN_ACTIONS_PAT }}' \
+            -commit_author 'seqan-actions[bot] <seqan-actions@users.noreply.github.com>' \
+            -commit_user_email 'seqan-actions@users.noreply.github.com' \
+            -commit_message '[MISC] Update README.md' \
+            -branch '${{ github.head_ref }}' \
+            -output_file_paths '[./README.md]' \
+            -categories '[code-block]'
