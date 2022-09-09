@@ -96,6 +96,20 @@ If you are working in the field of sequence analysis, we recommend using the
 An application with one option parsing an integer from the command line can be written in only 5 lines of code:
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp) -->
+<!-- The below code snippet is automatically added from ./test/snippet/readme_sneak_peek.cpp -->
+```cpp
+#include <sharg/all.hpp>
+
+int main(int argc, char ** argv)
+{
+    int val{};
+
+    sharg::parser parser{"Eat-Me-App", argc, argv};
+    parser.add_subsection("Eating Numbers");
+    parser.add_option(val, sharg::config{.short_id = 'i', .long_id = "int", .description = "Desc."});
+    parser.parse();
+}
+```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
 Done. `val` is automatically filled with the value provided by `-i` or `--int`.
