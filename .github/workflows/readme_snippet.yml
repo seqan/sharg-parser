@@ -48,7 +48,7 @@ jobs:
           python3 action.py \
             -repo '${{ github.repository }}' \
             -access_token '${{ secrets.SEQAN_ACTIONS_PAT }}' \
-            -commit_author 'seqan-actions[bot] <seqan-actions@users.noreply.github.com>' \
+            -commit_author 'seqan-actions[bot]' \
             -commit_user_email 'seqan-actions@users.noreply.github.com' \
             -commit_message '[MISC] Update README.md' \
             -branch '${{ github.head_ref }}' \
