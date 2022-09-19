@@ -1,0 +1,122 @@
+name: CI on Ubuntu 22.04
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+
+concurrency:
+  group: ubuntu2004-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_VERSION: 3.15.7
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -ex {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: "Unit gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: unit
+            build_type: Release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: sharg
+          fetch-depth: 2
+          submodules: recursive
+
+      # To reuse scripts
+      - name: Checkout SeqAn3
+        uses: actions/checkout@v3
+        with:
+          repository: seqan/seqan3
+          ref: df3f29a00543f02cc8cb5e05f40ea8057cf36c5d
+          path: seqan3
+          fetch-depth: 1
+          submodules: false
+
+      - name: Configure APT
+        continue-on-error: true
+        run: bash ./seqan3/.github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        run: bash ./seqan3/.github/workflows/scripts/install_cmake.sh
+
+      - name: Install ccache
+        run: |
+          conda install --yes --override-channels --channel conda-forge ccache
+          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
+
+      - name: Install compiler ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Load ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
+          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-
+
+      - name: Tool versions
+        run: |
+          env cmake --version
+          env ${{ matrix.cxx }} --version
+
+      - name: Configure tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir sharg-build
+          cd sharg-build
+          cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                                  -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                                                  -DSHARG_VERBOSE_TESTS=OFF
+          make -j2 gtest_build
+
+      - name: Build tests
+        env:
+          CCACHE_BASEDIR: ${{ github.workspace }}
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          CCACHE_COMPRESS: true
+          CCACHE_COMPRESSLEVEL: 12
+          CCACHE_MAXSIZE: ${{ matrix.build != 'coverage' && '125M' || '50M' }}
+          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
+          GCOV: ${{ github.workspace }}/seqan3/.github/workflows/scripts/gcov.sh
+        run: |
+          ccache -z
+          cd sharg-build
+          make -k -j2
+          ccache -sv
+
+      - name: Run tests
+        if: matrix.build != 'coverage'
+        run: |
+          cd sharg-build
+          ctest . -j2 --output-on-failure
+
+      - name: Submit coverage build
+        if: matrix.build == 'coverage'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ${{ github.workspace }}/sharg-build/sharg_coverage.xml
+          root_dir: ${{ github.workspace }}/sharg
