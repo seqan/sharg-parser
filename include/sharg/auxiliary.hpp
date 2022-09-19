@@ -20,7 +20,7 @@
 namespace sharg
 {
 
-/*!\brief Indicates whether application allows automatic update notifications by the sharg::argument_parser.
+/*!\brief Indicates whether application allows automatic update notifications by the sharg::parser.
  *
  * \details
  * \stableapi{Since version 1.0.}
