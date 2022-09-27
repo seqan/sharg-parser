@@ -42,6 +42,9 @@ namespace sharg::custom
  * \ref tutorial_parser for an example of customising a type within your own namespace.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \experimentalapi{Experimental since version 1.0.}
  */
 template <typename t>
 struct parsing
@@ -204,6 +207,9 @@ namespace sharg
  *
  * This is a customisation point (see \ref about_customisation). To specify the behaviour for your type,
  * simply provide one of the two functions specified above.
+ *
+ * \details
+ * \experimentalapi{Experimental since version 1.0.}
  */
 // clang-format off
 template <typename option_type>
@@ -223,6 +229,9 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
  *   `std::unordered_map<std::string, option_type>`.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \details
+ * \experimentalapi{Experimental since version 1.0.}
  */
 // clang-format off
 template <typename option_type>
@@ -234,6 +243,10 @@ concept named_enumeration = requires
 } // namespace sharg
 
 //!\cond
+/*!\brief Overload of ostream operator<<
+ * \details
+ * \experimentalapi{Experimental since version 1.0.}
+ */
 template <typename option_type>
     requires sharg::named_enumeration<std::remove_cvref_t<option_type>>
 inline std::ostream & std::operator<<(std::ostream & s, option_type && op)

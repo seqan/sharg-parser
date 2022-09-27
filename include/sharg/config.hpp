@@ -38,6 +38,8 @@ namespace sharg
  * | sharg::config::required             |           ✓          |      ✓      |             (✓)           |
  * | sharg::config::validator            |           ✓          |     (✓)     |              ✓            |
  *
+ * \details
+ * \stableapi{Since version 1.0.}
  */
 template <typename validator_t = detail::default_validator>
 struct config

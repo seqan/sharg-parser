@@ -150,6 +150,7 @@ namespace sharg
  * Note that in case there is no `--version-check` option (display available options with `-h/--help)`,
  * then the developer already disabled the version check functionality.
  *
+ * \stableapi{Since version 1.0.}
  */
 class parser
 {
@@ -178,6 +179,9 @@ public:
      *
      * See the [parser tutorial](https://sharg.vercel.app/usr/html/tutorial_parser.html)
      * for more information about the version check functionality.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     parser(std::string const & app_name,
            int const argc,
@@ -237,6 +241,9 @@ public:
      * The `config.validator` must be applicable to the given output variable (\p value).
      *
      * \throws sharg::design_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <typename option_type, typename validator_type>
         requires (parsable<option_type> || parsable<std::ranges::range_value_t<option_type>>)
@@ -262,6 +269,8 @@ public:
      *
      * \throws sharg::design_error
      *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <typename validator_type>
         requires std::invocable<validator_type, bool>
@@ -301,6 +310,8 @@ public:
      * \details
      *
      * The `config.validator` must be applicable to the given output variable (\p value).
+     *
+     * \stableapi{Since version 1.0.}
      */
     template <typename option_type, typename validator_type>
         requires (parsable<option_type> || parsable<std::ranges::range_value_t<option_type>>)
@@ -387,6 +398,8 @@ public:
      * The Age App - [PARSER ERROR] Value cast failed for option -a: Argument abc
      *                              could not be casted to type (signed 32 bit integer).
      * ```
+     *
+     * \stableapi{Since version 1.0.}
      */
     void parse()
     {
@@ -427,8 +440,12 @@ public:
         parse_was_called = true;
     }
 
-    //!\brief Returns a reference to the sub-parser instance if
-    //!       \link subcommand_parse subcommand parsing \endlink was enabled.
+    /*!\brief Returns a reference to the sub-parser instance if
+     *       \link subcommand_parse subcommand parsing \endlink was enabled.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
+     */
     parser & get_sub_parser()
     {
         if (sub_parser == nullptr)
@@ -464,6 +481,9 @@ public:
      *   pass a short identifier, please pass it as a `char` not a `std::string`.
      * * the option identifier cannot be found in the list of valid option identifiers that were added to the parser
      *   via `sharg::parser::add_option()` calls beforehand.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     // clang-format off
     template <typename id_type>
@@ -503,7 +523,11 @@ public:
     /*!\brief Adds an help page section to the sharg::parser.
      * \param[in] title The title of the section.
      * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
-     * \details This only affects the help page and other output formats.
+     * \details
+     *
+     * This only affects the help page and other output formats.
+     *
+     * \stableapi{Since version 1.0.}
      */
     void add_section(std::string const & title, bool const advanced_only = false)
     {
@@ -518,7 +542,11 @@ public:
     /*!\brief Adds an help page subsection to the sharg::parser.
      * \param[in] title The title of the subsection.
      * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
-     * \details This only affects the help page and other output formats.
+     * \details
+     *
+     * This only affects the help page and other output formats.
+     *
+     * \stableapi{Since version 1.0.}
      */
     void add_subsection(std::string const & title, bool const advanced_only = false)
     {
@@ -537,6 +565,8 @@ public:
      * \details
      * If the line is not a paragraph (false), only one line break is appended, otherwise two line breaks are appended.
      * This only affects the help page and other output formats.
+     *
+     * \stableapi{Since version 1.0.}
      */
     void add_line(std::string const & text, bool is_paragraph = false, bool const advanced_only = false)
     {
@@ -564,6 +594,8 @@ public:
      *     -a, --age LONG
      *            Super important integer for age.
      *```
+     *
+     * \stableapi{Since version 1.0.}
      */
     void add_list_item(std::string const & key, std::string const & desc, bool const advanced_only = false)
     {
@@ -623,6 +655,8 @@ public:
      *     Penguin_Parade version: 2.0.0
      *     Sharg version: 0.1.0
      * ```
+     *
+     * \stableapi{Since version 1.0.}
      */
     parser_meta_data info;
 

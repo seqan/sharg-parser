@@ -42,6 +42,8 @@ namespace sharg
  * You can learn more about Sharg validators in our tutorial \ref section_validation.
  *
  * To implement your own validator please refer to the detailed concept description below.
+ *
+ * \stableapi{Since version 1.0.}
  */
 // clang-format off
 template <typename validator_type>
@@ -69,6 +71,8 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
  * \include test/snippet/validators_1.cpp
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \stableapi{Since version 1.0.}
  */
 template <typename option_value_t>
     requires std::is_arithmetic_v<option_value_t>
@@ -81,6 +85,9 @@ public:
     /*!\brief The constructor.
      * \param[in] min_ Minimum set for the range to test.
      * \param[in] max_ Maximum set for the range to test.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     arithmetic_range_validator(option_value_type const min_, option_value_type const max_) :
         min{min_},
@@ -91,6 +98,9 @@ public:
     /*!\brief Tests whether cmp lies inside [`min`, `max`].
      * \param cmp The input value to check.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     void operator()(option_value_type const & cmp) const
     {
@@ -103,6 +113,9 @@ public:
      *                    std::is_arithmetic_v.
      * \param  range      The input range to iterate over and check every element.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <std::ranges::forward_range range_type>
         requires std::is_arithmetic_v<std::ranges::range_value_t<range_type>>
@@ -116,7 +129,11 @@ public:
                       });
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         return std::string{"Value must be in range "} + valid_range_str + ".";
@@ -151,6 +168,8 @@ private:
  * \include test/snippet/validators_2.cpp
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \stableapi{Since version 1.0.}
  */
 template <parsable option_value_t>
 class value_list_validator
@@ -173,6 +192,9 @@ public:
      * \tparam range_type The type of range; must model std::ranges::forward_range and value_list_validator::option_value_type
      *                    must be constructible from the rvalue reference type of the given range.
      * \param[in] rng The range of valid values to test.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <std::ranges::forward_range range_type>
         requires std::constructible_from<option_value_type, std::ranges::range_rvalue_reference_t<range_type>>
@@ -185,6 +207,9 @@ public:
      * \tparam option_types The type of option values in the parameter pack; The value_list_validator::option_value_type must
      *                      be constructible from each type in the parameter pack.
      * \param[in] opts The parameter pack values.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <typename... option_types>
         requires ((std::constructible_from<option_value_type, option_types> && ...))
@@ -197,6 +222,9 @@ public:
     /*!\brief Tests whether cmp lies inside values.
      * \param cmp The input value to check.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     void operator()(option_value_type const & cmp) const
     {
@@ -208,6 +236,9 @@ public:
      * \tparam range_type The type of range to check; must model std::ranges::forward_range.
      * \param  range      The input range to iterate over and check every element.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <std::ranges::forward_range range_type>
         requires std::convertible_to<std::ranges::range_value_t<range_type>, option_value_type>
@@ -221,7 +252,11 @@ public:
                       });
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         return detail::to_string("Value must be one of ", values, ".");
@@ -232,7 +267,7 @@ private:
     std::vector<option_value_type> values{};
 };
 
-/*!\brief Type deduction guides
+/*!\name Type deduction guides
  * \relates sharg::value_list_validator
  * \{
  */
@@ -270,6 +305,8 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
  * using the template argument to determine the valid extensions from the given file type.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \experimentalapi{Experimental since version 1.0.}
  */
 class file_validator_base
 {
@@ -294,6 +331,8 @@ public:
      * \details
      *
      * This is a pure virtual function and must be overloaded by the derived class.
+     *
+     * \experimentalapi{Experimental since version 1.0.}
      */
     virtual void operator()(std::filesystem::path const & path) const = 0;
 
@@ -303,6 +342,9 @@ public:
      *                    be convertible to std::filesystem::path.
      * \param  v          The input range to iterate over and check every element.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     template <std::ranges::forward_range range_type>
         requires (std::convertible_to<std::ranges::range_value_t<range_type>, std::filesystem::path const &>
@@ -464,6 +506,8 @@ protected:
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \experimentalapi{Experimental since version 1.0.}
  */
 class input_file_validator : public file_validator_base
 {
@@ -474,7 +518,6 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-
     input_file_validator() = default;                                         //!< Defaulted.
     input_file_validator(input_file_validator const &) = default;             //!< Defaulted.
     input_file_validator(input_file_validator &&) = default;                  //!< Defaulted.
@@ -484,6 +527,9 @@ public:
 
     /*!\brief Constructs from a given collection of valid extensions.
      * \param[in] extensions The valid extensions to validate for.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     explicit input_file_validator(std::vector<std::string> extensions) : file_validator_base{}
     {
@@ -502,6 +548,9 @@ public:
      * \param file The input value to check.
      * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     virtual void operator()(std::filesystem::path const & file) const override
     {
@@ -528,7 +577,10 @@ public:
         }
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         return "The input file must exist and read permissions must be granted."
@@ -537,7 +589,10 @@ public:
     }
 };
 
-//!\brief Mode of an output file: Determines whether an existing file can be (silently) overwritten.
+/*!\brief Mode of an output file: Determines whether an existing file can be (silently) overwritten.
+ * \details
+ * \experimentalapi{Experimental since version 1.0.}
+ */
 enum class output_file_open_options
 {
     //!\brief Allow to overwrite the output file
@@ -570,6 +625,8 @@ enum class output_file_open_options
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \experimentalapi{Experimental since version 1.0.}
  */
 class output_file_validator : public file_validator_base
 {
@@ -580,7 +637,6 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-
     output_file_validator() = default;                                          //!< Defaulted.
     output_file_validator(output_file_validator const &) = default;             //!< Defaulted.
     output_file_validator(output_file_validator &&) = default;                  //!< Defaulted.
@@ -592,6 +648,9 @@ public:
      * \param[in] mode A sharg::output_file_open_options indicating whether the validator throws if a file already
      *                 exists.
      * \param[in] extensions The valid extensions to validate for.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> const & extensions) :
         open_mode{mode}
@@ -605,6 +664,9 @@ public:
      *                 exists.
      * \param[in] extensions Parameter pack representing valid extensions. std::string must be constructible from each
      *                       argument. The pack may be empty ( → all extensions are valid).
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     explicit output_file_validator(output_file_open_options const mode, auto &&... extensions)
         requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
@@ -613,6 +675,9 @@ public:
 
     /*!\brief Constructs from a list of valid extensions.
      * \param[in] extensions The valid extensions to validate for.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     explicit output_file_validator(std::vector<std::string> const & extensions) :
         output_file_validator{output_file_open_options::create_new, extensions}
@@ -621,6 +686,9 @@ public:
     /*!\brief Constructs from a parameter pack of valid extensions.
      * \param[in] extensions Parameter pack representing valid extensions. std::string must be constructible from each
      *                       argument. The pack may be empty ( → all extensions are valid).
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     explicit output_file_validator(auto &&... extensions)
         requires ((std::constructible_from<std::string, decltype(extensions)> && ...))
@@ -638,6 +706,9 @@ public:
      * \param file The input value to check.
      * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     virtual void operator()(std::filesystem::path const & file) const override
     {
@@ -663,7 +734,11 @@ public:
         }
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         if (open_mode == output_file_open_options::open_or_create)
@@ -700,6 +775,8 @@ private:
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \experimentalapi{Experimental since version 1.0.}
  */
 class input_directory_validator : public file_validator_base
 {
@@ -728,6 +805,9 @@ public:
      * \param dir The input value to check.
      * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     virtual void operator()(std::filesystem::path const & dir) const override
     {
@@ -754,7 +834,11 @@ public:
         }
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         return "An existing, readable path for the input directory.";
@@ -776,6 +860,8 @@ public:
  * \note The validator works on every type that can be implicitly converted to std::filesystem::path.
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \experimentalapi{Experimental since version 1.0.}
  */
 class output_directory_validator : public file_validator_base
 {
@@ -804,6 +890,9 @@ public:
      * \param dir The input value to check.
      * \throws sharg::validation_error if the validation process failed. Might be nested with
      *         std::filesystem::filesystem_error on unhandled OS API errors.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
      */
     virtual void operator()(std::filesystem::path const & dir) const override
     {
@@ -840,7 +929,11 @@ public:
         }
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     *
+     * \details
+     * \experimentalapi{Experimental since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         return "A valid path for the output directory.";
@@ -865,6 +958,8 @@ public:
  * \include test/snippet/validators_4.cpp
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \stableapi{Since version 1.0.}
  */
 class regex_validator
 {
@@ -874,6 +969,9 @@ public:
 
     /*!\brief Constructing from a vector.
      * \param[in] pattern_ The pattern to match.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     regex_validator(std::string const & pattern_) : pattern{pattern_}
     {}
@@ -881,6 +979,9 @@ public:
     /*!\brief Tests whether cmp lies inside values.
      * \param[in] cmp The value to validate.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     void operator()(option_value_type const & cmp) const
     {
@@ -894,6 +995,9 @@ public:
      *                    be convertible to std::string.
      * \param  v          The input range to iterate over and check every element.
      * \throws sharg::validation_error
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
      */
     template <std::ranges::forward_range range_type>
         requires std::convertible_to<std::ranges::range_reference_t<range_type>, std::string const &>
@@ -906,7 +1010,11 @@ public:
         }
     }
 
-    //!\brief Returns a message that can be appended to the (positional) options help page info.
+    /*!\brief Returns a message that can be appended to the (positional) options help page info.
+     *
+     * \details
+     * \stableapi{Since version 1.0.}
+     */
     std::string get_help_page_message() const
     {
         return "Value must match the pattern '" + pattern + "'.";
@@ -1051,6 +1159,8 @@ private:
  * the other from left to right (first to last).
  *
  * \remark For a complete overview, take a look at \ref parser
+ *
+ * \stableapi{Since version 1.0.}
  */
 template <validator validator1_type, validator validator2_type>
     requires std::common_with<typename std::remove_reference_t<validator1_type>::option_value_type,
