@@ -13,7 +13,7 @@ works.
 # Software
 Requirements:
   - gcc >= 10
-  - cmake >= 3.4
+  - cmake >= 3.15
   - git
 
 ## Installing GCC
@@ -160,7 +160,7 @@ int main()
 To compile it, we first create a `CMakeLists.txt` file in the `source` directory:
 
 ```
-cmake_minimum_required (VERSION 3.4)
+cmake_minimum_required (VERSION 3.15)
 project (sharg_tutorial CXX)
 
 # add sharg to search path
