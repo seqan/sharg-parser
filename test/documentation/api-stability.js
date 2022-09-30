@@ -56,7 +56,4 @@ $(document).ready(function()
         select_and_add_label.call(this, this, "member");
     });
 
-    // Badge for "Detailed Description"
-    select_and_add_label($('div.textblock'), "header");
-
 });
