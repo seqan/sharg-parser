@@ -20,28 +20,28 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 # Release 1.0.0
 
-We are happy to release the first version of the SeqAn Sharg-Parser!
+We are happy to release the first version of the SeqAn Sharg parser!
 
-The Sharg-Parser surpasses the former `seqan3::argument_parser` with a few new features in a light-weight repository.
+The Sharg parser succeeds the former `seqan3::argument_parser` with a few new features in a light-weight repository.
 Most notably, we switched to
 [*Designated initializers*](https://en.cppreference.com/w/cpp/language/aggregate_initialization#Designated_initializers)
-for configuring (positional) options adn flags when adding them to the parser. See `API changes` for more details.
+for configuring (positional) options and flags when adding them to the parser. See `API changes` for more details.
 
 From this release on, most of the **API is now stable**. Stable entities are marked as such in our
 [online documentation](https://sharg.vercel.app/usr/html/classsharg_1_1parser.html).
 
 ## New features
 
-Next to new `sharg::config` API using designated initialisers which is described in `API changes`,
+Besides the new `sharg::config` API using designated initializers, which is described in `API changes`,
 you can now alter the default message printed on the help page. E.g.
 ```cpp
 int i{0};
-parser.add_option(val, sharg::config{.short_id = 'i', .default_message = "Calculated form your data"});
+parser.add_option(val, sharg::config{.short_id = 'i', .default_message = "Calculated from your data"});
 ```
 prints
 ```
     -i (signed 32 bit integer)
-    Default: Calculated form your data.
+    Default: Calculated from your data.
 ```
 instead of `Default: 0.`. See our online
 [documentation](https://sharg.vercel.app/usr/html/structsharg_1_1config.html#aec21e88c7a32f4c0cfab9970de89df71)
@@ -53,8 +53,8 @@ for more details.
 
 If you are switching form the `seqan3::argument_parser` to the `sharg::parser` there are several name changes.
 All of them can be fixed with a simple search & replace:
-* obviously, the namespace of all entities is now `sharg` instead of `seqan3`
-* every occurence of `argument_parser` has been replaced with `parser`
+* The namespace of all entities is now `sharg` instead of `seqan3`
+* Every occurrence of `argument_parser` has been replaced with `parser`
 * The concept `seqan::parser_compatible_option` has been renamed to `sharg::parsable`
 
 #### add_option/add_flag/add_positional_option
