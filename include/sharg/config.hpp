@@ -50,6 +50,7 @@ struct config
      *
      * \attention This parameter cannot be set for positional options added with
      *            sharg::parser::add_positional_option and will trigger a sharg::design_error.
+     * \stableapi{Since version 1.0.}
      */
     char short_id{'\0'};
 
@@ -57,10 +58,14 @@ struct config
      *
      * \attention This parameter cannot be set for positional options added with
      *            sharg::parser::add_positional_option and will trigger a sharg::design_error.
+     * \stableapi{Since version 1.0.}
      */
     std::string long_id{};
 
-    //!\brief The description to be shown on any (exported) help page.
+    /*!\brief The description to be shown on any (exported) help page.
+     * \details
+     * \stableapi{Since version 1.0.}
+     */
     std::string description{};
 
     /*!\brief The default message to be shown on any (exported) help page.
@@ -77,6 +82,7 @@ struct config
      * ```
      *
      * \attention Not allowed for required options, flags, and positional options.
+     * \stableapi{Since version 1.0.}
      */
     std::string default_message{};
 
@@ -93,6 +99,7 @@ struct config
      *
      * \attention This parameter cannot be set for positional options added with
      *            sharg::parser::add_positional_option and will trigger a sharg::design_error.
+     * \stableapi{Since version 1.0.}
      */
     bool advanced{false};
 
@@ -103,6 +110,7 @@ struct config
      *
      * \attention This parameter cannot be set for positional options added with
      *            sharg::parser::add_positional_option and will trigger a sharg::design_error.
+     * \stableapi{Since version 1.0.}
      */
     bool hidden{false};
 
@@ -113,10 +121,14 @@ struct config
      *
      * \attention This parameter cannot be set for positional options added with
      *            sharg::parser::add_positional_option and will trigger a sharg::design_error.
+     * \stableapi{Since version 1.0.}
      */
     bool required{false};
 
-    //!\brief A sharg::validator that verifies the value after parsing (callable).
+    /*!\brief A sharg::validator that verifies the value after parsing (callable).
+     * \details
+     * \stableapi{Since version 1.0.}
+     */
     validator_t validator{};
 };
 
