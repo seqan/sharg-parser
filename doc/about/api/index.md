@@ -2,20 +2,20 @@
 
 [TOC]
 
-# API stability {#api_stability}
+# Application **Programming** Interface (API) stability {#api_stability}
 
 Sharg adheres to [semantic versioning](https://semver.org) and provides a stable API within
 one major release unless otherwise noted.
 
 For details regarding API stability, please see the
-[SeqAn documentation on API stability](http://docs.seqan.de/seqan/3-master-user/about_api.html#api_stability).
+[SeqAn documentation on API stability](https://docs.seqan.de/seqan/3-master-user/about_api.html#api_stability).
 
-# ABI stability
+# Application **Binary** Interface (ABI) stability
 
-There is no ABI stability.
+There is no A**B**I stability.
 
-For details regarding API stability, please see the
-[SeqAn documentation on ABI stability](http://docs.seqan.de/seqan/3-master-user/about_api.html#autotoc_md38).
+For details regarding ABI stability, please see the
+[SeqAn documentation on ABI stability](https://docs.seqan.de/seqan/3-master-user/about_api.html#autotoc_md38).
 
 # Platform stability {#platform_stability}
 
