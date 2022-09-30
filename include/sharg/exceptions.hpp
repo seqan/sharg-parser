@@ -8,6 +8,7 @@
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  * \brief Provides parser related exceptions.
+ * \defgroup exceptions Exceptions
  */
 
 #pragma once
@@ -20,7 +21,7 @@ namespace sharg
 {
 /*!\brief Parser exception that is thrown whenever there is an error
  * while parsing the command line arguments.
- * \ingroup parser
+ * \ingroup exceptions
  *
  * \details
  *
@@ -53,7 +54,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when encountering unknown option.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details
@@ -73,7 +74,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when too many arguments are provided.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details
@@ -93,7 +94,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when too few arguments are provided.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details
@@ -113,7 +114,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when a required option is missing.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details
@@ -133,7 +134,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when a non-list option is declared multiple times.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details
@@ -153,7 +154,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when an incorrect argument is given as (positional) option value.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details
@@ -173,7 +174,7 @@ public:
 };
 
 /*!\brief Parser exception thrown when an argument could not be casted to the according type.
- * \ingroup parser
+ * \ingroup exceptions
  * \remark For a complete overview, take a look at \ref parser
  *
  * \details

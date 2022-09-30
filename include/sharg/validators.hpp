@@ -8,6 +8,7 @@
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  * \brief Provides some standard validators for (positional) options.
+ * \defgroup validators Validators
  */
 
 #pragma once
@@ -27,7 +28,7 @@ namespace sharg
 
 /*!\concept sharg::validator
  * \brief The concept for option validators passed to add_option/positional_option.
- * \ingroup parser
+ * \ingroup validators
  *
  * \details
  *
@@ -58,7 +59,7 @@ concept validator = std::copyable<std::remove_cvref_t<validator_type>> &&
 // clang-format on
 
 /*!\brief A validator that checks whether a number is inside a given range.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  * \tparam option_value_t The value type of the range; must model std::is_arithmetic_v.
  *
@@ -151,7 +152,7 @@ private:
 };
 
 /*!\brief A validator that checks whether a value is inside a list of valid values.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  * \tparam option_value_t The type the validator is called on. Must model sharg::parsable.
  *
@@ -294,7 +295,7 @@ value_list_validator(range_type && rng) -> value_list_validator<std::ranges::ran
 //!\}
 
 /*!\brief An abstract base class for the file and directory validators.
- * \ingroup parser
+ * \ingroup validators
  *
  * \details
  *
@@ -487,7 +488,7 @@ protected:
 };
 
 /*!\brief A validator that checks if a given path is a valid input file.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  *
  * \details
@@ -602,7 +603,7 @@ enum class output_file_open_options
 };
 
 /*!\brief A validator that checks if a given path is a valid output file.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  *
  * \details
@@ -761,7 +762,7 @@ private:
 };
 
 /*!\brief A validator that checks if a given path is a valid input directory.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  *
  * \details
@@ -846,7 +847,7 @@ public:
 };
 
 /*!\brief A validator that checks if a given path is a valid output directory.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  *
  * \details
@@ -941,7 +942,7 @@ public:
 };
 
 /*!\brief A validator that checks if a matches a regular expression pattern.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  *
  * \details
@@ -1029,7 +1030,7 @@ namespace detail
 {
 
 /*!\brief Validator that always returns true.
- * \ingroup parser
+ * \ingroup validators
  * \implements sharg::validator
  *
  * \details
@@ -1057,7 +1058,7 @@ struct default_validator
 };
 
 /*!\brief A helper struct to chain validators recursively via the pipe operator.
- *\ingroup parser
+ *\ingroup validators
  *\implements sharg::validator
  *
  *\details
@@ -1132,7 +1133,7 @@ private:
 } // namespace detail
 
 /*!\brief Enables the chaining of validators.
- * \ingroup parser
+ * \ingroup validators
  * \tparam validator1_type The type of the fist validator;
  *                         Must satisfy the sharg::validator and the
  *                         same option_value_type as the second validator type.
