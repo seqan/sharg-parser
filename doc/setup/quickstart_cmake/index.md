@@ -126,18 +126,19 @@ The output of the command `tree -L 2` should now look like this:
 .
 ├── build
 ├── sharg-parser
-│   ├── build_system
 │   ├── CHANGELOG.md
+│   ├── CMakeLists.txt
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
-│   ├── doc
-│   ├── include
 │   ├── LICENSE.md
 │   ├── README.md
+│   ├── build_system
+│   ├── doc
+│   ├── include
 │   └── test
 └── source
 
-7 directories, 5 files
+7 directories, 6 files
 ```
 
 # Compiling and Running
