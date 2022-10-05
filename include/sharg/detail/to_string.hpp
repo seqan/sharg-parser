@@ -21,6 +21,7 @@ namespace sharg::detail
 {
 
 /*!\brief Streams all parameters via std::ostringstream and returns a concatenated string.
+ * \ingroup misc
  * \tparam    value_types Must be sharg::ostreamable (stream << value).
  * \param[in] values     Variable number of parameters of any type that implement the stream operator.
  * \returns A concatenated string of all values (no separator in between is added).

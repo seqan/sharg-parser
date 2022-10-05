@@ -8,7 +8,6 @@
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  * \brief Provides parser related exceptions.
- * \defgroup exceptions Exceptions
  */
 
 #pragma once

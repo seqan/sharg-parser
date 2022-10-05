@@ -8,7 +8,6 @@
 /*!\file
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  * \brief Provides some standard validators for (positional) options.
- * \defgroup validators Validators
  */
 
 #pragma once

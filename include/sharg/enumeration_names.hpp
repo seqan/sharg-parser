@@ -24,7 +24,7 @@ namespace sharg::custom
 /*!\brief A type that can be specialised to provide customisation point implementations for the sharg::parser
  *        such that third party types may be adapted.
  * \tparam t The type you wish to specialise for.
- * \ingroup parser
+ * \ingroup misc
  *
  * \details
  *
@@ -69,7 +69,7 @@ struct parsing<t const &> : parsing<t>
 namespace sharg::detail
 {
 //!\brief A tag that allows controlled overload resolution via implicit base conversion rules.
-//!\ingroup core
+//!\ingroup misc
 template <size_t I>
 struct priority_tag
     //!\cond
@@ -93,7 +93,7 @@ template <typename t>
 std::unordered_map<std::string_view, t> enumeration_names(t) = delete;
 
 //!\brief Customization Point Object (CPO) definition for sharg::enumeration_names.
-//!\ingroup parser
+//!\ingroup misc
 //!\remark For a complete overview, take a look at \ref parser
 template <typename option_t>
 struct enumeration_names_cpo
@@ -178,7 +178,7 @@ namespace sharg
  * \tparam your_type Type of the value to retrieve the conversion map for.
  * \param value The value is not accessed, only its type is used.
  * \returns A std::unordered_map<std::string_view, your_type> that maps a string identifier to a value of your_type.
- * \ingroup parser
+ * \ingroup misc
  * \details
  *
  * This is a function object. Invoke it with the parameter(s) specified above.
@@ -220,7 +220,7 @@ inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<op
 
 /*!\concept sharg::named_enumeration
  * \brief Checks whether the free function sharg::enumeration_names can be called on the type.
- * \ingroup parser
+ * \ingroup misc
  * \tparam option_type The type to check.
  *
  * ### Requirements
