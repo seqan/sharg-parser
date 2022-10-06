@@ -9,14 +9,14 @@ function changeVersion(form_id)
 
     // Get the current page, e.g. "index.html"
     var full_url = window.top.location.href;
-    var current_page = full_url.substring(full_url.lastIndexOf("/") + 1);
+    var current_page = full_url.substring(full_url.indexOf("/",8) + 1);
 
     // Get the selected version
     var form = document.getElementById(form_id);
     var version = form.options[form.selectedIndex].value;
 
     // Check if the current page is valid with the selected version
-    var proposed_url = base_url + '/' + version + '/' + current_page;
+    var proposed_url = "https://sharg" + version + ".vercel.app/" + current_page;
     var request = new XMLHttpRequest();
     request.open('GET', proposed_url, false);
     request.send();
@@ -32,7 +32,7 @@ function changeVersion(form_id)
     window.top.location.href = proposed_url;
 }
 
-function addVersionSelection(arr)
+function addVersionSelection()
 {
     // add HTMLs
     var version_select = document.createElement("select");
@@ -49,26 +49,17 @@ function addVersionSelection(arr)
     // current selection is..
     cur_sel = window.location.pathname.split("/")[2];
 
-    for(i=0; i < arr.length; ++i)
-    {
-        var op = document.createElement("option");
-        op.value = arr[i];
-        op.text = arr[i];
-        op.selected = ( arr[i] == cur_sel ) ? true : false;
-        version_select.add(op);
-    }
+    var op = document.createElement("option");
+    op.value = "";
+    op.text = "main";
+    op.selected = ( "main" == cur_sel ) ? true : false;
+    version_select.add(op);
+
+    var op = document.createElement("option");
+    op.value = "-100";
+    op.text = "1.0.0";
+    op.selected = ( "1.0.0" == cur_sel ) ? true : false;
+    version_select.add(op);
 }
 
-// get JSON data & add selection form
-var request = new XMLHttpRequest();
-request.open("GET", "version.php", true);
-request.setRequestHeader("Content-type", "application/json");
-request.onreadystatechange = function()
-{
-    if( request.readyState == 4 && request.status == 200 )
-    {
-        var response = JSON.parse(request.responseText);
-        addVersionSelection(response); // add selection form
-    }
-}
-request.send();
+addVersionSelection();
