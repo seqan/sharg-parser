@@ -32,6 +32,7 @@ namespace sharg::detail
 // ----------------------------------------------------------------------------
 
 /*!\brief Check whether we are printing to a terminal.
+ * \ingroup parser
  * \return True if code is run in a terminal, false otherwise.
  */
 inline bool is_terminal()
@@ -48,6 +49,7 @@ inline bool is_terminal()
 // ----------------------------------------------------------------------------
 
 /*!\brief  Retrieve size of terminal.
+ * \ingroup parser
  * \return The width of the current terminal in number of characters.
  *
  * \details

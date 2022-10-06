@@ -10,9 +10,8 @@
  * \brief Meta-header for the \link parser Parser module \endlink.
  */
 
-/*!\file
+/*!\defgroup parser Parser
  * \brief The Parser Module
- * \defgroup parser Parser
  *
  * # The Parser Class
  *
@@ -36,6 +35,20 @@
  * - sharg::output_file_validator
  * - sharg::input_directory_validator
  * - sharg::output_directory_validator
+ */
+
+// Groups will appear in order they are defined.
+
+/*!\defgroup exceptions Exceptions
+ * \brief The Exceptions Module
+ */
+
+/*!\defgroup validators Validators
+ * \brief The Validators Module
+ */
+
+/*!\defgroup misc Misc
+ * \brief The Misc Module
  */
 
 #pragma once

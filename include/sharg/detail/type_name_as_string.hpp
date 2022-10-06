@@ -27,8 +27,8 @@ namespace sharg::detail
 {
 
 /*!\brief Defines the human-readable name of the given type using the
-          [typeid](https://en.cppreference.com/w/cpp/language/typeid) operator.
- *
+*        [typeid](https://en.cppreference.com/w/cpp/language/typeid) operator.
+ * \ingroup misc
  * \tparam type The type to get the human-readable name for.
  *
  * \details

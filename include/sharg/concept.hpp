@@ -20,7 +20,7 @@ namespace sharg
 {
 
 /*!\concept sharg::istreamable
- * \ingroup parser
+ * \ingroup misc
  * \brief Concept for types that can be parsed from a std::istream via the stream operator.
  * \tparam value_type The type to check whether it's stremable via std::istream.
  *
@@ -44,7 +44,7 @@ concept istreamable = requires (std::istream & is, value_type & val)
 // clang-format on
 
 /*!\concept sharg::ostreamable
- * \ingroup parser
+ * \ingroup misc
  * \brief Concept for types that can be parsed into a std::ostream via the stream operator.
  * \tparam type The type to check whether it's stremable via std::ostream or it's a container over streamable values.
  *
@@ -74,7 +74,7 @@ concept ostreamable = requires (std::ostream & os, type & val)
 
 /*!\concept sharg::parsable
  * \brief Checks whether the the type can be used in an add_(positional_)option call on the parser.
- * \ingroup parser
+ * \ingroup misc
  * \tparam option_type The type to check.
  *
  * Read up on how to make a type model this concept here:

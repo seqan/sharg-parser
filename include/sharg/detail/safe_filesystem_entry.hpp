@@ -22,6 +22,7 @@ namespace sharg::detail
 {
 
 /*!\brief A safe guard to manage a filesystem entry, e.g. a file or a directory.
+ * \ingroup misc
  *
  * \details
  *

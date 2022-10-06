@@ -32,6 +32,7 @@ namespace sharg::detail
 // ------------------------------------------------------------------------------------------------------------------
 
 /*!\brief Writes a timestamp file and performs the server call to get the newest version information.
+ * \ingroup parser
  * \param[in] command  The system command as a string. See sharg::detail::version_checker::command for details.
  * \param[in] prom     A promise object used to track the detached thread which executes this command.
  *
@@ -50,7 +51,9 @@ inline void call_server(std::string const & command, std::promise<bool> prom)
 // version_checker
 // ------------------------------------------------------------------------------------------------------------------
 
-//!\brief A functor whose operator() performs the server http request and version checks.
+/*!\brief A functor whose operator() performs the server http request and version checks.
+ * \ingroup parser
+ */
 class version_checker
 {
 public:
