@@ -136,7 +136,7 @@ namespace sharg
  * The functionality helps getting new versions out to users faster.
  * It is also used to inform application developers of new versions of the SeqAn library
  * which means that applications ship with less bugs.
- * For privacy implications, please see: https://sharg.vercel.app/usr/html/about_update_notifications.html.
+ * For privacy implications, please see: https://docs.seqan.de/sharg/main_user/about_update_notifications.html.
  *
  * Developers that wish to disable this feature permanently can pass an extra constructor argument:
  *
@@ -177,7 +177,7 @@ public:
      * The application name must only contain alpha-numeric characters, `_` or `-` ,
      * i.e. the following regex must evaluate to true: `"^[a-zA-Z0-9_-]+$"` .
      *
-     * See the [parser tutorial](https://sharg.vercel.app/usr/html/tutorial_parser.html)
+     * See the [parser tutorial](https://docs.seqan.de/sharg/main_user/tutorial_parser.html)
      * for more information about the version check functionality.
      *
      * \details

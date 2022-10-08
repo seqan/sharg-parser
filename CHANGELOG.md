@@ -5,7 +5,7 @@
 This changelog contains a top-level entry for each release with sections on new features, API changes and notable
 bug-fixes (not all bug-fixes will be listed).
 
-See the Sharg documentation on [API stability](https://sharg.vercel.app/usr/html/about_api.html) to learn about
+See the Sharg documentation on [API stability](https://docs.seqan.de/sharg/main_user/about_api.html) to learn about
 when API changes are allowed in the Sharg-parser.
 
 <!--
@@ -28,7 +28,7 @@ Most notably, we switched to
 for configuring (positional) options and flags when adding them to the parser. See `API changes` for more details.
 
 From this release on, most of the **API is now stable**. Stable entities are marked as such in our
-[online documentation](https://sharg.vercel.app/usr/html/classsharg_1_1parser.html).
+[online documentation](https://docs.seqan.de/sharg/main_user/classsharg_1_1parser.html).
 
 ## New features
 
@@ -44,7 +44,7 @@ prints
     Default: Calculated from your data.
 ```
 instead of `Default: 0.`. See our online
-[documentation](https://sharg.vercel.app/usr/html/structsharg_1_1config.html#aec21e88c7a32f4c0cfab9970de89df71)
+[documentation](https://docs.seqan.de/sharg/main_user/structsharg_1_1config.html#aec21e88c7a32f4c0cfab9970de89df71)
 for more details.
 
 ## API changes

@@ -25,7 +25,7 @@
 <!-- Use the Sharg logo within the repository. --->
 [sharg_logo_link]: ./test/documentation/sharg_logo.svg "Open documentation"
 <!-- Link the logo to the documentation website. --->
-[sharg_link]: https://sharg.vercel.app/
+[sharg_link]: https://docs.seqan.de/sharg.html
 
 <!--
     This is the CI badge image:
@@ -65,7 +65,7 @@
     This is the Copyright badge link:
         `"Open Copyright page"` - this text will be shown on hover
 -->
-[copy_link]: https://sharg.vercel.app/usr/html/about_copyright.html
+[copy_link]: https://docs.seqan.de/sharg/main_user/about_copyright.html
 
 [api_badge]: https://img.shields.io/badge/platform-linux%20%7C%20bsd%20%7C%20osx-informational.svg "Read more about our API"
 <!--
@@ -73,7 +73,7 @@
         Redirects to seqan's copyright page.
         `"Read more about our API"` - this text will be shown on hover
 -->
-[api_link]: https://sharg.vercel.app/usr/html/about_api.html
+[api_link]: https://docs.seqan.de/sharg/main_user/about_api.html
 
 [twitter_badge]: https://img.shields.io/twitter/follow/SeqAnLib.svg?label=follow&style=social "Follow us on Twitter"
 <!--
@@ -86,7 +86,7 @@
 The Sharg parser offers a neat and easy-to-use header-only library for argument parsing in C++. With Sharg, your command
 line interface can be customized to your specific needs and validated in a single line. Furthermore, the library provides
 helpful templates and makes even subcommands feel effortless. For more information, details, and a tutorial on how to
-use our features, please see our [online documentation](https://sharg.vercel.app/usr/html/index.html).
+use our features, please see our [online documentation](https://docs.seqan.de/sharg/main_user/index.html).
 
 If you are working in the field of sequence analysis, we recommend using the
 [SeqAn3 library](https://github.com/seqan/seqan3), which offers a wide range of bioinformatics-related C++ features.
