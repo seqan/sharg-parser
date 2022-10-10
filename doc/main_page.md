@@ -21,7 +21,7 @@ acquiring funding for the future development and maintenance of Sharg.
 Resources outside of this web-site that might be useful:
 
   * The [project homepage](https://www.seqan.de) with news and application pages.
-  * The [GitHub repository](https://github.com/seqan/seqan3) with issue tracker and downloads.
+  * The [GitHub repository](https://github.com/seqan/sharg-parser) with issue tracker and downloads.
   * The [SeqAn documentation](https://docs.seqan.de/).
 
 ### Some notes on using this documentation
@@ -34,8 +34,3 @@ If you spot any dead links in the documentation, please open an issue at our bug
 The documentation is versioned together with the library, see https://docs.seqan.de for release-specific
 documentation builds.
 The tutorial on \ref setup_tests contains instructions for setting up local documentation builds.
-
-Since doxygen does not support many modern C++ features, some parts of the documentation may not describe
-the interfaces completely. In particular, many *constraints* are only expressed verbally in the documentation of
-an interface and not as part of that interface's code. Also *C++ concepts* are currently called "interfaces" throughout
-the documentation.

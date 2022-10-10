@@ -263,7 +263,7 @@ TEST_F(version_check, option_implicitely_on)
               "   Automatic Update Notifications\n"
               "#######################################################################\n"
               " This app performs automatic checks for updates. For more information\n"
-              " see: https://sharg.vercel.app/usr/html/about_update_notifications.html\n"
+              " see: https://docs.seqan.de/sharg/main_user/about_update_notifications.html\n"
               "#######################################################################\n\n");
 
     // make sure that all files now exist
