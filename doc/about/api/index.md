@@ -2,7 +2,7 @@
 
 [TOC]
 
-# Application **Programming** Interface (API) stability {#api_stability}
+# Application Programming Interface (API) stability {#api_stability}
 
 Sharg adheres to [semantic versioning](https://semver.org) and provides a stable API within
 one major release unless otherwise noted.
@@ -10,9 +10,9 @@ one major release unless otherwise noted.
 For details regarding API stability, please see the
 [SeqAn documentation on API stability](https://docs.seqan.de/seqan/3-master-user/about_api.html#api_stability).
 
-# Application **Binary** Interface (ABI) stability
+# Application Binary Interface (ABI) stability
 
-There is no A**B**I stability.
+There is no A<strong>B</strong>I stability.
 
 For details regarding ABI stability, please see the
 [SeqAn documentation on ABI stability](https://docs.seqan.de/seqan/3-master-user/about_api.html#autotoc_md38).
@@ -22,7 +22,7 @@ For details regarding ABI stability, please see the
 The main requirement for Sharg is that your operating system provides one of the compilers supported by us.
 In general, we only support the latest three major compiler versions.
 We currently support the following compilers on 64-bit operating systems with little-endian CPU architectures:
-  * GCC10, GCC11
+  * GCC10, GCC11, GCC12
 
 \note Only the most recent minor release of a compiler is guaranteed to be supported, e.g. when `gcc-10.4` is released,
 we may drop support for `gcc-10.3`. Since all platforms with an older version receive minor release updates,
