@@ -95,7 +95,7 @@ If you are working in the field of sequence analysis, we recommend using the
 
 An application with one option parsing an integer from the command line can be written in only 5 lines of code:
 
-<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp) -->
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp&lines=3-13) -->
 <!-- The below code snippet is automatically added from ./test/snippet/readme_sneak_peek.cpp -->
 ```cpp
 #include <sharg/all.hpp>
@@ -116,7 +116,9 @@ Done. `val` is automatically filled with the value provided by `-i` or `--int`.
 
 You also have a pretty help page and many more features:
 
-```
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.out&header=user$ ./Eat-Me-App -h) -->
+<!-- The below code snippet is automatically added from ./test/snippet/readme_sneak_peek.out -->
+```out
 user$ ./Eat-Me-App -h
 Eat-Me-App
 ==========
@@ -144,8 +146,9 @@ OPTIONS
 VERSION
     Last update:
     Eat-Me-App version:
-    Sharg version: 0.1.0
+    Sharg version: 1.0.1-rc.1
 ```
+<!-- MARKDOWN-AUTO-DOCS:END -->
 
 ## Dependencies
 
