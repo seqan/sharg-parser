@@ -11,10 +11,12 @@ set (SHARG_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set (SHARG_DOXYGEN_EXCLUDE_SYMBOLS "detail sharg::simd") #/""
 set (SHARG_DOXYGEN_PREDEFINED_NDEBUG "-NDEBUG") #/""
 set (SHARG_DOXYGEN_ENABLED_SECTIONS "") #/"DEV"
+set (SHARG_SHOW_DEV_GROUP "NO") #/"YES"
 set (SHARG_DOXYGEN_EXTRACT_PRIVATE "NO") #/"YES":
 
 configure_file (${SHARG_DOXYFILE_IN} ${SHARG_DOXYGEN_OUTPUT_DIR}/Doxyfile)
 configure_file (${SHARG_FOOTER_HTML_IN} ${SHARG_DOXYGEN_OUTPUT_DIR}/sharg_footer.html)
+configure_file (${SHARG_LAYOUT_IN} ${SHARG_DOXYGEN_OUTPUT_DIR}/DoxygenLayout.xml)
 
 add_custom_target(doc_usr ALL
                   COMMAND ${DOXYGEN_EXECUTABLE}
