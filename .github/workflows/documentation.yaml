@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CMAKE_VERSION: 3.16.9
-  DOXYGEN_VERSION: 1.9.4
+  DOXYGEN_VERSION: 1.9.5
   TZ: Europe/Berlin
 
 defaults:
