@@ -192,7 +192,8 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            =
 HTML_FOOTER            = ${SHARG_DOXYGEN_OUTPUT_DIR}/sharg_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg.css
+HTML_EXTRA_STYLESHEET  = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg.css \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_dark.css
 ### Extra files that we can link to
 HTML_EXTRA_FILES       = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.js \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.php \
