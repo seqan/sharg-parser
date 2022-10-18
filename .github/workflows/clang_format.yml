@@ -39,11 +39,21 @@ jobs:
     steps:
       - name: "Cancel Misc"
         run: echo "Cancelling Misc"
+  cancel_coverage:
+    name: Cancel Coverage
+    concurrency:
+      group: coverage-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Cancel Coverage"
+        run: echo "Cancelling Coverage"
   lint:
     name: clang-format
     concurrency:
       group: clang-format-${{ github.event.pull_request.number }}
       cancel-in-progress: true
+    needs: [cancel_linux, cancel_macos, cancel_misc, cancel_coverage]
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
@@ -64,8 +74,8 @@ jobs:
           QUERY="/repos/${{ github.repository }}/compare/${COMMIT_RANGE}"
           ANSWER=$(gh api -H "Accept: application/vnd.github.v3+json" ${QUERY})
           NBEHIND=$(jq '.behind_by' <<< "${ANSWER}")
-          echo "::set-output name=depth::$(( ${NBEHIND} + 1 ))"
-          echo "::set-output name=pr_depth::$(( ${{ github.event.pull_request.commits }} + 1 ))"
+          echo "depth=$(( ${NBEHIND} + 1 ))" >> $GITHUB_OUTPUT
+          echo "pr_depth=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> $GITHUB_OUTPUT
 
       - name: Checkout Sharg
         uses: actions/checkout@v3
@@ -112,7 +122,7 @@ jobs:
           cd sharg
           LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
           { grep -E "(.cpp|.hpp|include/sharg/std/)" || test $? = 1; } | xargs)
-          echo "::set-output name=list::$LIST"
+          echo "list=$LIST" >> $GITHUB_OUTPUT
 
       - name: Install clang-format
         if: ${{ steps.changed_files.outputs.list }}

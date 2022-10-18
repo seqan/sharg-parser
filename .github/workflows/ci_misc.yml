@@ -16,7 +16,7 @@ on:
 
 concurrency:
   group: misc-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
   SHARG_NO_VERSION_CHECK: 1
@@ -92,8 +92,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: sharg
-          fetch-depth: 2
-          submodules: recursive
+          fetch-depth: 1
 
       # To reuse scripts
       - name: Checkout SeqAn3
