@@ -33,6 +33,7 @@ set (SHARG_DOXYGEN_DOT_NUM_THREADS "0")
 set (SHARG_DOXYGEN_SOURCE_DIR "${SHARG_CLONE_DIR}")
 set (SHARG_DOXYFILE_IN ${SHARG_DOXYGEN_INPUT_DIR}/sharg_doxygen_cfg.in)
 set (SHARG_FOOTER_HTML_IN ${SHARG_DOXYGEN_INPUT_DIR}/sharg_footer.html.in)
+set (SHARG_LAYOUT_IN ${SHARG_DOXYGEN_INPUT_DIR}/DoxygenLayout.xml.in)
 
 option(SHARG_USER_DOC "Create build target and test for user documentation." ON)
 option(SHARG_DEV_DOC "Create build target and test for developer documentation." ON)
@@ -43,7 +44,7 @@ if (SHARG_VERCEL_PREVIEW_DOC)
     set (SHARG_DOXYGEN_DOT_NUM_THREADS "2")
     set (SHARG_DOXYFILE_OPTION_POWERED_BY_VERCEL "HTML_EXTRA_FILES       += ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")
     set (SHARG_FOOTER_HTML_OPTION_POWERED_BY_VERCEL
-         "<li class='footer'><a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><img class='footer' src='$relpath^powered-by-vercel.svg' width='104' height='31' alt='Powered by Vercel'/></a></li>")
+         "<li class='footer'><a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><img src='$relpath^powered-by-vercel.svg' height='29px' alt='Powered by Vercel'/></a></li>")
 endif ()
 
 ### Download and extract cppreference-doxygen-web.tag.xml for std:: documentation links
