@@ -2,5 +2,10 @@
 checkoutLocation: "tutorial/source/sharg-parser"
 workspaceLocation: "/tutorial"
 tasks:
-  - name: Create Directories
+  - name: Setup
     before: mkdir -p build source
+    init: brew install gcc@12 || true
+    command: echo "GCC 12 available via g++-12"
+vscode:
+  extensions:
+    - ms-vscode.cpptools
