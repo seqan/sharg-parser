@@ -1,5 +1,5 @@
 # https://www.gitpod.io/docs/references/gitpod-yml
-checkoutLocation: "tutorial/source/sharg-parser"
+checkoutLocation: "tutorial/sharg-parser"
 workspaceLocation: "/tutorial"
 tasks:
   - name: Setup
