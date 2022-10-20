@@ -4,8 +4,5 @@ workspaceLocation: "/tutorial"
 tasks:
   - name: Setup
     before: mkdir -p build source
-    init: brew install gcc@12 || true
-    command: echo "GCC 12 available via g++-12"
-vscode:
-  extensions:
-    - ms-vscode.cpptools
+    init: HOMEBREW_NO_INSTALL_CLEANUP=1 HOMEBREW_NO_ENV_HINTS=1 brew install gcc@12
+    command: echo && echo "GCC 12 available via g++-12" && echo && echo "g++-12 --version" && g++-12 --version
