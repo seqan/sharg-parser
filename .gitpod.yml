@@ -1,5 +1,6 @@
 # https://www.gitpod.io/docs/references/gitpod-yml
 checkoutLocation: "tutorial/source/sharg-parser"
+workspaceLocation: "/workspace"
 tasks:
   - name: Create Directories
     before: mkdir -p tutorial/build tutorial/source
