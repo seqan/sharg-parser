@@ -5,14 +5,13 @@
 # shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------------
 
-# 3.14 is enough for the FetchContent feature, but it has a bug that prevents it from working.
-cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required (VERSION 3.16)
 
 # Exposes the google-test targets `gtest` and `gtest_main`.
 macro (sharg_require_test)
     enable_testing ()
 
-    set (gtest_git_tag "release-1.11.0")
+    set (gtest_git_tag "release-1.12.1")
 
     message (STATUS "Fetch Google Test:")
 

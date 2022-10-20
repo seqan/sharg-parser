@@ -24,6 +24,8 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 #### Dependencies
   * We now use Doxygen version 1.9.5 to build our documentation ([\#145](https://github.com/seqan/sharg-parser/pull/145)).
+  * We require at least CMake 3.16 for our test suite. Note that the minimum requirement for using Sharg is unchanged
+    ([\#135](https://github.com/seqan/sharg-parser/pull/135)).
 
 # Release 1.0.0
 

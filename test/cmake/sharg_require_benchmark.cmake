@@ -5,14 +5,13 @@
 # shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------------
 
-# 3.14 is enough for the FetchContent feature, but it has a bug that prevents it from working.
-cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required (VERSION 3.16)
 
 # Exposes the google-benchmark target `gbenchmark`.
 macro (sharg_require_benchmark)
     enable_testing ()
 
-    set (gbenchmark_git_tag "v1.6.1")
+    set (gbenchmark_git_tag "v1.7.0")
 
     message (STATUS "Fetch Google Benchmark:")
 
