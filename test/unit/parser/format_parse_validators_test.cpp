@@ -13,9 +13,7 @@
 #include <sharg/test/file_access.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
-std::string const basic_options_str = "OPTIONS\n"
-                                      "\n"
-                                      "  Basic options:\n"
+std::string const basic_options_str = "  Common options:\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
                                       "    -hh, --advanced-help\n"
@@ -170,7 +168,7 @@ TEST(validator_test, input_file)
                         "    ARGUMENT-1 (std::filesystem::path)\n"
                         "          desc The input file must exist and read permissions must be granted.\n"
                         "          Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
-                        "\n"}
+                        "\nOPTIONS\n\n"}
             + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
@@ -318,7 +316,7 @@ TEST(validator_test, output_file)
                         "          desc The output file must not exist already and write permissions\n"
                         "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
                         "          fasta.txt].\n"
-                        "\n"}
+                        "\nOPTIONS\n\n"}
             + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
@@ -346,7 +344,7 @@ TEST(validator_test, output_file)
                         "    ARGUMENT-1 (std::filesystem::path)\n"
                         "          desc Write permissions must be granted. Valid file extensions are:\n"
                         "          [fa, sam, fasta, fasta.txt].\n"
-                        "\n"}
+                        "\nOPTIONS\n\n"}
             + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
@@ -436,7 +434,7 @@ TEST(validator_test, input_directory)
                                        "POSITIONAL ARGUMENTS\n"
                                        "    ARGUMENT-1 (std::filesystem::path)\n"
                                        "          desc An existing, readable path for the input directory.\n"
-                                       "\n"}
+                                       "\nOPTIONS\n\n"}
                          + basic_options_str + "\n" + basic_version_str;
 
     EXPECT_EQ(my_stdout, expected);
@@ -498,7 +496,7 @@ TEST(validator_test, output_directory)
                                            "POSITIONAL ARGUMENTS\n"
                                            "    ARGUMENT-1 (std::filesystem::path)\n"
                                            "          desc A valid path for the output directory.\n"
-                                           "\n"}
+                                           "\nOPTIONS\n\n"}
                              + basic_options_str + "\n" + basic_version_str;
 
         EXPECT_EQ(my_stdout, expected);
@@ -772,7 +770,7 @@ TEST(validator_test, arithmetic_range_validator_success)
                                        "POSITIONAL ARGUMENTS\n"
                                        "    ARGUMENT-1 (List of signed 32 bit integer)\n"
                                        "          desc Default: []. Value must be in range [-20,20].\n"
-                                       "\n"
+                                       "\nOPTIONS\n\n"
                                        + basic_options_str + "\n" + basic_version_str);
     EXPECT_EQ(my_stdout, expected);
 
@@ -988,11 +986,10 @@ TEST(validator_test, value_list_validator_success)
     std::string my_stdout = testing::internal::GetCapturedStdout();
     std::string expected = std::string("test_parser\n"
                                        "===========\n"
-                                       "\n"
-                                       + basic_options_str
-                                       + "    -i, --int-option (List of signed 32 bit integer)\n"
-                                         "          desc Default: []. Value must be one of [-10, 48, 50].\n\n"
-                                       + basic_version_str);
+                                       "\nOPTIONS\n"
+                                       "    -i, --int-option (List of signed 32 bit integer)\n"
+                                       "          desc Default: []. Value must be one of [-10, 48, 50].\n\n"
+                                       + basic_options_str + "\n" + basic_version_str);
     EXPECT_EQ(my_stdout, expected);
 }
 
@@ -1128,13 +1125,12 @@ TEST(validator_test, regex_validator_success)
         std::string my_stdout = testing::internal::GetCapturedStdout();
         std::string expected = std::string("test_parser\n"
                                            "===========\n"
+                                           "\nOPTIONS\n"
+                                           "    -s, --string-option (List of std::string)\n"
+                                           "          desc Default: []. Value must match the pattern\n"
+                                           "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
                                            "\n"
-                                           + basic_options_str
-                                           + "    -s, --string-option (List of std::string)\n"
-                                             "          desc Default: []. Value must match the pattern\n"
-                                             "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
-                                             "\n"
-                                           + basic_version_str);
+                                           + basic_options_str + "\n" + basic_version_str);
         EXPECT_EQ(my_stdout, expected);
     }
 }
@@ -1366,15 +1362,14 @@ TEST(validator_test, chaining_validators)
         std::string expected =
             std::string{"test_parser\n"
                         "===========\n"
-                        "\n"
-                        + basic_options_str
-                        + "    -s, --string-option (std::string)\n"
-                          "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
-                          "          The output file must not exist already and write permissions must be\n"
-                          "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
-                          "          pattern '.*'.\n"
-                          "\n"}
-            + basic_version_str;
+                        "\nOPTIONS\n"
+                        "    -s, --string-option (std::string)\n"
+                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+                        "          The output file must not exist already and write permissions must be\n"
+                        "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
+                        "          pattern '.*'.\n"
+                        "\n"}
+            + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 
@@ -1400,14 +1395,13 @@ TEST(validator_test, chaining_validators)
         std::string expected =
             std::string{"test_parser\n"
                         "===========\n"
-                        "\n"
-                        + basic_options_str
-                        + "    -s, --string-option (std::string)\n"
-                          "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
-                          "          Write permissions must be granted. Valid file extensions are: [sa,\n"
-                          "          so]. Value must match the pattern '.*'.\n"
-                          "\n"}
-            + basic_version_str;
+                        "\nOPTIONS\n"
+                        "    -s, --string-option (std::string)\n"
+                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+                        "          Write permissions must be granted. Valid file extensions are: [sa,\n"
+                        "          so]. Value must match the pattern '.*'.\n"
+                        "\n"}
+            + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
     }
 

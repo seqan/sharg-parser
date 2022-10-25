@@ -22,9 +22,7 @@ char const * argv_with_h[] = {"./help_add_test", "-h"};
 char const * argv_with_hh[] = {"./help_add_test", "-hh"};
 char const * argv_with_version[] = {"./help_add_test", "--version"};
 
-std::string const basic_options_str = "OPTIONS\n"
-                                      "\n"
-                                      "  Basic options:\n"
+std::string const basic_options_str = "  Common options:\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
                                       "    -hh, --advanced-help\n"
@@ -116,7 +114,7 @@ TEST(help_page_printing, no_information)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(std_cout, expected);
 }
@@ -132,7 +130,7 @@ TEST(help_page_printing, with_short_copyright)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str + "\n"
              + "LEGAL\n"
                "    test_parser Copyright: short\n"
@@ -151,7 +149,7 @@ TEST(help_page_printing, with_long_copyright)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str + "\n"
              + "LEGAL\n"
                "    SeqAn Copyright: 2006-2022 Knut Reinert, FU-Berlin; released under the\n"
@@ -170,7 +168,7 @@ TEST(help_page_printing, with_citation)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str + "\n"
              + "LEGAL\n"
                "    SeqAn Copyright: 2006-2022 Knut Reinert, FU-Berlin; released under the\n"
@@ -189,7 +187,7 @@ TEST(help_page_printing, with_author)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str + "\n"
              + "LEGAL\n"
                "    Author: author\n"
@@ -208,7 +206,7 @@ TEST(help_page_printing, with_email)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str + "\n"
              + "LEGAL\n"
                "    Contact: email\n"
@@ -227,7 +225,7 @@ TEST(help_page_printing, empty_advanced_help)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(std_cout, expected);
 }
@@ -280,7 +278,7 @@ TEST(help_page_printing, do_not_print_hidden_options)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
-               "\n"
+               "\nOPTIONS\n\n"
              + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(std_cout, expected);
 }
@@ -329,9 +327,8 @@ TEST(help_page_printing, advanced_options)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
+               "\nOPTIONS\n"
                "\n"
-             + basic_options_str
-             + "\n"
                "DEFAULT SECTION\n"
                "\n"
                "  default subsection\n"
@@ -343,7 +340,7 @@ TEST(help_page_printing, advanced_options)
                "          list item.\n"
                "    some line.\n"
                "\n"
-             + basic_version_str;
+             + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(std_cout, expected);
 
     // with -hh everything is shown
@@ -355,9 +352,8 @@ TEST(help_page_printing, advanced_options)
     std_cout = testing::internal::GetCapturedStdout();
     expected = "test_parser\n"
                "===========\n"
+               "\nOPTIONS\n"
                "\n"
-             + basic_options_str
-             + "\n"
                "DEFAULT SECTION\n"
                "\n"
                "  default subsection\n"
@@ -380,7 +376,7 @@ TEST(help_page_printing, advanced_options)
                "          list item.\n"
                "    some line.\n"
                "\n"
-             + basic_version_str;
+             + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(std_cout, expected);
 }
 
@@ -454,9 +450,8 @@ TEST(help_page_printing, full_information)
                "          this is not a list.\n"
                "    ARGUMENT-2 (List of std::string)\n"
                "          this is a positional option. Default: [].\n"
-               "\n"
-             + basic_options_str
-             + "    -i, --int (signed 32 bit integer)\n"
+               "\nOPTIONS\n"
+               "    -i, --int (signed 32 bit integer)\n"
                "          this is a int option. Default: A number.\n"
                "    -e, --enum (foo)\n"
                "          this is an enum option. Default: one. Value must be one of [three,\n"
@@ -471,6 +466,8 @@ TEST(help_page_printing, full_information)
                "    -f, --flag\n"
                "          this is a flag.\n"
                "\n"
+             + basic_options_str
+             + "\n"
                "EXAMPLES\n"
                "    example\n"
                "\n"
@@ -580,12 +577,11 @@ TEST(parse_test, subcommand_parser)
                            "    The following options below belong to the top-level parser and need to be\n"
                            "    specified before the subcommand key word. Every argument after the\n"
                            "    subcommand key word is passed on to the corresponding sub-parser.\n"
-                           "\n"
-                         + basic_options_str
-                         + "    -f, --foo (signed 32 bit integer)\n"
+                           "\nOPTIONS\n"
+                           "    -f, --foo (signed 32 bit integer)\n"
                            "          foo bar. Default: 0.\n"
                            "\n"
-                         + basic_version_str;
+                         + basic_options_str + "\n" + basic_version_str;
 
     EXPECT_EQ(std_cout, expected);
 }
