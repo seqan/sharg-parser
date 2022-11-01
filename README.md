@@ -125,7 +125,11 @@ Eat-Me-App
 
 OPTIONS
 
-  Basic options:
+  Eating Numbers
+    -i, --int (signed 32 bit integer)
+          Desc. Default: 0.
+
+  Common options
     -h, --help
           Prints the help page.
     -hh, --advanced-help
@@ -138,10 +142,6 @@ OPTIONS
           Export the help page information. Value must be one of [html, man].
     --version-check (bool)
           Whether to check for the newest app version. Default: true.
-
-  Eating Numbers
-    -i, --int (signed 32 bit integer)
-          Desc. Default: 0.
 
 VERSION
     Last update:
