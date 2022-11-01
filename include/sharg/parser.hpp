@@ -705,7 +705,7 @@ private:
                  detail::format_html,
                  detail::format_man,
                  detail::format_copyright/*,
-                 detail::format_ctd*/> format{detail::format_help{{}, false}}; // Will be overwritten in any case.
+                 detail::format_ctd*/> format{detail::format_help{{}, {}, false}}; // Will be overwritten in any case.
 
     //!\brief List of option/flag identifiers that are already used.
     std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
@@ -762,14 +762,12 @@ private:
 
             if (arg == "-h" || arg == "--help")
             {
-                format = detail::format_help{subcommands, false};
-                init_standard_options();
+                format = detail::format_help{subcommands, version_check_dev_decision, false};
                 special_format_was_set = true;
             }
             else if (arg == "-hh" || arg == "--advanced-help")
             {
-                format = detail::format_help{subcommands, true};
-                init_standard_options();
+                format = detail::format_help{subcommands, version_check_dev_decision, true};
                 special_format_was_set = true;
             }
             else if (arg == "--version")
@@ -793,16 +791,16 @@ private:
                 }
 
                 if (export_format == "html")
-                    format = detail::format_html{subcommands};
+                    format = detail::format_html{subcommands, version_check_dev_decision};
                 else if (export_format == "man")
-                    format = detail::format_man{subcommands};
+                    format = detail::format_man{subcommands, version_check_dev_decision};
                 // TODO (smehringer) use when CTD support is available
                 // else if (export_format == "ctd")
                 //     format = detail::format_ctd{};
                 else
                     throw validation_error{"Validation failed for option --export-help: "
                                            "Value must be one of [html, man]"};
-                init_standard_options();
+
                 special_format_was_set = true;
             }
             else if (arg == "--copyright")
@@ -843,21 +841,6 @@ private:
 
         if (!special_format_was_set)
             format = detail::format_parse(argc, cmd_arguments);
-    }
-
-    //!\brief Adds standard options to the help page.
-    void init_standard_options()
-    {
-        add_subsection("Basic options:");
-        add_list_item("\\fB-h\\fP, \\fB--help\\fP", "Prints the help page.");
-        add_list_item("\\fB-hh\\fP, \\fB--advanced-help\\fP", "Prints the help page including advanced options.");
-        add_list_item("\\fB--version\\fP", "Prints the version information.");
-        add_list_item("\\fB--copyright\\fP", "Prints the copyright/license information.");
-        add_list_item("\\fB--export-help\\fP (std::string)",
-                      "Export the help page information. Value must be one of [html, man].");
-        if (version_check_dev_decision == update_notifications::on)
-            add_list_item("\\fB--version-check\\fP (bool)",
-                          "Whether to check for the newest app version. Default: true.");
     }
 
     /*!\brief Checks whether the long identifier has already been used before.

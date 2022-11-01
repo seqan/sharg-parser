@@ -206,11 +206,15 @@ private:
 
     /*!\brief Initializes a format_help_base object.
      * \param[in] names    A list of subcommands (see \link subcommand_parse subcommand parsing \endlink).
+     * \param[in] version_updates Whether the developer disabled version checks when constructing the parser.
      * \param[in] advanced Set to `true` to show advanced options.
      */
-    format_help_base(std::vector<std::string> const & names, bool const advanced) :
+    format_help_base(std::vector<std::string> const & names,
+                     update_notifications const version_updates,
+                     bool const advanced) :
         command_names{names},
-        show_advanced_options{advanced}
+        show_advanced_options{advanced},
+        version_check_dev_decision{version_updates}
     {}
     //!\}
 
@@ -321,13 +325,25 @@ public:
         for (auto f : positional_option_calls)
             f();
 
-        // add options and flags if specified
-        if (!parser_set_up_calls.empty())
-            derived_t().print_section("Options");
+        // There are always options because of the common options
+        derived_t().print_section("Options");
 
         // each call will evaluate the function derived_t().print_list_item()
         for (auto f : parser_set_up_calls)
             f();
+
+        // print Common options after developer options
+        derived_t().print_subsection("Common options");
+        derived_t().print_list_item("\\fB-h\\fP, \\fB--help\\fP", "Prints the help page.");
+        derived_t().print_list_item("\\fB-hh\\fP, \\fB--advanced-help\\fP",
+                                    "Prints the help page including advanced options.");
+        derived_t().print_list_item("\\fB--version\\fP", "Prints the version information.");
+        derived_t().print_list_item("\\fB--copyright\\fP", "Prints the copyright/license information.");
+        derived_t().print_list_item("\\fB--export-help\\fP (std::string)",
+                                    "Export the help page information. Value must be one of [html, man].");
+        if (version_check_dev_decision == update_notifications::on)
+            derived_t().print_list_item("\\fB--version-check\\fP (bool)",
+                                        "Whether to check for the newest app version. Default: true.");
 
         if (!meta.examples.empty())
         {
@@ -421,6 +437,9 @@ public:
     friend derived_type;
 
 protected:
+    //!\brief Set on construction and indicates whether the developer deactivated the version check calls completely.
+    update_notifications version_check_dev_decision{};
+
     //!\brief Returns the derived type.
     derived_type & derived_t()
     {

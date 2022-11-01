@@ -9,9 +9,7 @@
 
 #include <sharg/parser.hpp>
 
-std::string const basic_options_str = "OPTIONS\n"
-                                      "\n"
-                                      "  Basic options:\n"
+std::string const basic_options_str = "  Common options\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
                                       "    -hh, --advanced-help\n"
@@ -61,7 +59,7 @@ TEST(help_page_printing, no_information)
     std::string std_cout = testing::internal::GetCapturedStdout();
     std::string expected = "test_parser\n"
                            "===========\n"
-                           "\n"
+                           "\nOPTIONS\n\n"
                          + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(std_cout, expected);
 }
