@@ -22,7 +22,7 @@ char const * argv_with_h[] = {"./help_add_test", "-h"};
 char const * argv_with_hh[] = {"./help_add_test", "-hh"};
 char const * argv_with_version[] = {"./help_add_test", "--version"};
 
-std::string const basic_options_str = "  Common options:\n"
+std::string const basic_options_str = "  Common options\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
                                       "    -hh, --advanced-help\n"

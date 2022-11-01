@@ -13,7 +13,7 @@
 #include <sharg/test/file_access.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
-std::string const basic_options_str = "  Common options:\n"
+std::string const basic_options_str = "  Common options\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
                                       "    -hh, --advanced-help\n"

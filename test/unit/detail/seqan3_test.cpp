@@ -9,7 +9,7 @@
 
 #include <sharg/parser.hpp>
 
-std::string const basic_options_str = "  Common options:\n"
+std::string const basic_options_str = "  Common options\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
                                       "    -hh, --advanced-help\n"

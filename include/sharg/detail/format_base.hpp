@@ -333,7 +333,7 @@ public:
             f();
 
         // print Common options after developer options
-        derived_t().print_subsection("Common options:");
+        derived_t().print_subsection("Common options");
         derived_t().print_list_item("\\fB-h\\fP, \\fB--help\\fP", "Prints the help page.");
         derived_t().print_list_item("\\fB-hh\\fP, \\fB--advanced-help\\fP",
                                     "Prints the help page including advanced options.");

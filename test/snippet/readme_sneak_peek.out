@@ -7,7 +7,7 @@ OPTIONS
     -i, --int (signed 32 bit integer)
           Desc. Default: 0.
 
-  Common options:
+  Common options
     -h, --help
           Prints the help page.
     -hh, --advanced-help
