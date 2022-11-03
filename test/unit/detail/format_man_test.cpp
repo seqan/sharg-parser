@@ -17,7 +17,7 @@ struct format_man_test : public ::testing::Test
     int8_t non_list_pos_opt_value{1};
     std::vector<std::string> list_pos_opt_value{};
     std::string my_stdout{};
-    static constexpr std::array argv {"./format_man_test", "--version-check", "false", "--export-help", "man"};
+    static constexpr std::array argv{"./format_man_test", "--version-check", "false", "--export-help", "man"};
     std::string const version_str{sharg::sharg_version_cstring};
     std::string expected = R"(.TH DEFAULT 1 "December 01, 1994" "default 01.01.01" "default_man_page_title")"
                            "\n"
