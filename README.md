@@ -95,7 +95,7 @@ If you are working in the field of sequence analysis, we recommend using the
 
 An application with one option parsing an integer from the command line can be written in only 5 lines of code:
 
-<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp&lines=3-13) -->
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp&lines=3-15) -->
 <!-- The below code snippet is automatically added from ./test/snippet/readme_sneak_peek.cpp -->
 ```cpp
 #include <sharg/all.hpp>
