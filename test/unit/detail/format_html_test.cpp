@@ -15,8 +15,8 @@ TEST(html_format, empty_information)
     std::string expected;
 
     // Empty html help page.
-    char const * argv0[] = {"./help_add_test --version-check false", "--export-help", "html"};
-    sharg::parser parser0{"empty_options", 3, argv0};
+    std::array const argv0{"./help_add_test", "--version-check", "false", "--export-help", "html"};
+    sharg::parser parser0{"empty_options", argv0.size(), argv0.data()};
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser0.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     my_stdout = testing::internal::GetCapturedStdout();
@@ -60,8 +60,8 @@ TEST(html_format, empty_information)
                       "</body></html>");
     EXPECT_EQ(my_stdout, expected);
 
-    char const * argv1[] = {"./help_add_test --version-check false", "--export-help=html"};
-    sharg::parser parser1{"empty_options", 2, argv1};
+    std::array const argv1{"./help_add_test", "--version-check", "false", "--export-help=html"};
+    sharg::parser parser1{"empty_options", argv1.size(), argv1.data()};
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
     my_stdout = testing::internal::GetCapturedStdout();
@@ -78,8 +78,8 @@ TEST(html_format, full_information_information)
     std::vector<std::string> list_pos_opt_value{};
 
     // Full html help page.
-    char const * argv0[] = {"./help_add_test --version-check false", "--export-help", "html"};
-    sharg::parser parser1{"program_full_options", 3, argv0};
+    std::array const argv0{"./help_add_test", "--version-check", "false", "--export-help", "html"};
+    sharg::parser parser1{"program_full_options", argv0.size(), argv0.data()};
     parser1.info.synopsis.push_back("./some_binary_name synopsis");
     parser1.info.synopsis.push_back("./some_binary_name synopsis2");
     parser1.info.description.push_back("description");
@@ -212,16 +212,16 @@ TEST(html_format, full_information_information)
 
 TEST(export_help, parse_error)
 {
-    char const * argv[] = {"./help_add_test --version-check false", "--export-help"};
-    char const * argv2[] = {"./help_add_test --version-check false", "--export-help=atml"};
-    char const * argv3[] = {"./help_add_test --version-check false", "--export-help", "atml"};
+    std::array const argv{"./help_add_test", "--version-check", "false", "--export-help"};
+    std::array const argv2{"./help_add_test", "--version-check", "false", "--export-help=atml"};
+    std::array const argv3{"./help_add_test", "--version-check", "false", "--export-help", "atml"};
 
     // no value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", 2, argv}), sharg::parser_error);
+    EXPECT_THROW((sharg::parser{"test_parser", argv.size(), argv.data()}), sharg::parser_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", 2, argv2}), sharg::validation_error);
+    EXPECT_THROW((sharg::parser{"test_parser", argv2.size(), argv2.data()}), sharg::validation_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", 3, argv3}), sharg::validation_error);
+    EXPECT_THROW((sharg::parser{"test_parser", argv3.size(), argv3.data()}), sharg::validation_error);
 }

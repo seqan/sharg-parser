@@ -51,8 +51,8 @@ struct test_accessor
 
 TEST(help_page_printing, no_information)
 {
-    char const * argv[] = {"./help_add_test --version-check false", "-h"};
-    sharg::parser parser1{"test_parser", 2, argv};
+    std::array const argv{"./help_add_test", "--version-check", "false", "-h"};
+    sharg::parser parser1{"test_parser", argv.size(), argv.data()};
     sharg::detail::test_accessor::set_terminal_width(parser1, 80);
     testing::internal::CaptureStdout();
     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
