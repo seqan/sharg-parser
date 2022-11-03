@@ -17,7 +17,7 @@ struct format_man_test : public ::testing::Test
     int8_t non_list_pos_opt_value{1};
     std::vector<std::string> list_pos_opt_value{};
     std::string my_stdout{};
-    char const * argv[4] = {"./format_man_test --version-check false", "--export-help", "man"};
+    static constexpr std::array argv {"./format_man_test", "--version-check", "false", "--export-help", "man"};
     std::string const version_str{sharg::sharg_version_cstring};
     std::string expected = R"(.TH DEFAULT 1 "December 01, 1994" "default 01.01.01" "default_man_page_title")"
                            "\n"
@@ -185,7 +185,7 @@ struct format_man_test : public ::testing::Test
 TEST_F(format_man_test, empty_information)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
     parser.info.date = "December 01, 1994";
     parser.info.version = "01.01.01";
     parser.info.man_page_title = "default_man_page_title";
@@ -262,7 +262,7 @@ TEST_F(format_man_test, empty_information)
 TEST_F(format_man_test, full_information)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
@@ -277,7 +277,7 @@ TEST_F(format_man_test, full_information)
 TEST_F(format_man_test, full_info_short_copyright)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
@@ -298,7 +298,7 @@ TEST_F(format_man_test, full_info_short_copyright)
 TEST_F(format_man_test, full_info_short_and_citation)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
@@ -322,7 +322,7 @@ TEST_F(format_man_test, full_info_short_and_citation)
 TEST_F(format_man_test, full_info_short_long_and_citation)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
@@ -349,7 +349,7 @@ For full copyright and/or warranty information see \fB--copyright\fR.
 TEST_F(format_man_test, full_info_author)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
@@ -370,7 +370,7 @@ TEST_F(format_man_test, full_info_author)
 TEST_F(format_man_test, full_info_email)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", 3, argv};
+    sharg::parser parser{"default", argv.size(), argv.data()};
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
