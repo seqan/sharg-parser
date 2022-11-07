@@ -108,6 +108,8 @@ int main(int argc, char ** argv)
     parser.add_subsection("Eating Numbers");
     parser.add_option(val, sharg::config{.short_id = 'i', .long_id = "int", .description = "Desc."});
     parser.parse();
+
+    return 0;
 }
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
