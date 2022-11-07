@@ -58,7 +58,7 @@ endif ()
 # needed for performance test cases in sharg/test/performance
 if (NOT TARGET sharg::test::performance)
     add_library (sharg_test_performance INTERFACE)
-    target_link_libraries (sharg_test_performance INTERFACE "sharg::test" "gbenchmark")
+    target_link_libraries (sharg_test_performance INTERFACE "sharg::test" "benchmark_main" "benchmark")
 
     add_library (sharg::test::performance ALIAS sharg_test_performance)
 endif ()

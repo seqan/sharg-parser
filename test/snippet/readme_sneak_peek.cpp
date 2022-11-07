@@ -10,13 +10,16 @@ int main(int argc, char ** argv)
     parser.add_subsection("Eating Numbers");
     parser.add_option(val, sharg::config{.short_id = 'i', .long_id = "int", .description = "Desc."});
     parser.parse();
+
+    return 0;
 }
 
 #undef main
 
-int main(int argc, char ** argv)
+int main()
 {
-    char * test_argv[] = {"./Eat-Me-App", "-h"};
-    int const test_argc = sizeof(test_argv) / sizeof(*test_argv);
-    return test(test_argc, test_argv);
+    std::string argv1{"./Eat-Me-App"}, argv2{"-h"};
+    std::array argv{argv1.data(), argv2.data()};
+
+    return test(argv.size(), argv.data());
 }

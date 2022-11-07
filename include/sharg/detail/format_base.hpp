@@ -212,9 +212,9 @@ private:
     format_help_base(std::vector<std::string> const & names,
                      update_notifications const version_updates,
                      bool const advanced) :
+        version_check_dev_decision{version_updates},
         command_names{names},
-        show_advanced_options{advanced},
-        version_check_dev_decision{version_updates}
+        show_advanced_options{advanced}
     {}
     //!\}
 
