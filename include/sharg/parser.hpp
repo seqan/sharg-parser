@@ -158,11 +158,11 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    parser() = delete;                            //!< Deleted.
-    parser(parser const &) = default;             //!< Defaulted.
-    parser & operator=(parser const &) = default; //!< Defaulted.
-    parser(parser &&) = default;                  //!< Defaulted.
-    parser & operator=(parser &&) = default;      //!< Defaulted.
+    parser() = delete;                           //!< Deleted.
+    parser(parser const &) = delete;             //!< Deleted.
+    parser & operator=(parser const &) = delete; //!< Deleted.
+    parser(parser &&) = default;                 //!< Defaulted.
+    parser & operator=(parser &&) = default;     //!< Defaulted.
 
     /*!\brief Initializes an sharg::parser object from the command line arguments.
      *
