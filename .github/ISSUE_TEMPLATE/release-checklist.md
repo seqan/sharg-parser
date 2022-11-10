@@ -11,6 +11,7 @@ Pre-release Tasks:
 
 - [ ] Update copyright year. ([Script](https://github.com/seqan/sharg-parser/blob/main/test/scripts/update_copyright.sh))
 - [ ] Check whether the [directory structure](https://github.com/seqan/sharg-parser/blob/main/doc/setup/quickstart_cmake/index.md) is valid.
+- [ ] Update the cookbook. [Instructions](#cookbook))
 - [ ] Check whether supported compilers are listed correctly:
   - [ ] In [README](https://github.com/seqan/sharg-parser/blob/main/README.md)
   - [ ] In [doc/about/api](https://github.com/seqan/sharg-parser/blob/main/doc/about/api/index.md)
@@ -56,6 +57,13 @@ Pre-release Tasks:
 
 #### Instructions
 
+<a name="cookbook"></a>
+<details><summary>Updating cppreference index</summary><br>
+
+Execute `/path/to/sharg/test/scripts/add_snippets_to_cookbook.sh`
+Create a PR if there are any changes in the cookbook because new snippets have been added.
+
+</details>
 <a name="prerelease"></a>
 <details><summary>Creating a pre-release</summary><br>
 
