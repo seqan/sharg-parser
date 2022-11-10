@@ -11,6 +11,17 @@
 
 #include <sharg/parser.hpp>
 
+namespace sharg::detail
+{
+struct test_accessor
+{
+    static auto & executable_name(sharg::parser & parser)
+    {
+        return parser.executable_name;
+    }
+};
+} // namespace sharg::detail
+
 TEST(parse_type_test, add_option_short_id)
 {
     std::string option_value;
@@ -1072,4 +1083,48 @@ TEST(parse_test, container_default)
 
         EXPECT_TRUE(option_values == (std::vector<int>{2, 1, 3}));
     }
+}
+
+TEST(parse_test, executable_name)
+{
+    testing::internal::CaptureStdout();
+    {
+        std::array argv{"parser_test"};
+        sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off};
+        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+        auto & executable_name = sharg::detail::test_accessor::executable_name(parser);
+        ASSERT_EQ(executable_name.size(), 1);
+        EXPECT_EQ(executable_name[0], "parser_test");
+    }
+
+    {
+        std::array argv{"./parser_test"};
+        sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off};
+        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+        auto & executable_name = sharg::detail::test_accessor::executable_name(parser);
+        ASSERT_EQ(executable_name.size(), 1);
+        EXPECT_EQ(executable_name[0], "./parser_test");
+    }
+
+    {
+        std::array argv{"./bin/parser_test"};
+        sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off};
+        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+        auto & executable_name = sharg::detail::test_accessor::executable_name(parser);
+        ASSERT_EQ(executable_name.size(), 1);
+        EXPECT_EQ(executable_name[0], "./bin/parser_test");
+    }
+
+    {
+        std::array argv{"./bin/parser_test", "build"};
+        sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off, {"build"}};
+        parser.parse();
+        auto & sub_parser = parser.get_sub_parser();
+        EXPECT_EXIT(sub_parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+        auto & executable_name = sharg::detail::test_accessor::executable_name(sub_parser);
+        ASSERT_EQ(executable_name.size(), 2);
+        EXPECT_EQ(executable_name[0], "./bin/parser_test");
+        EXPECT_EQ(executable_name[1], "build");
+    }
+    testing::internal::GetCapturedStdout();
 }
