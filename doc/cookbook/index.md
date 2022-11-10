@@ -29,24 +29,24 @@ Invalid values throw a sharg::validation_error.
 The following lists all snippets that appear in our documentation. Search for keywords with Strg + F.
 
 <!-- ALL SNIPPETS START -->
-\include test/snippet/validators_input_directory.cpp
 \include test/snippet/auxiliary.cpp
-\include test/snippet/validators_input_file_ext_from_file.cpp
+\include test/snippet/custom_enumeration.cpp
 \include test/snippet/custom_parsing_enumeration.cpp
+\include test/snippet/is_option_set.cpp
 \include test/snippet/parser_1.cpp
-\include test/snippet/validators_1.cpp
 \include test/snippet/parser_2.cpp
-\include test/snippet/validators_output_file_ext_from_file.cpp
+\include test/snippet/parser_3.cpp
+\include test/snippet/readme_sneak_peek.cpp
+\include test/snippet/safe_filesystem_entry.cpp
+\include test/snippet/snippet_main.cpp
+\include test/snippet/validators_1.cpp
+\include test/snippet/validators_2.cpp
+\include test/snippet/validators_3.cpp
+\include test/snippet/validators_4.cpp
+\include test/snippet/validators_chaining.cpp
+\include test/snippet/validators_input_directory.cpp
+\include test/snippet/validators_input_file.cpp
+\include test/snippet/validators_input_file_ext_from_file.cpp
 \include test/snippet/validators_output_directory.cpp
 \include test/snippet/validators_output_file.cpp
-\include test/snippet/validators_chaining.cpp
-\include test/snippet/validators_input_file.cpp
-\include test/snippet/parser_3.cpp
-\include test/snippet/is_option_set.cpp
-\include test/snippet/safe_filesystem_entry.cpp
-\include test/snippet/validators_4.cpp
-\include test/snippet/readme_sneak_peek.cpp
-\include test/snippet/validators_3.cpp
-\include test/snippet/custom_enumeration.cpp
-\include test/snippet/validators_2.cpp
-\include test/snippet/snippet_main.cpp
+\include test/snippet/validators_output_file_ext_from_file.cpp
