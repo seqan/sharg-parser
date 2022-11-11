@@ -1,0 +1,514 @@
+From a4d009088bb473fb40a1287b17aecc7ee87c2af4 Mon Sep 17 00:00:00 2001
+From: Svenja Mehringer <svenja.mehringer@fu-berlin.de>
+Date: Tue, 1 Nov 2022 12:07:31 +0100
+Subject: [PATCH] [API] [FIX] Print common options at the end of the help page
+
+---
+ test/unit/detail/format_help_test.cpp         | 44 ++++++------
+ test/unit/detail/format_html_test.cpp         | 22 +++---
+ test/unit/detail/format_man_test.cpp          | 54 +++++++--------
+ test/unit/detail/seqan3_test.cpp              |  6 +-
+ .../parser/format_parse_validators_test.cpp   | 68 +++++++++----------
+ 5 files changed, 92 insertions(+), 102 deletions(-)
+
+diff --git a/test/unit/detail/format_help_test.cpp b/test/unit/detail/format_help_test.cpp
+index 53a5355..704e031 100644
+--- a/test/unit/detail/format_help_test.cpp
++++ b/test/unit/detail/format_help_test.cpp
+@@ -22,9 +22,7 @@ char const * argv_with_h[] = {"./help_add_test", "-h"};
+ char const * argv_with_hh[] = {"./help_add_test", "-hh"};
+ char const * argv_with_version[] = {"./help_add_test", "--version"};
+ 
+-std::string const basic_options_str = "OPTIONS\n"
+-                                      "\n"
+-                                      "  Basic options:\n"
++std::string const basic_options_str = "  Common options\n"
+                                       "    -h, --help\n"
+                                       "          Prints the help page.\n"
+                                       "    -hh, --advanced-help\n"
+@@ -116,7 +114,7 @@ TEST(help_page_printing, no_information)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str;
+     EXPECT_EQ(std_cout, expected);
+ }
+@@ -132,7 +130,7 @@ TEST(help_page_printing, with_short_copyright)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str + "\n"
+              + "LEGAL\n"
+                "    test_parser Copyright: short\n"
+@@ -151,7 +149,7 @@ TEST(help_page_printing, with_long_copyright)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str + "\n"
+              + "LEGAL\n"
+                "    SeqAn Copyright: 2006-2022 Knut Reinert, FU-Berlin; released under the\n"
+@@ -170,7 +168,7 @@ TEST(help_page_printing, with_citation)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str + "\n"
+              + "LEGAL\n"
+                "    SeqAn Copyright: 2006-2022 Knut Reinert, FU-Berlin; released under the\n"
+@@ -189,7 +187,7 @@ TEST(help_page_printing, with_author)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str + "\n"
+              + "LEGAL\n"
+                "    Author: author\n"
+@@ -208,7 +206,7 @@ TEST(help_page_printing, with_email)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str + "\n"
+              + "LEGAL\n"
+                "    Contact: email\n"
+@@ -227,7 +225,7 @@ TEST(help_page_printing, empty_advanced_help)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str;
+     EXPECT_EQ(std_cout, expected);
+ }
+@@ -280,7 +278,7 @@ TEST(help_page_printing, do_not_print_hidden_options)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
+-               "\n"
++               "\nOPTIONS\n\n"
+              + basic_options_str + "\n" + basic_version_str;
+     EXPECT_EQ(std_cout, expected);
+ }
+@@ -329,9 +327,8 @@ TEST(help_page_printing, advanced_options)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
++               "\nOPTIONS\n"
+                "\n"
+-             + basic_options_str
+-             + "\n"
+                "DEFAULT SECTION\n"
+                "\n"
+                "  default subsection\n"
+@@ -343,7 +340,7 @@ TEST(help_page_printing, advanced_options)
+                "          list item.\n"
+                "    some line.\n"
+                "\n"
+-             + basic_version_str;
++             + basic_options_str + "\n" + basic_version_str;
+     EXPECT_EQ(std_cout, expected);
+ 
+     // with -hh everything is shown
+@@ -355,9 +352,8 @@ TEST(help_page_printing, advanced_options)
+     std_cout = testing::internal::GetCapturedStdout();
+     expected = "test_parser\n"
+                "===========\n"
++               "\nOPTIONS\n"
+                "\n"
+-             + basic_options_str
+-             + "\n"
+                "DEFAULT SECTION\n"
+                "\n"
+                "  default subsection\n"
+@@ -380,7 +376,7 @@ TEST(help_page_printing, advanced_options)
+                "          list item.\n"
+                "    some line.\n"
+                "\n"
+-             + basic_version_str;
++             + basic_options_str + "\n" + basic_version_str;
+     EXPECT_EQ(std_cout, expected);
+ }
+ 
+@@ -454,9 +450,8 @@ TEST(help_page_printing, full_information)
+                "          this is not a list.\n"
+                "    ARGUMENT-2 (List of std::string)\n"
+                "          this is a positional option. Default: [].\n"
+-               "\n"
+-             + basic_options_str
+-             + "    -i, --int (signed 32 bit integer)\n"
++               "\nOPTIONS\n"
++               "    -i, --int (signed 32 bit integer)\n"
+                "          this is a int option. Default: A number.\n"
+                "    -e, --enum (foo)\n"
+                "          this is an enum option. Default: one. Value must be one of [three,\n"
+@@ -471,6 +466,8 @@ TEST(help_page_printing, full_information)
+                "    -f, --flag\n"
+                "          this is a flag.\n"
+                "\n"
++             + basic_options_str
++             + "\n"
+                "EXAMPLES\n"
+                "    example\n"
+                "\n"
+@@ -580,12 +577,11 @@ TEST(parse_test, subcommand_parser)
+                            "    The following options below belong to the top-level parser and need to be\n"
+                            "    specified before the subcommand key word. Every argument after the\n"
+                            "    subcommand key word is passed on to the corresponding sub-parser.\n"
+-                           "\n"
+-                         + basic_options_str
+-                         + "    -f, --foo (signed 32 bit integer)\n"
++                           "\nOPTIONS\n"
++                           "    -f, --foo (signed 32 bit integer)\n"
+                            "          foo bar. Default: 0.\n"
+                            "\n"
+-                         + basic_version_str;
++                         + basic_options_str + "\n" + basic_version_str;
+ 
+     EXPECT_EQ(std_cout, expected);
+ }
+diff --git a/test/unit/detail/format_html_test.cpp b/test/unit/detail/format_html_test.cpp
+index 3eff47f..655ab1d 100644
+--- a/test/unit/detail/format_html_test.cpp
++++ b/test/unit/detail/format_html_test.cpp
+@@ -31,7 +31,7 @@ TEST(html_format, empty_information)
+                     "<h1>empty_options</h1>\n"
+                     "<div></div>\n"
+                     "<h2>Options</h2>\n"
+-                    "<h3>Basic options:</h3>\n"
++                    "<h3>Common options</h3>\n"
+                     "<dl>\n"
+                     "<dt><strong>-h</strong>, <strong>--help</strong></dt>\n"
+                     "<dd>Prints the help page.</dd>\n"
+@@ -143,7 +143,17 @@ TEST(html_format, full_information_information)
+         "<dd>this is a positional option. Default: []. </dd>\n"
+         "</dl>\n"
+         "<h2>Options</h2>\n"
+-        "<h3>Basic options:</h3>\n"
++        "<dl>\n"
++        "<dt><strong>-i</strong>, <strong>--int</strong> (<em>signed 32 bit integer</em>)</dt>\n"
++        "<dd>this is a int option. Default: A number. </dd>\n"
++        "<dt><strong>-j</strong>, <strong>--jint</strong> (<em>signed 32 bit integer</em>)</dt>\n"
++        "<dd>this is a required int option. </dd>\n"
++        "<dt><strong>-f</strong>, <strong>--flag</strong></dt>\n"
++        "<dd>this is a flag.</dd>\n"
++        "<dt><strong>-k</strong>, <strong>--kflag</strong></dt>\n"
++        "<dd>this is a flag.</dd>\n"
++        "</dl>\n"
++        "<h3>Common options</h3>\n"
+         "<dl>\n"
+         "<dt><strong>-h</strong>, <strong>--help</strong></dt>\n"
+         "<dd>Prints the help page.</dd>\n"
+@@ -157,14 +167,6 @@ TEST(html_format, full_information_information)
+         "<dd>Export the help page information. Value must be one of [html, man].</dd>\n"
+         "<dt><strong>--version-check</strong> (bool)</dt>\n"
+         "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
+-        "<dt><strong>-i</strong>, <strong>--int</strong> (<em>signed 32 bit integer</em>)</dt>\n"
+-        "<dd>this is a int option. Default: A number. </dd>\n"
+-        "<dt><strong>-j</strong>, <strong>--jint</strong> (<em>signed 32 bit integer</em>)</dt>\n"
+-        "<dd>this is a required int option. </dd>\n"
+-        "<dt><strong>-f</strong>, <strong>--flag</strong></dt>\n"
+-        "<dd>this is a flag.</dd>\n"
+-        "<dt><strong>-k</strong>, <strong>--kflag</strong></dt>\n"
+-        "<dd>this is a flag.</dd>\n"
+         "</dl>\n"
+         "<h2>Examples</h2>\n"
+         "<p>\n"
+diff --git a/test/unit/detail/format_man_test.cpp b/test/unit/detail/format_man_test.cpp
+index b574e97..ccf73e3 100644
+--- a/test/unit/detail/format_man_test.cpp
++++ b/test/unit/detail/format_man_test.cpp
+@@ -57,73 +57,73 @@ struct format_man_test : public ::testing::Test
+                            "\n"
+                            R"(.SH OPTIONS)"
+                            "\n"
+-                           R"(.SS Basic options:)"
+-                           "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB-h\fP, \fB--help\fP)"
++                           R"(\fB-i\fP, \fB--int\fP (\fIsigned 32 bit integer\fP))"
+                            "\n"
+-                           R"(Prints the help page.)"
++                           R"(this is a int option. Default: A number. )"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB-hh\fP, \fB--advanced-help\fP)"
++                           R"(\fB-j\fP, \fB--jint\fP (\fIsigned 32 bit integer\fP))"
+                            "\n"
+-                           R"(Prints the help page including advanced options.)"
++                           R"(this is a required int option. )"
+                            "\n"
+-                           R"(.TP)"
++                           R"(.SH FLAGS)"
+                            "\n"
+-                           R"(\fB--version\fP)"
++                           R"(.SS SubFlags)"
+                            "\n"
+-                           R"(Prints the version information.)"
++                           R"(here come all the flags)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB--copyright\fP)"
++                           R"(\fB-f\fP, \fB--flag\fP)"
+                            "\n"
+-                           R"(Prints the copyright/license information.)"
++                           R"(this is a flag.)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB--export-help\fP (std::string))"
++                           R"(\fB-k\fP, \fB--kflag\fP)"
+                            "\n"
+-                           R"(Export the help page information. Value must be one of [html, man].)"
++                           R"(this is a flag.)"
++                           "\n"
++                           R"(.SS Common options)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB--version-check\fP (bool))"
++                           R"(\fB-h\fP, \fB--help\fP)"
+                            "\n"
+-                           R"(Whether to check for the newest app version. Default: true.)"
++                           R"(Prints the help page.)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB-i\fP, \fB--int\fP (\fIsigned 32 bit integer\fP))"
++                           R"(\fB-hh\fP, \fB--advanced-help\fP)"
+                            "\n"
+-                           R"(this is a int option. Default: A number. )"
++                           R"(Prints the help page including advanced options.)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB-j\fP, \fB--jint\fP (\fIsigned 32 bit integer\fP))"
++                           R"(\fB--version\fP)"
+                            "\n"
+-                           R"(this is a required int option. )"
++                           R"(Prints the version information.)"
+                            "\n"
+-                           R"(.SH FLAGS)"
++                           R"(.TP)"
+                            "\n"
+-                           R"(.SS SubFlags)"
++                           R"(\fB--copyright\fP)"
+                            "\n"
+-                           R"(here come all the flags)"
++                           R"(Prints the copyright/license information.)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB-f\fP, \fB--flag\fP)"
++                           R"(\fB--export-help\fP (std::string))"
+                            "\n"
+-                           R"(this is a flag.)"
++                           R"(Export the help page information. Value must be one of [html, man].)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+-                           R"(\fB-k\fP, \fB--kflag\fP)"
++                           R"(\fB--version-check\fP (bool))"
+                            "\n"
+-                           R"(this is a flag.)"
++                           R"(Whether to check for the newest app version. Default: true.)"
+                            "\n"
+                            R"(.SH EXAMPLES)"
+                            "\n"
+@@ -200,7 +200,7 @@ TEST_F(format_man_test, empty_information)
+                                  "\n"
+                                  R"(.SH OPTIONS)"
+                                  "\n"
+-                                 R"(.SS Basic options:)"
++                                 R"(.SS Common options)"
+                                  "\n"
+                                  R"(.TP)"
+                                  "\n"
+diff --git a/test/unit/detail/seqan3_test.cpp b/test/unit/detail/seqan3_test.cpp
+index cb56ed7..8c8288b 100644
+--- a/test/unit/detail/seqan3_test.cpp
++++ b/test/unit/detail/seqan3_test.cpp
+@@ -9,9 +9,7 @@
+ 
+ #include <sharg/parser.hpp>
+ 
+-std::string const basic_options_str = "OPTIONS\n"
+-                                      "\n"
+-                                      "  Basic options:\n"
++std::string const basic_options_str = "  Common options\n"
+                                       "    -h, --help\n"
+                                       "          Prints the help page.\n"
+                                       "    -hh, --advanced-help\n"
+@@ -61,7 +59,7 @@ TEST(help_page_printing, no_information)
+     std::string std_cout = testing::internal::GetCapturedStdout();
+     std::string expected = "test_parser\n"
+                            "===========\n"
+-                           "\n"
++                           "\nOPTIONS\n\n"
+                          + basic_options_str + "\n" + basic_version_str;
+     EXPECT_EQ(std_cout, expected);
+ }
+diff --git a/test/unit/parser/format_parse_validators_test.cpp b/test/unit/parser/format_parse_validators_test.cpp
+index 248089c..42589d6 100644
+--- a/test/unit/parser/format_parse_validators_test.cpp
++++ b/test/unit/parser/format_parse_validators_test.cpp
+@@ -13,9 +13,7 @@
+ #include <sharg/test/file_access.hpp>
+ #include <sharg/test/tmp_filename.hpp>
+ 
+-std::string const basic_options_str = "OPTIONS\n"
+-                                      "\n"
+-                                      "  Basic options:\n"
++std::string const basic_options_str = "  Common options\n"
+                                       "    -h, --help\n"
+                                       "          Prints the help page.\n"
+                                       "    -hh, --advanced-help\n"
+@@ -170,7 +168,7 @@ TEST(validator_test, input_file)
+                         "    ARGUMENT-1 (std::filesystem::path)\n"
+                         "          desc The input file must exist and read permissions must be granted.\n"
+                         "          Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
+-                        "\n"}
++                        "\nOPTIONS\n\n"}
+             + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+     }
+@@ -318,7 +316,7 @@ TEST(validator_test, output_file)
+                         "          desc The output file must not exist already and write permissions\n"
+                         "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
+                         "          fasta.txt].\n"
+-                        "\n"}
++                        "\nOPTIONS\n\n"}
+             + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+     }
+@@ -346,7 +344,7 @@ TEST(validator_test, output_file)
+                         "    ARGUMENT-1 (std::filesystem::path)\n"
+                         "          desc Write permissions must be granted. Valid file extensions are:\n"
+                         "          [fa, sam, fasta, fasta.txt].\n"
+-                        "\n"}
++                        "\nOPTIONS\n\n"}
+             + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+     }
+@@ -436,7 +434,7 @@ TEST(validator_test, input_directory)
+                                        "POSITIONAL ARGUMENTS\n"
+                                        "    ARGUMENT-1 (std::filesystem::path)\n"
+                                        "          desc An existing, readable path for the input directory.\n"
+-                                       "\n"}
++                                       "\nOPTIONS\n\n"}
+                          + basic_options_str + "\n" + basic_version_str;
+ 
+     EXPECT_EQ(my_stdout, expected);
+@@ -498,7 +496,7 @@ TEST(validator_test, output_directory)
+                                            "POSITIONAL ARGUMENTS\n"
+                                            "    ARGUMENT-1 (std::filesystem::path)\n"
+                                            "          desc A valid path for the output directory.\n"
+-                                           "\n"}
++                                           "\nOPTIONS\n\n"}
+                              + basic_options_str + "\n" + basic_version_str;
+ 
+         EXPECT_EQ(my_stdout, expected);
+@@ -772,7 +770,7 @@ TEST(validator_test, arithmetic_range_validator_success)
+                                        "POSITIONAL ARGUMENTS\n"
+                                        "    ARGUMENT-1 (List of signed 32 bit integer)\n"
+                                        "          desc Default: []. Value must be in range [-20,20].\n"
+-                                       "\n"
++                                       "\nOPTIONS\n\n"
+                                        + basic_options_str + "\n" + basic_version_str);
+     EXPECT_EQ(my_stdout, expected);
+ 
+@@ -988,11 +986,10 @@ TEST(validator_test, value_list_validator_success)
+     std::string my_stdout = testing::internal::GetCapturedStdout();
+     std::string expected = std::string("test_parser\n"
+                                        "===========\n"
+-                                       "\n"
+-                                       + basic_options_str
+-                                       + "    -i, --int-option (List of signed 32 bit integer)\n"
+-                                         "          desc Default: []. Value must be one of [-10, 48, 50].\n\n"
+-                                       + basic_version_str);
++                                       "\nOPTIONS\n"
++                                       "    -i, --int-option (List of signed 32 bit integer)\n"
++                                       "          desc Default: []. Value must be one of [-10, 48, 50].\n\n"
++                                       + basic_options_str + "\n" + basic_version_str);
+     EXPECT_EQ(my_stdout, expected);
+ }
+ 
+@@ -1128,13 +1125,12 @@ TEST(validator_test, regex_validator_success)
+         std::string my_stdout = testing::internal::GetCapturedStdout();
+         std::string expected = std::string("test_parser\n"
+                                            "===========\n"
++                                           "\nOPTIONS\n"
++                                           "    -s, --string-option (List of std::string)\n"
++                                           "          desc Default: []. Value must match the pattern\n"
++                                           "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
+                                            "\n"
+-                                           + basic_options_str
+-                                           + "    -s, --string-option (List of std::string)\n"
+-                                             "          desc Default: []. Value must match the pattern\n"
+-                                             "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
+-                                             "\n"
+-                                           + basic_version_str);
++                                           + basic_options_str + "\n" + basic_version_str);
+         EXPECT_EQ(my_stdout, expected);
+     }
+ }
+@@ -1366,15 +1362,14 @@ TEST(validator_test, chaining_validators)
+         std::string expected =
+             std::string{"test_parser\n"
+                         "===========\n"
+-                        "\n"
+-                        + basic_options_str
+-                        + "    -s, --string-option (std::string)\n"
+-                          "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+-                          "          The output file must not exist already and write permissions must be\n"
+-                          "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
+-                          "          pattern '.*'.\n"
+-                          "\n"}
+-            + basic_version_str;
++                        "\nOPTIONS\n"
++                        "    -s, --string-option (std::string)\n"
++                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
++                        "          The output file must not exist already and write permissions must be\n"
++                        "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
++                        "          pattern '.*'.\n"
++                        "\n"}
++            + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+     }
+ 
+@@ -1400,14 +1395,13 @@ TEST(validator_test, chaining_validators)
+         std::string expected =
+             std::string{"test_parser\n"
+                         "===========\n"
+-                        "\n"
+-                        + basic_options_str
+-                        + "    -s, --string-option (std::string)\n"
+-                          "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+-                          "          Write permissions must be granted. Valid file extensions are: [sa,\n"
+-                          "          so]. Value must match the pattern '.*'.\n"
+-                          "\n"}
+-            + basic_version_str;
++                        "\nOPTIONS\n"
++                        "    -s, --string-option (std::string)\n"
++                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
++                        "          Write permissions must be granted. Valid file extensions are: [sa,\n"
++                        "          so]. Value must match the pattern '.*'.\n"
++                        "\n"}
++            + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+     }
+ 
+-- 
+2.34.1
+
