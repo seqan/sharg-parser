@@ -9,6 +9,8 @@ adapt our changelog accordingly.
 ### Usage
 
 ```bash
+# Note that the build directory must not be a subdirectory of a git repository (a directory containing .git)
+# Otherwise, the patches cannot be applied correctly
 cd <build_dir> # e.g. sharg-builds/api_stability/
 
 # we recommend to disable deprecation warnings in CI
