@@ -37,7 +37,7 @@
         `&label=sharg-parser%20CI` - text on the badge
         `"Open GitHub actions page"` - this text will be shown on hover
 -->
-[ci_badge]: https://img.shields.io/github/workflow/status/seqan/sharg-parser/CI%20on%20Linux/main?style=flat&logo=github&label=Sharg%20CI "Open GitHub actions page"
+[ci_badge]: https://img.shields.io/github/actions/workflow/status/seqan/sharg-parser/ci_linux.yml?branch=main&style=flat&logo=github&label=Sharg%20CI "Open GitHub actions page"
 <!--
     This is the CI badge link:
         `https://github.com/seqan/sharg-parser/actions` - actions page of owner(seqan)/repository(sharg-parser)
