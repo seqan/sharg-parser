@@ -361,7 +361,7 @@ public:
 )";
             std::string line{};
             std::getline(std::cin, line);
-            line.resize(1); // ignore everything but the first char or resizes the empty string to the default
+            line.resize(1, 's'); // ignore everything but the first char or resizes the empty string to the default
 
             switch (line[0])
             {
