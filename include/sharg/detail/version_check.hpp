@@ -369,9 +369,10 @@ public:
             {
                 return true;
             }
-            case 's':
+            case 'a':
             {
-                return false;
+                write_cookie(std::string{"ALWAYS"}); // overwrite cookie
+                return true;
             }
             case 'n':
             {
@@ -380,23 +381,13 @@ public:
             }
             default:
             {
-                write_cookie(std::string{"ALWAYS"}); // overwrite cookie
-                return true;
+                return false;
             }
             }
         }
         else // if !detail::is_terminal()
         {
-            std::cerr << R"(
-#######################################################################
-   Automatic Update Notifications
-#######################################################################
- This app performs automatic checks for updates. For more information
- see: https://docs.seqan.de/sharg/main_user/about_update_notifications.html
-#######################################################################
-
-)";
-            return true; // default: check version if you cannot ask the user
+            return false; // default: do not check version today, if you cannot ask the user
         }
     } // LCOV_EXCL_STOP
 
