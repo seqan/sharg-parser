@@ -38,7 +38,7 @@ namespace sharg::detail
 inline bool is_terminal()
 {
 #ifndef _WIN32
-    return isatty(STDOUT_FILENO);
+    return isatty(STDIN_FILENO);
 #else
     return false;
 #endif
