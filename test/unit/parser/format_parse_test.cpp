@@ -892,10 +892,26 @@ TEST(parse_test, subcommand_parser_success)
 
 TEST(parse_test, subcommand_parser_error)
 {
-    // incorrect sub command
-    char const * argv[]{"./top_level", "subiddysub", "-f"};
+    // incorrect sub command regardless of following arguments
     { // see issue https://github.com/seqan/seqan3/issues/2172
-        sharg::parser top_level_parser{"top_level", 3, argv, sharg::update_notifications::off, {"sub1", "sub2"}};
+        std::array argv{"./top_level", "subiddysub", "-f"};
+        sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+
+        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
+    }
+
+    // incorrect sub command with no other arguments
+    {
+        std::array argv{"./top_level", "subiddysub"};
+        sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+
+        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
+    }
+
+    // incorrect sub command with trailing special option
+    { // see issue https://github.com/seqan/sharg-parser/issues/171
+        std::array argv{"./top_level", "subiddysub", "-h"};
+        sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
 
         EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
     }
