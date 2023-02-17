@@ -416,7 +416,7 @@ public:
                 subcommands_str += command + ", ";
             subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
 
-            throw too_few_arguments{"You either forgot or misspelled the subcommand! Please specify which sub-program "
+            throw too_few_arguments{"You misspelled the subcommand! Please specify which sub-program "
                                     "you want to use: one of "
                                     + subcommands_str
                                     + ". Use -h/--help for more "
@@ -757,19 +757,34 @@ private:
 
         for (int i = 1, argv_len = argc; i < argv_len; ++i) // start at 1 to skip binary name
         {
-            std::string arg{argv[i]};
+            std::string_view arg{argv[i]};
 
-            if (std::find(subcommands.begin(), subcommands.end(), arg) != subcommands.end())
+            if (!subcommands.empty()) // this is a top_level parser
             {
-                sub_parser =
-                    std::make_unique<parser>(info.app_name + "-" + arg, argc - i, argv + i, update_notifications::off);
+                if (std::ranges::find(subcommands, arg) != subcommands.end()) // identified subparser
+                {
+                    // LCOV_EXCL_START
+                    sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
+                                                          argc - i,
+                                                          argv + i,
+                                                          update_notifications::off);
+                    // LCOV_EXCL_STOP
 
-                // Add the original calls to the front, e.g. ["raptor"],
-                // s.t. ["raptor", "build"] will be the list after constructing the subparser
-                sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
-                                                   executable_name.begin(),
-                                                   executable_name.end());
-                break;
+                    // Add the original calls to the front, e.g. ["raptor"],
+                    // s.t. ["raptor", "build"] will be the list after constructing the subparser
+                    sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
+                                                       executable_name.begin(),
+                                                       executable_name.end());
+                    break;
+                }
+                else
+                {
+                    // Options and positional options are forbidden by design.
+                    // Flags starting with '-' are allowed for the top-level parser.
+                    // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
+                    if (!arg.empty() && arg[0] != '-')
+                        break;
+                }
             }
 
             if (arg == "-h" || arg == "--help")
@@ -839,7 +854,7 @@ private:
             }
             else
             {
-                cmd_arguments.push_back(std::move(arg));
+                cmd_arguments.emplace_back(arg);
             }
         }
 

@@ -22,6 +22,11 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 ## API changes
 
+## Bug fixes
+
+* When using subcommand parsers, e.g. `git push`, typing `git puhs -h` will raise an exception that the user misspelled
+  the subcommand instead of printing the help page of `git` ([\#172](https://github.com/seqan/sharg-parser/pull/172)).
+
 #### Dependencies
   * We now use Doxygen version 1.9.5 to build our documentation ([\#145](https://github.com/seqan/sharg-parser/pull/145)).
   * We require at least CMake 3.16 for our test suite. Note that the minimum requirement for using Sharg is unchanged

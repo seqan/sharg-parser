@@ -883,17 +883,37 @@ TEST(parse_test, subcommand_parser_success)
         EXPECT_FALSE(std::string{testing::internal::GetCapturedStdout()}.empty());
     }
 
-    // incorrect sub command
-    char const * argv[]{"./top_level", "subiddysub", "-f"};
+    // sub command may contain dash, see https://github.com/seqan/product_backlog/issues/234
+    {
+        char const * argv[]{"./top_level", "-dash"};
+        EXPECT_NO_THROW((sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"-dash"}}));
+    }
+}
+
+TEST(parse_test, subcommand_parser_error)
+{
+    // incorrect sub command regardless of following arguments
     { // see issue https://github.com/seqan/seqan3/issues/2172
-        sharg::parser top_level_parser{"top_level", 3, argv, sharg::update_notifications::off, {"sub1", "sub2"}};
+        std::array argv{"./top_level", "subiddysub", "-f"};
+        sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
 
         EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
     }
 
-    // sub command can contain dash, see https://github.com/seqan/product_backlog/issues/234
+    // incorrect sub command with no other arguments
     {
-        EXPECT_NO_THROW((sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"-dash"}}));
+        std::array argv{"./top_level", "subiddysub"};
+        sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+
+        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
+    }
+
+    // incorrect sub command with trailing special option
+    { // see issue https://github.com/seqan/sharg-parser/issues/171
+        std::array argv{"./top_level", "subiddysub", "-h"};
+        sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+
+        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
     }
 }
 
