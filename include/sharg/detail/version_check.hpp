@@ -287,7 +287,7 @@ public:
      * * ASK: Ask the user or default the decision once a day.
      *
      * If the cookie content is "ASK" and the timestamp is older than a day we ask the user,
-     * if possible (sharg::detail::is_terminal()), what he wants to do, set the according cookie for the next time
+     * if possible (sharg::detail::input_is_terminal()), what he wants to do, set the according cookie for the next time
      * and continue. If we cannot ask the user, the default kicks in (do the check).
      */
     bool decide_if_check_is_performed(update_notifications developer_approval, std::optional<bool> user_approval)
@@ -336,7 +336,7 @@ public:
         // nor did the the cookie tell us what to do. We will now ask the user if possible or do the check by default.
         write_cookie("ASK"); // Ask again next time when we read the cookie, if this is not overwritten.
 
-        if (detail::is_terminal()) // LCOV_EXCL_START
+        if (detail::input_is_terminal()) // LCOV_EXCL_START
         {
             std::cerr << R"(
 #######################################################################
@@ -385,7 +385,7 @@ public:
             }
             }
         }
-        else // if !detail::is_terminal()
+        else // if !detail::input_is_terminal()
         {
             return false; // default: do not check version today, if you cannot ask the user
         }

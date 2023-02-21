@@ -241,17 +241,17 @@ protected:
                     assert(it != str.end());
                     if (*it == 'I')
                     {
-                        if (is_terminal())
+                        if (input_is_terminal())
                             result.append("\033[4m");
                     }
                     else if (*it == 'B')
                     {
-                        if (is_terminal())
+                        if (input_is_terminal())
                             result.append("\033[1m");
                     }
                     else if (*it == 'P')
                     {
-                        if (is_terminal())
+                        if (input_is_terminal())
                             result.append("\033[0m");
                     }
                     else
