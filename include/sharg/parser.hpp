@@ -438,6 +438,10 @@ public:
             },
             format);
         parse_was_called = true;
+
+        // Exit after parsing any special format.
+        if (!std::holds_alternative<detail::format_parse>(format))
+            std::exit(EXIT_SUCCESS);
     }
 
     /*!\brief Returns a reference to the sub-parser instance if
