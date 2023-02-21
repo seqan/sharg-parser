@@ -13,6 +13,7 @@
 #pragma once
 
 #include <sharg/detail/format_base.hpp>
+#include <sharg/test/tmp_filename.hpp>
 
 namespace sharg::detail
 {
@@ -38,6 +39,9 @@ class format_man : public format_help_base<format_man>
     //!\brief Befriend the base class to give access to the private member functions.
     friend base_type;
 
+    //!\brief Whether to call man and open the man page.
+    bool open_man_page{false};
+
 public:
     /*!\name Constructors, destructor and assignment
      * \{
@@ -52,9 +56,37 @@ public:
     //!\copydoc sharg::detail::format_help_base::format_help_base
     format_man(std::vector<std::string> const & names,
                update_notifications const version_updates,
-               bool const advanced = false) :
-        base_type{names, version_updates, advanced} {};
+               bool const advanced = false,
+               bool const open_man_page = false) :
+        base_type{names, version_updates, advanced},
+        open_man_page{open_man_page} {};
     //!\}
+
+    /*!\brief Initiates the printing of the man page to std::cout or opens it in man.
+     * \param[in] parser_meta The meta information that are needed for a detailed man page.
+     */
+    void parse(parser_meta_data & parser_meta)
+    {
+        if (!open_man_page)
+            return base_type::parse(parser_meta);
+
+        sharg::test::tmp_filename tmp_file{parser_meta.app_name.c_str()};
+
+        {
+            std::ofstream out{tmp_file.get_path()};
+            std::streambuf * coutbuf = std::cout.rdbuf();
+            std::cout.rdbuf(out.rdbuf());
+
+            base_type::parse(parser_meta);
+
+            std::cout.rdbuf(coutbuf);
+        }
+
+        std::string command{"/usr/bin/man -l "};
+        command += tmp_file.get_path().c_str();
+        if (std::system(command.c_str()) != 0)
+            throw sharg::parser_error{"Unexpected failure."}; // LCOV_EXCL_LINE
+    }
 
 private:
     //!\brief Prints a help page header in man page format to std::cout.

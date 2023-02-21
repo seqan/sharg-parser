@@ -758,6 +758,7 @@ private:
         executable_name.emplace_back(argv[0]);
 
         bool special_format_was_set{false};
+        bool const use_man = detail::output_is_terminal() && !system("which /usr/bin/man > /dev/null 2>&1");
 
         for (int i = 1, argv_len = argc; i < argv_len; ++i) // start at 1 to skip binary name
         {
@@ -793,12 +794,18 @@ private:
 
             if (arg == "-h" || arg == "--help")
             {
-                format = detail::format_help{subcommands, version_check_dev_decision, false};
+                if (use_man)
+                    format = detail::format_man{subcommands, version_check_dev_decision, false, true};
+                else
+                    format = detail::format_help{subcommands, version_check_dev_decision, false};
                 special_format_was_set = true;
             }
             else if (arg == "-hh" || arg == "--advanced-help")
             {
-                format = detail::format_help{subcommands, version_check_dev_decision, true};
+                if (use_man)
+                    format = detail::format_man{subcommands, version_check_dev_decision, true, true};
+                else
+                    format = detail::format_help{subcommands, version_check_dev_decision, true};
                 special_format_was_set = true;
             }
             else if (arg == "--version")

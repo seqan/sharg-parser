@@ -46,6 +46,21 @@ inline bool input_is_terminal()
 #endif
 }
 
+/*!\brief Check whether the output is interactive.
+ * \ingroup parser
+ * \return True if code is run in a terminal, false otherwise.
+ * \details
+ * For example "./some_binary --help | less" will return false. "./some_binary --help" will return true.
+ */
+inline bool output_is_terminal()
+{
+#ifndef _WIN32
+    return isatty(STDOUT_FILENO);
+#else
+    return false;
+#endif
+}
+
 // ----------------------------------------------------------------------------
 // Function get_terminal_size()
 // ----------------------------------------------------------------------------
