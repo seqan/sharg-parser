@@ -422,8 +422,6 @@ public:
             print_synopsis();
 
         print_line("Try -h or --help for more information.\n", true);
-
-        std::exit(EXIT_SUCCESS);
     }
 };
 
@@ -450,8 +448,6 @@ public:
 
         print_header();
         print_version();
-
-        std::exit(EXIT_SUCCESS); // program should not continue from here
     }
 };
 
@@ -526,8 +522,6 @@ DAMAGE.)"};
                   << in_bold("This program contains SeqAn code licensed under the following terms:\n")
                   << std::string(80, '-') << '\n'
                   << seqan_license << '\n';
-
-        std::exit(EXIT_SUCCESS);
     }
 };
 
