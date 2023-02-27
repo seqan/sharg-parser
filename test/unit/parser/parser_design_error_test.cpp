@@ -9,12 +9,34 @@
 
 #include <sharg/parser.hpp>
 
+namespace sharg::detail
+{
+struct test_accessor
+{
+    static void ignore_missing_parse(sharg::parser & parser)
+    {
+        parser.parse_was_called = true;
+    }
+
+    static void ignore_missing_parse(sharg::parser && parser)
+    {
+        parser.parse_was_called = true;
+    }
+};
+} // namespace sharg::detail
+
+auto ignore_missing_parse = []<typename t>
+    requires std::same_as<std::remove_cvref_t<t>, sharg::parser>(t && parser)
+{
+    sharg::detail::test_accessor::ignore_missing_parse(std::forward<t>(parser));
+};
+
 TEST(design_error, app_name_validation)
 {
     char const * argv[] = {"./parser_test"};
 
-    EXPECT_NO_THROW((sharg::parser{"test_parser", 1, argv}));
-    EXPECT_NO_THROW((sharg::parser{"test-parser1234_foo", 1, argv}));
+    EXPECT_NO_THROW(ignore_missing_parse(sharg::parser{"test_parser", 1, argv}));
+    EXPECT_NO_THROW(ignore_missing_parse(sharg::parser{"test-parser1234_foo", 1, argv}));
 
     EXPECT_THROW((sharg::parser{"test parser", 1, argv}), sharg::design_error);
     EXPECT_THROW((sharg::parser{"test;", 1, argv}), sharg::design_error);
@@ -32,6 +54,7 @@ TEST(verify_option_config_test, short_option_was_used_before)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     parser.add_option(option_value, sharg::config{.short_id = 'i'});
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.short_id = 'i'}), sharg::design_error);
 }
@@ -42,6 +65,7 @@ TEST(verify_option_config_test, long_option_was_used_before)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     parser.add_option(option_value, sharg::config{.long_id = "int"});
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.long_id = "int"}), sharg::design_error);
 }
@@ -52,6 +76,7 @@ TEST(verify_option_config_test, short_and_long_id_empty)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{}), sharg::design_error);
 }
 
@@ -61,6 +86,7 @@ TEST(verify_option_config_test, special_identifiers)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.short_id = 'h'}), sharg::design_error);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.long_id = "help"}), sharg::design_error);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.long_id = "advanced-help"}), sharg::design_error);
@@ -73,6 +99,7 @@ TEST(verify_option_config_test, single_character_long_id)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.long_id = "z"}), sharg::design_error);
 }
 
@@ -82,6 +109,7 @@ TEST(verify_option_config_test, non_printable_characters)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.short_id = '\t'}), sharg::design_error);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.long_id = "no\n"}), sharg::design_error);
     EXPECT_THROW(parser.add_option(option_value, sharg::config{.long_id = "-no"}), sharg::design_error);
@@ -97,6 +125,7 @@ TEST(verify_flag_config_test, default_value_is_true)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_flag(true_value, sharg::config{.short_id = 'i'}), sharg::design_error);
 }
 
@@ -106,6 +135,7 @@ TEST(verify_flag_config_test, short_option_was_used_before)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     parser.add_flag(flag_value, sharg::config{.short_id = 'i'});
     EXPECT_THROW(parser.add_flag(flag_value, sharg::config{.short_id = 'i'}), sharg::design_error);
 }
@@ -115,9 +145,10 @@ TEST(verify_flag_config_test, long_option_was_used_before)
     bool flag_value{false};
 
     char const * argv[] = {"./parser_test"};
-    sharg::parser parser6{"test_parser", 1, argv};
-    parser6.add_flag(flag_value, sharg::config{.long_id = "int"});
-    EXPECT_THROW(parser6.add_flag(flag_value, sharg::config{.long_id = "int"}), sharg::design_error);
+    sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
+    parser.add_flag(flag_value, sharg::config{.long_id = "int"});
+    EXPECT_THROW(parser.add_flag(flag_value, sharg::config{.long_id = "int"}), sharg::design_error);
 }
 
 TEST(verify_flag_config_test, short_and_long_id_empty)
@@ -126,6 +157,7 @@ TEST(verify_flag_config_test, short_and_long_id_empty)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_flag(flag_value, sharg::config{}), sharg::design_error);
 }
 
@@ -134,8 +166,9 @@ TEST(verify_flag_config_test, single_character_long_id)
     bool flag_value;
 
     char const * argv[] = {"./parser_test"};
-    sharg::parser parser10{"test_parser", 1, argv};
-    EXPECT_THROW(parser10.add_flag(flag_value, sharg::config{.long_id = "z"}), sharg::design_error);
+    sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
+    EXPECT_THROW(parser.add_flag(flag_value, sharg::config{.long_id = "z"}), sharg::design_error);
 }
 
 // -----------------------------------------------------------------------------
@@ -149,6 +182,7 @@ TEST(verify_positional_option_config_test, list_option_not_the_very_last_option)
 
     char const * argv[] = {"./parser_test", "arg1", "arg2", "arg3"};
     sharg::parser parser{"test_parser", 4, argv};
+    ignore_missing_parse(parser);
     parser.add_positional_option(vec, sharg::config{});
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{}), sharg::design_error);
 }
@@ -159,6 +193,7 @@ TEST(verify_positional_option_config_test, short_id_set)
 
     char const * argv[] = {"./parser_test", "arg1"};
     sharg::parser parser{"test_parser", 2, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.short_id = 'a'}), sharg::design_error);
 }
 
@@ -168,6 +203,7 @@ TEST(verify_positional_option_config_test, long_id_set)
 
     char const * argv[] = {"./parser_test", "arg1"};
     sharg::parser parser{"test_parser", 2, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.long_id = "abc"}), sharg::design_error);
 }
 
@@ -177,6 +213,7 @@ TEST(verify_positional_option_config_test, advanced_config_set)
 
     char const * argv[] = {"./parser_test", "arg1"};
     sharg::parser parser{"test_parser", 2, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.advanced = true}), sharg::design_error);
 }
 
@@ -186,6 +223,7 @@ TEST(verify_positional_option_config_test, hidden_config_set)
 
     char const * argv[] = {"./parser_test", "arg1"};
     sharg::parser parser{"test_parser", 2, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.hidden = true}), sharg::design_error);
 }
 
@@ -199,6 +237,7 @@ TEST(verify_default_message_config_test, required_option_set)
 
     char const * argv[] = {"./parser_test", "arg1"};
     sharg::parser parser{"test_parser", 2, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_option(option_value,
                                    sharg::config{.long_id = "int", .default_message = "Some number", .required = true}),
                  sharg::design_error);
@@ -210,6 +249,7 @@ TEST(verify_default_message_config_test, positional_option_set)
 
     char const * argv[] = {"./parser_test", "arg1"};
     sharg::parser parser{"test_parser", 2, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_positional_option(option_value, sharg::config{.default_message = "Some number"}),
                  sharg::design_error);
 }
@@ -220,6 +260,7 @@ TEST(verify_default_message_config_test, flag_set)
 
     char const * argv[] = {"./parser_test"};
     sharg::parser parser{"test_parser", 1, argv};
+    ignore_missing_parse(parser);
     EXPECT_THROW(parser.add_flag(value, sharg::config{.short_id = 'i', .default_message = "false"}),
                  sharg::design_error);
 }
@@ -241,7 +282,40 @@ TEST(parse_test, parse_called_twice)
     EXPECT_TRUE((testing::internal::GetCapturedStderr()).empty());
     EXPECT_EQ(option_value, "option_string");
 
-    EXPECT_THROW(parser.parse(), sharg::design_error);
+    try
+    {
+        parser.parse();
+        FAIL();
+    }
+    catch (sharg::design_error const & exception)
+    {
+        EXPECT_STREQ("The function parse() must only be called once for the app test_parser!", exception.what());
+    }
+    catch (...)
+    {
+        FAIL();
+    }
+}
+
+TEST(parse_test, parse_not_called)
+{
+    std::string option_value;
+
+    try
+    {
+        char const * argv[] = {"./parser_test", "--version-check", "false", "-s", "option_string"};
+        sharg::parser parser{"test_parser", 5, argv};
+        parser.add_option(option_value, sharg::config{.short_id = 's'});
+    }
+    catch (sharg::design_error const & exception)
+    {
+        EXPECT_STREQ("The function parse() was not called for the app test_parser!", exception.what());
+        EXPECT_TRUE(option_value.empty());
+    }
+    catch (...)
+    {
+        FAIL();
+    }
 }
 
 TEST(parse_test, subcommand_parser_error)
@@ -263,14 +337,17 @@ TEST(parse_test, subcommand_parser_error)
     // subcommand key word must only contain alpha numeric characters
     {
         char const * argv[]{"./top_level", "-f"};
-        EXPECT_THROW((sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"with space"}}),
-                     sharg::design_error);
+        EXPECT_THROW(
+            ignore_missing_parse(sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"with space"}}),
+            sharg::design_error);
     }
 
     // no positional/options are allowed
     {
         char const * argv[]{"./top_level", "foo"};
         sharg::parser top_level_parser{"top_level", 2, argv, sharg::update_notifications::off, {"foo"}};
+        ignore_missing_parse(top_level_parser);
+        ignore_missing_parse(top_level_parser.get_sub_parser());
 
         EXPECT_THROW((top_level_parser.add_option(flag_value, sharg::config{.short_id = 'f'})), sharg::design_error);
         EXPECT_THROW((top_level_parser.add_positional_option(flag_value, sharg::config{})), sharg::design_error);

@@ -211,12 +211,17 @@ public:
         init(argc, argv);
     }
 
-    //!\brief The destructor.
-    ~parser()
+    /*!\brief The destructor.
+     * \throws sharg::design_error if sharg::parser::parse() was not called.
+     */
+    ~parser() noexcept(false)
     {
         // wait for another 3 seconds
         if (version_check_future.valid())
             version_check_future.wait_for(std::chrono::seconds(3));
+
+        if (!parse_was_called && std::uncaught_exceptions() == 0)
+            throw design_error{"The function parse() was not called for the app " + info.app_name + "!"};
     }
     //!\}
 
@@ -404,7 +409,7 @@ public:
     void parse()
     {
         if (parse_was_called)
-            throw design_error("The function parse() must only be called once!");
+            throw design_error{"The function parse() must only be called once for the app " + info.app_name + "!"};
 
         detail::version_checker app_version{info.app_name, info.version, info.url};
 
