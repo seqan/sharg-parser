@@ -437,6 +437,9 @@ protected:
      */
     void validate_writeability(std::filesystem::path const & path) const
     {
+        if (std::filesystem::is_directory(path))
+            throw validation_error{"\"" + path.string() + "\" is a directory. Cannot validate writeability."};
+
         std::ofstream file{path};
         sharg::detail::safe_filesystem_entry file_guard{path};
 
@@ -712,6 +715,9 @@ public:
      */
     virtual void operator()(std::filesystem::path const & file) const override
     {
+        if (std::filesystem::is_directory(file))
+            throw validation_error{"\"" + file.string() + "\" is a directory. Expected a file."};
+
         try
         {
             if ((open_mode == output_file_open_options::create_new) && std::filesystem::exists(file))
