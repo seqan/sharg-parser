@@ -1036,6 +1036,39 @@ TEST(validator_test, value_list_validator_error)
     EXPECT_THROW(parser5.parse(), sharg::validation_error);
 }
 
+// https://github.com/seqan/sharg-parser/issues/178
+TEST(validator_test, value_list_validator_issue178)
+{
+    std::filesystem::path option_value;
+    std::vector<std::filesystem::path> option_vector;
+    constexpr std::array valid_values{"ha", "ba", "ma"};
+
+    // option
+    char const * argv[] = {"./parser_test", "-s", "ba"};
+    sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
+    sharg::detail::test_accessor::set_terminal_width(parser, 80);
+    parser.add_option(option_value,
+                      sharg::config{.short_id = 's', .validator = sharg::value_list_validator{valid_values}});
+
+    testing::internal::CaptureStderr();
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_TRUE((testing::internal::GetCapturedStderr()).empty());
+    EXPECT_EQ(option_value, "ba");
+
+    // option - vector
+    char const * argv2[] = {"./parser_test", "-s", "ha", "-s", "ba"};
+    sharg::parser parser2{"test_parser", 5, argv2, sharg::update_notifications::off};
+    sharg::detail::test_accessor::set_terminal_width(parser2, 80);
+    parser2.add_option(option_vector,
+                       sharg::config{.short_id = 's', .validator = sharg::value_list_validator{valid_values}});
+
+    testing::internal::CaptureStderr();
+    EXPECT_NO_THROW(parser2.parse());
+    EXPECT_TRUE((testing::internal::GetCapturedStderr()).empty());
+    EXPECT_EQ(option_vector[0], "ha");
+    EXPECT_EQ(option_vector[1], "ba");
+}
+
 TEST(validator_test, regex_validator_success)
 {
     std::string option_value;
