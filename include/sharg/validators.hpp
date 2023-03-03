@@ -242,6 +242,7 @@ public:
      */
     template <std::ranges::forward_range range_type>
         requires std::convertible_to<std::ranges::range_value_t<range_type>, option_value_type>
+              && (!std::same_as<std::remove_cvref_t<range_type>, std::filesystem::path>)
     void operator()(range_type const & range) const
     {
         std::for_each(std::ranges::begin(range),
