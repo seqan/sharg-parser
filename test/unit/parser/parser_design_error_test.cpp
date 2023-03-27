@@ -12,43 +12,23 @@
 TEST(design_error, app_name_validation)
 {
     char const * argv[] = {"./parser_test", "-i", "3"};
+    int const argc{3};
     int option_value;
 
+    auto create_parser = [&](std::string && app_name)
     {
-        sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
+        sharg::parser parser{std::move(app_name), argc, argv, sharg::update_notifications::off};
         parser.add_option(option_value, sharg::config{.short_id = 'i'});
-        EXPECT_NO_THROW(parser.parse());
-    }
+        return parser;
+    };
 
-    {
-        sharg::parser parser{"test-parser1234_foo", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, sharg::config{.short_id = 'i'});
-        EXPECT_NO_THROW(parser.parse());
-    }
+    EXPECT_NO_THROW(create_parser("test_parser").parse());
+    EXPECT_NO_THROW(create_parser("test-parser1234_foo").parse());
 
-    {
-        sharg::parser parser{"test parser", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, sharg::config{.short_id = 'i'});
-        EXPECT_THROW(parser.parse(), sharg::design_error);
-    }
-
-    {
-        sharg::parser parser{"test;", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, sharg::config{.short_id = 'i'});
-        EXPECT_THROW(parser.parse(), sharg::design_error);
-    }
-
-    {
-        sharg::parser parser{";", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, sharg::config{.short_id = 'i'});
-        EXPECT_THROW(parser.parse(), sharg::design_error);
-    }
-
-    {
-        sharg::parser parser{"test;bad script:D", 3, argv, sharg::update_notifications::off};
-        parser.add_option(option_value, sharg::config{.short_id = 'i'});
-        EXPECT_THROW(parser.parse(), sharg::design_error);
-    }
+    EXPECT_THROW(create_parser("test parser").parse(), sharg::design_error);
+    EXPECT_THROW(create_parser("test;").parse(), sharg::design_error);
+    EXPECT_THROW(create_parser(";").parse(), sharg::design_error);
+    EXPECT_THROW(create_parser("test;bad script:D").parse(), sharg::design_error);
 }
 
 // -----------------------------------------------------------------------------

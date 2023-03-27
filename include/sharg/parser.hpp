@@ -400,8 +400,8 @@ public:
         if (parse_was_called)
             throw design_error("The function parse() must only be called once!");
 
-        // before creating the detail::version_checker we have to make sure that
-        // malicious code cannot be innjected through the app name
+        // Before creating the detail::version_checker, we have to make sure that
+        // malicious code cannot be injected through the app name.
         if (!std::regex_match(info.app_name, app_name_regex))
         {
             throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
