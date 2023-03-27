@@ -11,15 +11,24 @@
 
 TEST(design_error, app_name_validation)
 {
-    char const * argv[] = {"./parser_test"};
+    char const * argv[] = {"./parser_test", "-i", "3"};
+    int const argc{3};
+    int option_value;
 
-    EXPECT_NO_THROW((sharg::parser{"test_parser", 1, argv}));
-    EXPECT_NO_THROW((sharg::parser{"test-parser1234_foo", 1, argv}));
+    auto create_parser = [&](std::string && app_name)
+    {
+        sharg::parser parser{std::move(app_name), argc, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        return parser;
+    };
 
-    EXPECT_THROW((sharg::parser{"test parser", 1, argv}), sharg::design_error);
-    EXPECT_THROW((sharg::parser{"test;", 1, argv}), sharg::design_error);
-    EXPECT_THROW((sharg::parser{";", 1, argv}), sharg::design_error);
-    EXPECT_THROW((sharg::parser{"test;bad script:D", 1, argv}), sharg::design_error);
+    EXPECT_NO_THROW(create_parser("test_parser").parse());
+    EXPECT_NO_THROW(create_parser("test-parser1234_foo").parse());
+
+    EXPECT_THROW(create_parser("test parser").parse(), sharg::design_error);
+    EXPECT_THROW(create_parser("test;").parse(), sharg::design_error);
+    EXPECT_THROW(create_parser(";").parse(), sharg::design_error);
+    EXPECT_THROW(create_parser("test;bad script:D").parse(), sharg::design_error);
 }
 
 // -----------------------------------------------------------------------------

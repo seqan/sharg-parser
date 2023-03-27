@@ -191,12 +191,6 @@ public:
         version_check_dev_decision{version_updates},
         subcommands{std::move(subcommands)}
     {
-        if (!std::regex_match(app_name, app_name_regex))
-        {
-            throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
-                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
-        }
-
         for (auto & sub : this->subcommands)
         {
             if (!std::regex_match(sub, app_name_regex))
@@ -405,6 +399,14 @@ public:
     {
         if (parse_was_called)
             throw design_error("The function parse() must only be called once!");
+
+        // Before creating the detail::version_checker, we have to make sure that
+        // malicious code cannot be injected through the app name.
+        if (!std::regex_match(info.app_name, app_name_regex))
+        {
+            throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
+                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
+        }
 
         detail::version_checker app_version{info.app_name, info.version, info.url};
 
