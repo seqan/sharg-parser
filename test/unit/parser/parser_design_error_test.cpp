@@ -11,15 +11,44 @@
 
 TEST(design_error, app_name_validation)
 {
-    char const * argv[] = {"./parser_test"};
+    char const * argv[] = {"./parser_test", "-i", "3"};
+    int option_value;
 
-    EXPECT_NO_THROW((sharg::parser{"test_parser", 1, argv}));
-    EXPECT_NO_THROW((sharg::parser{"test-parser1234_foo", 1, argv}));
+    {
+        sharg::parser parser{"test_parser", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        EXPECT_NO_THROW(parser.parse());
+    }
 
-    EXPECT_THROW((sharg::parser{"test parser", 1, argv}), sharg::design_error);
-    EXPECT_THROW((sharg::parser{"test;", 1, argv}), sharg::design_error);
-    EXPECT_THROW((sharg::parser{";", 1, argv}), sharg::design_error);
-    EXPECT_THROW((sharg::parser{"test;bad script:D", 1, argv}), sharg::design_error);
+    {
+        sharg::parser parser{"test-parser1234_foo", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        EXPECT_NO_THROW(parser.parse());
+    }
+
+    {
+        sharg::parser parser{"test parser", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        EXPECT_THROW(parser.parse(), sharg::design_error);
+    }
+
+    {
+        sharg::parser parser{"test;", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        EXPECT_THROW(parser.parse(), sharg::design_error);
+    }
+
+    {
+        sharg::parser parser{";", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        EXPECT_THROW(parser.parse(), sharg::design_error);
+    }
+
+    {
+        sharg::parser parser{"test;bad script:D", 3, argv, sharg::update_notifications::off};
+        parser.add_option(option_value, sharg::config{.short_id = 'i'});
+        EXPECT_THROW(parser.parse(), sharg::design_error);
+    }
 }
 
 // -----------------------------------------------------------------------------
