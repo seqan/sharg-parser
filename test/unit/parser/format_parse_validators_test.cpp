@@ -212,6 +212,11 @@ TEST(validator_test, output_file)
             EXPECT_NO_THROW(my_validator5(not_existing_path));
         }
 
+        { // filepath is a directory. Checking writeability would delete content of directory.
+            sharg::output_file_validator my_validator{sharg::output_file_open_options::open_or_create};
+            EXPECT_THROW(my_validator(std::filesystem::temp_directory_path()), sharg::validation_error);
+        }
+
         { // file does exist & overwriting is prohibited
             sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new, formats};
             EXPECT_THROW(my_validator(existing_path), sharg::validation_error);

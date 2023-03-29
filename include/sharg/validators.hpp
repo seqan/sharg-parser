@@ -433,13 +433,18 @@ protected:
 
     /*!\brief Checks if the given path is writable.
      * \param path The path to check.
-     * \throws sharg::validation_error if the file could not be opened for writing, or
-     *         std::filesystem::filesystem_error on underlying OS API errors.
+     * \throws sharg::validation_error if the given path is a directory.
+     * \throws sharg::validation_error if the file could not be opened for writing.
+     * \throws std::filesystem::filesystem_error on underlying OS API errors.
      */
     void validate_writeability(std::filesystem::path const & path) const
     {
+        // Contingency check. This case should already be handled by the output_file_validator.
+        // Opening a file handle on a directory would delete its contents.
+        // LCOV_EXCL_START
         if (std::filesystem::is_directory(path))
             throw validation_error{"\"" + path.string() + "\" is a directory. Cannot validate writeability."};
+        // LCOV_EXCL_STOP
 
         std::ofstream file{path};
         sharg::detail::safe_filesystem_entry file_guard{path};
