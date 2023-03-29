@@ -357,8 +357,6 @@ public:
         print_legal();
 
         derived_t().print_footer();
-
-        std::exit(EXIT_SUCCESS); // program should not continue from here
     }
 
     /*!\brief Adds a print_section call to parser_set_up_calls.

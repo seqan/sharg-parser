@@ -250,7 +250,7 @@ TEST_F(version_check, option_on)
 }
 
 // Note that we cannot test interactiveness because google test captures std::cin and thus
-// sharg::detail::is_terminal() is always false
+// sharg::detail::input_is_terminal() is always false
 TEST_F(version_check, option_implicitely_on)
 {
     char const * argv[2] = {app_name.c_str(), "-f"};
