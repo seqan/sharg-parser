@@ -131,4 +131,4 @@ jobs:
       - name: Run tests
         run: |
           cd sharg-build
-          ctest . -j2 --output-on-failure
+          script --return quiet -c "ctest . -j2 --output-on-failure"
