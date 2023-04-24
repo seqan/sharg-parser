@@ -14,33 +14,61 @@
 #pragma once
 
 #ifndef _WIN32
+#    include <unistd.h>
+
 #    include <sys/ioctl.h>
 #else
-#    include <windows.h>
+#    include <io.h>
+#    include <stdio.h>
 #endif
-
-#include <cstdio>
-#include <unistd.h>
 
 #include <sharg/platform.hpp>
 
 namespace sharg::detail
 {
 
-// ----------------------------------------------------------------------------
-// Function is_terminal()
-// ----------------------------------------------------------------------------
-
-/*!\brief Check whether we are printing to a terminal.
+/*!\brief Check whether the standard input is interactive.
  * \ingroup parser
- * \return True if code is run in a terminal, false otherwise.
+ * \return True if standard input is a terminal, false otherwise.
+ * \details
+ * For example "./some_binary --help | less" will return false. "./some_binary --help" will return true.
  */
-inline bool is_terminal()
+inline bool stdin_is_terminal()
 {
 #ifndef _WIN32
     return isatty(STDIN_FILENO);
 #else
-    return false;
+    return _isatty(_fileno(stdin));
+#endif
+}
+
+/*!\brief Check whether the standard output is interactive.
+ * \ingroup parser
+ * \return True if standard output is a terminal, false otherwise.
+ * \details
+ * For example "./some_binary --help | less" will return false. "./some_binary --help" will return true.
+ */
+inline bool stdout_is_terminal()
+{
+#ifndef _WIN32
+    return isatty(STDOUT_FILENO);
+#else
+    return _isatty(_fileno(stdout));
+#endif
+}
+
+/*!\brief Check whether the standard error output is interactive.
+ * \ingroup parser
+ * \return True if standard error output is a terminal, false otherwise.
+ * \details
+ * For example "./some_binary --help 2> cerr.out" will return false. "./some_binary --help" will return true.
+ */
+inline bool stderr_is_terminal()
+{
+#ifndef _WIN32
+    return isatty(STDERR_FILENO);
+#else
+    return _isatty(_fileno(stderr));
 #endif
 }
 
@@ -70,7 +98,7 @@ inline unsigned get_terminal_width()
 
     return w.ws_col;
 #else
-    return 80; // not implemented in windows
+    return 80; // Not implemented for Windows yet. For inspiration, see https://stackoverflow.com/a/12642749.
 #endif
 }
 
