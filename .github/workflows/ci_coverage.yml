@@ -55,6 +55,7 @@ jobs:
         with:
           path: sharg
           fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
+          submodules: true
 
       # To reuse scripts
       - name: Checkout SeqAn3
@@ -115,7 +116,7 @@ jobs:
                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
                                                   -DSHARG_VERBOSE_TESTS=OFF \
                                                   -DSHARG_COVERAGE_PARALLEL_LEVEL=2
-          make -j2 gtest_build
+          make -j2 gtest_build yaml-cpp
 
       - name: Build tests
         env:

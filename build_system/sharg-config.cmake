@@ -254,6 +254,23 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
+# tool description lib (tdl) dependency
+# ----------------------------------------------------------------------------
+
+# Dependency: TDL.
+set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+set (CMAKE_MESSAGE_LOG_LEVEL "WARNING")
+find_package (TDL QUIET HINTS ${CMAKE_CURRENT_LIST_DIR}/../submodules/tool_description_lib ${SHARG_HINT_TDL})
+set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
+
+if (TDL_FOUND)
+    sharg_config_print ("Dependency:                 TDL found.")
+else ()
+    sharg_config_error ("Dependency:                 TDL not found.")
+endif ()
+
+# ----------------------------------------------------------------------------
 # System dependencies
 # ----------------------------------------------------------------------------
 
@@ -297,9 +314,9 @@ try_compile (SHARG_PLATFORM_TEST
              OUTPUT_VARIABLE     SHARG_PLATFORM_TEST_OUTPUT)
 
 if (SHARG_PLATFORM_TEST)
-    sharg_config_print ("SHARG platform.hpp build:  passed.")
+    sharg_config_print ("SHARG platform.hpp build:   passed.")
 else ()
-    sharg_config_error ("SHARG platform.hpp build:  failed!\n\
+    sharg_config_error ("SHARG platform.hpp build:   failed!\n\
                         ${SHARG_PLATFORM_TEST_OUTPUT}")
 endif ()
 
@@ -330,6 +347,7 @@ if (SHARG_FOUND AND NOT TARGET sharg::sharg)
     target_compile_definitions (sharg_sharg INTERFACE ${SHARG_DEFINITIONS})
     target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS_LIST})
     target_link_libraries (sharg_sharg INTERFACE "${SHARG_LIBRARIES}")
+    target_link_libraries (sharg_sharg INTERFACE "tdl::tdl")
     # include sharg/include/ as -I, because sharg should never produce warnings.
     target_include_directories (sharg_sharg INTERFACE "${SHARG_INCLUDE_DIR}")
     # include everything except sharg/include/ as -isystem, i.e.

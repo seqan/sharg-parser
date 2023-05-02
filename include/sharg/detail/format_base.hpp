@@ -340,7 +340,7 @@ public:
         derived_t().print_list_item("\\fB--version\\fP", "Prints the version information.");
         derived_t().print_list_item("\\fB--copyright\\fP", "Prints the copyright/license information.");
         derived_t().print_list_item("\\fB--export-help\\fP (std::string)",
-                                    "Export the help page information. Value must be one of [html, man].");
+                                    "Export the help page information. Value must be one of [html, man, ctd, cwl].");
         if (version_check_dev_decision == update_notifications::on)
             derived_t().print_list_item("\\fB--version-check\\fP (bool)",
                                         "Whether to check for the newest app version. Default: true.");
