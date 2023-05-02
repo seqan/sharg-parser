@@ -756,6 +756,7 @@ private:
      * - <b>\--version</b> sets the format to sharg::detail::format_version.
      * - <b>\--export-help html</b> sets the format to sharg::detail::format_html.
      * - <b>\--export-help man</b> sets the format to sharg::detail::format_man.
+     * - <b>\--export-help cwl</b> sets the format to sharg::detail::format_tdl{FileFormat::CWL}.
      * - <b>\--export-help ctd</b> sets the format to sharg::detail::format_tdl{FileFormat::CTD}.
      * - else the format is that to sharg::detail::format_parse
      *

@@ -118,7 +118,7 @@ endmacro ()
 # Note that sharg-config.cmake can be standalone and thus SHARG_CLONE_DIR might be empty.
 # * `SHARG_CLONE_DIR` was already found in sharg-config-version.cmake
 # * `SHARG_INCLUDE_DIR` was already found in sharg-config-version.cmake
-find_path (SHARG_SUBMODULES_DIR NAMES lib/seqan3 HINTS "${SHARG_CLONE_DIR}" "${SHARG_INCLUDE_DIR}/sharg")
+find_path (SHARG_SUBMODULES_DIR NAMES submodules/tool_description_lib HINTS "${SHARG_CLONE_DIR}" "${SHARG_INCLUDE_DIR}/sharg")
 
 if (SHARG_INCLUDE_DIR)
     sharg_config_print ("SHARG include dir found:   ${SHARG_INCLUDE_DIR}")
@@ -134,15 +134,16 @@ if (SHARG_CLONE_DIR)
     sharg_config_print ("Detected as running from a repository checkout…")
 endif ()
 
-if (SHARG_SUBMODULES_DIR)
-    file (GLOB submodules ${SHARG_SUBMODULES_DIR}/lib/*/include)
-    foreach (submodule ${submodules})
-        if (IS_DIRECTORY ${submodule})
-            sharg_config_print ("  …adding submodule include:  ${submodule}")
-            set (SHARG_DEPENDENCY_INCLUDE_DIRS ${submodule} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
-        endif ()
-    endforeach ()
-endif ()
+# Currently unused.
+# if (SHARG_SUBMODULES_DIR)
+#     file (GLOB submodules ${SHARG_SUBMODULES_DIR}/lib/*/include)
+#     foreach (submodule ${submodules})
+#         if (IS_DIRECTORY ${submodule})
+#             sharg_config_print ("  …adding submodule include:  ${submodule}")
+#             set (SHARG_DEPENDENCY_INCLUDE_DIRS ${submodule} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
+#         endif ()
+#     endforeach ()
+# endif ()
 
 # ----------------------------------------------------------------------------
 # Options for CheckCXXSourceCompiles
@@ -212,6 +213,22 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
+# tool description lib (tdl) dependency
+# ----------------------------------------------------------------------------
+
+set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
+find_package (TDL QUIET HINTS ${SHARG_SUBMODULES_DIR}/submodules/tool_description_lib ${SHARG_HINT_TDL})
+set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
+
+if (TDL_FOUND)
+    sharg_config_print ("Dependency:                 TDL found.")
+else ()
+    sharg_config_error ("Dependency:                 TDL not found.")
+endif ()
+
+# ----------------------------------------------------------------------------
 # ZLIB dependency
 # ----------------------------------------------------------------------------
 
@@ -251,23 +268,6 @@ if (BZIP2_FOUND)
     sharg_config_print ("Optional dependency:        BZip2-${BZIP2_VERSION_STRING} found.")
 else ()
     sharg_config_print ("Optional dependency:        BZip2 not found.")
-endif ()
-
-# ----------------------------------------------------------------------------
-# tool description lib (tdl) dependency
-# ----------------------------------------------------------------------------
-
-# Dependency: TDL.
-set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
-set (CMAKE_MESSAGE_LOG_LEVEL "WARNING")
-find_package (TDL QUIET HINTS ${CMAKE_CURRENT_LIST_DIR}/../submodules/tool_description_lib ${SHARG_HINT_TDL})
-set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
-unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
-
-if (TDL_FOUND)
-    sharg_config_print ("Dependency:                 TDL found.")
-else ()
-    sharg_config_error ("Dependency:                 TDL not found.")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -346,8 +346,7 @@ if (SHARG_FOUND AND NOT TARGET sharg::sharg)
     add_library (sharg_sharg INTERFACE)
     target_compile_definitions (sharg_sharg INTERFACE ${SHARG_DEFINITIONS})
     target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS_LIST})
-    target_link_libraries (sharg_sharg INTERFACE "${SHARG_LIBRARIES}")
-    target_link_libraries (sharg_sharg INTERFACE "tdl::tdl")
+    target_link_libraries (sharg_sharg INTERFACE "${SHARG_LIBRARIES}" tdl::tdl)
     # include sharg/include/ as -I, because sharg should never produce warnings.
     target_include_directories (sharg_sharg INTERFACE "${SHARG_INCLUDE_DIR}")
     # include everything except sharg/include/ as -isystem, i.e.

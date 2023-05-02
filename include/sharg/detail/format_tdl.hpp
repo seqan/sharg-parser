@@ -1,11 +1,12 @@
 // -----------------------------------------------------------------------------------------------------------
-// Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
-// Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
+// Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
 // shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------------
 
 /*!\file
+ * \author Simon Gene Gottlieb <simon.gottlieb AT fu-berlin.de>
  * \brief Provides the format_tdl struct and its helper functions.
  */
 
@@ -23,10 +24,9 @@
 namespace sharg::detail
 {
 
-/** \brief converts a value into the corresponding tdl value type
- *
- * \param v value to convert
- * \return returns the matching tdl type
+/*!\brief converts a value into the corresponding tdl value type
+ * \param v The value to convert.
+ * \return the matching tdl type.
  */
 inline auto to_tdl(bool v)
 {
@@ -57,23 +57,22 @@ auto to_tdl(auto SHARG_DOXYGEN_ONLY(v))
     return tdl::BoolValue(false);
 }
 
-/*!\brief A generalized format to create different tool description files
+/*!\brief A generalized format to create different tool description files.
  * \ingroup parser
  *
  * \details
  *
- * This class allows to create different outputs format. See FileFormat for
+ * This class allows to create different outputs format. See sharg::detail::format_tdl::FileFormat for
  * available formats.
  */
 class format_tdl : format_base
 {
 public:
-    /*!\brief Supported tool description file formats
-     */
+    //!\brief Supported tool description file formats.
     enum class FileFormat
     {
-        CTD, // Support for CTD format
-        CWL, // Support for CWL format
+        CTD, //!<Support for CTD format
+        CWL, //!<Support for CWL format
     };
 
     //!\brief Vector of functions that stores all calls except add_positional_option.
@@ -111,18 +110,17 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    /*!\brief CTor
-     *
-     * \param fileFormat file format type
+    /*!\brief Construct from a file format.
+     * \param fileFormat The file format.
      */
     format_tdl(FileFormat fileFormat) : fileFormat{fileFormat}
     {}
 
-    format_tdl(format_tdl const & pf) = default;             //!< Defaulted.
-    format_tdl & operator=(format_tdl const & pf) = default; //!< Defaulted.
-    format_tdl(format_tdl &&) = default;                     //!< Defaulted.
-    format_tdl & operator=(format_tdl &&) = default;         //!< Defaulted.
-    ~format_tdl() = default;                                 //!< Defaulted.
+    format_tdl(format_tdl const &) = default;             //!< Defaulted.
+    format_tdl & operator=(format_tdl const &) = default; //!< Defaulted.
+    format_tdl(format_tdl &&) = default;                  //!< Defaulted.
+    format_tdl & operator=(format_tdl &&) = default;      //!< Defaulted.
+    ~format_tdl() = default;                              //!< Defaulted.
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_option
@@ -253,7 +251,8 @@ public:
 
     /*!\brief Initiates the printing of the help page to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed help page.
-     * \param[in] executable_name A list of arguments that form together the call to the executable e.g.: [raptor, build]
+     * \param[in] executable_name A list of arguments that form together the call to the executable.
+     *                            For example: [raptor, build]
      */
     void parse(parser_meta_data & parser_meta, std::vector<std::string> const & executable_name)
     {
