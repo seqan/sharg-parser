@@ -141,7 +141,8 @@ OPTIONS
     --copyright
           Prints the copyright/license information.
     --export-help (std::string)
-          Export the help page information. Value must be one of [html, man].
+          Export the help page information. Value must be one of [html, man,
+          ctd, cwl].
     --version-check (bool)
           Whether to check for the newest app version. Default: true.
 
