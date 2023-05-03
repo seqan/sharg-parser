@@ -20,6 +20,7 @@
 #include <sharg/detail/format_html.hpp>
 #include <sharg/detail/format_man.hpp>
 #include <sharg/detail/format_parse.hpp>
+#include <sharg/detail/format_tdl.hpp>
 #include <sharg/detail/version_check.hpp>
 
 namespace sharg
@@ -432,11 +433,17 @@ public:
             version_check_future = app_version_prom.get_future();
             app_version(std::move(app_version_prom));
         }
-
         std::visit(
-            [this](auto & f)
+            [this]<typename T>(T & f)
             {
-                f.parse(info);
+                if constexpr (std::same_as<T, detail::format_tdl>)
+                {
+                    f.parse(info, executable_name);
+                }
+                else
+                {
+                    f.parse(info);
+                }
             },
             format);
         parse_was_called = true;
@@ -710,6 +717,7 @@ private:
                  detail::format_version,
                  detail::format_html,
                  detail::format_man,
+                 detail::format_tdl,
                  detail::format_copyright/*,
                  detail::format_ctd*/> format{detail::format_help{{}, {}, false}}; // Will be overwritten in any case.
 
@@ -748,11 +756,11 @@ private:
      * - <b>\--version</b> sets the format to sharg::detail::format_version.
      * - <b>\--export-help html</b> sets the format to sharg::detail::format_html.
      * - <b>\--export-help man</b> sets the format to sharg::detail::format_man.
-     * - <b>\--export-help ctd</b> sets the format to sharg::detail::format_ctd.
+     * - <b>\--export-help cwl</b> sets the format to sharg::detail::format_tdl{FileFormat::CWL}.
+     * - <b>\--export-help ctd</b> sets the format to sharg::detail::format_tdl{FileFormat::CTD}.
      * - else the format is that to sharg::detail::format_parse
      *
-     * If `--export-help` is specified with a value other than html/man or ctd
-     * an sharg::parser_error is thrown.
+     * If `--export-help` is specified with a value other than html, man, cwl or ctd, an sharg::parser_error is thrown.
      */
     void init(int argc, char const * const * const argv)
     {
@@ -827,13 +835,13 @@ private:
                     format = detail::format_html{subcommands, version_check_dev_decision};
                 else if (export_format == "man")
                     format = detail::format_man{subcommands, version_check_dev_decision};
-                // TODO (smehringer) use when CTD support is available
-                // else if (export_format == "ctd")
-                //     format = detail::format_ctd{};
+                else if (export_format == "ctd")
+                    format = detail::format_tdl{detail::format_tdl::FileFormat::CTD};
+                else if (export_format == "cwl")
+                    format = detail::format_tdl{detail::format_tdl::FileFormat::CWL};
                 else
                     throw validation_error{"Validation failed for option --export-help: "
-                                           "Value must be one of [html, man]"};
-
+                                           "Value must be one of [html, man, ctd, cwl]."};
                 special_format_was_set = true;
             }
             else if (arg == "--copyright")

@@ -1,0 +1,3 @@
+[submodule "submodules/tool_description_lib"]
+	path = submodules/tool_description_lib
+	url = https://github.com/deNBI-cibi/tool_description_lib.git

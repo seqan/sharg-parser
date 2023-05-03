@@ -38,6 +38,7 @@ jobs:
         with:
           path: sharg
           fetch-depth: 1
+          submodules: true
 
       # To reuse scripts
       - name: Checkout SeqAn3
