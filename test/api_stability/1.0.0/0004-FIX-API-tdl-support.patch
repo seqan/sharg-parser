@@ -1,0 +1,102 @@
+From 6b255c681e4c627c98f0681bf1dd152dbf0ad9cf Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Sun, 7 May 2023 13:43:44 +0200
+Subject: [PATCH 4/4] [FIX] [API] tdl support
+
+---
+ test/unit/detail/format_help_test.cpp             | 3 ++-
+ test/unit/detail/format_html_test.cpp             | 4 ++--
+ test/unit/detail/format_man_test.cpp              | 4 ++--
+ test/unit/detail/seqan3_test.cpp                  | 3 ++-
+ test/unit/parser/format_parse_validators_test.cpp | 3 ++-
+ 5 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/test/unit/detail/format_help_test.cpp b/test/unit/detail/format_help_test.cpp
+index 49b3fde..ed9ad51 100644
+--- a/test/unit/detail/format_help_test.cpp
++++ b/test/unit/detail/format_help_test.cpp
+@@ -32,7 +32,8 @@ std::string const basic_options_str = "  Common options\n"
+                                       "    --copyright\n"
+                                       "          Prints the copyright/license information.\n"
+                                       "    --export-help (std::string)\n"
+-                                      "          Export the help page information. Value must be one of [html, man].\n"
++                                      "          Export the help page information. Value must be one of [html, man,\n"
++                                      "          ctd, cwl].\n"
+                                       "    --version-check (bool)\n"
+                                       "          Whether to check for the newest app version. Default: true.\n";
+ 
+diff --git a/test/unit/detail/format_html_test.cpp b/test/unit/detail/format_html_test.cpp
+index 741750c..8217651 100644
+--- a/test/unit/detail/format_html_test.cpp
++++ b/test/unit/detail/format_html_test.cpp
+@@ -42,7 +42,7 @@ TEST(html_format, empty_information)
+                     "<dt><strong>--copyright</strong></dt>\n"
+                     "<dd>Prints the copyright/license information.</dd>\n"
+                     "<dt><strong>--export-help</strong> (std::string)</dt>\n"
+-                    "<dd>Export the help page information. Value must be one of [html, man].</dd>\n"
++                    "<dd>Export the help page information. Value must be one of [html, man, ctd, cwl].</dd>\n"
+                     "<dt><strong>--version-check</strong> (bool)</dt>\n"
+                     "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
+                     "</dl>\n"
+@@ -164,7 +164,7 @@ TEST(html_format, full_information_information)
+         "<dt><strong>--copyright</strong></dt>\n"
+         "<dd>Prints the copyright/license information.</dd>\n"
+         "<dt><strong>--export-help</strong> (std::string)</dt>\n"
+-        "<dd>Export the help page information. Value must be one of [html, man].</dd>\n"
++        "<dd>Export the help page information. Value must be one of [html, man, ctd, cwl].</dd>\n"
+         "<dt><strong>--version-check</strong> (bool)</dt>\n"
+         "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
+         "</dl>\n"
+diff --git a/test/unit/detail/format_man_test.cpp b/test/unit/detail/format_man_test.cpp
+index 8a3393d..4b97dee 100644
+--- a/test/unit/detail/format_man_test.cpp
++++ b/test/unit/detail/format_man_test.cpp
+@@ -117,7 +117,7 @@ struct format_man_test : public ::testing::Test
+                            "\n"
+                            R"(\fB--export-help\fP (std::string))"
+                            "\n"
+-                           R"(Export the help page information. Value must be one of [html, man].)"
++                           R"(Export the help page information. Value must be one of [html, man, ctd, cwl].)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+@@ -230,7 +230,7 @@ TEST_F(format_man_test, empty_information)
+                                  "\n"
+                                  R"(\fB--export-help\fP (std::string))"
+                                  "\n"
+-                                 R"(Export the help page information. Value must be one of [html, man].)"
++                                 R"(Export the help page information. Value must be one of [html, man, ctd, cwl].)"
+                                  "\n"
+                                  R"(.TP)"
+                                  "\n"
+diff --git a/test/unit/detail/seqan3_test.cpp b/test/unit/detail/seqan3_test.cpp
+index 8c8288b..3083a13 100644
+--- a/test/unit/detail/seqan3_test.cpp
++++ b/test/unit/detail/seqan3_test.cpp
+@@ -19,7 +19,8 @@ std::string const basic_options_str = "  Common options\n"
+                                       "    --copyright\n"
+                                       "          Prints the copyright/license information.\n"
+                                       "    --export-help (std::string)\n"
+-                                      "          Export the help page information. Value must be one of [html, man].\n"
++                                      "          Export the help page information. Value must be one of [html, man,\n"
++                                      "          ctd, cwl].\n"
+                                       "    --version-check (bool)\n"
+                                       "          Whether to check for the newest app version. Default: true.\n";
+ 
+diff --git a/test/unit/parser/format_parse_validators_test.cpp b/test/unit/parser/format_parse_validators_test.cpp
+index 42589d6..3c33604 100644
+--- a/test/unit/parser/format_parse_validators_test.cpp
++++ b/test/unit/parser/format_parse_validators_test.cpp
+@@ -23,7 +23,8 @@ std::string const basic_options_str = "  Common options\n"
+                                       "    --copyright\n"
+                                       "          Prints the copyright/license information.\n"
+                                       "    --export-help (std::string)\n"
+-                                      "          Export the help page information. Value must be one of [html, man].\n";
++                                      "          Export the help page information. Value must be one of [html, man,\n"
++                                      "          ctd, cwl].\n";
+ 
+ std::string const basic_version_str = "VERSION\n"
+                                       "    Last update:\n"
+-- 
+2.40.1
+
