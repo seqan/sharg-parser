@@ -1,7 +1,7 @@
-From 5b413be33aa070658744dc2ae8dd4c8d21b28bd3 Mon Sep 17 00:00:00 2001
+From 7cba72443b1b76ce80ecb909ac1cf37bb76e5008 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 27 Feb 2023 15:34:10 +0100
-Subject: [PATCH 2/2] [NOAPI] Update copyright
+Subject: [PATCH 2/4] [NOAPI] Update copyright
 
 ---
  LICENSE.md                            |  4 ++--
@@ -137,5 +137,5 @@ index ccf73e3..8a3393d 100644
      testing::internal::CaptureStdout();
      EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
 -- 
-2.39.2
+2.40.1
 

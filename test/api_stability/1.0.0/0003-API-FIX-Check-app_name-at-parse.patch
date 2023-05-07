@@ -1,0 +1,49 @@
+From ed9fcd579308edef9530ef53d657b59118fe5469 Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Sun, 7 May 2023 13:15:46 +0200
+Subject: [PATCH 3/4] [API] [FIX] Check app_name at parse()
+
+---
+ test/unit/parser/parser_design_error_test.cpp | 25 +++++++++++++------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/test/unit/parser/parser_design_error_test.cpp b/test/unit/parser/parser_design_error_test.cpp
+index e4725f5..a984ee3 100644
+--- a/test/unit/parser/parser_design_error_test.cpp
++++ b/test/unit/parser/parser_design_error_test.cpp
+@@ -11,15 +11,24 @@
+ 
+ TEST(design_error, app_name_validation)
+ {
+-    char const * argv[] = {"./parser_test"};
+-
+-    EXPECT_NO_THROW((sharg::parser{"test_parser", 1, argv}));
+-    EXPECT_NO_THROW((sharg::parser{"test-parser1234_foo", 1, argv}));
++    char const * argv[] = {"./parser_test", "-i", "3"};
++    int const argc{3};
++    int option_value;
+ 
+-    EXPECT_THROW((sharg::parser{"test parser", 1, argv}), sharg::design_error);
+-    EXPECT_THROW((sharg::parser{"test;", 1, argv}), sharg::design_error);
+-    EXPECT_THROW((sharg::parser{";", 1, argv}), sharg::design_error);
+-    EXPECT_THROW((sharg::parser{"test;bad script:D", 1, argv}), sharg::design_error);
++    auto create_parser = [&](std::string && app_name)
++    {
++        sharg::parser parser{std::move(app_name), argc, argv, sharg::update_notifications::off};
++        parser.add_option(option_value, sharg::config{.short_id = 'i'});
++        return parser;
++    };
++
++    EXPECT_NO_THROW(create_parser("test_parser").parse());
++    EXPECT_NO_THROW(create_parser("test-parser1234_foo").parse());
++
++    EXPECT_THROW(create_parser("test parser").parse(), sharg::design_error);
++    EXPECT_THROW(create_parser("test;").parse(), sharg::design_error);
++    EXPECT_THROW(create_parser(";").parse(), sharg::design_error);
++    EXPECT_THROW(create_parser("test;bad script:D").parse(), sharg::design_error);
+ }
+ 
+ // -----------------------------------------------------------------------------
+-- 
+2.40.1
+

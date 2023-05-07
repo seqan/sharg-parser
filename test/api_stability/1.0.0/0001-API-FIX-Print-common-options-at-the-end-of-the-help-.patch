@@ -1,7 +1,7 @@
-From cc79c9febda2e05777266a827d770272325f113a Mon Sep 17 00:00:00 2001
+From eb3d3ff8b3745938eb841cf6bad21192e83c947c Mon Sep 17 00:00:00 2001
 From: Svenja Mehringer <svenja.mehringer@fu-berlin.de>
 Date: Tue, 1 Nov 2022 12:07:31 +0100
-Subject: [PATCH 1/2] [API] [FIX] Print common options at the end of the help
+Subject: [PATCH 1/4] [API] [FIX] Print common options at the end of the help
  page
 
 ---
@@ -511,5 +511,5 @@ index 248089c..42589d6 100644
      }
  
 -- 
-2.39.2
+2.40.1
 
