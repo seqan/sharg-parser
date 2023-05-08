@@ -149,7 +149,7 @@ OPTIONS
 VERSION
     Last update:
     Eat-Me-App version:
-    Sharg version: 1.1.0
+    Sharg version: 1.1.1-rc.1
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
