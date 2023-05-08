@@ -117,6 +117,9 @@ cd tutorial
 mkdir build
 mkdir source
 git clone https://github.com/seqan/sharg-parser.git
+cd sharg-parser
+git submodule update --init
+cd ..
 ```
 
 The output of the command `tree -L 2` should now look like this:
@@ -133,6 +136,7 @@ The output of the command `tree -L 2` should now look like this:
 │   ├── build_system
 │   ├── doc
 │   ├── include
+│   ├── submodules
 │   └── test
 └── source
 
