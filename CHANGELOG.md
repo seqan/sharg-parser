@@ -18,7 +18,14 @@ The following API changes should be documented as such:
 If possible, provide tooling that performs the changes, e.g. a shell-script.
 -->
 
-# Release 1.0.1
+# Release 1.1.0
+
+## Features
+
+* We support Gitpod. [Click here](https://gitpod.io/#https://github.com/seqan/sharg-parser/)
+  to try it out.
+* **CWL support** (Common Workflow Language): An app using Sharg can now automatically export a CWL tool
+  description file via `--export-help cwl` [#94](https://github.com/seqan/sharg-parser/pull/94).
 
 ## API changes
 
