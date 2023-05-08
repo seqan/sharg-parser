@@ -155,10 +155,11 @@ VERSION
 
 ## Dependencies
 
-|                   | requirement                                          | version  | comment                                     |
-|-------------------|------------------------------------------------------|----------|---------------------------------------------|
-|**compiler**       | [GCC](https://gcc.gnu.org)                           | ≥ 10     | no other compiler is currently supported!   |
-|**build system**   | [CMake](https://cmake.org)                           | ≥ 3.16   | optional, but recommended                   |
+|                   | requirement                                               | version  | comment                                     |
+|-------------------|-----------------------------------------------------------|----------|---------------------------------------------|
+|**compiler**       | [GCC](https://gcc.gnu.org)                                | ≥ 10     | no other compiler is currently supported!   |
+|**build system**   | [CMake](https://cmake.org)                                | ≥ 3.16   | optional, but recommended                   |
+|**required libs**  | [TDL](https://github.com/deNBI-cibi/tool_description_lib) | ≥ 1.0.0  | required for CWL export                     |
 
 
 ## Sponsorships
