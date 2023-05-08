@@ -17,11 +17,11 @@
 //!\brief The major version as MACRO.
 #define SHARG_VERSION_MAJOR 1
 //!\brief The minor version as MACRO.
-#define SHARG_VERSION_MINOR 0
+#define SHARG_VERSION_MINOR 1
 //!\brief The patch version as MACRO.
-#define SHARG_VERSION_PATCH 1
+#define SHARG_VERSION_PATCH 0
 //!\brief The release candidate number. 0 means stable release, >= 1 means release candidate.
-#define SHARG_RELEASE_CANDIDATE 1
+#define SHARG_RELEASE_CANDIDATE 0
 
 //!\brief The full version as MACRO (number).
 #define SHARG_VERSION (SHARG_VERSION_MAJOR * 10000 + SHARG_VERSION_MINOR * 100 + SHARG_VERSION_PATCH)
