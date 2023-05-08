@@ -110,7 +110,7 @@ TEST_F(format_ctd_test, empty_information)
     // Create the dummy parser.
     sharg::parser parser{"default", argv.size(), argv.data()};
     parser.info.date = "December 01, 1994";
-    parser.info.version = "1.0.1-rc.1";
+    parser.info.version = "1.1.0";
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 
