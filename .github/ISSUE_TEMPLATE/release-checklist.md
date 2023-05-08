@@ -87,7 +87,7 @@ Once again, the release message can be simply something along the lines of:
 ```
 This is the first release candidate for Sharg 1.0.0
 
-You can find a list of changes in our [changelog](https://github.com/seqan/sharg-parser/blob/1.0.0-rc.1/CHANGELOG.md).
+You can find a list of changes in our [changelog](https://github.com/seqan/sharg-parser/blob/1.0.0/CHANGELOG.md).
 ```
 
 Afterwards, bump the succeeding release candidate number in the `main`` branch: [include/sharg/version.hpp](https://github.com/seqan/sharg-parser/blob/1.0.0/include/sharg/version.hpp#L17-L22).
