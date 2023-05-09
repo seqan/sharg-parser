@@ -26,7 +26,7 @@ Pre-release Tasks:
 
 ---
 
-- [ ] Freeze `main` branch. ([Instructions](#freeze))
+- [ ] Freeze `main` branch and set `SHARG_RELEASE_CANDIDATE` to `0`. ([Instructions](#freeze))
 - [ ] Add versioned documentation to docs.seqan.de. ([Instructions](#versioned-docs))
 - [ ] Prepare `sharg-[VERSION]-{Linux,Source}.tar.xz{,.sha265}`. ([Instructions](#packaging))
 - [ ] Prepare a release note with notable features, API changes, bugs, and external dependency updates.
@@ -37,19 +37,12 @@ Pre-release Tasks:
 
 ---
 
-- [ ] Bump version. ([Instructions](#version-bump))
+- [ ] Bump version and set `SHARG_RELEASE_CANDIDATE` to `1`. ([Instructions](#version-bump))
 - [ ] Update the version used for [update notifications](https://github.com/OpenMS/usage_plots/blob/master/seqan_versions.txt).
 - [ ] Announce release on [Twitter](https://twitter.com/seqanlib).
 - [ ] Announce release on [website](https://www.seqan.de) ([Instructions](#website-post)).
 - [ ] Announce release on mailing list `seqan-dev@lists.fu-berlin.de`.
 - [ ] Announce release on [public Gitter channel](https://gitter.im/seqan/Lobby).
-- [ ] Notify upstream package maintainers:
-  - [ ] [brew](https://github.com/brewsci/homebrew-bio/tree/develop/Formula/seqan%403.rb) (@rrahn)
-  - [ ] [macports](https://github.com/macports/macports-ports/tree/master/science/seqan3/Portfile) (@rrahn)
-  - [ ] [bio.tools](https://bio.tools/seqan) (@rrahn)
-  - [ ] [conda](https://github.com/bioconda/bioconda-recipes/tree/master/recipes/seqan3) (@eseiler)
-  - [ ] [debian](https://tracker.debian.org/pkg/seqan3) (@mr-c)
-  - [ ] [fedora](https://src.fedoraproject.org/rpms/seqan3) (@sagitter)
 - [ ] Update release template with the current release tasks.
 - [ ] Celebrate :tada: :beer:
 
