@@ -18,6 +18,12 @@ The following API changes should be documented as such:
 If possible, provide tooling that performs the changes, e.g. a shell-script.
 -->
 
+# Release 1.1.1
+
+#### Dependencies
+
+* We now use Doxygen version 1.9.7 to build our documentation ([\#195](https://github.com/seqan/sharg-parser/pull/195)).
+
 # Release 1.1.0
 
 ## Features

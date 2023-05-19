@@ -212,11 +212,9 @@ namespace sharg
  * \experimentalapi{Experimental since version 1.0.}
  */
 // clang-format off
-// `SHARG_DOXYGEN_ONLY((size_t value))` is needed for Doxygen 1.9.5 
-// Doxygen 1.9.5 bug: https://github.com/doxygen/doxygen/issues/9552
 template <typename option_type>
     requires requires { { detail::adl_only::enumeration_names_cpo<option_type>{}() }; }
-inline auto const enumeration_names SHARG_DOXYGEN_ONLY((size_t value)) = detail::adl_only::enumeration_names_cpo<option_type>{}();
+inline auto const enumeration_names = detail::adl_only::enumeration_names_cpo<option_type>{}();
 // clang-format on
 //!\}
 
