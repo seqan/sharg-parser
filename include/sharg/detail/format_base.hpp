@@ -222,8 +222,8 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_option
      */
-    template <typename option_type, typename config_type>
-    void add_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void add_option(option_type & value, config<validator_t> const & config)
     {
         std::string id = prep_id_for_help(config.short_id, config.long_id) + " " + option_type_and_list_info(value);
         std::string info{config.description};
@@ -245,8 +245,8 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_flag
      */
-    template <typename config_type>
-    void add_flag(bool & SHARG_DOXYGEN_ONLY(value), config_type const & config)
+    template <typename validator_t>
+    void add_flag(bool & SHARG_DOXYGEN_ONLY(value), config<validator_t> const & config)
     {
         store_help_page_element(
             [this, id = prep_id_for_help(config.short_id, config.long_id), description = config.description]()
@@ -259,8 +259,8 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_positional_option
      */
-    template <typename option_type, typename config_type>
-    void add_positional_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void add_positional_option(option_type & value, config<validator_t> const & config)
     {
         positional_option_calls.push_back(
             [this, &value, description = config.description, validator = config.validator]()
@@ -571,7 +571,8 @@ private:
      * If `config.advanced = true`, the information is only added to the help page if
      * the advanced help page has been queried on the command line (`show_advanced_options == true`).
      */
-    void store_help_page_element(std::function<void()> printer, config<auto> const & config)
+    template <typename validator_t>
+    void store_help_page_element(std::function<void()> printer, config<validator_t> const & config)
     {
         if (!(config.hidden) && (!(config.advanced) || show_advanced_options))
             parser_set_up_calls.push_back(std::move(printer));

@@ -212,7 +212,7 @@ namespace sharg
  * \experimentalapi{Experimental since version 1.0.}
  */
 // clang-format off
-// `SHARG_DOXYGEN_ONLY((size_t value))` is needed for Doxygen 1.9.5 
+// `SHARG_DOXYGEN_ONLY((size_t value))` is needed for Doxygen 1.9.5
 // Doxygen 1.9.5 bug: https://github.com/doxygen/doxygen/issues/9552
 template <typename option_type>
     requires requires { { detail::adl_only::enumeration_names_cpo<option_type>{}() }; }
@@ -245,13 +245,16 @@ concept named_enumeration = requires
 } // namespace sharg
 
 //!\cond
+namespace std
+{
+
 /*!\brief Overload of ostream operator<<
  * \details
  * \experimentalapi{Experimental since version 1.0.}
  */
 template <typename option_type>
-    requires sharg::named_enumeration<std::remove_cvref_t<option_type>>
-inline std::ostream & std::operator<<(std::ostream & s, option_type && op)
+    requires sharg::named_enumeration<remove_cvref_t<option_type>>
+inline ostream & operator<<(ostream & s, option_type && op)
 {
     for (auto & [key, value] : sharg::enumeration_names<option_type>)
     {
@@ -261,4 +264,6 @@ inline std::ostream & std::operator<<(std::ostream & s, option_type && op)
 
     return s << "<UNKNOWN_VALUE>";
 }
+
+} // namespace std
 //!\endcond
