@@ -70,8 +70,8 @@ public:
     /*!\brief Adds an sharg::detail::get_option call to be evaluated later on.
      * \copydetails sharg::parser::add_option
      */
-    template <typename option_type, typename config_type>
-    void add_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void add_option(option_type & value, config<validator_t> const & config)
     {
         option_calls.push_back(
             [this, &value, config]()
@@ -83,8 +83,8 @@ public:
     /*!\brief Adds a get_flag call to be evaluated later on.
      * \copydetails sharg::parser::add_flag
      */
-    template <typename config_type>
-    void add_flag(bool & value, config_type const & config)
+    template <typename validator_t>
+    void add_flag(bool & value, config<validator_t> const & config)
     {
         flag_calls.push_back(
             [this, &value, config]()
@@ -96,8 +96,8 @@ public:
     /*!\brief Adds a get_positional_option call to be evaluated later on.
      * \copydetails sharg::parser::add_positional_option
      */
-    template <typename option_type, typename config_type>
-    void add_positional_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void add_positional_option(option_type & value, config<validator_t> const & config)
     {
         positional_option_calls.push_back(
             [this, &value, config]()
@@ -678,8 +678,8 @@ private:
      * - throws on (mis)use of both identifiers for non-container type values,
      * - re-throws the validation exception with appended option information.
      */
-    template <typename option_type, typename config_type>
-    void get_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void get_option(option_type & value, config<validator_t> const & config)
     {
         bool short_id_is_set{get_option_by_id(value, config.short_id)};
         bool long_id_is_set{get_option_by_id(value, config.long_id)};

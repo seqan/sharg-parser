@@ -125,8 +125,8 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_option
      */
-    template <typename option_type, typename config_type>
-    void add_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void add_option(option_type & value, config<validator_t> const & config)
     {
         auto description = config.description;
         description += (config.required ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
@@ -200,8 +200,8 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_flag
      */
-    template <typename config_type>
-    void add_flag(bool & value, config_type const & config)
+    template <typename validator_t>
+    void add_flag(bool & value, config<validator_t> const & config)
     {
         store_help_page_element(
             [this, config, value](std::string_view)
@@ -219,8 +219,8 @@ public:
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
      * \copydetails sharg::parser::add_positional_option
      */
-    template <typename option_type, typename config_type>
-    void add_positional_option(option_type & value, config_type const & config)
+    template <typename option_type, typename validator_t>
+    void add_positional_option(option_type & value, config<validator_t> const & config)
     {
         std::string msg = config.validator.get_help_page_message();
 
@@ -346,7 +346,8 @@ private:
      *
      * If `spec` equals `sharg::option_spec::hidden`, the information is never added to the help page.
      */
-    void store_help_page_element(std::function<void(std::string_view)> printer, config<auto> const & config)
+    template <typename validator_t>
+    void store_help_page_element(std::function<void(std::string_view)> printer, config<validator_t> const & config)
     {
         if (config.hidden)
             return;

@@ -938,7 +938,8 @@ private:
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_option call.
-    void verify_option_config(config<auto> const & config)
+    template <typename validator_t>
+    void verify_option_config(config<validator_t> const & config)
     {
         if (sub_parser != nullptr)
             throw design_error{"You may only specify flags for the top-level parser."};
@@ -950,7 +951,8 @@ private:
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_flag call.
-    void verify_flag_config(config<auto> const & config)
+    template <typename validator_t>
+    void verify_flag_config(config<validator_t> const & config)
     {
         verify_identifiers(config.short_id, config.long_id);
 
@@ -959,7 +961,8 @@ private:
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_positional_option call.
-    void verify_positional_option_config(config<auto> const & config) const
+    template <typename validator_t>
+    void verify_positional_option_config(config<validator_t> const & config) const
     {
         if (config.short_id != '\0' || config.long_id != "")
             throw design_error{"Positional options are identified by their position on the command line. "
