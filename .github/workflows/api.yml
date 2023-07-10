@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [10, 11, 12]
+        compiler: [11, 12, 13]
 
     steps:
       - name: Checkout Sharg
@@ -40,30 +40,18 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      # To reuse scripts
-      - name: Checkout SeqAn3
-        uses: actions/checkout@v3
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
         with:
-          repository: seqan/seqan3
-          ref: aa3df18a6df59679e07e9fe2de4e0998a94af7e7
-          path: seqan3
-          fetch-depth: 1
-          submodules: false
-
-      - name: Configure APT
-        continue-on-error: true
-        run: bash ./seqan3/.github/workflows/scripts/configure_apt.sh
+          compiler: gcc-${{ matrix.compiler }}
+          ccache_size: 75M
 
       - name: Install CMake
-        run: bash ./seqan3/.github/workflows/scripts/install_cmake.sh
-
-      - name: Install compiler g++-${{ matrix.compiler }}
-        run: sudo apt-get install --yes g++-${{ matrix.compiler }}
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.16.9
 
       - name: Configure tests
-        env:
-          CXX: g++-${{ matrix.compiler }}
-          CC: gcc-${{ matrix.compiler }}
         run: |
           mkdir sharg-build
           cd sharg-build

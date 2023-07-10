@@ -12,13 +12,13 @@ works.
 
 # Software
 Requirements:
-  - gcc >= 10
+  - gcc >= 11 or clang >= 17
   - cmake >= 3.16
   - git
 
 ## Installing GCC
 
-SeqAn requires GCC >= 10. Current versions of LLVM/Clang and VisualStudio/MSVC are **not yet supported**.
+Sharg requires GCC >= 11 or LLVM/Clang >= 17. Current versions of VisualStudio/MSVC are **not yet supported**.
 We will briefly explain how to install GCC-11 (or the latest GCC if such an option is available) on some popular
 operating systems. We recommend using the latest version of GCC available. For more information, refer to your
 operating system's documentation.

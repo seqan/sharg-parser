@@ -1,4 +1,4 @@
-name: CI misc
+name: Linux
 
 on:
   push:
@@ -16,7 +16,7 @@ on:
 
 concurrency:
   group: misc-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   SHARG_NO_VERSION_CHECK: 1
@@ -24,68 +24,35 @@ env:
 
 defaults:
   run:
-    shell: bash -ex {0}
+    shell: bash -Eexuo pipefail {0}
 
 jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ubuntu-22.04
     timeout-minutes: 120
-    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: "Snippet gcc11"
-            cxx: "g++-11"
-            cc: "gcc-11"
+            compiler: "gcc-11"
             build: snippet
             build_type: Release
-            build_threads: 2
             test_threads: 1 # snippets create and delete files and some separate tests create/delete the same files
-            cxx_flags: "-std=c++20"
-            cmake: 3.16.9
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: false
 
-          - name: "Header gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "Header gcc13"
+            compiler: "gcc-13"
             build: header
             build_type: Debug
-            build_threads: 2
             test_threads: 2
-            cmake: 3.16.9
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: false
 
-          - name: "Header gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
+          - name: "Header gcc11"
+            compiler: "gcc-11"
             build: header
             build_type: Debug
-            build_threads: 2
             test_threads: 2
-            cmake: 3.16.9
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: false
-
-          - name: "Documentation"
-            build: documentation
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.16.9
-            doxygen: 1.9.5
-            requires_toolchain: false
-            requires_ccache: false
-            skip_build_tests: true
-            skip_run_tests: false
 
     steps:
       - name: Checkout
@@ -95,92 +62,36 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      # To reuse scripts
-      - name: Checkout SeqAn3
-        uses: actions/checkout@v3
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
         with:
-          repository: seqan/seqan3
-          ref: aa3df18a6df59679e07e9fe2de4e0998a94af7e7
-          path: seqan3
-          fetch-depth: 1
-          submodules: false
-
-      - name: Configure APT
-        continue-on-error: true
-        run: bash ./seqan3/.github/workflows/scripts/configure_apt.sh
+          compiler: ${{ matrix.compiler }}
+          ccache_size: 75M
 
       - name: Install CMake
-        env:
-          BUILD: ${{ matrix.build }}
-          CMAKE_VERSION: ${{ matrix.cmake }}
-        run: bash ./seqan3/.github/workflows/scripts/install_cmake.sh
-
-      - name: Install Doxygen
-        if: matrix.build == 'documentation'
-        env:
-          DOXYGEN_VERSION: ${{ matrix.doxygen }}
-        run: bash ./seqan3/.github/workflows/scripts/install_doxygen.sh
-
-      - name: Install ccache
-        if: matrix.requires_ccache
-        run: |
-          conda install --yes --override-channels --channel conda-forge ccache
-          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
-
-      - name: Install compiler ${{ matrix.cxx }}
-        if: matrix.requires_toolchain
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
-
-      - name: Load ccache
-        if: matrix.requires_ccache
-        uses: actions/cache@v3
+        uses: seqan/actions/setup-cmake@main
         with:
-          path: .ccache
-          key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
-          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
-          restore-keys: |
-            ${{ matrix.name }}-ccache-${{ github.ref }}
-            ${{ matrix.name }}-ccache-${{ github.base_ref }}
-            ${{ matrix.name }}-ccache-
-
-      - name: Tool versions
-        run: |
-          env cmake --version
-          env doxygen --version || true
-          env ${{ matrix.cxx }} --version || true
+          cmake: 3.16.9
 
       - name: Configure tests
-        env:
-          CXX: ${{ matrix.cxx }}
-          CC: ${{ matrix.cc }}
         run: |
           mkdir sharg-build
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                  -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
                                                   -DSHARG_VERBOSE_TESTS=OFF
           case "${{ matrix.build }}" in
-            snippet) make -j${{ matrix.build_threads }} gtest_build yaml-cpp;;
-            header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build yaml-cpp;;
-            documentation) make -j${{ matrix.build_threads }} download-cppreference-doxygen-web-tag;;
+            snippet) make -j2 gtest_build yaml-cpp;;
+            header) make -j2 gtest_build gbenchmark_build yaml-cpp;;
           esac
 
       - name: Build tests
-        if: ${{ !matrix.skip_build_tests }}
-        env:
-          CCACHE_BASEDIR: ${{ github.workspace }}
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
-          CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 75M
         run: |
-          ccache -z || true
+          ccache -z
           cd sharg-build
-          make -k -j${{ matrix.build_threads }}
-          ccache -sv || true
+          make -k -j2
+          ccache -sv
 
       - name: Run tests
-        if: ${{ !matrix.skip_run_tests }}
         run: |
           cd sharg-build
           ctest . -j${{ matrix.test_threads }} --output-on-failure

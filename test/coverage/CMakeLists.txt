@@ -27,37 +27,50 @@ set (SHARG_COVERAGE_PARALLEL_LEVEL
      "1"
      CACHE STRING "Number of threads to use for coverage report generation.")
 
+set (SHARG_GCOVR_ARGUMENTS "")
+
+macro (sharg_append_gcovr_args)
+    set (key ${ARGV0})
+    if (${ARGC} EQUAL 1)
+        list (APPEND SHARG_GCOVR_ARGUMENTS ${key})
+    else ()
+        string (REPLACE "'^" "\\''^" value "${ARGV1}")
+        string (REPLACE "$'" "$$'\\'" value "${value}")
+        string (REPLACE ";" "\\\\\\;" value "${value}")
+        list (APPEND SHARG_GCOVR_ARGUMENTS ${key} ${value})
+    endif ()
+endmacro ()
+
 # Arguments for gcovr.
 # Each line is an argument, ';' will end up being a whitespace due to expansion by CMake.
 # Special characters like '"', '\', ')' need to be escaped by a number of '\', depending how often they are evaluated.
 # gcovr uses python regex expressions.
 # See https://gcovr.com/en/5.0/guide.html#the-gcovr-command for an overview of parameters.
 # See https://gcovr.com/en/5.0/faq.html#why-does-c-code-have-so-many-uncovered-branches for an explanation on branches.
-set (SHARG_GCOVR_ARGUMENTS "")
+
 # The directory of the CMakeLists.txt used for invoking cmake.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--root;${CMAKE_CURRENT_LIST_DIR}")
+sharg_append_gcovr_args ("--root" "${CMAKE_CURRENT_LIST_DIR}")
 # The build directory.
-list (APPEND SHARG_GCOVR_ARGUMENTS "${PROJECT_BINARY_DIR}")
+sharg_append_gcovr_args ("${PROJECT_BINARY_DIR}")
 # Include all files whose path match '${SHARG_CLONE_DIR}/include/sharg/.*'.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--filter;\'${SHARG_CLONE_DIR}/include/sharg/.*\'")
+sharg_append_gcovr_args ("--filter" "${SHARG_CLONE_DIR}/include/sharg")
 # Include all files whose path match '${SHARG_CLONE_DIR}/test/include/sharg/test/.*'.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--filter;\'${SHARG_CLONE_DIR}/test/include/sharg/test/.*\'")
+sharg_append_gcovr_args ("--filter" "${SHARG_CLONE_DIR}/test/include/sharg/test")
 # Remove all files whose path match '${SHARG_CLONE_DIR}/include/sharg/contrib/.*'.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--exclude;\'${SHARG_CLONE_DIR}/include/sharg/contrib/.*\'")
+sharg_append_gcovr_args ("--exclude" "${SHARG_CLONE_DIR}/include/sharg/contrib")
 # Remove all files whose path match '${SHARG_CLONE_DIR}/include/sharg/std/.*'.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--exclude;\'${SHARG_CLONE_DIR}/include/sharg/std/.*\'")
+sharg_append_gcovr_args ("--exclude" "${SHARG_CLONE_DIR}/include/sharg/std")
 # Remove line coverage for all lines that match '^\s*$', i.e. empty lines.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--exclude-lines-by-pattern;\\\'^\\\\s*$$\\\'")
+sharg_append_gcovr_args ("--exclude-lines-by-pattern" [['^\\s*$']])
 # Remove line coverage for all lines that match "^\s*[\{\}]\s*\;*\s*(//.*)?$", i.e. lines with a single '{' or '}' which
 # might be followed by a semicolon or a comment '//'.
-list (APPEND SHARG_GCOVR_ARGUMENTS
-      "--exclude-lines-by-pattern;\\\'^\\\\s*[\\{\\}]\\\\s*\\\\\\;*\\\\s*\\(//.*\\)?$$\\\'")
+sharg_append_gcovr_args ("--exclude-lines-by-pattern" [['^\\s*[{}]{0,2}\\s*;*\\s*(//.*)?$']])
 # Will exclude branches that are unreachable.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--exclude-unreachable-branches")
+sharg_append_gcovr_args ("--exclude-unreachable-branches")
 # Will exclude branches that are only generated for exception handling.
-list (APPEND SHARG_GCOVR_ARGUMENTS "--exclude-throw-branches")
+sharg_append_gcovr_args ("--exclude-throw-branches")
 # Run up to this many gcov instances in parallel.
-list (APPEND SHARG_GCOVR_ARGUMENTS "-j;${SHARG_COVERAGE_PARALLEL_LEVEL}")
+sharg_append_gcovr_args ("-j" "${SHARG_COVERAGE_PARALLEL_LEVEL}")
 
 add_custom_command (OUTPUT ${PROJECT_BINARY_DIR}/sharg_coverage.xml
                     # Run tests.

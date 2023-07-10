@@ -157,7 +157,8 @@ VERSION
 
 |                   | requirement                                               | version  | comment                                     |
 |-------------------|-----------------------------------------------------------|----------|---------------------------------------------|
-|**compiler**       | [GCC](https://gcc.gnu.org)                                | ≥ 10     | no other compiler is currently supported!   |
+|**compiler**       | [GCC](https://gcc.gnu.org)                                | ≥ 11     |                                             |
+|**compiler**       | [Clang](https://clang.llvm.org/)                          | ≥ 17     |                                             |
 |**build system**   | [CMake](https://cmake.org)                                | ≥ 3.16   | optional, but recommended                   |
 |**required libs**  | [TDL](https://github.com/deNBI-cibi/tool_description_lib) | ≥ 1.0.0  | required for CWL export                     |
 

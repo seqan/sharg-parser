@@ -171,7 +171,7 @@ option (SHARG_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-    "#if !defined (__cplusplus) || (__cplusplus < 201709L)
+    "#if !defined (__cplusplus) || (__cplusplus < 202002)
     #error NOCXX20
     #endif
     int main() {}")

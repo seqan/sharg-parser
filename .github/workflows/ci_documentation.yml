@@ -1,0 +1,61 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      # Push events to branches matching refs/heads/main
+      - 'main'
+      # Push events to branches matching refs/heads/release*
+      - 'release*'
+  # Trigger after PR was unlabeled
+  pull_request:
+    types:
+      - unlabeled
+  # Enables a manual trigger, may run on any branch
+  workflow_dispatch:
+
+concurrency:
+  group: documentation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: Documentation
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Install CMake
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.16.9
+
+      - name: Install Doxygen
+        uses: seqan/actions/setup-doxygen@main
+        with:
+          doxygen: 1.9.5
+
+      - name: Configure tests
+        run: |
+          mkdir build
+          cd build
+          cmake ../test/documentation
+          make -j2 download-cppreference-doxygen-web-tag
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j2 --output-on-failure
