@@ -45,7 +45,7 @@ std::string const basic_version_str = "VERSION\n"
 
 std::string license_text()
 {
-    std::ifstream license_file{std::string{{SHARG_TEST_LICENSE_DIR}} + "/LICENSE.md"};
+    std::ifstream license_file{std::string{SHARG_TEST_LICENSE_DIR} + "/LICENSE.md"};
     EXPECT_TRUE(license_file) << "Could not open file '" SHARG_TEST_LICENSE_DIR "/LICENSE.md'";
     std::stringstream buffer;
     buffer << license_file.rdbuf();
