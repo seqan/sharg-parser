@@ -118,7 +118,7 @@ public:
 
 private:
     //!/brief The path of the managed directory.
-    std::filesystem::path const directory_path;
+    std::filesystem::path directory_path;
 
     /*!\brief Tries to remove the directory.
      */

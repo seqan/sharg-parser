@@ -346,6 +346,11 @@ if (SHARG_FOUND AND NOT TARGET sharg::sharg)
     add_library (sharg_sharg INTERFACE)
     target_compile_definitions (sharg_sharg INTERFACE ${SHARG_DEFINITIONS})
     target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS_LIST})
+
+    # Include TDL as system header to suppress warnings.
+    get_target_property (tdl_include_dir tdl::tdl INTERFACE_INCLUDE_DIRECTORIES)
+    target_include_directories (sharg_sharg SYSTEM INTERFACE ${tdl_include_dir})
+
     target_link_libraries (sharg_sharg INTERFACE "${SHARG_LIBRARIES}" tdl::tdl)
     # include sharg/include/ as -I, because sharg should never produce warnings.
     target_include_directories (sharg_sharg INTERFACE "${SHARG_INCLUDE_DIR}")
