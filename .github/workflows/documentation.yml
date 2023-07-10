@@ -12,8 +12,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  CMAKE_VERSION: 3.16.9
-  DOXYGEN_VERSION: 1.9.5
   TZ: Europe/Berlin
 
 defaults:
@@ -42,15 +40,15 @@ jobs:
           fetch-depth: 1
           submodules: false
 
-      - name: Configure APT
-        continue-on-error: true
-        run: bash ./seqan3/.github/workflows/scripts/configure_apt.sh
-
       - name: Install CMake
-        run: bash ./seqan3/.github/workflows/scripts/install_cmake.sh
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.16.9
 
       - name: Install Doxygen
-        run: bash ./seqan3/.github/workflows/scripts/install_doxygen.sh
+        uses: seqan/actions/setup-doxygen@main
+        with:
+          doxygen: 1.9.5
 
       - name: Load cached documentation
         uses: actions/cache@v3

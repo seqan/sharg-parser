@@ -1,4 +1,4 @@
-name: CI on Linux
+name: Coverage
 
 on:
   push:
@@ -20,29 +20,27 @@ concurrency:
   cancel-in-progress: false # PRs will be canceled by the clang-format CI
 
 env:
-  CMAKE_VERSION: 3.16.9
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
 defaults:
   run:
-    shell: bash -ex {0}
+    shell: bash -Eexuo pipefail {0}
 
 jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ubuntu-22.04
     timeout-minutes: 120
-    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: true
       matrix:
         include:
-          - name: "Coverage gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "gcc13"
+            compiler: "gcc-13"
             build: coverage
-            build_type: Debug
+            build_type: Coverage
 
     steps:
       # How many commits do we need to fetch to also fetch the branch point?
@@ -57,58 +55,23 @@ jobs:
           fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
           submodules: true
 
-      # To reuse scripts
-      - name: Checkout SeqAn3
-        uses: actions/checkout@v3
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
         with:
-          repository: seqan/seqan3
-          ref: aa3df18a6df59679e07e9fe2de4e0998a94af7e7
-          path: seqan3
-          fetch-depth: 1
-          submodules: false
-
-      - name: Configure APT
-        continue-on-error: true
-        run: bash ./seqan3/.github/workflows/scripts/configure_apt.sh
+          compiler: ${{ matrix.compiler }}
+          ccache_size: 125M
 
       - name: Install CMake
-        run: bash ./seqan3/.github/workflows/scripts/install_cmake.sh
-
-      - name: Install ccache
-        run: |
-          conda install --yes --override-channels --channel conda-forge ccache
-          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
-
-      - name: Install compiler ${{ matrix.cxx }}
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.16.9
 
       - name: Install gcovr
-        env:
-            CC: ${{ matrix.cc }}
         run: |
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==5.0
-
-      - name: Load ccache
-        uses: actions/cache@v3
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
-          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
-            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
-            ${{ runner.os }}-${{ matrix.name }}-ccache-
-
-      - name: Tool versions
-        run: |
-          env cmake --version
-          env ${{ matrix.cxx }} --version
+          pip install gcovr==6.0
 
       - name: Configure tests
-        env:
-            CXX: ${{ matrix.cxx }}
-            CC: ${{ matrix.cc }}
         run: |
           mkdir sharg-build
           cd sharg-build
@@ -120,13 +83,8 @@ jobs:
 
       - name: Build tests
         env:
-          CCACHE_BASEDIR: ${{ github.workspace }}
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
-          CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 125M
           CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
-          GCOV: ${{ github.workspace }}/seqan3/.github/workflows/scripts/gcov.sh
+          GCOV: ${{ github.workspace }}/sharg/.github/workflows/scripts/gcov.sh
         run: |
           ccache -z
           cd sharg-build
