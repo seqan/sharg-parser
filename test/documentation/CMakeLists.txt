@@ -6,13 +6,15 @@
 # --------------------------------------------------------------------------------------------------------
 
 # Minimum cmake version
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required (VERSION 3.7)
 
 ### Find sharg
 include (../../build_system/sharg-config-version.cmake)
 set (SHARG_VERSION "${PACKAGE_VERSION}")
 
-project (sharg LANGUAGES NONE VERSION "${SHARG_PROJECT_VERSION}")
+project (sharg
+         LANGUAGES NONE
+         VERSION "${SHARG_PROJECT_VERSION}")
 
 if (NOT EXISTS "${SHARG_INCLUDE_DIR}/sharg/version.hpp")
     message (FATAL_ERROR "Could not find sharg. Not building documentation.")
@@ -26,11 +28,11 @@ include (sharg-doxygen.cmake)
 enable_testing ()
 
 if (SHARG_USER_DOC)
-    add_subdirectory(doc_usr)
+    add_subdirectory (doc_usr)
 endif ()
 
 if (SHARG_DEV_DOC)
-    add_subdirectory(doc_dev)
+    add_subdirectory (doc_dev)
 endif ()
 
 include (sharg-doxygen-package.cmake)

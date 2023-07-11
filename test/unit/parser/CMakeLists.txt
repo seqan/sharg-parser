@@ -1,4 +1,4 @@
-sharg_test(enumeration_names_test.cpp)
-sharg_test(format_parse_test.cpp)
-sharg_test(format_parse_validators_test.cpp)
-sharg_test(parser_design_error_test.cpp)
+sharg_test (enumeration_names_test.cpp)
+sharg_test (format_parse_test.cpp)
+sharg_test (format_parse_validators_test.cpp)
+sharg_test (parser_design_error_test.cpp)

@@ -17,7 +17,7 @@ macro (sharg_header_test component header_base_path exclude_regex)
 
     if (NOT ";${exclude_regex};" STREQUAL ";;")
         list (FILTER header_files EXCLUDE REGEX "${exclude_regex}")
-    endif()
+    endif ()
 
     file (WRITE "${PROJECT_BINARY_DIR}/${target}.cpp" "")
     add_executable (${target} ${PROJECT_BINARY_DIR}/${target}.cpp)
@@ -29,21 +29,21 @@ macro (sharg_header_test component header_base_path exclude_regex)
         sharg_test_component (header_target_name "${header}" TARGET_UNIQUE_NAME)
 
         foreach (header_sub_test "header-guard" "no-self-include")
-            set (header_target_source "${PROJECT_BINARY_DIR}/${target}_files/${header_test_name}.hpp-${header_sub_test}.cpp")
+            set (header_target_source
+                 "${PROJECT_BINARY_DIR}/${target}_files/${header_test_name}.hpp-${header_sub_test}.cpp")
             set (header_target "${target}--${header_target_name}-${header_sub_test}")
 
             string (REPLACE "-" "__" header_test_name_safe "${target}, ${header_target}")
 
             add_custom_command (OUTPUT "${header_target_source}"
-                                COMMAND "${CMAKE_COMMAND}"
+                                COMMAND "${CMAKE_COMMAND}" #
                                         "-DHEADER_FILE_ABSOLUTE=${header_base_path}/${header}"
                                         "-DHEADER_FILE_INCLUDE=${header}"
                                         "-DHEADER_TARGET_SOURCE=${header_target_source}"
                                         "-DHEADER_TEST_NAME_SAFE=${header_test_name_safe}"
-                                        "-DHEADER_COMPONENT=${component}"
-                                        "-DHEADER_SUB_TEST=${header_sub_test}"
-                                        "-P"
-                                        "${CMAKE_CURRENT_SOURCE_DIR}/generate_header_source.cmake"
+                                        "-DHEADER_COMPONENT=${component}" #
+                                        "-DHEADER_SUB_TEST=${header_sub_test}" #
+                                        "-P" "${CMAKE_CURRENT_SOURCE_DIR}/generate_header_source.cmake"
                                 DEPENDS "${header_base_path}/${header}"
                                         "${CMAKE_CURRENT_SOURCE_DIR}/generate_header_source.cmake")
             add_library (${header_target} OBJECT "${header_target_source}")

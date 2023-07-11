@@ -22,10 +22,8 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
 
     add_executable (${target} "${snippet_base_path}/${snippet}")
     target_link_libraries (${target} PUBLIC snippet_main)
-    set_target_properties(${target}
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${snippet_target_path}"
-    )
+    set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                                                "${CMAKE_CURRENT_BINARY_DIR}/${snippet_target_path}")
     collect_used_snippet (${target})
 
     set (snippet_test_target "${test_name_prefix}/${snippet_test_name}_snippet")
@@ -37,10 +35,9 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
     set (snippet_compare_test_target "${test_name_prefix}/${snippet_test_name}_snippet_cmp_output")
 
     add_test (NAME "${snippet_compare_test_target}"
-              COMMAND ${CMAKE_COMMAND}
-                      -DTARGET_FILE=$<TARGET_FILE:${target}>
-                      -DSOURCE_FILE=${snippet_base_path}/${snippet}
-                      -P "${CMAKE_SOURCE_DIR}/compare_snippet_output.cmake")
+              COMMAND ${CMAKE_COMMAND} -DTARGET_FILE=$<TARGET_FILE:${target}>
+                      -DSOURCE_FILE=${snippet_base_path}/${snippet} -P
+                      "${CMAKE_SOURCE_DIR}/compare_snippet_output.cmake")
 
     # disable version checker, as it interferes with comparing the snippet output
     set_tests_properties ("${snippet_compare_test_target}" PROPERTIES ENVIRONMENT SHARG_NO_VERSION_CHECK=0)
@@ -52,11 +49,12 @@ macro (sharg_snippet test_name_prefix snippet snippet_base_path)
 endmacro ()
 
 macro (sharg_snippets test_name_prefix snippet_base_path_)
-    get_filename_component(snippet_base_path "${snippet_base_path_}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+    get_filename_component (snippet_base_path "${snippet_base_path_}" ABSOLUTE BASE_DIR
+                            "${CMAKE_CURRENT_SOURCE_DIR}/../..")
     message (STATUS "${snippet_base_path}")
     sharg_test_files (snippet_files "${snippet_base_path}" "*.cpp")
     foreach (snippet ${snippet_files})
-        sharg_snippet("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
+        sharg_snippet ("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
     endforeach ()
 endmacro ()
 
@@ -68,4 +66,3 @@ sharg_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
 
 list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}")
 list_unused_snippets ("${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
-

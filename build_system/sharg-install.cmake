@@ -26,4 +26,3 @@ install (FILES "${SHARG_CLONE_DIR}/build_system/sharg-config.cmake"
 
 # install sharg header files in /include/sharg
 install (DIRECTORY "${SHARG_INCLUDE_DIR}/sharg" TYPE INCLUDE)
-

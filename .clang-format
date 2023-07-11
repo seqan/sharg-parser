@@ -1,5 +1,5 @@
 # Format all files in include folder, including std module, excluding contrib module
-# find . \( -path "./include/seqan3/std/*" -or -iname "*.hpp" \) -and -not -path "./submodules/*" -and -not -path "./build/*" -and -not -path "./include/seqan3/contrib/*" -and -not -path "./test/*" | xargs clang-format-15 --style=file -i
+# find . \( -iname "*.hpp" -or -iname "*.cpp" \) -and -not -path "./submodules/*" -and -not -path "./build/*" | xargs clang-format-15 --style=file -i
 ---
 Language:        Cpp
 AccessModifierOffset: -4

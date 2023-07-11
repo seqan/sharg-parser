@@ -16,10 +16,12 @@ include (diagnostics/list_unused_unit_tests)
 include (include_dependencies/add_include_dependencies)
 
 option (SHARG_VERBOSE_TESTS "Run each test case individually" ON)
-option (SHARG_USE_INCLUDE_DEPENDENCIES "Build tests in an hierarchical order (by an include graph, i.e. tests with less dependencies are build first)" OFF)
+option (SHARG_USE_INCLUDE_DEPENDENCIES
+        "Build tests in an hierarchical order (by an include graph, i.e. tests with less dependencies are build first)"
+        OFF)
 
 macro (sharg_test unit_test_cpp)
-    cmake_parse_arguments(SHARG_TEST "" "" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
+    cmake_parse_arguments (SHARG_TEST "" "" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
 
     file (RELATIVE_PATH unit_test "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_LIST_DIR}/${unit_test_cpp}")
     sharg_test_component (target "${unit_test}" TARGET_NAME)
@@ -30,7 +32,11 @@ macro (sharg_test unit_test_cpp)
     add_include_dependencies (${target} "${SHARG_TEST_CYCLIC_DEPENDING_INCLUDES}")
     collect_used_test (${target})
     if (SHARG_VERBOSE_TESTS)
-        gtest_discover_tests(${target} TEST_PREFIX "${test_name}::" PROPERTIES TIMEOUT "30")
+        gtest_discover_tests (
+            ${target}
+            TEST_PREFIX "${test_name}::"
+            PROPERTIES
+            TIMEOUT "30")
     else ()
         add_test (NAME "${test_name}" COMMAND ${target})
     endif ()
@@ -45,5 +51,5 @@ sharg_require_test ()
 
 add_subdirectories ()
 
-list_missing_unit_tests()
+list_missing_unit_tests ()
 list_unused_unit_tests ()

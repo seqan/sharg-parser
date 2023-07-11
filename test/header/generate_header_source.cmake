@@ -18,13 +18,15 @@ if (HEADER_SUB_TEST STREQUAL "no-self-include")
     file (APPEND "${HEADER_TARGET_SOURCE}" "${header_content}")
 else ()
     # this test ensures that a header guard is in place
-    file (APPEND "${HEADER_TARGET_SOURCE}" "
+    file (APPEND "${HEADER_TARGET_SOURCE}"
+          "
 #include <${HEADER_FILE_INCLUDE}>
 #include <${HEADER_FILE_INCLUDE}>")
-endif()
+endif ()
 
 # these includes are required by some headers (note that they follow)
-file (APPEND "${HEADER_TARGET_SOURCE}" "
+file (APPEND "${HEADER_TARGET_SOURCE}"
+      "
 #include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
 TEST(${HEADER_TEST_NAME_SAFE}) {}")
@@ -34,7 +36,8 @@ if ("${HEADER_COMPONENT}" MATCHES "sharg")
 
     # exclude sharg/std/* and sharg/version.hpp from platform test
     if (NOT HEADER_FILE_INCLUDE MATCHES "sharg/(std/|version.hpp)")
-        file (APPEND "${HEADER_TARGET_SOURCE}" "
+        file (APPEND "${HEADER_TARGET_SOURCE}"
+              "
 #ifndef SHARG_DOXYGEN_ONLY
 #error \"Your header '${HEADER_FILE_INCLUDE}' file is missing #include <sharg/platform.hpp>\"
 #endif")
@@ -43,7 +46,8 @@ if ("${HEADER_COMPONENT}" MATCHES "sharg")
     # sharg/std/* must not include platform.hpp (and therefore any other sharg header)
     # See https://github.com/seqan/product_backlog/issues/135
     if (HEADER_FILE_INCLUDE MATCHES "sharg/std/")
-        file (APPEND "${HEADER_TARGET_SOURCE}" "
+        file (APPEND "${HEADER_TARGET_SOURCE}"
+              "
 #ifdef SHARG_DOXYGEN_ONLY
 #error \"The standard header '${HEADER_FILE_INCLUDE}' file MUST NOT include any other sharg header\"
 #endif")
@@ -52,7 +56,8 @@ if ("${HEADER_COMPONENT}" MATCHES "sharg")
     # test whether sharg has the visibility bug on lower gcc versions
     # https://github.com/seqan/seqan3/issues/1317
     if (NOT HEADER_FILE_INCLUDE MATCHES "sharg/version.hpp")
-        file (APPEND "${HEADER_TARGET_SOURCE}" "
+        file (APPEND "${HEADER_TARGET_SOURCE}"
+              "
 #include <sharg/platform.hpp>
 class A{ int i{5}; };
 
