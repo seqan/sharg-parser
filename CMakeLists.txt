@@ -17,11 +17,10 @@ list (APPEND CMAKE_MODULE_PATH "${SHARG_MODULE_PATH}")
 include (sharg-config-version)
 
 project (sharg
-            LANGUAGES CXX
-            VERSION "${SHARG_PROJECT_VERSION}"
-            DESCRIPTION "Sharg -- hungrily eating away your arguments"
-            HOMEPAGE_URL "https://github.com/seqan/sharg-parser"
-)
+         LANGUAGES CXX
+         VERSION "${SHARG_PROJECT_VERSION}"
+         DESCRIPTION "Sharg -- hungrily eating away your arguments"
+         HOMEPAGE_URL "https://github.com/seqan/sharg-parser")
 
 find_package (Sharg 1.0 REQUIRED HINTS ${SHARG_MODULE_PATH})
 

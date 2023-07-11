@@ -67,8 +67,8 @@ cmake_minimum_required (VERSION 3.4...3.12)
 # ----------------------------------------------------------------------------
 
 # make output globally quiet if required by find_package, this effects cmake functions like `check_*`
-set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
-set(CMAKE_REQUIRED_QUIET ${${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY})
+set (CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
+set (CMAKE_REQUIRED_QUIET ${${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY})
 
 # ----------------------------------------------------------------------------
 # Greeter
@@ -118,7 +118,9 @@ endmacro ()
 # Note that sharg-config.cmake can be standalone and thus SHARG_CLONE_DIR might be empty.
 # * `SHARG_CLONE_DIR` was already found in sharg-config-version.cmake
 # * `SHARG_INCLUDE_DIR` was already found in sharg-config-version.cmake
-find_path (SHARG_SUBMODULES_DIR NAMES submodules/tool_description_lib HINTS "${SHARG_CLONE_DIR}" "${SHARG_INCLUDE_DIR}/sharg")
+find_path (SHARG_SUBMODULES_DIR
+           NAMES submodules/tool_description_lib
+           HINTS "${SHARG_CLONE_DIR}" "${SHARG_INCLUDE_DIR}/sharg")
 
 if (SHARG_INCLUDE_DIR)
     sharg_config_print ("SHARG include dir found:   ${SHARG_INCLUDE_DIR}")
@@ -150,10 +152,10 @@ endif ()
 # ----------------------------------------------------------------------------
 
 # deactivate messages in check_*
-set (CMAKE_REQUIRED_QUIET       1)
+set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES    ${CMAKE_INCLUDE_PATH} ${SHARG_INCLUDE_DIR} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
-set (CMAKE_REQUIRED_FLAGS       ${CMAKE_CXX_FLAGS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${SHARG_INCLUDE_DIR} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
+set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
 # Force-deactivate optional dependencies
@@ -161,7 +163,7 @@ set (CMAKE_REQUIRED_FLAGS       ${CMAKE_CXX_FLAGS})
 
 # These two are "opt-in", because detected by CMake
 # If you want to force-require these, just do find_package (zlib REQUIRED) before find_package (sharg)
-option (SHARG_NO_ZLIB  "Don't use ZLIB, even if present." OFF)
+option (SHARG_NO_ZLIB "Don't use ZLIB, even if present." OFF)
 option (SHARG_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 
 # ----------------------------------------------------------------------------
@@ -171,10 +173,10 @@ option (SHARG_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-    "#if !defined (__cplusplus) || (__cplusplus < 202002)
-    #error NOCXX20
-    #endif
-    int main() {}")
+     "#if !defined (__cplusplus) || (__cplusplus < 202002)
+      #error NOCXX20
+      #endif
+      int main() {}")
 
 check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CXX20_BUILTIN)
 
@@ -237,9 +239,9 @@ if (NOT SHARG_NO_ZLIB)
 endif ()
 
 if (ZLIB_FOUND)
-    set (SHARG_LIBRARIES         ${SHARG_LIBRARIES}         ${ZLIB_LIBRARIES})
-    set (SHARG_DEPENDENCY_INCLUDE_DIRS      ${SHARG_DEPENDENCY_INCLUDE_DIRS}      ${ZLIB_INCLUDE_DIRS})
-    set (SHARG_DEFINITIONS       ${SHARG_DEFINITIONS}       "-DSHARG_HAS_ZLIB=1")
+    set (SHARG_LIBRARIES ${SHARG_LIBRARIES} ${ZLIB_LIBRARIES})
+    set (SHARG_DEPENDENCY_INCLUDE_DIRS ${SHARG_DEPENDENCY_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_ZLIB=1")
     sharg_config_print ("Optional dependency:        ZLIB-${ZLIB_VERSION_STRING} found.")
 else ()
     sharg_config_print ("Optional dependency:        ZLIB not found.")
@@ -262,9 +264,9 @@ if (NOT ZLIB_FOUND AND BZIP2_FOUND)
 endif ()
 
 if (BZIP2_FOUND)
-    set (SHARG_LIBRARIES         ${SHARG_LIBRARIES}         ${BZIP2_LIBRARIES})
-    set (SHARG_DEPENDENCY_INCLUDE_DIRS      ${SHARG_DEPENDENCY_INCLUDE_DIRS}      ${BZIP2_INCLUDE_DIRS})
-    set (SHARG_DEFINITIONS       ${SHARG_DEFINITIONS}       "-DSHARG_HAS_BZIP2=1")
+    set (SHARG_LIBRARIES ${SHARG_LIBRARIES} ${BZIP2_LIBRARIES})
+    set (SHARG_DEPENDENCY_INCLUDE_DIRS ${SHARG_DEPENDENCY_INCLUDE_DIRS} ${BZIP2_INCLUDE_DIRS})
+    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_BZIP2=1")
     sharg_config_print ("Optional dependency:        BZip2-${BZIP2_VERSION_STRING} found.")
 else ()
     sharg_config_print ("Optional dependency:        BZip2 not found.")
@@ -275,9 +277,9 @@ endif ()
 # ----------------------------------------------------------------------------
 
 # librt
-if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
-    (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD") OR
-    (${CMAKE_SYSTEM_NAME} STREQUAL "GNU"))
+if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    OR (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
+    OR (${CMAKE_SYSTEM_NAME} STREQUAL "GNU"))
     set (SHARG_LIBRARIES ${SHARG_LIBRARIES} rt)
 endif ()
 
@@ -297,21 +299,19 @@ endif ()
 # Perform compilability test of platform.hpp (tests some requirements)
 # ----------------------------------------------------------------------------
 
-set (CXXSTD_TEST_SOURCE
-     "#include <sharg/platform.hpp>
+set (CXXSTD_TEST_SOURCE "#include <sharg/platform.hpp>
      int main() {}")
 
 # using try_compile instead of check_cxx_source_compiles to capture output in case of failure
 file (WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx" "${CXXSTD_TEST_SOURCE}\n")
 
-try_compile (SHARG_PLATFORM_TEST
-             ${CMAKE_BINARY_DIR}
+try_compile (SHARG_PLATFORM_TEST ${CMAKE_BINARY_DIR}
              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
-             CMAKE_FLAGS         "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${SHARG_CXX_FLAGS}"
-                                 "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SHARG_INCLUDE_DIR};${SHARG_DEPENDENCY_INCLUDE_DIRS}"
+             CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${SHARG_CXX_FLAGS}"
+                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SHARG_INCLUDE_DIR};${SHARG_DEPENDENCY_INCLUDE_DIRS}"
              COMPILE_DEFINITIONS ${SHARG_DEFINITIONS}
-             LINK_LIBRARIES      ${SHARG_LIBRARIES}
-             OUTPUT_VARIABLE     SHARG_PLATFORM_TEST_OUTPUT)
+             LINK_LIBRARIES ${SHARG_LIBRARIES}
+             OUTPUT_VARIABLE SHARG_PLATFORM_TEST_OUTPUT)
 
 if (SHARG_PLATFORM_TEST)
     sharg_config_print ("SHARG platform.hpp build:   passed.")
@@ -329,7 +329,17 @@ find_package_handle_standard_args (${CMAKE_FIND_PACKAGE_NAME} REQUIRED_VARS SHAR
 # Set SHARG_* variables with the content of ${CMAKE_FIND_PACKAGE_NAME}_(FOUND|...|VERSION)
 # This needs to be done, because `find_package(SHARG)` might be called in any case-sensitive way and we want to
 # guarantee that SHARG_* are always set.
-foreach (package_var FOUND DIR ROOT CONFIG VERSION VERSION_MAJOR VERSION_MINOR VERSION_PATCH VERSION_TWEAK VERSION_COUNT)
+foreach (package_var
+         FOUND
+         DIR
+         ROOT
+         CONFIG
+         VERSION
+         VERSION_MAJOR
+         VERSION_MINOR
+         VERSION_PATCH
+         VERSION_TWEAK
+         VERSION_COUNT)
     set (SHARG_${package_var} "${${CMAKE_FIND_PACKAGE_NAME}_${package_var}}")
 endforeach ()
 
@@ -363,24 +373,24 @@ endif ()
 set (CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
 
 if (SHARG_FIND_DEBUG)
-  message ("Result for ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
-  message ("")
-  message ("  CMAKE_BUILD_TYPE            ${CMAKE_BUILD_TYPE}")
-  message ("  CMAKE_SOURCE_DIR            ${CMAKE_SOURCE_DIR}")
-  message ("  CMAKE_INCLUDE_PATH          ${CMAKE_INCLUDE_PATH}")
-  message ("  SHARG_INCLUDE_DIR          ${SHARG_INCLUDE_DIR}")
-  message ("")
-  message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
-  message ("  SHARG_HAS_ZLIB             ${ZLIB_FOUND}")
-  message ("  SHARG_HAS_BZIP2            ${BZIP2_FOUND}")
-  message ("")
-  message ("  SHARG_INCLUDE_DIRS         ${SHARG_INCLUDE_DIRS}")
-  message ("  SHARG_LIBRARIES            ${SHARG_LIBRARIES}")
-  message ("  SHARG_DEFINITIONS          ${SHARG_DEFINITIONS}")
-  message ("  SHARG_CXX_FLAGS            ${SHARG_CXX_FLAGS}")
-  message ("")
-  message ("  SHARG_VERSION              ${SHARG_VERSION}")
-  message ("  SHARG_VERSION_MAJOR        ${SHARG_VERSION_MAJOR}")
-  message ("  SHARG_VERSION_MINOR        ${SHARG_VERSION_MINOR}")
-  message ("  SHARG_VERSION_PATCH        ${SHARG_VERSION_PATCH}")
+    message ("Result for ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
+    message ("")
+    message ("  CMAKE_BUILD_TYPE            ${CMAKE_BUILD_TYPE}")
+    message ("  CMAKE_SOURCE_DIR            ${CMAKE_SOURCE_DIR}")
+    message ("  CMAKE_INCLUDE_PATH          ${CMAKE_INCLUDE_PATH}")
+    message ("  SHARG_INCLUDE_DIR          ${SHARG_INCLUDE_DIR}")
+    message ("")
+    message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
+    message ("  SHARG_HAS_ZLIB             ${ZLIB_FOUND}")
+    message ("  SHARG_HAS_BZIP2            ${BZIP2_FOUND}")
+    message ("")
+    message ("  SHARG_INCLUDE_DIRS         ${SHARG_INCLUDE_DIRS}")
+    message ("  SHARG_LIBRARIES            ${SHARG_LIBRARIES}")
+    message ("  SHARG_DEFINITIONS          ${SHARG_DEFINITIONS}")
+    message ("  SHARG_CXX_FLAGS            ${SHARG_CXX_FLAGS}")
+    message ("")
+    message ("  SHARG_VERSION              ${SHARG_VERSION}")
+    message ("  SHARG_VERSION_MAJOR        ${SHARG_VERSION_MAJOR}")
+    message ("  SHARG_VERSION_MINOR        ${SHARG_VERSION_MINOR}")
+    message ("  SHARG_VERSION_PATCH        ${SHARG_VERSION_PATCH}")
 endif ()
