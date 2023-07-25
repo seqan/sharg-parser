@@ -1,0 +1,60 @@
+name: CMake
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: cmake-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+env:
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: "External project"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: sharg-parser
+          fetch-depth: 1
+          submodules: true
+
+      - name: Install CMake
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.16.9
+
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
+        with:
+          compiler: gcc-13
+          use_actions_cache: false
+
+      - name: Configure tests
+        run: |
+          mkdir sharg-build
+          cd sharg-build
+          cmake ../sharg-parser/test/external_project -DCMAKE_BUILD_TYPE=Debug
+          make -j2 sharg_test_prerequisite
+
+      - name: Build tests
+        run: |
+          cd sharg-build
+          make -k -j2
+
