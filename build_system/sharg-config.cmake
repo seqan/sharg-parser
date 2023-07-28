@@ -217,12 +217,7 @@ endif ()
 # ----------------------------------------------------------------------------
 # tool description lib (tdl) dependency
 # ----------------------------------------------------------------------------
-
-set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
-set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
 find_package (TDL QUIET HINTS ${SHARG_SUBMODULES_DIR}/submodules/tool_description_lib ${SHARG_HINT_TDL})
-set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
-unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
 
 if (TDL_FOUND)
     sharg_config_print ("Dependency:                 TDL found.")

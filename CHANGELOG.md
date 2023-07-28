@@ -18,6 +18,21 @@ The following API changes should be documented as such:
 If possible, provide tooling that performs the changes, e.g. a shell-script.
 -->
 
+# Release 1.1.1
+
+## Bug fixes
+
+* Fixed installation of Sharg via `make install` ([#202](https://github.com/seqan/sharg-parser/pull/202)).
+
+## API changes
+
+#### Compiler
+
+* Dropped support for gcc-10 ([#199](https://github.com/seqan/sharg-parser/pull/199)).
+* Added support for gcc-13 ([#199](https://github.com/seqan/sharg-parser/pull/199)).
+* Added support for clang-17 ([#197](https://github.com/seqan/sharg-parser/pull/197),
+  [#198](https://github.com/seqan/sharg-parser/pull/198)).
+
 # Release 1.1.0
 
 ## Features
@@ -25,9 +40,7 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 * We support Gitpod. [Click here](https://gitpod.io/#https://github.com/seqan/sharg-parser/)
   to try it out.
 * **CWL support** (Common Workflow Language): An app using Sharg can now automatically export a CWL tool
-  description file via `--export-help cwl` [#94](https://github.com/seqan/sharg-parser/pull/94).
-
-## API changes
+  description file via `--export-help cwl` ([#94](https://github.com/seqan/sharg-parser/pull/94)).
 
 ## Bug fixes
 
