@@ -18,6 +18,8 @@ The following API changes should be documented as such:
 If possible, provide tooling that performs the changes, e.g. a shell-script.
 -->
 
+# Release 1.1.2
+
 # Release 1.1.1
 
 ## Bug fixes
