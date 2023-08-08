@@ -16,7 +16,7 @@ TEST(format_cwl_test, empty_information)
     // Create the dummy parser.
     auto parser = sharg::parser{"default", argv.size(), argv.data()};
     parser.info.date = "December 01, 1994";
-    parser.info.version = "1.1.1";
+    parser.info.version = "1.1.2-rc.1";
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 
