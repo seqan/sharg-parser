@@ -48,7 +48,7 @@ jobs:
       - name: Install Doxygen
         uses: seqan/actions/setup-doxygen@main
         with:
-          doxygen: 1.9.5
+          doxygen: 1.9.6
 
       - name: Load cached documentation
         uses: actions/cache@v3
