@@ -1,4 +1,4 @@
-# Doxyfile 1.9.5
+# Doxyfile 1.9.6
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -134,6 +134,7 @@ WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_IF_INCOMPLETE_DOC = YES
 WARN_NO_PARAMDOC       = NO
+WARN_IF_UNDOC_ENUM_VAL = NO
 WARN_AS_ERROR          = NO
 WARN_FORMAT            = "$file:$line: $text"
 WARN_LINE_FORMAT       = "at line $line of file $file"
@@ -189,16 +190,21 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            =
+HTML_HEADER            = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_header.html
 HTML_FOOTER            = ${SHARG_DOXYGEN_OUTPUT_DIR}/sharg_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg.css \
-                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_dark.css
+HTML_EXTRA_STYLESHEET  = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome.css \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg.css
 ### Extra files that we can link to
-HTML_EXTRA_FILES       = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.js \
+HTML_EXTRA_FILES       = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js \
+                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.js \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.php \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/api-stability.js
-HTML_COLORSTYLE        = AUTO_LIGHT
+HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
 HTML_COLORSTYLE_GAMMA  = 80
@@ -229,17 +235,17 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 GENERATE_ECLIPSEHELP   = NO
 ECLIPSE_DOC_ID         = org.doxygen.Project
-DISABLE_INDEX          = YES
+DISABLE_INDEX          = NO
 GENERATE_TREEVIEW      = YES
 FULL_SIDEBAR           = NO
 ENUM_VALUES_PER_LINE   = 4
-TREEVIEW_WIDTH         = 250
+TREEVIEW_WIDTH         = 265
 EXT_LINKS_IN_WINDOW    = YES
 OBFUSCATE_EMAILS       = YES
 HTML_FORMULA_FORMAT    = png
 FORMULA_FONTSIZE       = 14
 FORMULA_MACROFILE      =
-USE_MATHJAX            = ${SHARG_DOXYGEN_USE_MATHJAX}
+USE_MATHJAX            = YES
 MATHJAX_VERSION        = MathJax_3
 MATHJAX_FORMAT         = HTML-CSS
 MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/

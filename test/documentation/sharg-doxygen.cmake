@@ -23,9 +23,6 @@ else ()
     set (SHARG_DOXYGEN_HAVE_DOT "YES")
 endif ()
 
-### Use mathjax instead of latex to render formulas.
-set (SHARG_DOXYGEN_USE_MATHJAX "NO")
-
 ### Number of threads to use for dot. Doxygen's default is 0 (all threads).
 set (SHARG_DOXYGEN_DOT_NUM_THREADS "0")
 
@@ -40,7 +37,6 @@ option (SHARG_DEV_DOC "Create build target and test for developer documentation.
 option (SHARG_VERCEL_PREVIEW_DOC "Is this a preview build by vercel.com?" OFF)
 
 if (SHARG_VERCEL_PREVIEW_DOC)
-    set (SHARG_DOXYGEN_USE_MATHJAX "YES")
     set (SHARG_DOXYGEN_DOT_NUM_THREADS "2")
     set (SHARG_DOXYFILE_OPTION_POWERED_BY_VERCEL
          "HTML_EXTRA_FILES       += ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")
