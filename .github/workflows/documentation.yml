@@ -26,13 +26,13 @@ jobs:
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
       # To reuse scripts
       - name: Checkout SeqAn3
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: seqan/seqan3
           ref: aa3df18a6df59679e07e9fe2de4e0998a94af7e7
