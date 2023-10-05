@@ -18,8 +18,7 @@
 #include <sharg/detail/format_base.hpp>
 #include <sharg/validators.hpp>
 
-#include <tdl/ParamDocumentToCTD.h>
-#include <tdl/ParamDocumentToCWL.h>
+#include <tdl/tdl.h>
 
 namespace sharg::detail
 {
@@ -81,11 +80,12 @@ public:
     std::vector<std::function<void(std::string_view)>> positional_option_calls; // singled out to be printed on top
     //!\brief Keeps track of the number of positional options
     unsigned positional_option_count{0};
-    //!\brief The names of subcommand programs.
-    std::vector<std::string> command_names{};
 
     //!\brief TDL DS filled with tool meta information
     tdl::ToolInfo info;
+
+    //!\brief all collected parameters
+    tdl::Node::Children parameters;
 
     //!\brief Targeted tool description format
     FileFormat fileFormat;
@@ -170,7 +170,7 @@ public:
                         tags.insert("output");
                     }
 
-                    info.params.push_back(tdl::Node{
+                    parameters.push_back(tdl::Node{
                         .name = config.long_id,
                         .description = description,
                         .tags = std::move(tags),
@@ -185,7 +185,7 @@ public:
             store_help_page_element(
                 [this, config, value, description, tags](std::string_view)
                 {
-                    info.params.push_back(tdl::Node{
+                    parameters.push_back(tdl::Node{
                         .name = config.long_id,
                         .description = description,
                         .tags = std::move(tags),
@@ -206,7 +206,7 @@ public:
         store_help_page_element(
             [this, config, value](std::string_view)
             {
-                info.params.push_back(tdl::Node{
+                parameters.push_back(tdl::Node{
                     .name = config.long_id,
                     .description = config.description,
                     .tags = {},
@@ -236,7 +236,7 @@ public:
                                                                 : std::string{" "})
                     + msg;
 
-                info.params.push_back(tdl::Node{
+                parameters.push_back(tdl::Node{
                     .name = id,
                     .description = description,
                     .tags = {},
@@ -286,13 +286,13 @@ public:
         }
         for (size_t i{1}; i < executable_name.size(); ++i)
         {
-            auto name = "subcommand_" + std::to_string(i);
-            info.params.push_back(tdl::Node{
-                .name = name,
-                .value = tdl::StringValue(executable_name[i]),
-            });
-            info.cliMapping.emplace_back("", name);
+            parameters = {tdl::Node{
+                .name = executable_name[executable_name.size() - i],
+                .tags = {"basecommand"},
+                .value = parameters,
+            }};
         }
+        info.params = std::move(parameters);
 
         if (fileFormat == FileFormat::CTD)
         {
