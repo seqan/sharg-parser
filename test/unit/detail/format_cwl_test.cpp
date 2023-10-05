@@ -20,12 +20,12 @@ TEST(format_cwl_test, empty_information)
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 
-    std::string expected_short = "inputs:\n"
-                                 "  {}\n"
-                                 "outputs:\n"
-                                 "  {}\n"
-                                 "label: default\n"
+    std::string expected_short = "label: default\n"
                                  "doc: \"\"\n"
+                                 "inputs:\n"
+                                 "  []\n"
+                                 "outputs:\n"
+                                 "  []\n"
                                  "cwlVersion: v1.2\n"
                                  "class: CommandLineTool\n"
                                  "baseCommand:\n"
@@ -75,7 +75,9 @@ TEST(format_cwl_test, full_information)
     parser.info.examples.push_back("example");
     parser.info.examples.push_back("example2");
 
-    std::string expected_short = "inputs:\n"
+    std::string expected_short = "label: default\n"
+                                 "doc: \"description\\ndescription2\\n\"\n"
+                                 "inputs:\n"
                                  "  int:\n"
                                  "    doc: \"this is a int option. Default: 5. \"\n"
                                  "    type: long?\n"
@@ -87,9 +89,7 @@ TEST(format_cwl_test, full_information)
                                  "    inputBinding:\n"
                                  "      prefix: --jint\n"
                                  "outputs:\n"
-                                 "  {}\n"
-                                 "label: default\n"
-                                 "doc: \"description\\ndescription2\\n\"\n"
+                                 "  []\n"
                                  "cwlVersion: v1.2\n"
                                  "class: CommandLineTool\n"
                                  "baseCommand:\n"
@@ -193,6 +193,8 @@ TEST(format_cwl_test, subparser)
     sub_parser.info.examples.push_back("example2");
 
     std::string expected_short =
+        "label: default-index\n"
+        "doc: \"\"\n"
         "inputs:\n"
         "  int:\n"
         "    doc: \"this is a int option. Default: 5. \"\n"
@@ -251,8 +253,6 @@ TEST(format_cwl_test, subparser)
         "    type: Directory?\n"
         "    outputBinding:\n"
         "      glob: $(inputs.path05)\n"
-        "label: default-index\n"
-        "doc: \"\"\n"
         "cwlVersion: v1.2\n"
         "class: CommandLineTool\n"
         "baseCommand:\n"
