@@ -158,15 +158,6 @@ set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${SHARG_INCLUDE_DIR} ${SHARG_
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
-# Force-deactivate optional dependencies
-# ----------------------------------------------------------------------------
-
-# These two are "opt-in", because detected by CMake
-# If you want to force-require these, just do find_package (zlib REQUIRED) before find_package (sharg)
-option (SHARG_NO_ZLIB "Don't use ZLIB, even if present." OFF)
-option (SHARG_NO_BZIP2 "Don't use BZip2, even if present." OFF)
-
-# ----------------------------------------------------------------------------
 # Require C++20
 # ----------------------------------------------------------------------------
 
@@ -223,48 +214,6 @@ if (TDL_FOUND)
     sharg_config_print ("Dependency:                 TDL found.")
 else ()
     sharg_config_error ("Dependency:                 TDL not found.")
-endif ()
-
-# ----------------------------------------------------------------------------
-# ZLIB dependency
-# ----------------------------------------------------------------------------
-
-if (NOT SHARG_NO_ZLIB)
-    find_package (ZLIB QUIET)
-endif ()
-
-if (ZLIB_FOUND)
-    set (SHARG_LIBRARIES ${SHARG_LIBRARIES} ${ZLIB_LIBRARIES})
-    set (SHARG_DEPENDENCY_INCLUDE_DIRS ${SHARG_DEPENDENCY_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
-    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_ZLIB=1")
-    sharg_config_print ("Optional dependency:        ZLIB-${ZLIB_VERSION_STRING} found.")
-else ()
-    sharg_config_print ("Optional dependency:        ZLIB not found.")
-endif ()
-
-# ----------------------------------------------------------------------------
-# BZip2 dependency
-# ----------------------------------------------------------------------------
-
-if (NOT SHARG_NO_BZIP2)
-    find_package (BZip2 QUIET)
-endif ()
-
-if (NOT ZLIB_FOUND AND BZIP2_FOUND)
-    # NOTE (marehr): iostream_bzip2 uses the type `uInt`, which is defined by
-    # `zlib`. Therefore, `bzip2` will cause a ton of errors without `zlib`.
-    message (AUTHOR_WARNING "Disabling BZip2 [which was successfully found], "
-                            "because ZLIB was not found. BZip2 depends on ZLIB.")
-    unset (BZIP2_FOUND)
-endif ()
-
-if (BZIP2_FOUND)
-    set (SHARG_LIBRARIES ${SHARG_LIBRARIES} ${BZIP2_LIBRARIES})
-    set (SHARG_DEPENDENCY_INCLUDE_DIRS ${SHARG_DEPENDENCY_INCLUDE_DIRS} ${BZIP2_INCLUDE_DIRS})
-    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_BZIP2=1")
-    sharg_config_print ("Optional dependency:        BZip2-${BZIP2_VERSION_STRING} found.")
-else ()
-    sharg_config_print ("Optional dependency:        BZip2 not found.")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -376,8 +325,6 @@ if (SHARG_FIND_DEBUG)
     message ("  SHARG_INCLUDE_DIR          ${SHARG_INCLUDE_DIR}")
     message ("")
     message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
-    message ("  SHARG_HAS_ZLIB             ${ZLIB_FOUND}")
-    message ("  SHARG_HAS_BZIP2            ${BZIP2_FOUND}")
     message ("")
     message ("  SHARG_INCLUDE_DIRS         ${SHARG_INCLUDE_DIRS}")
     message ("  SHARG_LIBRARIES            ${SHARG_LIBRARIES}")
