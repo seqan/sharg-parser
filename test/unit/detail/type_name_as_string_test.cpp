@@ -51,7 +51,11 @@ public:
         else if constexpr (std::is_same_v<param_type, foo::bar<char> const &>)
             return "foo::bar<char> const &";
         else if constexpr (std::is_same_v<param_type, foo::bar<foo::bar<char, double>>>)
+#ifdef _LIBCPP_VERSION
+            return "foo::bar<foo::bar<char, double>>";
+#else
             return "foo::bar<foo::bar<char, double> >";
+#endif
         else
             throw std::runtime_error{"Encountered unknown type in test."};
     }
