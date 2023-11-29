@@ -36,11 +36,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: "Snippet clang17"
+            compiler: "clang-17"
+            build: snippet
+            build_type: Release
+            cxx_flags: "-stdlib=libc++"
+            test_threads: 1
+
           - name: "Snippet gcc11"
             compiler: "gcc-11"
             build: snippet
             build_type: Release
             test_threads: 1 # snippets create and delete files and some separate tests create/delete the same files
+
+          - name: "Header clang17"
+            compiler: "clang-17"
+            build: header
+            build_type: Release
+            cxx_flags: "-stdlib=libc++"
+            test_threads: 2
 
           - name: "Header gcc13"
             compiler: "gcc-13"
@@ -78,6 +92,7 @@ jobs:
           mkdir sharg-build
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                                  -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
                                                   -DSHARG_VERBOSE_TESTS=OFF
           case "${{ matrix.build }}" in
             snippet) make -j2 gtest_build yaml-cpp;;

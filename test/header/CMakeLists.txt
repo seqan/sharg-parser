@@ -21,7 +21,7 @@ macro (sharg_header_test component header_base_path exclude_regex)
 
     file (WRITE "${PROJECT_BINARY_DIR}/${target}.cpp" "")
     add_executable (${target} ${PROJECT_BINARY_DIR}/${target}.cpp)
-    target_link_libraries (${target} sharg::test::header)
+    target_link_libraries (${target} sharg::test sharg::test::header)
     add_test (NAME "header/${target}" COMMAND ${target})
 
     foreach (header ${header_files})
@@ -48,7 +48,10 @@ macro (sharg_header_test component header_base_path exclude_regex)
                                         "${CMAKE_CURRENT_SOURCE_DIR}/generate_header_source.cmake")
             add_library (${header_target} OBJECT "${header_target_source}")
 
-            target_link_libraries (${header_target} sharg::test::header)
+            # Link sharg::test first, even though it is also linked by sharg::test:header.
+            # Without this, the compile options of sharg::test are appended, e.g.,
+            # `-Wno-error=... -Werror -Wall`, instead of `-Werror -Wall -Wno-error=...`
+            target_link_libraries (${header_target} sharg::test sharg::test::header)
 
             target_sources (${target} PRIVATE $<TARGET_OBJECTS:${header_target}>)
         endforeach ()
