@@ -117,7 +117,12 @@ struct format_man_test : public ::testing::Test
                            "\n"
                            R"(\fB--export-help\fP (std::string))"
                            "\n"
-                           R"(Export the help page information. Value must be one of [html, man, ctd, cwl].)"
+                           R"(Export the help page information. Value must be one of )"
+#if SHARG_HAS_TDL
+                           "[html, man, ctd, cwl]."
+#else
+                           "[html, man]."
+#endif
                            "\n"
                            R"(.TP)"
                            "\n"
@@ -230,7 +235,12 @@ TEST_F(format_man_test, empty_information)
                                  "\n"
                                  R"(\fB--export-help\fP (std::string))"
                                  "\n"
-                                 R"(Export the help page information. Value must be one of [html, man, ctd, cwl].)"
+                                 R"(Export the help page information. Value must be one of )"
+#if SHARG_HAS_TDL
+                                 "[html, man, ctd, cwl]."
+#else
+                                 "[html, man]."
+#endif
                                  "\n"
                                  R"(.TP)"
                                  "\n"

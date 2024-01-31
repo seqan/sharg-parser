@@ -9,6 +9,12 @@
 
 #include <sharg/parser.hpp>
 
+#if !SHARG_HAS_TDL
+TEST(format_cwl_test, skipped)
+{
+    GTEST_SKIP() << "TDL is not available.";
+}
+#else
 TEST(format_cwl_test, empty_information)
 {
     auto argv = std::array{"./format_cwl_test", "--version-check", "false", "--export-help", "cwl"};
@@ -265,3 +271,4 @@ TEST(format_cwl_test, subparser)
     auto my_stdout = testing::internal::GetCapturedStdout();
     EXPECT_EQ(my_stdout, expected_short);
 }
+#endif

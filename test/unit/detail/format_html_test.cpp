@@ -42,7 +42,12 @@ TEST(html_format, empty_information)
                     "<dt><strong>--copyright</strong></dt>\n"
                     "<dd>Prints the copyright/license information.</dd>\n"
                     "<dt><strong>--export-help</strong> (std::string)</dt>\n"
-                    "<dd>Export the help page information. Value must be one of [html, man, ctd, cwl].</dd>\n"
+                    "<dd>Export the help page information. Value must be one of "
+#if SHARG_HAS_TDL
+                    "[html, man, ctd, cwl].</dd>\n"
+#else
+                    "[html, man].</dd>\n"
+#endif
                     "<dt><strong>--version-check</strong> (bool)</dt>\n"
                     "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
                     "</dl>\n"
@@ -164,7 +169,12 @@ TEST(html_format, full_information_information)
         "<dt><strong>--copyright</strong></dt>\n"
         "<dd>Prints the copyright/license information.</dd>\n"
         "<dt><strong>--export-help</strong> (std::string)</dt>\n"
-        "<dd>Export the help page information. Value must be one of [html, man, ctd, cwl].</dd>\n"
+        "<dd>Export the help page information. Value must be one of "
+#if SHARG_HAS_TDL
+        "[html, man, ctd, cwl].</dd>\n"
+#else
+        "[html, man].</dd>\n"
+#endif
         "<dt><strong>--version-check</strong> (bool)</dt>\n"
         "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
         "</dl>\n"

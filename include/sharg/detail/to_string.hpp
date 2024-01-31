@@ -20,6 +20,14 @@
 namespace sharg::detail
 {
 
+//!\brief A string containing all supported export formats.
+static std::string const supported_exports =
+#if SHARG_HAS_TDL
+    "[html, man, ctd, cwl]";
+#else
+    "[html, man]";
+#endif
+
 /*!\brief Streams all parameters via std::ostringstream and returns a concatenated string.
  * \ingroup misc
  * \tparam    value_types Must be sharg::ostreamable (stream << value).

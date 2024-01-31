@@ -136,17 +136,6 @@ if (SHARG_CLONE_DIR)
     sharg_config_print ("Detected as running from a repository checkout…")
 endif ()
 
-# Currently unused.
-# if (SHARG_SUBMODULES_DIR)
-#     file (GLOB submodules ${SHARG_SUBMODULES_DIR}/lib/*/include)
-#     foreach (submodule ${submodules})
-#         if (IS_DIRECTORY ${submodule})
-#             sharg_config_print ("  …adding submodule include:  ${submodule}")
-#             set (SHARG_DEPENDENCY_INCLUDE_DIRS ${submodule} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
-#         endif ()
-#     endforeach ()
-# endif ()
-
 # ----------------------------------------------------------------------------
 # Options for CheckCXXSourceCompiles
 # ----------------------------------------------------------------------------
@@ -154,12 +143,20 @@ endif ()
 # deactivate messages in check_*
 set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${SHARG_INCLUDE_DIR} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${SHARG_INCLUDE_DIR})
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
+
+# ----------------------------------------------------------------------------
+# Force-deactivate optional dependencies
+# ----------------------------------------------------------------------------
+
+option (SHARG_NO_TDL "Do not use TDL, even if present." OFF)
 
 # ----------------------------------------------------------------------------
 # Require C++20
 # ----------------------------------------------------------------------------
+
+set (SHARG_CXX_FLAGS "")
 
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
@@ -184,18 +181,19 @@ else ()
         sharg_config_error ("SHARG requires C++20, but your compiler does not support it.")
     endif ()
 
-    set (SHARG_CXX_FLAGS "${SHARG_CXX_FLAGS} -std=c++20")
+    list (APPEND SHARG_CXX_FLAGS "-std=c++20")
 endif ()
 
 # ----------------------------------------------------------------------------
 # thread support (pthread, windows threads)
 # ----------------------------------------------------------------------------
+set (SHARG_LIBRARIES "")
 
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package (Threads QUIET)
 
 if (Threads_FOUND)
-    set (SHARG_LIBRARIES ${SHARG_LIBRARIES} Threads::Threads)
+    list (APPEND SHARG_LIBRARIES Threads::Threads)
     if ("${CMAKE_THREAD_LIBS_INIT}" STREQUAL "")
         sharg_config_print ("Thread support:             builtin.")
     else ()
@@ -208,12 +206,26 @@ endif ()
 # ----------------------------------------------------------------------------
 # tool description lib (tdl) dependency
 # ----------------------------------------------------------------------------
-find_package (TDL QUIET HINTS ${SHARG_SUBMODULES_DIR}/submodules/tool_description_lib ${SHARG_HINT_TDL})
+set (SHARG_USE_TDL FALSE)
 
-if (TDL_FOUND)
-    sharg_config_print ("Dependency:                 TDL found.")
+if (NOT SHARG_NO_TDL)
+    find_package (TDL QUIET HINTS ${SHARG_SUBMODULES_DIR}/submodules/tool_description_lib ${SHARG_HINT_TDL})
+
+    if (TDL_FOUND)
+        sharg_config_print ("Optional dependency:        TDL found.")
+        set (SHARG_USE_TDL TRUE)
+        list (APPEND SHARG_LIBRARIES tdl::tdl)
+    else ()
+        sharg_config_print ("Optional dependency:        TDL not found.")
+    endif ()
 else ()
-    sharg_config_error ("Dependency:                 TDL not found.")
+    sharg_config_print ("Optional dependency:        TDL deactivated.")
+endif ()
+
+if (SHARG_USE_TDL)
+    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_TDL=1")
+else ()
+    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_TDL=0")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -224,7 +236,7 @@ endif ()
 if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     OR (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
     OR (${CMAKE_SYSTEM_NAME} STREQUAL "GNU"))
-    set (SHARG_LIBRARIES ${SHARG_LIBRARIES} rt)
+    list (APPEND SHARG_LIBRARIES rt)
 endif ()
 
 # libexecinfo -- implicit
@@ -233,7 +245,7 @@ mark_as_advanced (_SHARG_HAVE_EXECINFO)
 if (_SHARG_HAVE_EXECINFO)
     sharg_config_print ("Optional dependency:        libexecinfo found.")
     if ((${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD"))
-        set (SHARG_LIBRARIES ${SHARG_LIBRARIES} execinfo elf)
+        list (APPEND SHARG_LIBRARIES execinfo elf)
     endif ()
 else ()
     sharg_config_print ("Optional dependency:        libexecinfo not found.")
@@ -249,12 +261,15 @@ set (CXXSTD_TEST_SOURCE "#include <sharg/platform.hpp>
 # using try_compile instead of check_cxx_source_compiles to capture output in case of failure
 file (WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx" "${CXXSTD_TEST_SOURCE}\n")
 
+# Can't find tdl::tdl in try_compile, so we need to remove it from SHARG_LIBRARIES
+set (SHARG_TRY_COMPILE_LIBRARIES ${SHARG_LIBRARIES})
+list (REMOVE_ITEM SHARG_TRY_COMPILE_LIBRARIES tdl::tdl)
 try_compile (SHARG_PLATFORM_TEST ${CMAKE_BINARY_DIR}
              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
              CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${SHARG_CXX_FLAGS}"
-                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SHARG_INCLUDE_DIR};${SHARG_DEPENDENCY_INCLUDE_DIRS}"
+                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SHARG_INCLUDE_DIR}"
              COMPILE_DEFINITIONS ${SHARG_DEFINITIONS}
-             LINK_LIBRARIES ${SHARG_LIBRARIES}
+             LINK_LIBRARIES ${SHARG_TRY_COMPILE_LIBRARIES}
              OUTPUT_VARIABLE SHARG_PLATFORM_TEST_OUTPUT)
 
 if (SHARG_PLATFORM_TEST)
@@ -287,31 +302,23 @@ foreach (package_var
     set (SHARG_${package_var} "${${CMAKE_FIND_PACKAGE_NAME}_${package_var}}")
 endforeach ()
 
-# propagate SHARG_INCLUDE_DIR into SHARG_INCLUDE_DIRS
-set (SHARG_INCLUDE_DIRS ${SHARG_INCLUDE_DIR} ${SHARG_DEPENDENCY_INCLUDE_DIRS})
-
 # ----------------------------------------------------------------------------
 # Export targets
 # ----------------------------------------------------------------------------
 
 if (SHARG_FOUND AND NOT TARGET sharg::sharg)
-    separate_arguments (SHARG_CXX_FLAGS_LIST UNIX_COMMAND "${SHARG_CXX_FLAGS}")
-
     add_library (sharg_sharg INTERFACE)
     target_compile_definitions (sharg_sharg INTERFACE ${SHARG_DEFINITIONS})
-    target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS_LIST})
-
-    # Include TDL as system header to suppress warnings.
-    get_target_property (tdl_include_dir tdl::tdl INTERFACE_INCLUDE_DIRECTORIES)
-    target_include_directories (sharg_sharg SYSTEM INTERFACE ${tdl_include_dir})
-
-    target_link_libraries (sharg_sharg INTERFACE "${SHARG_LIBRARIES}" tdl::tdl)
-    # include sharg/include/ as -I, because sharg should never produce warnings.
+    target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS})
+    target_link_libraries (sharg_sharg INTERFACE ${SHARG_LIBRARIES})
     target_include_directories (sharg_sharg INTERFACE "${SHARG_INCLUDE_DIR}")
-    # include everything except sharg/include/ as -isystem, i.e.
-    # a system header which suppresses warnings of external libraries.
-    target_include_directories (sharg_sharg SYSTEM INTERFACE "${SHARG_DEPENDENCY_INCLUDE_DIRS}")
     add_library (sharg::sharg ALIAS sharg_sharg)
+
+    if (SHARG_USE_TDL)
+        # Include TDL as system header to suppress warnings.
+        get_target_property (tdl_include_dir tdl::tdl INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories (sharg_sharg SYSTEM INTERFACE ${tdl_include_dir})
+    endif ()
 endif ()
 
 set (CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
@@ -326,7 +333,7 @@ if (SHARG_FIND_DEBUG)
     message ("")
     message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
     message ("")
-    message ("  SHARG_INCLUDE_DIRS         ${SHARG_INCLUDE_DIRS}")
+    message ("  SHARG_INCLUDE_DIR          ${SHARG_INCLUDE_DIR}")
     message ("  SHARG_LIBRARIES            ${SHARG_LIBRARIES}")
     message ("  SHARG_DEFINITIONS          ${SHARG_DEFINITIONS}")
     message ("  SHARG_CXX_FLAGS            ${SHARG_CXX_FLAGS}")

@@ -277,7 +277,6 @@ public:
                                                      : std::string{" "})
                                                 + validator.get_help_page_message());
             });
-        // clang-format on
     }
 
     /*!\brief Initiates the printing of the help page to std::cout.
@@ -340,7 +339,8 @@ public:
         derived_t().print_list_item("\\fB--version\\fP", "Prints the version information.");
         derived_t().print_list_item("\\fB--copyright\\fP", "Prints the copyright/license information.");
         derived_t().print_list_item("\\fB--export-help\\fP (std::string)",
-                                    "Export the help page information. Value must be one of [html, man, ctd, cwl].");
+                                    "Export the help page information. Value must be one of "
+                                        + detail::supported_exports + ".");
         if (version_check_dev_decision == update_notifications::on)
             derived_t().print_list_item("\\fB--version-check\\fP (bool)",
                                         "Whether to check for the newest app version. Default: true.");

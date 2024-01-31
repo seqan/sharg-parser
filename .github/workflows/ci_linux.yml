@@ -42,7 +42,18 @@ jobs:
             build_type: Release
             cxx_flags: "-stdlib=libc++"
 
+          - name: "clang17 no TDL"
+            compiler: "clang-17"
+            build: unit
+            build_type: Release
+            cxx_flags: "-stdlib=libc++"
+
           - name: "gcc13"
+            compiler: "gcc-13"
+            build: unit
+            build_type: Release
+
+          - name: "gcc13 no TDL"
             compiler: "gcc-13"
             build: unit
             build_type: Release
@@ -89,8 +100,9 @@ jobs:
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF
-          make -j2 gtest_build yaml-cpp
+                                                  -DSHARG_VERBOSE_TESTS=OFF \
+                                                  ${{ contains(matrix.name, 'no TDL') && '-DSHARG_NO_TDL=ON' || '' }}
+          make -j2 gtest_build ${{ contains(matrix.name, 'no TDL') == false && 'yaml-cpp' || '' }}
 
       - name: Build tests
         run: |

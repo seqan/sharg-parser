@@ -9,6 +9,12 @@
 
 #include <sharg/parser.hpp>
 
+#if !SHARG_HAS_TDL
+TEST(format_ctd_test, skipped)
+{
+    GTEST_SKIP() << "TDL is not available.";
+}
+#else
 // Reused global variables
 struct format_ctd_test : public ::testing::Test
 {
@@ -153,3 +159,4 @@ TEST_F(format_ctd_test, full_information)
     my_stdout = testing::internal::GetCapturedStdout();
     EXPECT_EQ(my_stdout, expected);
 }
+#endif

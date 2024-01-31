@@ -19,8 +19,12 @@ std::string const basic_options_str = "  Common options\n"
                                       "    --copyright\n"
                                       "          Prints the copyright/license information.\n"
                                       "    --export-help (std::string)\n"
-                                      "          Export the help page information. Value must be one of [html, man,\n"
-                                      "          ctd, cwl].\n"
+                                      "          Export the help page information. Value must be one of "
+#if SHARG_HAS_TDL
+                                      "[html, man,\n          ctd, cwl].\n"
+#else
+                                      "[html, man].\n"
+#endif
                                       "    --version-check (bool)\n"
                                       "          Whether to check for the newest app version. Default: true.\n";
 

@@ -336,7 +336,8 @@ PREDEFINED             = "CEREAL_SERIALIZE_FUNCTION_NAME=serialize" \
                          "CEREAL_LOAD_MINIMAL_FUNCTION_NAME=load_minimal" \
                          "CEREAL_SAVE_MINIMAL_FUNCTION_NAME=save_minimal" \
                          "SHARG_DOXYGEN_ONLY(x)= x" \
-                         "${SHARG_DOXYGEN_PREDEFINED_NDEBUG}"
+                         "${SHARG_DOXYGEN_PREDEFINED_NDEBUG}" \
+                         "SHARG_HAS_TDL=1"
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = NO
 #---------------------------------------------------------------------------
