@@ -437,13 +437,9 @@ public:
             [this]<typename T>(T & f)
             {
                 if constexpr (std::same_as<T, detail::format_tdl>)
-                {
                     f.parse(info, executable_name);
-                }
                 else
-                {
                     f.parse(info);
-                }
             },
             format);
         parse_was_called = true;
@@ -718,8 +714,8 @@ private:
                  detail::format_html,
                  detail::format_man,
                  detail::format_tdl,
-                 detail::format_copyright/*,
-                 detail::format_ctd*/> format{detail::format_help{{}, {}, false}}; // Will be overwritten in any case.
+                 detail::format_copyright>
+        format{detail::format_help{{}, {}, false}}; // Will be overwritten in any case.
 
     //!\brief List of option/flag identifiers that are already used.
     std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
@@ -841,7 +837,8 @@ private:
                     format = detail::format_tdl{detail::format_tdl::FileFormat::CWL};
                 else
                     throw validation_error{"Validation failed for option --export-help: "
-                                           "Value must be one of [html, man, ctd, cwl]."};
+                                           "Value must be one of "
+                                           + detail::supported_exports + "."};
                 special_format_was_set = true;
             }
             else if (arg == "--copyright")

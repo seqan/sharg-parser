@@ -12,13 +12,54 @@
 
 #pragma once
 
-#include <concepts>
-#include <numeric>
+#if !SHARG_HAS_TDL
 
-#include <sharg/detail/format_base.hpp>
-#include <sharg/validators.hpp>
+#    include <sharg/detail/format_help.hpp>
 
-#include <tdl/tdl.h>
+namespace sharg::detail
+{
+// A dummy class that is used when TDL is not available.
+// This reduces the number of '#if's in the code.
+// It will always throw when parse is called.
+// For the user, the behavior of the parser will be the same as if `parser::init()` would check for TDL availability.
+class format_tdl : public format_help
+{
+public:
+    enum class FileFormat
+    {
+        CTD,
+        CWL
+    };
+
+    format_tdl(format_tdl const &) = default;
+    format_tdl & operator=(format_tdl const &) = default;
+    format_tdl(format_tdl &&) = default;
+    format_tdl & operator=(format_tdl &&) = default;
+    ~format_tdl() = default;
+
+    format_tdl(FileFormat fileFormat) : fileFormat{fileFormat}
+    {}
+
+    void parse(parser_meta_data &, std::vector<std::string> const &)
+    {
+        throw validation_error{"Validation failed for option --export-help: "
+                               "Value must be one of "
+                               + detail::supported_exports + "."};
+    }
+
+    FileFormat fileFormat;
+};
+
+} // namespace sharg::detail
+
+#else
+#    include <concepts>
+#    include <numeric>
+
+#    include <sharg/detail/format_base.hpp>
+#    include <sharg/validators.hpp>
+
+#    include <tdl/tdl.h>
 
 namespace sharg::detail
 {
@@ -356,3 +397,5 @@ private:
 };
 
 } // namespace sharg::detail
+
+#endif

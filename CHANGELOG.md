@@ -20,6 +20,12 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 # Release 1.1.2
 
+## API changes
+
+#### Dependencies
+  * TDL is now an optional dependency and can be force deactivated via CMake (`-DSHARG_NO_TDL=ON`)
+    ([#218](https://github.com/seqan/sharg-parser/pull/218)).
+
 # Release 1.1.1
 
 ## Bug fixes
@@ -52,6 +58,8 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
   directory's contents ([\#175](https://github.com/seqan/sharg-parser/pull/175)).
 * Segmentation fault when using `sharg::value_list_validator` in conjuction with a `std::filesystem::path` option
   ([\#179](https://github.com/seqan/sharg-parser/pull/179)).
+
+## API changes
 
 #### Dependencies
   * We now use Doxygen version 1.9.5 to build our documentation ([\#145](https://github.com/seqan/sharg-parser/pull/145)).
