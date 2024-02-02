@@ -93,10 +93,12 @@ jobs:
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF
+                                                  -DSHARG_VERBOSE_TESTS=OFF \
+                                                  ${{ contains(matrix.name, 'Header') && '-DSHARG_NO_TDL=ON' || '' }}
+
           case "${{ matrix.build }}" in
             snippet) make -j2 gtest_build yaml-cpp;;
-            header) make -j2 gtest_build gbenchmark_build yaml-cpp;;
+            header) make -j2 gtest_build gbenchmark_build;;
           esac
 
       - name: Build tests
