@@ -49,11 +49,25 @@ jobs:
             build_type: Release
             test_threads: 1 # snippets create and delete files and some separate tests create/delete the same files
 
+          - name: "Header clang17 cpp23"
+            compiler: "clang-17"
+            build: header
+            build_type: Release
+            cxx_flags: "-stdlib=libc++ -std=c++23"
+            test_threads: 2
+
           - name: "Header clang17"
             compiler: "clang-17"
             build: header
             build_type: Release
             cxx_flags: "-stdlib=libc++"
+            test_threads: 2
+
+          - name: "Header gcc13 cpp23"
+            compiler: "gcc-13"
+            build: header
+            build_type: Debug
+            cxx_flags: "-std=c++23"
             test_threads: 2
 
           - name: "Header gcc13"
@@ -93,10 +107,12 @@ jobs:
           cd sharg-build
           cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF
+                                                  -DSHARG_VERBOSE_TESTS=OFF \
+                                                  ${{ contains(matrix.name, 'Header') && '-DSHARG_NO_TDL=ON' || '' }}
+
           case "${{ matrix.build }}" in
             snippet) make -j2 gtest_build yaml-cpp;;
-            header) make -j2 gtest_build gbenchmark_build yaml-cpp;;
+            header) make -j2 gtest_build gbenchmark_build;;
           esac
 
       - name: Build tests
