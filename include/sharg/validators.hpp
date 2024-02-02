@@ -12,8 +12,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <any>
 #include <concepts>
+#include <exception>
 #include <fstream>
 #include <ranges>
 #include <regex>
