@@ -1407,10 +1407,10 @@ TEST(validator_test, chaining_validators)
                         "===========\n"
                         "\nOPTIONS\n"
                         "    -s, --string-option (std::string)\n"
-                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
-                        "          The output file must not exist already and write permissions must be\n"
-                        "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
-                        "          pattern '.*'.\n"
+                        "          desc Default: \"\". Value must match the pattern\n"
+                        "          '(/[^/]+)+/.*\\.[^/\\.]+$'. The output file must not exist already and\n"
+                        "          write permissions must be granted. Valid file extensions are: [sa,\n"
+                        "          so]. Value must match the pattern '.*'.\n"
                         "\n"}
             + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
@@ -1440,9 +1440,9 @@ TEST(validator_test, chaining_validators)
                         "===========\n"
                         "\nOPTIONS\n"
                         "    -s, --string-option (std::string)\n"
-                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
-                        "          Write permissions must be granted. Valid file extensions are: [sa,\n"
-                        "          so]. Value must match the pattern '.*'.\n"
+                        "          desc Default: \"\". Value must match the pattern\n"
+                        "          '(/[^/]+)+/.*\\.[^/\\.]+$'. Write permissions must be granted. Valid\n"
+                        "          file extensions are: [sa, so]. Value must match the pattern '.*'.\n"
                         "\n"}
             + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);

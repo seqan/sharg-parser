@@ -109,6 +109,84 @@ TEST(help_page_printing, short_help)
     check_expected_short_help(argv_with_version_check);
 }
 
+TEST(help_page_printing, quote_strings)
+{
+    sharg::parser quoted("test_parser", 2, argv_with_h);
+    sharg::detail::test_accessor::set_terminal_width(quoted, 80);
+
+    std::string value1{};
+    std::string value2{"Some string"};
+    std::vector<std::string> container_value{"Some", "other", "string"};
+
+    quoted.add_option(value1, sharg::config{.short_id = 'a', .long_id = "string1"});
+    quoted.add_option(value2, sharg::config{.short_id = 'b', .long_id = "string2"});
+    quoted.add_option(value2, sharg::config{.short_id = 'c', .long_id = "string3", .default_message = "Quoted"});
+    quoted.add_option(container_value, sharg::config{.short_id = 'd', .long_id = "string4"});
+    quoted.add_option(container_value, sharg::config{.short_id = 'e', .long_id = "string5", .default_message = "None"});
+    quoted.add_positional_option(container_value, sharg::config{/* No default_message allowed. */});
+
+    testing::internal::CaptureStdout();
+    EXPECT_EXIT(quoted.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+    std_cout = testing::internal::GetCapturedStdout();
+    expected = "test_parser\n"
+               "===========\n\n"
+               "POSITIONAL ARGUMENTS\n"
+               "    ARGUMENT-1 (List of std::string)\n"
+               "          Default: [\"Some\", \"other\", \"string\"].\n\n"
+               "OPTIONS\n"
+               "    -a, --string1 (std::string)\n"
+               "          Default: \"\".\n"
+               "    -b, --string2 (std::string)\n"
+               "          Default: \"Some string\".\n"
+               "    -c, --string3 (std::string)\n"
+               "          Default: \"Quoted\".\n"
+               "    -d, --string4 (List of std::string)\n"
+               "          Default: [\"Some\", \"other\", \"string\"].\n"
+               "    -e, --string5 (List of std::string)\n"
+               "          Default: None.\n\n"
+             + basic_options_str + "\n" + basic_version_str;
+    EXPECT_EQ(std_cout, expected);
+}
+
+TEST(help_page_printing, quote_paths)
+{
+    sharg::parser quoted("test_parser", 2, argv_with_h);
+    sharg::detail::test_accessor::set_terminal_width(quoted, 80);
+
+    std::filesystem::path value1{};
+    std::filesystem::path value2{"/some/path"};
+    std::vector<std::filesystem::path> container_value{"/some", "/other", "/path"};
+
+    quoted.add_option(value1, sharg::config{.short_id = 'a', .long_id = "path1"});
+    quoted.add_option(value2, sharg::config{.short_id = 'b', .long_id = "path2"});
+    quoted.add_option(value2, sharg::config{.short_id = 'c', .long_id = "path3", .default_message = "/usr/bin/"});
+    quoted.add_option(container_value, sharg::config{.short_id = 'd', .long_id = "path4"});
+    quoted.add_option(container_value, sharg::config{.short_id = 'e', .long_id = "path5", .default_message = "None"});
+    quoted.add_positional_option(container_value, sharg::config{/* No default_message allowed. */});
+
+    testing::internal::CaptureStdout();
+    EXPECT_EXIT(quoted.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+    std_cout = testing::internal::GetCapturedStdout();
+    expected = "test_parser\n"
+               "===========\n\n"
+               "POSITIONAL ARGUMENTS\n"
+               "    ARGUMENT-1 (List of std::filesystem::path)\n"
+               "          Default: [\"/some\", \"/other\", \"/path\"].\n\n"
+               "OPTIONS\n"
+               "    -a, --path1 (std::filesystem::path)\n"
+               "          Default: \"\".\n"
+               "    -b, --path2 (std::filesystem::path)\n"
+               "          Default: \"/some/path\".\n"
+               "    -c, --path3 (std::filesystem::path)\n"
+               "          Default: \"/usr/bin/\".\n"
+               "    -d, --path4 (List of std::filesystem::path)\n"
+               "          Default: [\"/some\", \"/other\", \"/path\"].\n"
+               "    -e, --path5 (List of std::filesystem::path)\n"
+               "          Default: None.\n\n"
+             + basic_options_str + "\n" + basic_version_str;
+    EXPECT_EQ(std_cout, expected);
+}
+
 TEST(help_page_printing, no_information)
 {
     // Empty help call with -h

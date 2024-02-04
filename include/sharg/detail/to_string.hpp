@@ -28,6 +28,10 @@ static std::string const supported_exports =
     "[html, man]";
 #endif
 
+//!\brief Concept for views whose value type is ostreamable.
+template <typename container_t>
+concept is_ostreamable_view = std::ranges::view<container_t> && ostreamable<std::ranges::range_value_t<container_t>>;
+
 /*!\brief Streams all parameters via std::ostringstream and returns a concatenated string.
  * \ingroup misc
  * \tparam    value_types Must be sharg::ostreamable (stream << value).
@@ -42,7 +46,11 @@ std::string to_string(value_types &&... values)
 
     auto print = [&stream](auto && val)
     {
-        if constexpr (is_container_option<std::remove_cvref_t<decltype(val)>>)
+        using value_t = std::remove_cvref_t<decltype(val)>;
+
+        // When passing a `std::vector<std::string> | std::views::transform(...)` which returns `std::quoted(str)` for
+        // each element, the `std::quoted`'s return value does not model a range, but is ostreamable.
+        if constexpr (is_container_option<value_t> || is_ostreamable_view<value_t>)
         {
             if (val.empty())
             {
@@ -58,8 +66,7 @@ std::string to_string(value_types &&... values)
                 stream << ']';
             }
         }
-        else if constexpr (std::is_same_v<std::remove_cvref_t<decltype(val)>, int8_t>
-                           || std::is_same_v<std::remove_cvref_t<decltype(val)>, uint8_t>)
+        else if constexpr (std::is_same_v<value_t, int8_t> || std::is_same_v<value_t, uint8_t>)
         {
             stream << static_cast<int16_t>(val);
         }
