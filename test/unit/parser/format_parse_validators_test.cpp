@@ -171,8 +171,8 @@ TEST(validator_test, input_file)
                         "\n"
                         "POSITIONAL ARGUMENTS\n"
                         "    ARGUMENT-1 (std::filesystem::path)\n"
-                        "          desc The input file must exist and read permissions must be granted.\n"
-                        "          Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
+                        "          desc. The input file must exist and read permissions must be\n"
+                        "          granted. Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
                         "\nOPTIONS\n\n"}
             + basic_options_str + "\n" + basic_version_str;
         EXPECT_EQ(my_stdout, expected);
@@ -323,7 +323,7 @@ TEST(validator_test, output_file)
                         "\n"
                         "POSITIONAL ARGUMENTS\n"
                         "    ARGUMENT-1 (std::filesystem::path)\n"
-                        "          desc The output file must not exist already and write permissions\n"
+                        "          desc. The output file must not exist already and write permissions\n"
                         "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
                         "          fasta.txt].\n"
                         "\nOPTIONS\n\n"}
@@ -352,7 +352,7 @@ TEST(validator_test, output_file)
                         "\n"
                         "POSITIONAL ARGUMENTS\n"
                         "    ARGUMENT-1 (std::filesystem::path)\n"
-                        "          desc Write permissions must be granted. Valid file extensions are:\n"
+                        "          desc. Write permissions must be granted. Valid file extensions are:\n"
                         "          [fa, sam, fasta, fasta.txt].\n"
                         "\nOPTIONS\n\n"}
             + basic_options_str + "\n" + basic_version_str;
@@ -443,7 +443,7 @@ TEST(validator_test, input_directory)
                                        "\n"
                                        "POSITIONAL ARGUMENTS\n"
                                        "    ARGUMENT-1 (std::filesystem::path)\n"
-                                       "          desc An existing, readable path for the input directory.\n"
+                                       "          desc. An existing, readable path for the input directory.\n"
                                        "\nOPTIONS\n\n"}
                          + basic_options_str + "\n" + basic_version_str;
 
@@ -505,7 +505,7 @@ TEST(validator_test, output_directory)
                                            "\n"
                                            "POSITIONAL ARGUMENTS\n"
                                            "    ARGUMENT-1 (std::filesystem::path)\n"
-                                           "          desc A valid path for the output directory.\n"
+                                           "          desc. A valid path for the output directory.\n"
                                            "\nOPTIONS\n\n"}
                              + basic_options_str + "\n" + basic_version_str;
 

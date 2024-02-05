@@ -12,7 +12,6 @@
  */
 
 #pragma once
-#include <ranges>
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/config.hpp>
@@ -238,7 +237,6 @@ protected:
                 message << detail::to_string(value);
         }
 
-        message << ". ";
         return message.str();
     }
 };
@@ -287,11 +285,12 @@ public:
         std::string info{config.description};
 
         if (config.default_message.empty())
-            info += ((config.required) ? std::string{" "} : get_default_message(value, value));
+            info += ((config.required) ? std::string{} : get_default_message(value, value));
         else
             info += get_default_message(value, config.default_message);
 
-        info += config.validator.get_help_page_message();
+        if (auto const & validator_message = config.validator.get_help_page_message(); !validator_message.empty())
+            info += ". " + validator_message;
 
         store_help_page_element(
             [this, id, info]()
@@ -321,20 +320,41 @@ public:
     template <typename option_type, typename validator_t>
     void add_positional_option(option_type & value, config<validator_t> const & config)
     {
+        // a list at the end may be empty and thus have a default value
+        auto positional_default_message = [&value]() -> std::string
+        {
+            if constexpr (detail::is_container_option<option_type>)
+            {
+                return get_default_message(value, value);
+            }
+            else
+            {
+                (void)value; // Silence unused variable warning.
+                return {};
+            }
+        };
+
+        auto positional_validator_message = [&config]() -> std::string
+        {
+            if (auto const & validator_message = config.validator.get_help_page_message(); !validator_message.empty())
+                return ". " + validator_message;
+            else
+                return {};
+        };
+
         positional_option_calls.push_back(
-            [this, &value, description = config.description, validator = config.validator]()
+            [this,
+             &value,
+             default_message = positional_default_message(),
+             validator_message = positional_validator_message(),
+             description = config.description]()
             {
                 ++positional_option_count;
                 derived_t().print_list_item(detail::to_string("\\fBARGUMENT-",
                                                               positional_option_count,
                                                               "\\fP ",
                                                               option_type_and_list_info(value)),
-                                            description +
-                                                // a list at the end may be empty and thus have a default value
-                                                ((detail::is_container_option<option_type>)
-                                                     ? get_default_message(value, value)
-                                                     : std::string{" "})
-                                                + validator.get_help_page_message());
+                                            description + default_message + validator_message);
             });
     }
 
@@ -402,7 +422,7 @@ public:
                                         + detail::supported_exports + ".");
         if (version_check_dev_decision == update_notifications::on)
             derived_t().print_list_item("\\fB--version-check\\fP (bool)",
-                                        "Whether to check for the newest app version. Default: true.");
+                                        "Whether to check for the newest app version. Default: true");
 
         if (!meta.examples.empty())
         {
