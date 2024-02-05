@@ -1,0 +1,88 @@
+From 724ad34dea87caf2dde5f19af51d7b5527acf3a2 Mon Sep 17 00:00:00 2001
+From: Simon Gene Gottlieb <simon@gottliebtfreitag.de>
+Date: Thu, 5 Oct 2023 13:43:30 +0200
+Subject: [PATCH 1/2] [API] Update TDL
+
+---
+ test/unit/detail/format_ctd_test.cpp |  2 +-
+ test/unit/detail/format_cwl_test.cpp | 22 +++++++++++-----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
+index fa6a5b6..352acaa 100644
+--- a/test/unit/detail/format_ctd_test.cpp
++++ b/test/unit/detail/format_ctd_test.cpp
+@@ -110,7 +110,7 @@ TEST_F(format_ctd_test, empty_information)
+     // Create the dummy parser.
+     sharg::parser parser{"default", argv.size(), argv.data()};
+     parser.info.date = "December 01, 1994";
+-    parser.info.version = "1.1.1";
++    parser.info.version = "1.1.2-rc.1";
+     parser.info.man_page_title = "default_man_page_title";
+     parser.info.short_description = "A short description here.";
+ 
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index d2bb143..5591a88 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -20,12 +20,12 @@ TEST(format_cwl_test, empty_information)
+     parser.info.man_page_title = "default_man_page_title";
+     parser.info.short_description = "A short description here.";
+ 
+-    std::string expected_short = "inputs:\n"
+-                                 "  {}\n"
+-                                 "outputs:\n"
+-                                 "  {}\n"
+-                                 "label: default\n"
++    std::string expected_short = "label: default\n"
+                                  "doc: \"\"\n"
++                                 "inputs:\n"
++                                 "  []\n"
++                                 "outputs:\n"
++                                 "  []\n"
+                                  "cwlVersion: v1.2\n"
+                                  "class: CommandLineTool\n"
+                                  "baseCommand:\n"
+@@ -75,7 +75,9 @@ TEST(format_cwl_test, full_information)
+     parser.info.examples.push_back("example");
+     parser.info.examples.push_back("example2");
+ 
+-    std::string expected_short = "inputs:\n"
++    std::string expected_short = "label: default\n"
++                                 "doc: \"description\\ndescription2\\n\"\n"
++                                 "inputs:\n"
+                                  "  int:\n"
+                                  "    doc: \"this is a int option. Default: 5. \"\n"
+                                  "    type: long?\n"
+@@ -87,9 +89,7 @@ TEST(format_cwl_test, full_information)
+                                  "    inputBinding:\n"
+                                  "      prefix: --jint\n"
+                                  "outputs:\n"
+-                                 "  {}\n"
+-                                 "label: default\n"
+-                                 "doc: \"description\\ndescription2\\n\"\n"
++                                 "  []\n"
+                                  "cwlVersion: v1.2\n"
+                                  "class: CommandLineTool\n"
+                                  "baseCommand:\n"
+@@ -193,6 +193,8 @@ TEST(format_cwl_test, subparser)
+     sub_parser.info.examples.push_back("example2");
+ 
+     std::string expected_short =
++        "label: default-index\n"
++        "doc: \"\"\n"
+         "inputs:\n"
+         "  int:\n"
+         "    doc: \"this is a int option. Default: 5. \"\n"
+@@ -251,8 +253,6 @@ TEST(format_cwl_test, subparser)
+         "    type: Directory?\n"
+         "    outputBinding:\n"
+         "      glob: $(inputs.path05)\n"
+-        "label: default-index\n"
+-        "doc: \"\"\n"
+         "cwlVersion: v1.2\n"
+         "class: CommandLineTool\n"
+         "baseCommand:\n"
+-- 
+2.43.0
+
