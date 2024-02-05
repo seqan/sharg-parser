@@ -92,7 +92,7 @@ jobs:
           ccache -sv
 
       - name: Submit coverage build
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ${{ github.workspace }}/sharg-build/sharg_coverage.xml
           root_dir: ${{ github.workspace }}/sharg
