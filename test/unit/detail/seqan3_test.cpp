@@ -26,7 +26,7 @@ std::string const basic_options_str = "  Common options\n"
                                       "[html, man].\n"
 #endif
                                       "    --version-check (bool)\n"
-                                      "          Whether to check for the newest app version. Default: true.\n";
+                                      "          Whether to check for the newest app version. Default: true\n";
 
 std::string const basic_version_str = "VERSION\n"
                                       "    Last update:\n"

@@ -5,7 +5,7 @@ OPTIONS
 
   Eating Numbers
     -i, --int (signed 32 bit integer)
-          Desc. Default: 0.
+          Desc. Default: 0
 
   Common options
     -h, --help
@@ -20,7 +20,7 @@ OPTIONS
           Export the help page information. Value must be one of [html, man,
           ctd, cwl].
     --version-check (bool)
-          Whether to check for the newest app version. Default: true.
+          Whether to check for the newest app version. Default: true
 
 VERSION
     Last update:

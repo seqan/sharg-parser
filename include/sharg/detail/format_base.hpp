@@ -137,7 +137,7 @@ protected:
      *
      * \details Special characters considered are `"`, `\`, `&`, `<` and `>`.
      */
-    std::string escape_special_xml_chars(std::string const & original)
+    static std::string escape_special_xml_chars(std::string const & original)
     {
         std::string escaped;
         escaped.reserve(original.size()); // will be at least as long
@@ -183,6 +183,62 @@ protected:
 
         return tmp;
     }
+
+    /*!\brief Returns the default message for the help page.
+     * \tparam option_type The type of the option.
+     * \tparam default_type  The type of the default value.
+     * \param[in] option The option to get the default message for.
+     * \param[in] value The default value to get the default message for.
+     * \returns The default message for the help page (" Default: <default-value>. ").
+     * \details
+     * `value` is either `config.default_message`, or the same as `option`.
+     * If the `option_type` is a std::string or std::filesystem::path, the value is quoted.
+     * If the `option_type` is a container of std::string or std::filesystem::path, each individual value is quoted;
+     * if a `config.default_message` is provided, it will not be quoted.
+     */
+    template <typename option_type, typename default_type>
+    static std::string get_default_message(option_type const & SHARG_DOXYGEN_ONLY(option), default_type const & value)
+    {
+        static_assert(std::same_as<option_type, default_type> || std::same_as<default_type, std::string>);
+
+        std::stringstream message{};
+        message << " Default: ";
+
+        if constexpr (detail::is_container_option<option_type>)
+        {
+            // If we have a list of strings, we want to quote each string.
+            if constexpr (std::same_as<std::ranges::range_value_t<default_type>, std::string>)
+            {
+                auto view = std::views::transform(value,
+                                                  [](auto const & val)
+                                                  {
+                                                      return std::quoted(val);
+                                                  });
+                message << detail::to_string(view);
+            }
+            else // Otherwise we just print the list or the default_message without quotes.
+            {
+                message << detail::to_string(value);
+            }
+        }
+        else
+        {
+            static constexpr bool option_is_string = std::same_as<option_type, std::string>;
+            static constexpr bool option_is_path = std::same_as<option_type, std::filesystem::path>;
+            static constexpr bool value_is_string = std::same_as<default_type, std::string>;
+
+            // Quote: std::string (from value + default_message), and std::filesystem::path (default_message).
+            // std::filesystem::path is quoted by the STL's operator<< in detail::to_string.
+            static constexpr bool needs_string_quote = option_is_string || (option_is_path && value_is_string);
+
+            if constexpr (needs_string_quote)
+                message << std::quoted(value);
+            else
+                message << detail::to_string(value);
+        }
+
+        return message.str();
+    }
 };
 
 /*!\brief The format that contains all helper functions needed in all formats for
@@ -227,12 +283,14 @@ public:
     {
         std::string id = prep_id_for_help(config.short_id, config.long_id) + " " + option_type_and_list_info(value);
         std::string info{config.description};
-        if (config.default_message.empty())
-            info += ((config.required) ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
-        else
-            info += detail::to_string(" Default: ", config.default_message, ". ");
 
-        info += config.validator.get_help_page_message();
+        if (config.default_message.empty())
+            info += ((config.required) ? std::string{} : get_default_message(value, value));
+        else
+            info += get_default_message(value, config.default_message);
+
+        if (auto const & validator_message = config.validator.get_help_page_message(); !validator_message.empty())
+            info += ". " + validator_message;
 
         store_help_page_element(
             [this, id, info]()
@@ -262,20 +320,41 @@ public:
     template <typename option_type, typename validator_t>
     void add_positional_option(option_type & value, config<validator_t> const & config)
     {
+        // a list at the end may be empty and thus have a default value
+        auto positional_default_message = [&value]() -> std::string
+        {
+            if constexpr (detail::is_container_option<option_type>)
+            {
+                return get_default_message(value, value);
+            }
+            else
+            {
+                (void)value; // Silence unused variable warning.
+                return {};
+            }
+        };
+
+        auto positional_validator_message = [&config]() -> std::string
+        {
+            if (auto const & validator_message = config.validator.get_help_page_message(); !validator_message.empty())
+                return ". " + validator_message;
+            else
+                return {};
+        };
+
         positional_option_calls.push_back(
-            [this, &value, description = config.description, validator = config.validator]()
+            [this,
+             &value,
+             default_message = positional_default_message(),
+             validator_message = positional_validator_message(),
+             description = config.description]()
             {
                 ++positional_option_count;
                 derived_t().print_list_item(detail::to_string("\\fBARGUMENT-",
                                                               positional_option_count,
                                                               "\\fP ",
                                                               option_type_and_list_info(value)),
-                                            description +
-                                                // a list at the end may be empty and thus have a default value
-                                                ((detail::is_container_option<option_type>)
-                                                     ? detail::to_string(" Default: ", value, ". ")
-                                                     : std::string{" "})
-                                                + validator.get_help_page_message());
+                                            description + default_message + validator_message);
             });
     }
 
@@ -343,7 +422,7 @@ public:
                                         + detail::supported_exports + ".");
         if (version_check_dev_decision == update_notifications::on)
             derived_t().print_list_item("\\fB--version-check\\fP (bool)",
-                                        "Whether to check for the newest app version. Default: true.");
+                                        "Whether to check for the newest app version. Default: true");
 
         if (!meta.examples.empty())
         {

@@ -1,0 +1,345 @@
+From a10348cbebceb4276eeb6f8832d47374fc7bfc1a Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Mon, 5 Feb 2024 16:02:03 +0100
+Subject: [PATCH 2/2] [API] Quoted strings and paths
+
+---
+ test/snippet/readme_sneak_peek.out            |  6 ++---
+ test/unit/detail/format_ctd_test.cpp          |  8 +++---
+ test/unit/detail/format_cwl_test.cpp          | 12 ++++-----
+ test/unit/detail/format_help_test.cpp         | 10 +++----
+ test/unit/detail/format_html_test.cpp         | 12 ++++-----
+ test/unit/detail/format_man_test.cpp          | 12 ++++-----
+ test/unit/detail/seqan3_test.cpp              |  2 +-
+ .../parser/format_parse_validators_test.cpp   | 26 +++++++++----------
+ 8 files changed, 44 insertions(+), 44 deletions(-)
+
+diff --git a/test/snippet/readme_sneak_peek.out b/test/snippet/readme_sneak_peek.out
+index 47bc0c1..8b51ee2 100644
+--- a/test/snippet/readme_sneak_peek.out
++++ b/test/snippet/readme_sneak_peek.out
+@@ -5,7 +5,7 @@ OPTIONS
+ 
+   Eating Numbers
+     -i, --int (signed 32 bit integer)
+-          Desc. Default: 0.
++          Desc. Default: 0
+ 
+   Common options
+     -h, --help
+@@ -20,9 +20,9 @@ OPTIONS
+           Export the help page information. Value must be one of [html, man,
+           ctd, cwl].
+     --version-check (bool)
+-          Whether to check for the newest app version. Default: true.
++          Whether to check for the newest app version. Default: true
+ 
+ VERSION
+     Last update:
+     Eat-Me-App version:
+-    Sharg version: 1.1.1
++    Sharg version: 1.1.2-rc.1
+diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
+index 352acaa..eb14047 100644
+--- a/test/unit/detail/format_ctd_test.cpp
++++ b/test/unit/detail/format_ctd_test.cpp
+@@ -42,13 +42,13 @@ struct format_ctd_test : public ::testing::Test
+         "\n"
+         R"del(    <PARAMETERS version="1.7.0" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/OpenMS/OpenMS/develop/share/OpenMS/SCHEMAS/Param_1_7_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">)del"
+         "\n"
+-        R"del(        <ITEM name="positional_0" value="" type="string" description="this is a positional option. " required="false" advanced="false" />)del"
++        R"del(        <ITEM name="positional_0" value="" type="string" description="this is a positional option." required="false" advanced="false" />)del"
+         "\n"
+-        R"del(        <ITEM name="positional_1" value="" type="string" description="this is a positional option. Default: []. " required="false" advanced="false" />)del"
++        R"del(        <ITEM name="positional_1" value="" type="string" description="this is a positional option. Default: []" required="false" advanced="false" />)del"
+         "\n"
+-        R"del(        <ITEM name="int" value="5" type="int" description="this is a int option. Default: 5. " required="false" advanced="false" />)del"
++        R"del(        <ITEM name="int" value="5" type="int" description="this is a int option. Default: 5" required="false" advanced="false" />)del"
+         "\n"
+-        R"del(        <ITEM name="jint" value="5" type="int" description="this is a required int option. " required="true" advanced="false" />)del"
++        R"del(        <ITEM name="jint" value="5" type="int" description="this is a required int option." required="true" advanced="false" />)del"
+         "\n"
+         R"del(        <ITEM name="flag" value="false" type="bool" description="this is a flag." required="false" advanced="false" />)del"
+         "\n"
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index 5591a88..1d27cc3 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -79,12 +79,12 @@ TEST(format_cwl_test, full_information)
+                                  "doc: \"description\\ndescription2\\n\"\n"
+                                  "inputs:\n"
+                                  "  int:\n"
+-                                 "    doc: \"this is a int option. Default: 5. \"\n"
++                                 "    doc: \"this is a int option. Default: 5\"\n"
+                                  "    type: long?\n"
+                                  "    inputBinding:\n"
+                                  "      prefix: --int\n"
+                                  "  jint:\n"
+-                                 "    doc: \"this is a required int option. \"\n"
++                                 "    doc: this is a required int option.\n"
+                                  "    type: long\n"
+                                  "    inputBinding:\n"
+                                  "      prefix: --jint\n"
+@@ -197,22 +197,22 @@ TEST(format_cwl_test, subparser)
+         "doc: \"\"\n"
+         "inputs:\n"
+         "  int:\n"
+-        "    doc: \"this is a int option. Default: 5. \"\n"
++        "    doc: \"this is a int option. Default: 5\"\n"
+         "    type: long?\n"
+         "    inputBinding:\n"
+         "      prefix: --int\n"
+         "  jint:\n"
+-        "    doc: \"this is a required int option. \"\n"
++        "    doc: this is a required int option.\n"
+         "    type: long\n"
+         "    inputBinding:\n"
+         "      prefix: --jint\n"
+         "  percent:\n"
+-        "    doc: \"this is a required float option. \"\n"
++        "    doc: this is a required float option.\n"
+         "    type: double\n"
+         "    inputBinding:\n"
+         "      prefix: --percent\n"
+         "  string:\n"
+-        "    doc: \"this is a string option (advanced). Default: . \"\n"
++        "    doc: \"this is a string option (advanced). Default: \\\"\\\"\"\n"
+         "    type: string?\n"
+         "    inputBinding:\n"
+         "      prefix: --string\n"
+diff --git a/test/unit/detail/format_help_test.cpp b/test/unit/detail/format_help_test.cpp
+index c5ffd9f..f31e066 100644
+--- a/test/unit/detail/format_help_test.cpp
++++ b/test/unit/detail/format_help_test.cpp
+@@ -35,7 +35,7 @@ std::string const basic_options_str = "  Common options\n"
+                                       "          Export the help page information. Value must be one of [html, man,\n"
+                                       "          ctd, cwl].\n"
+                                       "    --version-check (bool)\n"
+-                                      "          Whether to check for the newest app version. Default: true.\n";
++                                      "          Whether to check for the newest app version. Default: true\n";
+ 
+ std::string const basic_version_str = "VERSION\n"
+                                       "    Last update:\n"
+@@ -370,7 +370,7 @@ TEST(help_page_printing, advanced_options)
+                "\n"
+                "  advanced subsection\n"
+                "    -j, --jnt (unsigned 8 bit integer)\n"
+-               "          this is a int option. Default: 2.\n"
++               "          this is a int option. Default: 2\n"
+                "    -f, --flag\n"
+                "          this is a flag.\n"
+                "    -s, --some\n"
+@@ -450,10 +450,10 @@ TEST(help_page_printing, full_information)
+                "    ARGUMENT-1 (signed 8 bit integer)\n"
+                "          this is not a list.\n"
+                "    ARGUMENT-2 (List of std::string)\n"
+-               "          this is a positional option. Default: [].\n"
++               "          this is a positional option. Default: []\n"
+                "\nOPTIONS\n"
+                "    -i, --int (signed 32 bit integer)\n"
+-               "          this is a int option. Default: A number.\n"
++               "          this is a int option. Default: A number\n"
+                "    -e, --enum (foo)\n"
+                "          this is an enum option. Default: one. Value must be one of [three,\n"
+                "          two, one].\n"
+@@ -580,7 +580,7 @@ TEST(parse_test, subcommand_parser)
+                            "    subcommand key word is passed on to the corresponding sub-parser.\n"
+                            "\nOPTIONS\n"
+                            "    -f, --foo (signed 32 bit integer)\n"
+-                           "          foo bar. Default: 0.\n"
++                           "          foo bar. Default: 0\n"
+                            "\n"
+                          + basic_options_str + "\n" + basic_version_str;
+ 
+diff --git a/test/unit/detail/format_html_test.cpp b/test/unit/detail/format_html_test.cpp
+index a0f7d0a..83c6818 100644
+--- a/test/unit/detail/format_html_test.cpp
++++ b/test/unit/detail/format_html_test.cpp
+@@ -44,7 +44,7 @@ TEST(html_format, empty_information)
+                     "<dt><strong>--export-help</strong> (std::string)</dt>\n"
+                     "<dd>Export the help page information. Value must be one of [html, man, ctd, cwl].</dd>\n"
+                     "<dt><strong>--version-check</strong> (bool)</dt>\n"
+-                    "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
++                    "<dd>Whether to check for the newest app version. Default: true</dd>\n"
+                     "</dl>\n"
+                     "<h2>Version</h2>\n"
+                     "<p>\n"
+@@ -138,16 +138,16 @@ TEST(html_format, full_information_information)
+         "<h2>Positional Arguments</h2>\n"
+         "<dl>\n"
+         "<dt><strong>ARGUMENT-1</strong> (<em>signed 8 bit integer</em>)</dt>\n"
+-        "<dd>this is a positional option. </dd>\n"
++        "<dd>this is a positional option.</dd>\n"
+         "<dt><strong>ARGUMENT-2</strong> (<em>List</em> of <em>std::string</em>)</dt>\n"
+-        "<dd>this is a positional option. Default: []. </dd>\n"
++        "<dd>this is a positional option. Default: []</dd>\n"
+         "</dl>\n"
+         "<h2>Options</h2>\n"
+         "<dl>\n"
+         "<dt><strong>-i</strong>, <strong>--int</strong> (<em>signed 32 bit integer</em>)</dt>\n"
+-        "<dd>this is a int option. Default: A number. </dd>\n"
++        "<dd>this is a int option. Default: A number</dd>\n"
+         "<dt><strong>-j</strong>, <strong>--jint</strong> (<em>signed 32 bit integer</em>)</dt>\n"
+-        "<dd>this is a required int option. </dd>\n"
++        "<dd>this is a required int option.</dd>\n"
+         "<dt><strong>-f</strong>, <strong>--flag</strong></dt>\n"
+         "<dd>this is a flag.</dd>\n"
+         "<dt><strong>-k</strong>, <strong>--kflag</strong></dt>\n"
+@@ -166,7 +166,7 @@ TEST(html_format, full_information_information)
+         "<dt><strong>--export-help</strong> (std::string)</dt>\n"
+         "<dd>Export the help page information. Value must be one of [html, man, ctd, cwl].</dd>\n"
+         "<dt><strong>--version-check</strong> (bool)</dt>\n"
+-        "<dd>Whether to check for the newest app version. Default: true.</dd>\n"
++        "<dd>Whether to check for the newest app version. Default: true</dd>\n"
+         "</dl>\n"
+         "<h2>Examples</h2>\n"
+         "<p>\n"
+diff --git a/test/unit/detail/format_man_test.cpp b/test/unit/detail/format_man_test.cpp
+index 9827886..307b58b 100644
+--- a/test/unit/detail/format_man_test.cpp
++++ b/test/unit/detail/format_man_test.cpp
+@@ -47,13 +47,13 @@ struct format_man_test : public ::testing::Test
+                            "\n"
+                            R"(\fBARGUMENT-1\fP (\fIsigned 8 bit integer\fP))"
+                            "\n"
+-                           R"(this is a positional option. )"
++                           R"(this is a positional option.)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+                            R"(\fBARGUMENT-2\fP (\fIList\fP of \fIstd::string\fP))"
+                            "\n"
+-                           R"(this is a positional option. Default: []. )"
++                           R"(this is a positional option. Default: [])"
+                            "\n"
+                            R"(.SH OPTIONS)"
+                            "\n"
+@@ -61,13 +61,13 @@ struct format_man_test : public ::testing::Test
+                            "\n"
+                            R"(\fB-i\fP, \fB--int\fP (\fIsigned 32 bit integer\fP))"
+                            "\n"
+-                           R"(this is a int option. Default: A number. )"
++                           R"(this is a int option. Default: A number)"
+                            "\n"
+                            R"(.TP)"
+                            "\n"
+                            R"(\fB-j\fP, \fB--jint\fP (\fIsigned 32 bit integer\fP))"
+                            "\n"
+-                           R"(this is a required int option. )"
++                           R"(this is a required int option.)"
+                            "\n"
+                            R"(.SH FLAGS)"
+                            "\n"
+@@ -123,7 +123,7 @@ struct format_man_test : public ::testing::Test
+                            "\n"
+                            R"(\fB--version-check\fP (bool))"
+                            "\n"
+-                           R"(Whether to check for the newest app version. Default: true.)"
++                           R"(Whether to check for the newest app version. Default: true)"
+                            "\n"
+                            R"(.SH EXAMPLES)"
+                            "\n"
+@@ -236,7 +236,7 @@ TEST_F(format_man_test, empty_information)
+                                  "\n"
+                                  R"(\fB--version-check\fP (bool))"
+                                  "\n"
+-                                 R"(Whether to check for the newest app version. Default: true.)"
++                                 R"(Whether to check for the newest app version. Default: true)"
+                                  "\n"
+                                  R"(.SH VERSION)"
+                                  "\n"
+diff --git a/test/unit/detail/seqan3_test.cpp b/test/unit/detail/seqan3_test.cpp
+index c1329cb..6c228f5 100644
+--- a/test/unit/detail/seqan3_test.cpp
++++ b/test/unit/detail/seqan3_test.cpp
+@@ -22,7 +22,7 @@ std::string const basic_options_str = "  Common options\n"
+                                       "          Export the help page information. Value must be one of [html, man,\n"
+                                       "          ctd, cwl].\n"
+                                       "    --version-check (bool)\n"
+-                                      "          Whether to check for the newest app version. Default: true.\n";
++                                      "          Whether to check for the newest app version. Default: true\n";
+ 
+ std::string const basic_version_str = "VERSION\n"
+                                       "    Last update:\n"
+diff --git a/test/unit/parser/format_parse_validators_test.cpp b/test/unit/parser/format_parse_validators_test.cpp
+index cade0f9..ba1694d 100644
+--- a/test/unit/parser/format_parse_validators_test.cpp
++++ b/test/unit/parser/format_parse_validators_test.cpp
+@@ -167,8 +167,8 @@ TEST(validator_test, input_file)
+                         "\n"
+                         "POSITIONAL ARGUMENTS\n"
+                         "    ARGUMENT-1 (std::filesystem::path)\n"
+-                        "          desc The input file must exist and read permissions must be granted.\n"
+-                        "          Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
++                        "          desc. The input file must exist and read permissions must be\n"
++                        "          granted. Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
+                         "\nOPTIONS\n\n"}
+             + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+@@ -319,7 +319,7 @@ TEST(validator_test, output_file)
+                         "\n"
+                         "POSITIONAL ARGUMENTS\n"
+                         "    ARGUMENT-1 (std::filesystem::path)\n"
+-                        "          desc The output file must not exist already and write permissions\n"
++                        "          desc. The output file must not exist already and write permissions\n"
+                         "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
+                         "          fasta.txt].\n"
+                         "\nOPTIONS\n\n"}
+@@ -348,7 +348,7 @@ TEST(validator_test, output_file)
+                         "\n"
+                         "POSITIONAL ARGUMENTS\n"
+                         "    ARGUMENT-1 (std::filesystem::path)\n"
+-                        "          desc Write permissions must be granted. Valid file extensions are:\n"
++                        "          desc. Write permissions must be granted. Valid file extensions are:\n"
+                         "          [fa, sam, fasta, fasta.txt].\n"
+                         "\nOPTIONS\n\n"}
+             + basic_options_str + "\n" + basic_version_str;
+@@ -439,7 +439,7 @@ TEST(validator_test, input_directory)
+                                        "\n"
+                                        "POSITIONAL ARGUMENTS\n"
+                                        "    ARGUMENT-1 (std::filesystem::path)\n"
+-                                       "          desc An existing, readable path for the input directory.\n"
++                                       "          desc. An existing, readable path for the input directory.\n"
+                                        "\nOPTIONS\n\n"}
+                          + basic_options_str + "\n" + basic_version_str;
+ 
+@@ -501,7 +501,7 @@ TEST(validator_test, output_directory)
+                                            "\n"
+                                            "POSITIONAL ARGUMENTS\n"
+                                            "    ARGUMENT-1 (std::filesystem::path)\n"
+-                                           "          desc A valid path for the output directory.\n"
++                                           "          desc. A valid path for the output directory.\n"
+                                            "\nOPTIONS\n\n"}
+                              + basic_options_str + "\n" + basic_version_str;
+ 
+@@ -1403,10 +1403,10 @@ TEST(validator_test, chaining_validators)
+                         "===========\n"
+                         "\nOPTIONS\n"
+                         "    -s, --string-option (std::string)\n"
+-                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+-                        "          The output file must not exist already and write permissions must be\n"
+-                        "          granted. Valid file extensions are: [sa, so]. Value must match the\n"
+-                        "          pattern '.*'.\n"
++                        "          desc Default: \"\". Value must match the pattern\n"
++                        "          '(/[^/]+)+/.*\\.[^/\\.]+$'. The output file must not exist already and\n"
++                        "          write permissions must be granted. Valid file extensions are: [sa,\n"
++                        "          so]. Value must match the pattern '.*'.\n"
+                         "\n"}
+             + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+@@ -1436,9 +1436,9 @@ TEST(validator_test, chaining_validators)
+                         "===========\n"
+                         "\nOPTIONS\n"
+                         "    -s, --string-option (std::string)\n"
+-                        "          desc Default: . Value must match the pattern '(/[^/]+)+/.*\\.[^/\\.]+$'.\n"
+-                        "          Write permissions must be granted. Valid file extensions are: [sa,\n"
+-                        "          so]. Value must match the pattern '.*'.\n"
++                        "          desc Default: \"\". Value must match the pattern\n"
++                        "          '(/[^/]+)+/.*\\.[^/\\.]+$'. Write permissions must be granted. Valid\n"
++                        "          file extensions are: [sa, so]. Value must match the pattern '.*'.\n"
+                         "\n"}
+             + basic_options_str + "\n" + basic_version_str;
+         EXPECT_EQ(my_stdout, expected);
+-- 
+2.43.0
+

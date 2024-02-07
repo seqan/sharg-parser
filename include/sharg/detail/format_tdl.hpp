@@ -170,8 +170,14 @@ public:
     void add_option(option_type & value, config<validator_t> const & config)
     {
         auto description = config.description;
-        description += (config.required ? std::string{" "} : detail::to_string(" Default: ", value, ". "));
-        description += config.validator.get_help_page_message();
+
+        if (config.default_message.empty())
+            description += ((config.required) ? std::string{} : get_default_message(value, value));
+        else
+            description += get_default_message(value, config.default_message);
+
+        if (auto const & validator_message = config.validator.get_help_page_message(); !validator_message.empty())
+            description += ". " + validator_message;
 
         auto tags = std::set<std::string>{};
         if (config.required)
@@ -263,19 +269,37 @@ public:
     template <typename option_type, typename validator_t>
     void add_positional_option(option_type & value, config<validator_t> const & config)
     {
-        std::string msg = config.validator.get_help_page_message();
+        // a list at the end may be empty and thus have a default value
+        auto positional_default_message = [&value]() -> std::string
+        {
+            if constexpr (detail::is_container_option<option_type>)
+            {
+                return get_default_message(value, value);
+            }
+            else
+            {
+                (void)value; // Silence unused variable warning.
+                return {};
+            }
+        };
+
+        auto positional_validator_message = [&config]() -> std::string
+        {
+            if (auto const & validator_message = config.validator.get_help_page_message(); !validator_message.empty())
+                return ". " + validator_message;
+            else
+                return {};
+        };
 
         positional_option_calls.push_back(
-            [this, &value, config, msg](std::string_view)
+            [this,
+             config,
+             default_message = positional_default_message(),
+             validator_message = positional_validator_message()](std::string_view)
             {
                 auto id = "positional_" + std::to_string(positional_option_count);
                 ++positional_option_count;
-                auto description =
-                    config.description +
-                    // a list at the end may be empty and thus have a default value
-                    ((detail::is_container_option<option_type>) ? detail::to_string(" Default: ", value, ". ")
-                                                                : std::string{" "})
-                    + msg;
+                auto description = config.description + default_message + validator_message;
 
                 parameters.push_back(tdl::Node{
                     .name = id,

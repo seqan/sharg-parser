@@ -2,16 +2,20 @@ cmake_minimum_required (VERSION 3.8)
 
 project (api_stability)
 
+if (NOT CMAKE_VERSION VERSION_LESS 3.24) # cmake >= 3.24
+    cmake_policy (SET CMP0135 NEW)
+endif ()
+
 find_package (Git)
 
 include (../sharg-test.cmake)
 
 include (ExternalProject)
-set (SHARG_LAST_STABLE_VERSION "1.0.0")
+set (SHARG_LAST_STABLE_VERSION "1.1.1")
 set (SHARG_LAST_STABLE_SOURCE_URL
      "https://github.com/seqan/sharg-parser/releases/download/${SHARG_LAST_STABLE_VERSION}/sharg-${SHARG_LAST_STABLE_VERSION}-Source.tar.xz"
 )
-set (SHARG_LAST_STABLE_SOURCE_SHA256 "babd34fc0851ac6710346b67eb46ca067576fc319e0be5c478437733a69b66a0")
+set (SHARG_LAST_STABLE_SOURCE_SHA256 "7330f06501718e7871e55e5fd70d0e41472cc8b34bd0e3519f8c5547510c671c")
 
 set (SHARG_API_STABILITY_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSHARG_DISABLE_DEPRECATED_WARNINGS=1")
 
@@ -37,7 +41,8 @@ endmacro ()
 
 if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/${SHARG_LAST_STABLE_VERSION}")
     set (SHARG_GIT_APPLY
-         "${GIT_EXECUTABLE} apply --verbose ${CMAKE_CURRENT_LIST_DIR}/${SHARG_LAST_STABLE_VERSION}/*.patch")
+         "${GIT_EXECUTABLE} init . && ${GIT_EXECUTABLE} apply --verbose ${CMAKE_CURRENT_LIST_DIR}/${SHARG_LAST_STABLE_VERSION}/*.patch"
+    )
 else ()
     set (SHARG_GIT_APPLY "true")
     message (STATUS "No patches found in ${CMAKE_CURRENT_LIST_DIR}/${SHARG_LAST_STABLE_VERSION}.")
