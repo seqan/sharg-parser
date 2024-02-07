@@ -191,3 +191,17 @@ dl.no-api {
     background-color: var(--seqan-no-api-box-color);
     color: #2f4153;
 }
+
+/* Doxygen 1.10.0 changed the style of the navigation bar.
+   doxygen-awesome-css does not yet support these changes,
+   so we need to revert Doxygen's changes. */
+
+a:hover {
+    text-decoration: underline;
+    background: none;
+}
+
+a:hover > span.arrow {
+    text-decoration: none;
+    background: none;
+}

@@ -31,6 +31,8 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 #### Dependencies
   * TDL is now an optional dependency and can be force deactivated via CMake (`-DSHARG_NO_TDL=ON`)
     ([#218](https://github.com/seqan/sharg-parser/pull/218)).
+  * We now use Doxygen version 1.10.0 to build our documentation
+    ([\#230](https://github.com/seqan/sharg-parser/pull/230)).
 
 # Release 1.1.1
 
