@@ -1,7 +1,7 @@
-From a10348cbebceb4276eeb6f8832d47374fc7bfc1a Mon Sep 17 00:00:00 2001
+From 09a51343b1ee29f245eeae8210d50cd74ac9b1b4 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 5 Feb 2024 16:02:03 +0100
-Subject: [PATCH 2/2] [API] Quoted strings and paths
+Subject: [PATCH 2/3] [API] Quoted strings and paths
 
 ---
  test/snippet/readme_sneak_peek.out            |  6 ++---

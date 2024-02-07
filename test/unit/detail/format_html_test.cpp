@@ -1,9 +1,6 @@
-// --------------------------------------------------------------------------------------------------------
-// Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
-// Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
-// This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/sharg-parser/blob/main/LICENSE.md
-// --------------------------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
+// SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
@@ -209,7 +206,7 @@ TEST(html_format, full_information_information)
           "<br>\n"
           "<strong>Contact: </strong>email\n"
           "<br>\n"
-          "<strong>SeqAn Copyright: </strong>2006-2023 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.\n"
+          "<strong>SeqAn Copyright: </strong>2006-2024 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.\n"
           "<br>\n"
           "<strong>In your academic works please cite: </strong>citation\n"
           "<br>\n"
