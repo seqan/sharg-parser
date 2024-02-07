@@ -6,6 +6,12 @@
 [![twitter][twitter_badge]][twitter_link]
 
 <!--
+    SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+    SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+    SPDX-License-Identifier: CC-BY-4.0
+-->
+
+<!--
     Above uses reference-style links with numbers.
     See also https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#links.
 
@@ -95,7 +101,7 @@ If you are working in the field of sequence analysis, we recommend using the
 
 An application with one option parsing an integer from the command line can be written in only 5 lines of code:
 
-<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp&lines=3-15) -->
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme_sneak_peek.cpp&lines=7-19) -->
 <!-- The below code snippet is automatically added from ./test/snippet/readme_sneak_peek.cpp -->
 ```cpp
 #include <sharg/all.hpp>

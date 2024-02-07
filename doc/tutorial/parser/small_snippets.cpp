@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-License-Identifier: CC0-1.0
+
 #include <sharg/all.hpp>
 
 //![validator_include]
@@ -64,7 +68,7 @@ parser.add_positional_option(list_variable, sharg::config{.description = "Give m
 sharg::parser parser{"Example-Parser", argc, argv};
 //![required_option]
 std::string required_variable{};
-parser.add_option(required_variable, sharg::config{.short_id = 'n', .long_id = "name", 
+parser.add_option(required_variable, sharg::config{.short_id = 'n', .long_id = "name",
                                                    .description = "I really need a name.", .required = true});
 //![required_option]
 }

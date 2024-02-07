@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: BSD-3-Clause
+-->
+
 # Sharg API Stability
 
 This test suite will check whether the current version of Sharg (e.g. git checkout) can be used to build the test cases
@@ -23,13 +29,13 @@ CMAKE_BUILD_PARALLEL_LEVEL=40 cmake --build .
 
 ### How does this work?
 
-In the following we will use `1.0.0` as the latest stable release (LSR).
+In the following we will use `1.1.1` as the latest stable release (LSR).
 
 The workflow entails these steps:
 1. Download and unzip the LSR.
 2. Remove everything from the LSR except the tests in `<sharg_lsr_source>/test/`.
 3. Apply patches from the current git version on the LSR, i.e., patches found in
-   `<sharg_git_source>/test/api_stability/1.0.0`.
+   `<sharg_git_source>/test/api_stability/1.1.1`.
   * These patches will only apply changes on the tests.
   * This step is necessary as some of our tests also test non-public / non-stable API.
 3. Use the current version of `find_package (Sharg)` found in `<sharg_git_source>/build_system`.
@@ -78,24 +84,21 @@ There are two categories of API changes that are reflected in the patches (prefi
 
 ### How to create patches?
 
-In the following, we will use `1.0.0` as the latest stable release (LSR).
+In the following, we will use `1.1.1` as the latest stable release (LSR).
 
-Create a new branch based on the LSR and apply all existing patches in `<sharg_git_source>/test/api_stability/1.0.0`.
+Create a new branch based on the LSR and apply all existing patches in `<sharg_git_source>/test/api_stability/1.1.1`.
 
 ```
 cd <sharg_git_source>
 
-# assume that your current branch you are working on is fix_api_stability
-git checkout fix_api_stability
-
 # copy over patches to a tmp directory (`git am` seems to not support applying patches onto a different branch)
 mkdir -p /tmp/sharg-api-stability-patches
-cp test/api_stability/1.0.0/*.patch /tmp/sharg-api-stability-patches
+cp test/api_stability/1.1.1/*.patch /tmp/sharg-api-stability-patches
 
 # create a new branch based on the LSR and switch to it
-git checkout -b api-stability-patches 1.0.0
+git checkout -b api-stability-patches 1.1.1
 
-# apply all patches onto 1.0.0 (--keep-non-patch will keep `[NOAPI]` tags in the commit message)
+# apply all patches onto 1.1.1 (--keep-non-patch will keep `[NOAPI]` tags in the commit message)
 git am --keep-non-patch /tmp/sharg-api-stability-patches/*.patch
 
 # clean up applied patches
@@ -126,8 +129,8 @@ It is also important that you double check if the patch only contains changes th
 After that, we can export all patches.
 
 ```
-# export all patches since 1.0.0
-git format-patch 1.0.0
+# export all patches since 1.1.1
+git format-patch 1.1.1
 
 # move them to tmp directory
 mv *.patch /tmp/sharg-api-stability-patches
@@ -136,14 +139,14 @@ mv *.patch /tmp/sharg-api-stability-patches
 Now change to your branch that you were working on and check-in the patches.
 
 ```
-git checkout fix_api_stability
+git checkout -
 
-cp /tmp/sharg-api-stability-patches/*.patch test/api_stability/1.0.0/
+cp /tmp/sharg-api-stability-patches/*.patch test/api_stability/1.1.1/
 
 rm -rf /tmp/sharg-api-stability-patches
 
 # add new patches
-git add test/api_stability/1.0.0/
+git add test/api_stability/1.1.1/
 
 # commit changes
 git commit

@@ -1,5 +1,11 @@
 # Parsing command line arguments with Sharg {#tutorial_parser}
 
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 <b>Learning Objective:</b> <br>
 You will learn how to use the sharg::parser class to parse command line arguments. This tutorial is a
 walkthrough with links to the API documentation and is also meant as a source for copy-and-paste code.

@@ -1,5 +1,11 @@
 # Contributing {#about_contributing}
 
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 First of all, thanks for wanting to contribute to the SeqAn's Sharg-parser! Community is important to us and we strive
 to maintain a great culture and atmosphere. Please have a look at our [Code of Conduct](\ref about_code_of_conduct).
 
