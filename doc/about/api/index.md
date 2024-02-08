@@ -14,14 +14,14 @@ Sharg adheres to [semantic versioning](https://semver.org) and provides a stable
 one major release unless otherwise noted.
 
 For details regarding API stability, please see the
-[SeqAn documentation on API stability](https://docs.seqan.de/seqan/3-master-user/about_api.html#api_stability).
+[SeqAn documentation on API stability](https://docs.seqan.de/seqan3/main_user/about_api.html#api_stability).
 
 # Application Binary Interface (ABI) stability
 
 There is no A<strong>B</strong>I stability.
 
 For details regarding ABI stability, please see the
-[SeqAn documentation on ABI stability](https://docs.seqan.de/seqan/3-master-user/about_api.html#autotoc_md38).
+[SeqAn documentation on ABI stability](https://docs.seqan.de/seqan3/main_user/about_api.html#autotoc_md47).
 
 # Platform stability {#platform_stability}
 
