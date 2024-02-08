@@ -14,39 +14,29 @@ works.
 
 [TOC]
 
-<br>
-
 # Software
 Requirements:
   - gcc >= 11 or clang >= 17
   - cmake >= 3.16
   - git
 
-## Installing GCC
+## Installing a Compiler
 
-Sharg requires GCC >= 11 or LLVM/Clang >= 17. Current versions of VisualStudio/MSVC are **not yet supported**.
-We will briefly explain how to install GCC-11 (or the latest GCC if such an option is available) on some popular
-operating systems. We recommend using the latest version of GCC available. For more information, refer to your
-operating system's documentation.
+Sharg requires GCC >= 11 or LLVM/Clang >= 17. Presently, VisualStudio/MSVC is **not supported**.
+We'll offer a brief tutorial on compiler updates through common package managers and suggest some web-based
+alternatives. For further details, consult your OS documentation.
 
-\startcollapsible{Linux-based}
-
-#### Ubuntu >= 22.04
+<div class="tabbed">
+- <b class="tab-title">Ubuntu</b>
 ```bash
-# Installs default compiler version (gcc-11 for Ubuntu 22.04).
-sudo apt install g++
-# To install gcc-12, follow below instructions.
-```
-
-#### Ubuntu < 22.04
-```bash
+# Installs gcc-13
 sudo add-apt-repository --no-update --yes ppa:ubuntu-toolchain-r/ppa
 sudo add-apt-repository --no-update --yes ppa:ubuntu-toolchain-r/test
 sudo apt-get update
-sudo apt install g++-11
+sudo apt install g++-13
 ```
-
-#### Using [conda](https://conda.io)
+See https://apt.llvm.org/ if you prefer to use LLVM's Clang.
+- <b class="tab-title">Conda</b>
 To avoid interference with system packages, we recommend creating a new environment when using conda.
 ```bash
 conda create -n conda_gcc_env -c conda-forge gcc_linux-64
@@ -54,53 +44,36 @@ conda activate conda_gcc_env
 ```
 This will put GCC in a separate environment `conda_gcc_env` which can be activated via `conda activate conda_gcc_env`
 and deactivated via `conda deactivate`.
-
-\endcollapsible
-
-\startcollapsible{macOS}
-
-#### Using [Homebrew](https://brew.sh/)
+- <b class="tab-title">Homebrew</b>
 ```bash
-brew install gcc@11
+brew install gcc@13
+brew install llvm@17
 ```
-
-#### Using [MacPorts](https://www.macports.org/)
+- <b class="tab-title">Macports</b>
 ```bash
-sudo port install gcc11
+sudo port install gcc13
+sudo port install llvm-17
 ```
-
-\endcollapsible
-
-\startcollapsible{Windows}
-
-#### Using [WSL](https://docs.microsoft.com/en-us/windows/wsl/about)
+- <b class="tab-title">Windows</b>
 The Windows Subsystem for Linux offers an easy way to run a Linux distribution under Windows.
 Follow [Microsoft's setup guide](https://docs.microsoft.com/en-us/windows/wsl/about) to install WSL and then follow
 the steps listed for Linux-based systems.
-
-\endcollapsible
-
-\startcollapsible{Browser-based}
-
-#### Using [gitpod.io](https://gitpod.io/#https://github.com/seqan/sharg-parser/)
-[gitpod.io](https://gitpod.io) allows you to edit, compile and run code from within your browser. The free version
-includes 50 hours of use per month, which is plenty for our tutorials. A GitHub account is required.
-[Click here](https://gitpod.io/#https://github.com/seqan/sharg-parser/) to open Sharg in gitpod.
-
-<!-- Codespaces are currently not free. Revisit in the future.
-#### Using [GitHub codespaces](https://github.com/codespaces)
-GitHub offers a service similar to gitpod. Codespaces are currently in **public beta** and may not be available to
-everyone. [Click here](https://github.com/codespaces) to check for availability.
-
+- <b class="tab-title">gitpod.io</b>
+[gitpod.io](https://gitpod.io) allows you to edit, compile and run code from within your browser. The free version includes 50
+hours of use per month, which is plenty for our tutorials. A GitHub account is required.
+[Click here](https://gitpod.io/#https://github.com/seqan/sharg-parser) to open Sharg in gitpod.
+- <b class="tab-title">GitHub Codespaces</b>
+[GitHub Codespaces](https://github.com/codespaces) offer a service similar to gitpod, including a free monthly quota.
+[Click here](https://codespaces.new/seqan/sharg-parser) to open Sharg in Codespaces.
 Please note that you may have to manually clone the submodules by running `git submodule update --init`.
--->
 
-\endcollapsible
+</div>
 
-\attention After installing, `g++ --version` should print the desired version.
-           If not, you may have to use, for example, `g++-11 --version` or even specify the full path to your compiler.
+<br>
+\note After installing, `g++ --version` should print the desired GCC version.
+      If not, you may have to use, for example, `g++-11 --version` or even specify the full path to your compiler.
 
-Similarly, you may need to install CMake and git, e.g. `apt install cmake git`.
+Similarly, you may need to install CMake and git, e.g. `sudo apt install cmake git`.
 
 # Directory Structure
 In this section we will use the `tree` command to show the directory structure. This program may not be installed
@@ -116,16 +89,13 @@ tutorial
 └── source
 ```
 
-To set these directories up you can follow this script:
+To set these directories up you can follow this script (note the <b>\--recurse-submodules</b> when cloning Sharg):
 ```bash
 mkdir tutorial
 cd tutorial
 mkdir build
 mkdir source
-git clone https://github.com/seqan/sharg-parser.git
-cd sharg-parser
-git submodule update --init
-cd ..
+git clone --recurse-submodules https://github.com/seqan/sharg-parser.git
 ```
 
 The output of the command `tree -L 2` should now look like this:
@@ -135,18 +105,9 @@ The output of the command `tree -L 2` should now look like this:
 ├── sharg-parser
 │   ├── CHANGELOG.md
 │   ├── CMakeLists.txt
-│   ├── CODE_OF_CONDUCT.md
-│   ├── CONTRIBUTING.md
-│   ├── LICENSE.md
-│   ├── README.md
-│   ├── build_system
-│   ├── doc
-│   ├── include
-│   ├── submodules
+│   ├── ...
 │   └── test
 └── source
-
-7 directories, 6 files
 ```
 
 # Compiling and Running
@@ -155,32 +116,16 @@ To test whether everything works, we will now compile and run a small example.
 
 First we create the file `hello_world.cpp` in the `source` directory with the following contents:
 
-```
-#include <sharg/core/debug_stream.hpp>
-
-int main()
-{
-    sharg::debug_stream << "Hello World!\n";
-    return 0;
-}
-```
+\include test/external_project/src/hello_world.cpp
 
 To compile it, we first create a `CMakeLists.txt` file in the `source` directory:
-
-```
-cmake_minimum_required (VERSION 3.16)
-project (sharg_tutorial CXX)
-
-# add sharg to search path
-list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../sharg/build_system")
-
-# require sharg with a version >=1.0.0
-find_package (sharg 1.0 REQUIRED)
-
-# build app with sharg
-add_executable (hello_world hello_world.cpp)
-target_link_libraries (hello_world sharg::sharg)
-```
+<!-- Parsing the snippet like this to avoid verbatim includes of the snippet identifiers if we used nested snippets. -->
+<!-- Snippet start -->
+\dontinclude test/external_project/sharg_setup_tutorial/CMakeLists.txt
+\until cmake_minimum_required
+\skipline project
+\until target_link_libraries
+<!-- Snippet end -->
 
 The directories should now look like this:
 
@@ -188,9 +133,10 @@ The directories should now look like this:
 .
 ├── build
 ├── sharg-parser
-│   ├── build_system
-│   ├── ...
-│   └── test
+│   ├── CHANGELOG.md
+│   ├── CMakeLists.txt
+│   ├── ...
+│   └── test
 └── source
     ├── CMakeLists.txt
     └── hello_world.cpp
@@ -204,16 +150,17 @@ make
 ./hello_world
 ```
 
-The output should be `Hello World!`. Note that the build type is specified with `-DCMAKE_BUILD_TYPE=Release`.
+This should output a basic help page. Note that the build type is specified with `-DCMAKE_BUILD_TYPE=Release`.
 Specifying `Release` enables an optimized build where no debug information is available. Release mode is therefore
 suitable for the end user. Programs built using `-DCMAKE_BUILD_TYPE=Debug` will run slower, but also make the detection
 of errors easier. `Debug` is suitable for contributors, and we recommend using it while working with our
 [Tutorials](usergroup1.html).
 
+\anchor remark_cmake_cxx_compiler
 \remark Depending on the standard C++ compiler on your system, you may need to specify the compiler via
 `-DCMAKE_CXX_COMPILER=`, for example:
 ```bash
-cmake -DCMAKE_CXX_COMPILER=/path/to/executable/g++-11 ../source
+cmake -DCMAKE_CXX_COMPILER=/path/to/executable/g++-13 ../source
 ```
 
 # Adding a new source file to your project
@@ -221,13 +168,7 @@ cmake -DCMAKE_CXX_COMPILER=/path/to/executable/g++-11 ../source
 If you create a new `cpp` file and want to compile it, you need to add another `add_executable` and
 `target_link_libraries` directive to you `CMakeLists.txt`.
 For example, after adding `another_program.cpp` your `CMakeLists.txt` may look like this:
-
-```
-# ... former cmake code from above
-
-add_executable (another_program another_program.cpp)
-target_link_libraries (another_program sharg::sharg)
-```
+\snippet test/external_project/sharg_setup_tutorial/CMakeLists.txt adding_files
 
 # Encountered issues
 
