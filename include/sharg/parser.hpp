@@ -165,8 +165,7 @@ public:
     /*!\brief Initializes an sharg::parser object from the command line arguments.
      *
      * \param[in] app_name The name of the app that is displayed on the help page.
-     * \param[in] argc The number of command line arguments.
-     * \param[in] argv The command line arguments to parse.
+     * \param[in] arguments The command line arguments to parse.
      * \param[in] version_updates Notify users about version updates (default sharg::update_notifications::on).
      * \param[in] subcommands A list of subcommands (see \link subcommand_parse subcommand parsing \endlink).
      *
@@ -182,12 +181,12 @@ public:
      * \stableapi{Since version 1.0.}
      */
     parser(std::string const & app_name,
-           int const argc,
-           char const * const * const argv,
+           std::vector<std::string> const & arguments,
            update_notifications version_updates = update_notifications::on,
            std::vector<std::string> subcommands = {}) :
         version_check_dev_decision{version_updates},
-        subcommands{std::move(subcommands)}
+        subcommands{std::move(subcommands)},
+        arguments{arguments}
     {
         for (auto & sub : this->subcommands)
         {
@@ -200,8 +199,17 @@ public:
 
         info.app_name = app_name;
 
-        init(argc, argv);
+        init();
     }
+
+    //!\overload
+    parser(std::string const & app_name,
+           int const argc,
+           char const * const * const argv,
+           update_notifications version_updates = update_notifications::on,
+           std::vector<std::string> subcommands = {}) :
+        parser{app_name, std::vector<std::string>{argv, argv + argc}, version_updates, std::move(subcommands)}
+    {}
 
     //!\brief The destructor.
     ~parser()
@@ -517,10 +525,10 @@ public:
         if (std::find(used_option_ids.begin(), used_option_ids.end(), std::string{id}) == used_option_ids.end())
             throw design_error{"You can only ask for option identifiers that you added with add_option() before."};
 
-        // we only need to search for an option before the `end_of_options_indentifier` (`--`)
-        auto end_of_options = std::find(cmd_arguments.begin(), cmd_arguments.end(), end_of_options_indentifier);
-        auto option_it = detail::format_parse::find_option_id(cmd_arguments.begin(), end_of_options, short_or_long_id);
-        return option_it != end_of_options;
+        // we only need to search for an option before the `option_end_identifier` (`--`)
+        auto option_end = std::find(format_arguments.begin(), format_arguments.end(), option_end_identifier);
+        auto option_it = detail::format_parse::find_option_id(format_arguments.begin(), option_end, short_or_long_id);
+        return option_it != option_end;
     }
 
     //!\name Structuring the Help Page
@@ -689,7 +697,7 @@ private:
     std::regex app_name_regex{"^[a-zA-Z0-9_-]+$"};
 
     //!\brief Signals the parser that no options follow this string but only positional arguments.
-    static constexpr std::string_view const end_of_options_indentifier{"--"};
+    static constexpr std::string_view const option_end_identifier{"--"};
 
     //!\brief Stores the sub-parser in case \link subcommand_parse subcommand parsing \endlink is enabled.
     std::unique_ptr<parser> sub_parser{nullptr};
@@ -717,26 +725,24 @@ private:
     //!\brief List of option/flag identifiers that are already used.
     std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
 
-    //!\brief The command line arguments.
-    std::vector<std::string> cmd_arguments{};
+    //!\brief The command line arguments that will be passed to the format.
+    std::vector<std::string> format_arguments{};
+
+    //!\brief The original command line arguments.
+    std::vector<std::string> arguments{};
 
     //!\brief The command that lead to calling this parser, e.g. [./build/bin/raptor, build]
     std::vector<std::string> executable_name{};
 
     /*!\brief Initializes the sharg::parser class on construction.
-     *
-     * \param[in] argc        The number of command line arguments.
-     * \param[in] argv        The command line arguments.
-     *
      * \throws sharg::too_few_arguments if option --export-help was specified without a value
      * \throws sharg::too_few_arguments if option --version-check was specified without a value
      * \throws sharg::validation_error if the value passed to option --export-help was invalid.
      * \throws sharg::validation_error if the value passed to option --version-check was invalid.
      * \throws sharg::too_few_arguments if a sub parser was configured at construction but a subcommand is missing.
-     *
      * \details
      *
-     * This function adds all command line parameters to the cmd_arguments member variable
+     * This function adds all command line parameters to the format_arguments member variable
      * to take advantage of the vector functionality later on. Additionally,
      * the format member variable is set, depending on which parameters are given
      * by the user:
@@ -755,27 +761,34 @@ private:
      *
      * If `--export-help` is specified with a value other than html, man, cwl or ctd, an sharg::parser_error is thrown.
      */
-    void init(int argc, char const * const * const argv)
+    void init()
     {
-        assert(argc > 0);
-        executable_name.emplace_back(argv[0]);
+        assert(!arguments.empty());
+
+        executable_name.emplace_back(arguments[0]);
 
         bool special_format_was_set{false};
 
-        for (int i = 1, argv_len = argc; i < argv_len; ++i) // start at 1 to skip binary name
+        // Helper function for going to the next argument. This makes it more obvious that we are
+        // incrementing `it` (version-check, and export-help).
+        auto go_to_next_arg = [this](auto & it, std::string_view message) -> auto
         {
-            std::string_view arg{argv[i]};
+            if (++it == arguments.end())
+                throw too_few_arguments{message.data()};
+        };
+
+        // start at 1 to skip binary name
+        for (auto it = ++arguments.begin(); it != arguments.end(); ++it)
+        {
+            std::string_view arg{*it};
 
             if (!subcommands.empty()) // this is a top_level parser
             {
                 if (std::ranges::find(subcommands, arg) != subcommands.end()) // identified subparser
                 {
-                    // LCOV_EXCL_START
                     sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
-                                                          argc - i,
-                                                          argv + i,
+                                                          std::vector<std::string>{it, arguments.end()},
                                                           update_notifications::off);
-                    // LCOV_EXCL_STOP
 
                     // Add the original calls to the front, e.g. ["raptor"],
                     // s.t. ["raptor", "build"] will be the list after constructing the subparser
@@ -790,28 +803,38 @@ private:
                     // Flags starting with '-' are allowed for the top-level parser.
                     // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
                     if (!arg.empty() && arg[0] != '-')
+                    {
+                        format_arguments.emplace_back(arg);
                         break;
+                    }
                 }
             }
 
             if (arg == "-h" || arg == "--help")
             {
-                format = detail::format_help{subcommands, version_check_dev_decision, false};
                 special_format_was_set = true;
+                format = detail::format_help{subcommands, version_check_dev_decision, false};
             }
             else if (arg == "-hh" || arg == "--advanced-help")
             {
-                format = detail::format_help{subcommands, version_check_dev_decision, true};
                 special_format_was_set = true;
+                format = detail::format_help{subcommands, version_check_dev_decision, true};
             }
             else if (arg == "--version")
             {
-                format = detail::format_version{};
                 special_format_was_set = true;
+                format = detail::format_version{};
+            }
+            else if (arg == "--copyright")
+            {
+                special_format_was_set = true;
+                format = detail::format_copyright{};
             }
             else if (arg.substr(0, 13) == "--export-help") // --export-help=man is also allowed
             {
-                std::string export_format;
+                special_format_was_set = true;
+
+                std::string_view export_format;
 
                 if (arg.size() > 13)
                 {
@@ -819,9 +842,8 @@ private:
                 }
                 else
                 {
-                    if (argv_len <= i + 1)
-                        throw too_few_arguments{"Option --export-help must be followed by a value."};
-                    export_format = std::string{argv[i + 1]};
+                    go_to_next_arg(it, "Option --export-help must be followed by a value.");
+                    export_format = *it;
                 }
 
                 if (export_format == "html")
@@ -836,19 +858,11 @@ private:
                     throw validation_error{"Validation failed for option --export-help: "
                                            "Value must be one of "
                                            + detail::supported_exports + "."};
-                special_format_was_set = true;
-            }
-            else if (arg == "--copyright")
-            {
-                format = detail::format_copyright{};
-                special_format_was_set = true;
             }
             else if (arg == "--version-check")
             {
-                if (++i >= argv_len)
-                    throw too_few_arguments{"Option --version-check must be followed by a value."};
-
-                arg = argv[i];
+                go_to_next_arg(it, "Option --version-check must be followed by a value.");
+                arg = *it;
 
                 if (arg == "1" || arg == "true")
                     version_check_user_decision = true;
@@ -856,26 +870,22 @@ private:
                     version_check_user_decision = false;
                 else
                     throw validation_error{"Value for option --version-check must be true (1) or false (0)."};
-
-                // in case --version-check is specified it shall not be passed to format_parse()
-                argc -= 2;
             }
             else
             {
-                cmd_arguments.emplace_back(arg);
+                format_arguments.emplace_back(arg);
             }
         }
 
-        // all special options have been identified, which might involve deleting them from argv (e.g. version-check)
-        // check if no actual options remain and then call the short help page.
-        if (argc <= 1) // no arguments provided
-        {
-            format = detail::format_short_help{};
+        if (special_format_was_set)
             return;
-        }
 
-        if (!special_format_was_set)
-            format = detail::format_parse(argc, cmd_arguments);
+        // All special options have been handled. If there are no arguments left and we do not have a subparser,
+        // we call the short help.
+        if (format_arguments.empty() && !sub_parser)
+            format = detail::format_short_help{};
+        else
+            format = detail::format_parse(format_arguments);
     }
 
     /*!\brief Checks whether the long identifier has already been used before.
