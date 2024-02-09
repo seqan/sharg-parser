@@ -27,10 +27,15 @@ defaults:
 
 jobs:
   build:
-    name: "External project"
+    name: "External project ${{ contains(matrix.SHARG_NO_TDL, 'OFF') && 'with TDL' || 'without TDL' }}"
     runs-on: ubuntu-22.04
     timeout-minutes: 120
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
+    strategy:
+      fail-fast: false
+      matrix:
+        SHARG_NO_TDL: [ON, OFF]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,13 +53,30 @@ jobs:
         uses: seqan/actions/setup-toolchain@main
         with:
           compiler: gcc-13
-          use_actions_cache: false
+
+      - name: Install dependencies
+        if: matrix.SHARG_NO_TDL == 'OFF'
+        run: |
+          git clone --depth 1 --single-branch --branch 0.8.0 https://github.com/jbeder/yaml-cpp.git
+          cd yaml-cpp
+          mkdir build
+          cd build
+          cmake ../ -DCMAKE_BUILD_TYPE=Debug \
+                    -DYAML_CPP_BUILD_CONTRIB=OFF \
+                    -DYAML_CPP_BUILD_TOOLS=OFF \
+                    -DYAML_BUILD_SHARED_LIBS=OFF \
+                    -DYAML_CPP_INSTALL=ON \
+                    -DYAML_CPP_BUILD_TESTS=OFF \
+                    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          make -j2
+          sudo make install
 
       - name: Configure tests
         run: |
           mkdir sharg-build
           cd sharg-build
-          cmake ../sharg-parser/test/external_project -DCMAKE_BUILD_TYPE=Debug
+          cmake ../sharg-parser/test/external_project -DCMAKE_BUILD_TYPE=Debug \
+                                                      -DSHARG_NO_TDL=${{ matrix.SHARG_NO_TDL }}
           make -j2 sharg_test_prerequisite
 
       - name: Build tests
