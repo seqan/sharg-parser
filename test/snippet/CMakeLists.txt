@@ -48,7 +48,6 @@ endmacro ()
 macro (sharg_snippets test_name_prefix snippet_base_path_)
     get_filename_component (snippet_base_path "${snippet_base_path_}" ABSOLUTE BASE_DIR
                             "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-    message (STATUS "${snippet_base_path}")
     sharg_test_files (snippet_files "${snippet_base_path}" "*.cpp")
     foreach (snippet ${snippet_files})
         sharg_snippet ("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
