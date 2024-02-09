@@ -6,6 +6,10 @@
 
 #include <sharg/parser.hpp>
 
+#if !__has_include(<seqan3/version.hpp>)
+#    error "seqan3/version.hpp is not available"
+#endif
+
 std::string const basic_options_str = "  Common options\n"
                                       "    -h, --help\n"
                                       "          Prints the help page.\n"
