@@ -263,7 +263,7 @@ TEST(parse_test, subcommand_parser_error)
         EXPECT_NO_THROW(top_level_parser.parse());
         EXPECT_EQ(true, flag_value);
 
-        EXPECT_THROW(top_level_parser.get_sub_parser(), sharg::design_error);
+        EXPECT_THROW(std::ignore = top_level_parser.get_sub_parser(), sharg::design_error);
     }
 
     // subcommand key word must only contain alpha numeric characters

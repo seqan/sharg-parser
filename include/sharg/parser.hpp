@@ -681,8 +681,9 @@ public:
      */
     parser_meta_data info;
 
-    /*!\brief Adds subcommands to the parser.
-     * \param[in] subcommands A list of subcommands.
+    /*!\brief Adds a subcommand to the parser.
+     * \param[in] subcommand The subcommand to add.
+     * \returns A pointer to the sub-parser if subcommand is encountered, nullptr otherwise.
      * \throws sharg::design_error if the subcommand name contains illegal characters.
      */
     [[nodiscard]] parser * add_subcommand(std::string subcommand)
@@ -701,7 +702,7 @@ public:
         };
 
         auto & parser_subcommands = this->subcommands;
-        parser_subcommands.emplace_back(std::move(subcommand));
+        parser_subcommands.emplace_back(subcommand);
 
         std::ranges::sort(parser_subcommands);
         auto const [first, last] = std::ranges::unique(parser_subcommands);
@@ -709,7 +710,11 @@ public:
 
         init();
 
-        return sub_parser.get();
+        // If a subcommand was already added via the constructor, we need to check if the subcommand is the same.
+        if (sub_parser && sub_parser->info.app_name == info.app_name + '-' + subcommand)
+            return sub_parser.get();
+        else
+            return nullptr;
     }
 
 private:
