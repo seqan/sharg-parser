@@ -1,0 +1,73 @@
+From 9f040f8ccb8d304841d24d8ac4d67db0d06c370f Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Fri, 9 Feb 2024 16:17:21 +0100
+Subject: [PATCH 4/5] [INFRA] Update TDL
+
+---
+ test/unit/detail/format_cwl_test.cpp | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index 1d27cc3..eaf0cad 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -76,8 +76,16 @@ TEST(format_cwl_test, full_information)
+     parser.info.examples.push_back("example2");
+ 
+     std::string expected_short = "label: default\n"
+-                                 "doc: \"description\\ndescription2\\n\"\n"
++                                 "doc: \"description\\n"
++                                 "description2\\n"
++                                 "\"\n"
+                                  "inputs:\n"
++                                 "  positional_0:\n"
++                                 "    doc: this is a positional option.\n"
++                                 "    type: string?\n"
++                                 "  positional_1:\n"
++                                 "    doc: \"this is a positional option. Default: []\"\n"
++                                 "    type: string?\n"
+                                  "  int:\n"
+                                  "    doc: \"this is a int option. Default: 5\"\n"
+                                  "    type: long?\n"
+@@ -88,6 +96,12 @@ TEST(format_cwl_test, full_information)
+                                  "    type: long\n"
+                                  "    inputBinding:\n"
+                                  "      prefix: --jint\n"
++                                 "  flag:\n"
++                                 "    doc: this is a flag.\n"
++                                 "    type: boolean?\n"
++                                 "  kflag:\n"
++                                 "    doc: this is a flag.\n"
++                                 "    type: boolean?\n"
+                                  "outputs:\n"
+                                  "  []\n"
+                                  "cwlVersion: v1.2\n"
+@@ -196,6 +210,12 @@ TEST(format_cwl_test, subparser)
+         "label: default-index\n"
+         "doc: \"\"\n"
+         "inputs:\n"
++        "  positional_0:\n"
++        "    doc: this is a positional option.\n"
++        "    type: string?\n"
++        "  positional_1:\n"
++        "    doc: \"this is a positional option. Default: []\"\n"
++        "    type: string?\n"
+         "  int:\n"
+         "    doc: \"this is a int option. Default: 5\"\n"
+         "    type: long?\n"
+@@ -244,6 +264,12 @@ TEST(format_cwl_test, subparser)
+         "    type: string?\n"
+         "    inputBinding:\n"
+         "      prefix: --path05\n"
++        "  flag:\n"
++        "    doc: this is a flag.\n"
++        "    type: boolean?\n"
++        "  kflag:\n"
++        "    doc: this is a flag.\n"
++        "    type: boolean?\n"
+         "outputs:\n"
+         "  path04:\n"
+         "    type: File?\n"
+-- 
+2.43.0
+

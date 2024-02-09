@@ -1,0 +1,25 @@
+From 3a7dfd8103806e97af6376e9173d686b67fb5b52 Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Fri, 9 Feb 2024 18:13:36 +0100
+Subject: [PATCH 5/5] [INFRA] Use seqan3 main branch
+
+---
+ test/unit/detail/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/unit/detail/CMakeLists.txt b/test/unit/detail/CMakeLists.txt
+index 392f878..1f9a8e0 100644
+--- a/test/unit/detail/CMakeLists.txt
++++ b/test/unit/detail/CMakeLists.txt
+@@ -23,7 +23,7 @@ sharg_test (type_name_as_string_test.cpp)
+ sharg_test (version_check_debug_test.cpp)
+ sharg_test (version_check_release_test.cpp)
+ 
+-file (DOWNLOAD https://raw.githubusercontent.com/seqan/seqan3/master/include/seqan3/version.hpp
++file (DOWNLOAD https://raw.githubusercontent.com/seqan/seqan3/main/include/seqan3/version.hpp
+       ${CMAKE_BINARY_DIR}/include/seqan3/version.hpp)
+ sharg_test (seqan3_test.cpp)
+ target_include_directories (seqan3_test SYSTEM PUBLIC ${CMAKE_BINARY_DIR}/include)
+-- 
+2.43.0
+
