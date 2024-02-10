@@ -165,8 +165,7 @@ public:
     /*!\brief Initializes an sharg::parser object from the command line arguments.
      *
      * \param[in] app_name The name of the app that is displayed on the help page.
-     * \param[in] argc The number of command line arguments.
-     * \param[in] argv The command line arguments to parse.
+     * \param[in] arguments The command line arguments to parse.
      * \param[in] version_updates Notify users about version updates (default sharg::update_notifications::on).
      * \param[in] subcommands A list of subcommands (see \link subcommand_parse subcommand parsing \endlink).
      *
@@ -182,26 +181,29 @@ public:
      * \stableapi{Since version 1.0.}
      */
     parser(std::string const & app_name,
+           std::vector<std::string> const & arguments,
+           update_notifications version_updates = update_notifications::on,
+           std::vector<std::string> subcommands = {}) :
+        version_check_dev_decision{version_updates},
+        original_arguments{arguments}
+    {
+        info.app_name = app_name;
+
+        for (auto const & subcommand : subcommands)
+            std::ignore /* function is nodisard */ = add_subcommand(subcommand);
+
+        if (subcommands.empty())
+            init();
+    }
+
+    //!\overload
+    parser(std::string const & app_name,
            int const argc,
            char const * const * const argv,
            update_notifications version_updates = update_notifications::on,
            std::vector<std::string> subcommands = {}) :
-        version_check_dev_decision{version_updates},
-        subcommands{std::move(subcommands)}
-    {
-        for (auto & sub : this->subcommands)
-        {
-            if (!std::regex_match(sub, app_name_regex))
-            {
-                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
-                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
-            }
-        }
-
-        info.app_name = app_name;
-
-        init(argc, argv);
-    }
+        parser{app_name, std::vector<std::string>{argv, argv + argc}, version_updates, std::move(subcommands)}
+    {}
 
     //!\brief The destructor.
     ~parser()
@@ -242,6 +244,7 @@ public:
               && std::invocable<validator_type, option_type>
     void add_option(option_type & value, config<validator_type> const & config)
     {
+        check_parse_not_called("add_option");
         verify_option_config(config);
 
         // copy variables into the lambda because the calls are pushed to a stack
@@ -268,6 +271,7 @@ public:
         requires std::invocable<validator_type, bool>
     void add_flag(bool & value, config<validator_type> const & config)
     {
+        check_parse_not_called("add_flag");
         verify_flag_config(config);
 
         if (value)
@@ -310,6 +314,7 @@ public:
               && std::invocable<validator_type, option_type>
     void add_positional_option(option_type & value, config<validator_type> const & config)
     {
+        check_parse_not_called("add_positional_option");
         verify_positional_option_config(config);
 
         if constexpr (detail::is_container_option<option_type>)
@@ -452,12 +457,18 @@ public:
      * \details
      * \stableapi{Since version 1.0.}
      */
-    parser & get_sub_parser()
+    [[nodiscard]] parser & get_sub_parser()
     {
+        // Technically not, as sub_parser is set via init(), but if if no subcommand is used in the command line,
+        // we do not process special formats (help/short-help/etc.) for the top-level parser.
+        if (!parse_was_called)
+            throw design_error("The function parse() must be called before get_sub_parser!");
+
+        if (subcommands.empty())
+            throw design_error("No subcommand was provided for the argument parser!");
+
         if (sub_parser == nullptr)
-        {
-            throw design_error("No subcommand was provided at the construction of the argument parser!");
-        }
+            throw design_error("There is no subparser!");
 
         return *sub_parser;
     }
@@ -537,6 +548,7 @@ public:
      */
     void add_section(std::string const & title, bool const advanced_only = false)
     {
+        check_parse_not_called("add_section");
         std::visit(
             [&title, advanced_only](auto & f)
             {
@@ -556,6 +568,7 @@ public:
      */
     void add_subsection(std::string const & title, bool const advanced_only = false)
     {
+        check_parse_not_called("add_subsection");
         std::visit(
             [&title, advanced_only](auto & f)
             {
@@ -576,6 +589,7 @@ public:
      */
     void add_line(std::string const & text, bool is_paragraph = false, bool const advanced_only = false)
     {
+        check_parse_not_called("add_line");
         std::visit(
             [&text, is_paragraph, advanced_only](auto & f)
             {
@@ -605,6 +619,7 @@ public:
      */
     void add_list_item(std::string const & key, std::string const & desc, bool const advanced_only = false)
     {
+        check_parse_not_called("add_list_item");
         std::visit(
             [&key, &desc, advanced_only](auto & f)
             {
@@ -666,6 +681,42 @@ public:
      */
     parser_meta_data info;
 
+    /*!\brief Adds a subcommand to the parser.
+     * \param[in] subcommand The subcommand to add.
+     * \returns A pointer to the sub-parser if subcommand is encountered, nullptr otherwise.
+     * \throws sharg::design_error if the subcommand name contains illegal characters.
+     */
+    [[nodiscard]] parser * add_subcommand(std::string subcommand)
+    {
+        check_parse_not_called("add_subcommand");
+
+        if (!std::regex_match(subcommand, app_name_regex))
+        {
+            std::string const error_message =
+                detail::to_string(std::quoted(info.app_name),
+                                  " contains an invalid subcommand name: ",
+                                  std::quoted(subcommand),
+                                  ". The subcommand name must only contain alpha-numeric characters ",
+                                  "or '_' and '-' (regex: \"^[a-zA-Z0-9_-]+$\").");
+            throw design_error{error_message};
+        };
+
+        auto & parser_subcommands = this->subcommands;
+        parser_subcommands.emplace_back(subcommand);
+
+        std::ranges::sort(parser_subcommands);
+        auto const [first, last] = std::ranges::unique(parser_subcommands);
+        parser_subcommands.erase(first, last);
+
+        init();
+
+        // If a subcommand was already added via the constructor, we need to check if the subcommand is the same.
+        if (sub_parser && sub_parser->info.app_name == info.app_name + '-' + subcommand)
+            return sub_parser.get();
+        else
+            return nullptr;
+    }
+
 private:
     //!\brief Keeps track of whether the parse function has been called already.
     bool parse_was_called{false};
@@ -717,23 +768,21 @@ private:
     //!\brief List of option/flag identifiers that are already used.
     std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
 
-    //!\brief The command line arguments.
+    //!\brief The command line arguments that will be passed to the format.
     std::vector<std::string> cmd_arguments{};
+
+    //!\brief The original command line arguments.
+    std::vector<std::string> original_arguments{};
 
     //!\brief The command that lead to calling this parser, e.g. [./build/bin/raptor, build]
     std::vector<std::string> executable_name{};
 
     /*!\brief Initializes the sharg::parser class on construction.
-     *
-     * \param[in] argc        The number of command line arguments.
-     * \param[in] argv        The command line arguments.
-     *
      * \throws sharg::too_few_arguments if option --export-help was specified without a value
      * \throws sharg::too_few_arguments if option --version-check was specified without a value
      * \throws sharg::validation_error if the value passed to option --export-help was invalid.
      * \throws sharg::validation_error if the value passed to option --version-check was invalid.
      * \throws sharg::too_few_arguments if a sub parser was configured at construction but a subcommand is missing.
-     *
      * \details
      *
      * This function adds all command line parameters to the cmd_arguments member variable
@@ -755,27 +804,52 @@ private:
      *
      * If `--export-help` is specified with a value other than html, man, cwl or ctd, an sharg::parser_error is thrown.
      */
-    void init(int argc, char const * const * const argv)
+    void init()
     {
-        assert(argc > 0);
-        executable_name.emplace_back(argv[0]);
+        assert(!original_arguments.empty());
+
+        // Start: If init() is called multiple times (via add_subcommands).
+
+        // * If sub_parser is set, nothing needs to be done. There can only ever be one subparser.
+        if (sub_parser)
+            return;
+
+        // * We need to clear cmd_arguments. They will be parsed again.
+        cmd_arguments.clear();
+
+        // * We need to handle executable_name:
+        //   * If it is empty:
+        //      * We are in the top level parser, or
+        //      * We are constructing a subparser: make_unique<parser> -> constructor -> init
+        //   * If it is not empty, we arrived here through a call to add_subcommands, in which case we already
+        //     appended the subcommand to the executable_name.
+        if (executable_name.empty())
+            executable_name.emplace_back(original_arguments[0]);
+
+        // End: If init() is called multiple times (via add_subcommands).
 
         bool special_format_was_set{false};
 
-        for (int i = 1, argv_len = argc; i < argv_len; ++i) // start at 1 to skip binary name
+        // Helper function for going to the next argument. This makes it more obvious that we are
+        // incrementing `it` (version-check, and export-help).
+        auto go_to_next_arg = [this](auto & it, std::string_view message) -> auto
         {
-            std::string_view arg{argv[i]};
+            if (++it == original_arguments.end())
+                throw too_few_arguments{message.data()};
+        };
+
+        // start at 1 to skip binary name
+        for (auto it = ++original_arguments.begin(); it != original_arguments.end(); ++it)
+        {
+            std::string_view arg{*it};
 
             if (!subcommands.empty()) // this is a top_level parser
             {
                 if (std::ranges::find(subcommands, arg) != subcommands.end()) // identified subparser
                 {
-                    // LCOV_EXCL_START
                     sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
-                                                          argc - i,
-                                                          argv + i,
+                                                          std::vector<std::string>{it, original_arguments.end()},
                                                           update_notifications::off);
-                    // LCOV_EXCL_STOP
 
                     // Add the original calls to the front, e.g. ["raptor"],
                     // s.t. ["raptor", "build"] will be the list after constructing the subparser
@@ -790,28 +864,38 @@ private:
                     // Flags starting with '-' are allowed for the top-level parser.
                     // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
                     if (!arg.empty() && arg[0] != '-')
+                    {
+                        cmd_arguments.emplace_back(arg);
                         break;
+                    }
                 }
             }
 
             if (arg == "-h" || arg == "--help")
             {
-                format = detail::format_help{subcommands, version_check_dev_decision, false};
                 special_format_was_set = true;
+                format = detail::format_help{subcommands, version_check_dev_decision, false};
             }
             else if (arg == "-hh" || arg == "--advanced-help")
             {
-                format = detail::format_help{subcommands, version_check_dev_decision, true};
                 special_format_was_set = true;
+                format = detail::format_help{subcommands, version_check_dev_decision, true};
             }
             else if (arg == "--version")
             {
-                format = detail::format_version{};
                 special_format_was_set = true;
+                format = detail::format_version{};
+            }
+            else if (arg == "--copyright")
+            {
+                special_format_was_set = true;
+                format = detail::format_copyright{};
             }
             else if (arg.substr(0, 13) == "--export-help") // --export-help=man is also allowed
             {
-                std::string export_format;
+                special_format_was_set = true;
+
+                std::string_view export_format;
 
                 if (arg.size() > 13)
                 {
@@ -819,9 +903,8 @@ private:
                 }
                 else
                 {
-                    if (argv_len <= i + 1)
-                        throw too_few_arguments{"Option --export-help must be followed by a value."};
-                    export_format = std::string{argv[i + 1]};
+                    go_to_next_arg(it, "Option --export-help must be followed by a value.");
+                    export_format = *it;
                 }
 
                 if (export_format == "html")
@@ -836,19 +919,11 @@ private:
                     throw validation_error{"Validation failed for option --export-help: "
                                            "Value must be one of "
                                            + detail::supported_exports + "."};
-                special_format_was_set = true;
-            }
-            else if (arg == "--copyright")
-            {
-                format = detail::format_copyright{};
-                special_format_was_set = true;
             }
             else if (arg == "--version-check")
             {
-                if (++i >= argv_len)
-                    throw too_few_arguments{"Option --version-check must be followed by a value."};
-
-                arg = argv[i];
+                go_to_next_arg(it, "Option --version-check must be followed by a value.");
+                arg = *it;
 
                 if (arg == "1" || arg == "true")
                     version_check_user_decision = true;
@@ -856,9 +931,6 @@ private:
                     version_check_user_decision = false;
                 else
                     throw validation_error{"Value for option --version-check must be true (1) or false (0)."};
-
-                // in case --version-check is specified it shall not be passed to format_parse()
-                argc -= 2;
             }
             else
             {
@@ -866,16 +938,15 @@ private:
             }
         }
 
-        // all special options have been identified, which might involve deleting them from argv (e.g. version-check)
-        // check if no actual options remain and then call the short help page.
-        if (argc <= 1) // no arguments provided
-        {
-            format = detail::format_short_help{};
+        if (special_format_was_set)
             return;
-        }
 
-        if (!special_format_was_set)
-            format = detail::format_parse(argc, cmd_arguments);
+        // All special options have been handled. If there are no arguments left and we do not have a subparser,
+        // we call the short help.
+        if (cmd_arguments.empty() && !sub_parser)
+            format = detail::format_short_help{};
+        else
+            format = detail::format_parse(cmd_arguments);
     }
 
     /*!\brief Checks whether the long identifier has already been used before.
@@ -974,6 +1045,21 @@ private:
 
         if (!config.default_message.empty())
             throw design_error{"A positional option may not have a default message because it is always required."};
+    }
+
+    /*!\brief Throws a sharg::design_error if parse() was already called.
+     * \param[in] function_name The name of the function that was called after parse().
+     * \throws sharg::design_error
+     * \details
+     * This function is used when calling functions which have no effect (add_line, add_option, ...) or unexpected
+     * behavior (add_subcommands) after parse() was called.
+     * Has no effect when parse() encounters a special format (help, version, ...), since those will terminate
+     * the program.
+     */
+    inline void check_parse_not_called(std::string_view const function_name) const
+    {
+        if (parse_was_called)
+            throw design_error{detail::to_string(function_name.data(), " may only be used before calling parse().")};
     }
 };
 
