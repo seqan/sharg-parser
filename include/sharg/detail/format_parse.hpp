@@ -57,13 +57,10 @@ public:
     ~format_parse() = default;                                   //!< Defaulted.
 
     /*!\brief The constructor of the parse format.
-     * \param[in] argc_ The number of command line arguments.
      * \param[in] argv_ The command line arguments to parse.
      */
-    format_parse(int const argc_, std::vector<std::string> argv_) : argv{std::move(argv_)}
-    {
-        (void)argc_;
-    }
+    format_parse(std::vector<std::string> argv_) : argv{std::move(argv_)}
+    {}
     //!\}
 
     /*!\brief Adds an sharg::detail::get_option call to be evaluated later on.
