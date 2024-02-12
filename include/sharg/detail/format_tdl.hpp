@@ -304,10 +304,6 @@ public:
                     .tags = {},
                     .value = tdl::StringValue{},
                 });
-                if (!config.long_id.empty())
-                {
-                    info.cliMapping.emplace_back("--" + config.long_id, config.long_id);
-                }
             });
     }
 
