@@ -38,7 +38,7 @@ namespace sharg::detail
  * -#. Positional Options (order within as specified by the developer)
  *
  * When parsing flags and options, the identifiers (and values) are removed from
- * the vector format_parse::argv. That way, options that are specified multiple times,
+ * the vector format_parse::arguments. That way, options that are specified multiple times,
  * but are no container type, can be identified and an error is reported.
  *
  * \remark For a complete overview, take a look at \ref parser
@@ -57,13 +57,10 @@ public:
     ~format_parse() = default;                                   //!< Defaulted.
 
     /*!\brief The constructor of the parse format.
-     * \param[in] argc_ The number of command line arguments.
-     * \param[in] argv_ The command line arguments to parse.
+     * \param[in] cmd_arguments The command line arguments to parse.
      */
-    format_parse(int const argc_, std::vector<std::string> argv_) : argv{std::move(argv_)}
-    {
-        (void)argc_;
-    }
+    format_parse(std::vector<std::string> cmd_arguments) : arguments{std::move(cmd_arguments)}
+    {}
     //!\}
 
     /*!\brief Adds an sharg::detail::get_option call to be evaluated later on.
@@ -108,7 +105,7 @@ public:
     //!\brief Initiates the actual command line parsing.
     void parse(parser_meta_data const & /*meta*/)
     {
-        end_of_options_it = std::find(argv.begin(), argv.end(), "--");
+        end_of_options_it = std::find(arguments.begin(), arguments.end(), "--");
 
         // parse options first, because we need to rule out -keyValue pairs
         // (e.g. -AnoSpaceAfterIdentifierA) before parsing flags
@@ -120,7 +117,7 @@ public:
 
         check_for_unknown_ids();
 
-        if (end_of_options_it != argv.end())
+        if (end_of_options_it != arguments.end())
             *end_of_options_it = ""; // remove -- before parsing positional arguments
 
         for (auto && f : positional_option_calls)
@@ -151,7 +148,7 @@ public:
             return id == '\0';
     }
 
-    /*!\brief Finds the position of a short/long identifier in format_parse::argv.
+    /*!\brief Finds the position of a short/long identifier in format_parse::arguments.
      * \tparam iterator_type The type of iterator that defines the range to search in.
      * \tparam id_type The identifier type; must be either of type `char` if it denotes a short identifier or
      *                 std::string if it denotes a long identifier.
@@ -165,11 +162,11 @@ public:
      *
      * **Valid short-id value pairs are: `-iValue`, `-i=Value`, or `-i Value`**
      * If the `id` passed to this function is of type `char`, it is assumed to be a short identifier.
-     * The `id` is found by comparing the prefix of every argument in argv to the `id` prepended with a single `-`.
+     * The `id` is found by comparing the prefix of every argument in arguments to the `id` prepended with a single `-`.
      *
      * **Valid long id value pairs are: `--id=Value`, `--id Value`**.
      * If the `id` passed to this function is of type `std::string`, it is assumed to be a long identifier.
-     * The `id` is found by comparing every argument in argv to `id` prepended with two dashes (`--`)
+     * The `id` is found by comparing every argument in arguments to `id` prepended with two dashes (`--`)
      * or a prefix of such followed by the equal sign `=`.
      */
     template <typename iterator_type, typename id_type>
@@ -242,12 +239,12 @@ private:
             return prepend_dash(short_id) + "/" + prepend_dash(long_id);
     }
 
-    /*!\brief Returns true and removes the long identifier if it is in format_parse::argv.
+    /*!\brief Returns true and removes the long identifier if it is in format_parse::arguments.
      * \param[in] long_id The long identifier of the flag to check.
      */
     bool flag_is_set(std::string const & long_id)
     {
-        auto it = std::find(argv.begin(), end_of_options_it, prepend_dash(long_id));
+        auto it = std::find(arguments.begin(), end_of_options_it, prepend_dash(long_id));
 
         if (it != end_of_options_it)
             *it = ""; // remove seen flag
@@ -255,13 +252,13 @@ private:
         return (it != end_of_options_it);
     }
 
-    /*!\brief Returns true and removes the short identifier if it is in format_parse::argv.
+    /*!\brief Returns true and removes the short identifier if it is in format_parse::arguments.
      * \param[in] short_id The short identifier of the flag to check.
      */
     bool flag_is_set(char const short_id)
     {
         // short flags need special attention, since they could be grouped (-rGv <=> -r -G -v)
-        for (std::string & arg : argv)
+        for (std::string & arg : arguments)
         {
             if (arg[0] == '-' && arg.size() > 1 && arg[1] != '-') // is option && not dash && no long option
             {
@@ -476,7 +473,7 @@ private:
 
     /*!\brief Handles value retrieval for options based on different key-value pairs.
      *
-     * \param[out] value     Stores the value found in argv, parsed by parse_option_value.
+     * \param[out] value     Stores the value found in arguments, parsed by parse_option_value.
      * \param[in]  option_it The iterator where the option identifier was found.
      * \param[in]  id        The option identifier supplied on the command line.
      *
@@ -536,16 +533,16 @@ private:
 
     /*!\brief Handles value retrieval (non container type) options.
      *
-     * \param[out] value Stores the value found in argv, parsed by parse_option_value.
+     * \param[out] value Stores the value found in arguments, parsed by parse_option_value.
      * \param[in] id The option identifier supplied on the command line.
      *
      * \throws sharg::option_declared_multiple_times
      *
      * \details
      *
-     * If the option identifier is found in format_parse::argv, the value of
-     * the following position in argv is tried to be parsed given the respective option value type
-     * and the identifier and value argument are removed from argv.
+     * If the option identifier is found in format_parse::arguments, the value of
+     * the following position in arguments is tried to be parsed given the respective option value type
+     * and the identifier and value argument are removed from arguments.
      *
      * Returns true on success and false otherwise. This is needed to catch
      * the user error of supplying multiple arguments for the same
@@ -554,7 +551,7 @@ private:
     template <typename option_type, typename id_type>
     bool get_option_by_id(option_type & value, id_type const & id)
     {
-        auto it = find_option_id(argv.begin(), end_of_options_it, id);
+        auto it = find_option_id(arguments.begin(), end_of_options_it, id);
 
         if (it != end_of_options_it)
             identify_and_retrieve_option_value(value, it, id);
@@ -568,7 +565,7 @@ private:
 
     /*!\brief Handles value retrieval (container type) options.
      *
-     * \param[out] value Stores all values found in argv, parsed by parse_option_value.
+     * \param[out] value Stores all values found in arguments, parsed by parse_option_value.
      * \param[in]  id    The option identifier supplied on the command line.
      *
      * \details
@@ -580,7 +577,7 @@ private:
     template <detail::is_container_option option_type, typename id_type>
     bool get_option_by_id(option_type & value, id_type const & id)
     {
-        auto it = find_option_id(argv.begin(), end_of_options_it, id);
+        auto it = find_option_id(arguments.begin(), end_of_options_it, id);
         bool seen_at_least_once{it != end_of_options_it};
 
         if (seen_at_least_once)
@@ -595,22 +592,22 @@ private:
         return seen_at_least_once;
     }
 
-    /*!\brief Checks format_parse::argv for unknown options/flags.
+    /*!\brief Checks format_parse::arguments for unknown options/flags.
      *
      * \throws sharg::unknown_option
      *
      * \details
      *
      * This function is used by format_parse::parse() AFTER all flags and options
-     * specified by the developer were parsed and therefore removed from argv.
+     * specified by the developer were parsed and therefore removed from arguments.
      * Thus, all remaining flags/options are unknown.
      *
-     * In addition this function removes "--" (if specified) from argv to
-     * clean argv for positional option retrieval.
+     * In addition this function removes "--" (if specified) from arguments to
+     * clean arguments for positional option retrieval.
      */
     void check_for_unknown_ids()
     {
-        for (auto it = argv.begin(); it != end_of_options_it; ++it)
+        for (auto it = arguments.begin(); it != end_of_options_it; ++it)
         {
             std::string arg{*it};
             if (!arg.empty() && arg[0] == '-') // may be an identifier
@@ -637,7 +634,7 @@ private:
         }
     }
 
-    /*!\brief Checks format_parse::argv for unknown options/flags.
+    /*!\brief Checks format_parse::arguments for unknown options/flags.
      *
      * \throws sharg::too_many_arguments
      *
@@ -645,18 +642,18 @@ private:
      *
      * This function is used by format_parse::parse() AFTER all flags, options
      * and positional options specified by the developer were parsed and
-     * therefore removed from argv.
+     * therefore removed from arguments.
      * Thus, all remaining non-empty arguments are too much.
      */
     void check_for_left_over_args()
     {
-        if (std::find_if(argv.begin(),
-                         argv.end(),
+        if (std::find_if(arguments.begin(),
+                         arguments.end(),
                          [](std::string const & s)
                          {
                              return (s != "");
                          })
-            != argv.end())
+            != arguments.end())
             throw too_many_arguments("Too many arguments provided. Please see -h/--help for more information.");
     }
 
@@ -734,27 +731,27 @@ private:
      * \details
      *
      * This function assumes that
-     * -#) argv has been stripped from all known options and flags
-     * -#) argv has been checked for unknown options
-     * -#) argv does not contain "--" anymore
-     *  Thus we can simply iterate over non empty entries of argv.
+     * -#) arguments has been stripped from all known options and flags
+     * -#) arguments has been checked for unknown options
+     * -#) arguments does not contain "--" anymore
+     *  Thus we can simply iterate over non empty entries of arguments.
      *
      * This function
      * - checks if the user did not provide enough arguments,
-     * - retrieves the next (no container type) or all (container type) remaining non empty value/s in argv
+     * - retrieves the next (no container type) or all (container type) remaining non empty value/s in arguments
      */
     template <typename option_type, typename validator_type>
     void get_positional_option(option_type & value, validator_type && validator)
     {
         ++positional_option_count;
-        auto it = std::find_if(argv.begin(),
-                               argv.end(),
+        auto it = std::find_if(arguments.begin(),
+                               arguments.end(),
                                [](std::string const & s)
                                {
                                    return (s != "");
                                });
 
-        if (it == argv.end())
+        if (it == arguments.end())
             throw too_few_arguments("Not enough positional arguments provided (Need at least "
                                     + std::to_string(positional_option_calls.size())
                                     + "). See -h/--help for more information.");
@@ -766,15 +763,15 @@ private:
 
             value.clear();
 
-            while (it != argv.end())
+            while (it != arguments.end())
             {
                 auto res = parse_option_value(value, *it);
                 std::string id = "positional option" + std::to_string(positional_option_count);
                 throw_on_input_error<option_type>(res, id, *it);
 
-                *it = ""; // remove arg from argv
+                *it = ""; // remove arg from arguments
                 it = std::find_if(it,
-                                  argv.end(),
+                                  arguments.end(),
                                   [](std::string const & s)
                                   {
                                       return (s != "");
@@ -788,7 +785,7 @@ private:
             std::string id = "positional option" + std::to_string(positional_option_count);
             throw_on_input_error<option_type>(res, id, *it);
 
-            *it = ""; // remove arg from argv
+            *it = ""; // remove arg from arguments
         }
 
         try
@@ -811,8 +808,8 @@ private:
     //!\brief Keeps track of the number of specified positional options.
     unsigned positional_option_count{0};
     //!\brief Vector of command line arguments.
-    std::vector<std::string> argv;
-    //!\brief Artificial end of argv if \-- was seen.
+    std::vector<std::string> arguments;
+    //!\brief Artificial end of arguments if \-- was seen.
     std::vector<std::string>::iterator end_of_options_it;
 };
 
