@@ -1,0 +1,59 @@
+From c84f8aeeba0895677c64d9740f4df908674cd0be Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Wed, 14 Feb 2024 12:34:40 +0100
+Subject: [PATCH 6/6] [API][FIX] positional options in CWL/CTD
+
+---
+ test/unit/detail/format_ctd_test.cpp | 4 ++--
+ test/unit/detail/format_cwl_test.cpp | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
+index eb14047..4e9261a 100644
+--- a/test/unit/detail/format_ctd_test.cpp
++++ b/test/unit/detail/format_ctd_test.cpp
+@@ -42,9 +42,9 @@ struct format_ctd_test : public ::testing::Test
+         "\n"
+         R"del(    <PARAMETERS version="1.7.0" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/OpenMS/OpenMS/develop/share/OpenMS/SCHEMAS/Param_1_7_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">)del"
+         "\n"
+-        R"del(        <ITEM name="positional_0" value="" type="string" description="this is a positional option." required="false" advanced="false" />)del"
++        R"del(        <ITEM name="positional_0" value="" type="string" description="this is a positional option." required="true" advanced="false" />)del"
+         "\n"
+-        R"del(        <ITEM name="positional_1" value="" type="string" description="this is a positional option. Default: []" required="false" advanced="false" />)del"
++        R"del(        <ITEMLIST name="positional_1" type="string" description="this is a positional option. Default: []" required="false" advanced="false" />)del"
+         "\n"
+         R"del(        <ITEM name="int" value="5" type="int" description="this is a int option. Default: 5" required="false" advanced="false" />)del"
+         "\n"
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index eaf0cad..52079db 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -82,10 +82,10 @@ TEST(format_cwl_test, full_information)
+                                  "inputs:\n"
+                                  "  positional_0:\n"
+                                  "    doc: this is a positional option.\n"
+-                                 "    type: string?\n"
++                                 "    type: string\n"
+                                  "  positional_1:\n"
+                                  "    doc: \"this is a positional option. Default: []\"\n"
+-                                 "    type: string?\n"
++                                 "    type: string[]?\n"
+                                  "  int:\n"
+                                  "    doc: \"this is a int option. Default: 5\"\n"
+                                  "    type: long?\n"
+@@ -212,10 +212,10 @@ TEST(format_cwl_test, subparser)
+         "inputs:\n"
+         "  positional_0:\n"
+         "    doc: this is a positional option.\n"
+-        "    type: string?\n"
++        "    type: string\n"
+         "  positional_1:\n"
+         "    doc: \"this is a positional option. Default: []\"\n"
+-        "    type: string?\n"
++        "    type: string[]?\n"
+         "  int:\n"
+         "    doc: \"this is a int option. Default: 5\"\n"
+         "    type: long?\n"
+-- 
+2.43.0
+

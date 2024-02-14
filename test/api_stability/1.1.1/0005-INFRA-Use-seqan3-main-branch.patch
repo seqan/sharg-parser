@@ -1,7 +1,7 @@
-From 3a7dfd8103806e97af6376e9173d686b67fb5b52 Mon Sep 17 00:00:00 2001
+From 085bc1fd63f3c48999610e0a9a916895a7cf9207 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Fri, 9 Feb 2024 18:13:36 +0100
-Subject: [PATCH 5/5] [INFRA] Use seqan3 main branch
+Subject: [PATCH 5/6] [INFRA] Use seqan3 main branch
 
 ---
  test/unit/detail/CMakeLists.txt | 2 +-

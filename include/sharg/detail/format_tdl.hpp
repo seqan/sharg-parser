@@ -298,15 +298,18 @@ public:
                 ++positional_option_count;
                 auto description = config.description + default_message + validator_message;
 
-                parameters.push_back(tdl::Node{
-                    .name = id,
-                    .description = description,
-                    .tags = {},
-                    .value = tdl::StringValue{},
-                });
-                if (!config.long_id.empty())
+                parameters.push_back(tdl::Node{.name = id, .description = description});
+
+                auto & node = parameters.back();
+
+                if constexpr (detail::is_container_option<option_type>)
                 {
-                    info.cliMapping.emplace_back("--" + config.long_id, config.long_id);
+                    node.value = tdl::StringValueList{};
+                }
+                else
+                {
+                    node.value = tdl::StringValue{};
+                    node.tags.insert("required");
                 }
             });
     }
