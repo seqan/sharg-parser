@@ -282,3 +282,41 @@ TEST(parse_test, subcommand_parser_error)
         EXPECT_THROW((top_level_parser.add_positional_option(flag_value, sharg::config{})), sharg::design_error);
     }
 }
+
+TEST(parse_test, not_allowed_after_parse)
+{
+    int32_t value{};
+    bool flag{};
+
+    std::vector<std::string> const arguments{"./parser_test", "-i", "3"};
+    sharg::parser parser{"test_parser", arguments};
+    parser.add_option(value, sharg::config{.short_id = 'i'});
+    EXPECT_NO_THROW(parser.parse());
+
+    auto check_error = [](auto call_fn, std::string const function_name)
+    {
+        try
+        {
+            call_fn();
+            FAIL();
+        }
+        catch (sharg::design_error const & exception)
+        {
+            EXPECT_EQ(function_name + " may only be used before calling parse().", exception.what());
+        }
+        catch (...)
+        {
+            FAIL();
+        }
+    };
+
+    // clang-format off
+    check_error([&parser, &value]() { parser.add_option(value, sharg::config{.short_id = 'i'}); }, "add_option");
+    check_error([&parser, &flag]() { parser.add_flag(flag, sharg::config{.short_id = 'i'}); }, "add_flag");
+    check_error([&parser, &value]() { parser.add_positional_option(value, sharg::config{}); }, "add_positional_option");
+    check_error([&parser]() { parser.add_section(""); }, "add_section");
+    check_error([&parser]() { parser.add_subsection(""); }, "add_subsection");
+    check_error([&parser]() { parser.add_line(""); }, "add_line");
+    check_error([&parser]() { parser.add_list_item("", ""); }, "add_list_item");
+    // clang-format on
+}
