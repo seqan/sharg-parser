@@ -240,7 +240,10 @@ public:
      *
      * The `config.validator` must be applicable to the given output variable (\p value).
      *
-     * \throws sharg::design_error
+     * \throws sharg::design_error if sharg::parser::parse was already called.
+     * \throws sharg::design_error if the option is required and has a default_message.
+     * \throws sharg::design_error if the option identifier was already used.
+     * \throws sharg::design_error if the option identifier is not a valid identifier.
      *
      * \details
      * \stableapi{Since version 1.0.}
@@ -268,7 +271,10 @@ public:
      * \param[in, out] value     The variable which shows if the flag is turned off (default) or on.
      * \param[in] config A configuration object to customise the sharg::parser behaviour. See sharg::config.
      *
-     * \throws sharg::design_error
+     * \throws sharg::design_error if sharg::parser::parse was already called.
+     * \throws sharg::design_error if `value` is true.
+     * \throws sharg::design_error if the option identifier was already used.
+     * \throws sharg::design_error if the option identifier is not a valid identifier.
      *
      * \details
      * \stableapi{Since version 1.0.}
@@ -307,7 +313,11 @@ public:
      * \param[in, out] value The variable in which to store the given command line argument.
      * \param[in] config Customise the sharg::parser behaviour. See sharg::positional_config.
      *
-     * \throws sharg::design_error
+     * \throws sharg::design_error if sharg::parser::parse was already called.
+     * \throws sharg::design_error if the option has a short or long identifier.
+     * \throws sharg::design_error if the option is advanced or hidden.
+     * \throws sharg::design_error if the option has a default_message.
+     * \throws sharg::design_error if there already is a positional list option.
      *
      * \details
      *
@@ -540,6 +550,7 @@ public:
     /*!\brief Adds an help page section to the sharg::parser.
      * \param[in] title The title of the section.
      * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
+     * \throws sharg::design_error if sharg::parser::parse was already called.
      * \details
      *
      * This only affects the help page and other output formats.
@@ -561,6 +572,7 @@ public:
     /*!\brief Adds an help page subsection to the sharg::parser.
      * \param[in] title The title of the subsection.
      * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
+     * \throws sharg::design_error if sharg::parser::parse was already called.
      * \details
      *
      * This only affects the help page and other output formats.
@@ -583,6 +595,7 @@ public:
      * \param[in] text The text to print.
      * \param[in] is_paragraph Whether to insert as paragraph or just a line (Default: false).
      * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
+     * \throws sharg::design_error if sharg::parser::parse was already called.
      * \details
      * If the line is not a paragraph (false), only one line break is appended, otherwise two line breaks are appended.
      * This only affects the help page and other output formats.
@@ -605,6 +618,7 @@ public:
      * \param[in] key  The key of the key-value pair of the list item.
      * \param[in] desc The value of the key-value pair of the list item.
      * \param[in] advanced_only If set to true, the section only shows when the user requested the advanced help page.
+     * \throws sharg::design_error if sharg::parser::parse was already called.
      *
      * \details
      *
