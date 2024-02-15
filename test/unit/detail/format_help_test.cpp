@@ -539,11 +539,11 @@ TEST_F(format_help_test, copyright)
 
 TEST_F(format_help_test, subcommand_parser)
 {
-    int option_value{};
+    bool flag_value{false};
 
     auto parser = get_subcommand_parser({"-h"}, {"sub1", "sub2"});
     parser.info.description.push_back("description");
-    parser.add_option(option_value, sharg::config{.short_id = 'f', .long_id = "foo", .description = "foo bar."});
+    parser.add_flag(flag_value, sharg::config{.short_id = 'f', .long_id = "foo", .description = "A flag."});
 
     std::string expected = "test_parser\n"
                            "===========\n"
@@ -558,12 +558,13 @@ TEST_F(format_help_test, subcommand_parser)
                            "    See the respective help page for further details (e.g. by calling\n"
                            "    test_parser sub1 -h).\n"
                            "\n"
-                           "    The following options below belong to the top-level parser and need to be\n"
+                           "    The following options belong to the top-level parser and need to be\n"
                            "    specified before the subcommand key word. Every argument after the\n"
                            "    subcommand key word is passed on to the corresponding sub-parser.\n"
-                           "\nOPTIONS\n"
-                           "    -f, --foo (signed 32 bit integer)\n"
-                           "          foo bar. Default: 0\n"
+                           "\n"
+                           "OPTIONS\n"
+                           "    -f, --foo\n"
+                           "          A flag.\n"
                            "\n"
                          + basic_options_str + "\n" + basic_version_str;
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);

@@ -386,7 +386,7 @@ public:
             derived_t().print_line("See the respective help page for further details (e.g. by calling " + meta.app_name
                                        + " " + command_names[0] + " -h).",
                                    true);
-            derived_t().print_line("The following options below belong to the top-level parser and need to be "
+            derived_t().print_line("The following options belong to the top-level parser and need to be "
                                    "specified \\fBbefore\\fP the subcommand key word. Every argument after the "
                                    "subcommand key word is passed on to the corresponding sub-parser.",
                                    true);

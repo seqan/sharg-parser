@@ -203,20 +203,19 @@ TEST_F(format_html_test, full_information_information)
 
 TEST_F(format_html_test, parse_error)
 {
-    std::vector<std::string> argv1{"./help_add_test", "--version-check", "false", "--export-help"};
-    std::vector<std::string> argv2{"./help_add_test", "--version-check", "false", "--export-help=atml"};
-    std::vector<std::string> argv3{"./help_add_test", "--version-check", "false", "--export-help", "atml"};
-    std::vector<std::string> argv4{"./help_add_test", "--version-check", "false", "--export-help#html"};
-
     // no value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", argv1}), sharg::parser_error);
+    auto parser = get_parser("./help_add_test", "--export-help");
+    EXPECT_THROW(parser.parse(), sharg::parser_error);
+
+    // wrong value after --export-help=
+    parser = get_parser("./help_add_test", "--export-help=atml");
+    EXPECT_THROW(parser.parse(), sharg::validation_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", argv2}), sharg::validation_error);
-
-    // wrong value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", argv3}), sharg::validation_error);
+    parser = get_parser("./help_add_test", "--export-help", "atml");
+    EXPECT_THROW(parser.parse(), sharg::validation_error);
 
     // Currently not checking for `=`
-    EXPECT_NO_THROW((sharg::parser{"test_parser", argv4}));
+    parser = get_parser("./help_add_test", "--export-help#html");
+    EXPECT_NE(get_parse_cout_on_exit(parser), "");
 }

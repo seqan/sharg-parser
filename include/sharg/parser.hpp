@@ -188,18 +188,7 @@ public:
         subcommands{std::move(subcommands)},
         arguments{arguments}
     {
-        for (auto & sub : this->subcommands)
-        {
-            if (!std::regex_match(sub, app_name_regex))
-            {
-                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
-                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
-            }
-        }
-
         info.app_name = app_name;
-
-        init();
     }
 
     //!\overload
@@ -256,14 +245,17 @@ public:
         check_parse_not_called("add_option");
         verify_option_config(config);
 
-        // copy variables into the lambda because the calls are pushed to a stack
-        // and the references would go out of scope.
-        std::visit(
-            [&value, &config](auto & f)
+        auto operation = [this, &value, config]()
+        {
+            auto visit_fn = [&value, &config](auto & f)
             {
                 f.add_option(value, config);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds a flag to the sharg::parser.
@@ -289,14 +281,17 @@ public:
         if (value)
             throw design_error("A flag's default value must be false.");
 
-        // copy variables into the lambda because the calls are pushed to a stack
-        // and the references would go out of scope.
-        std::visit(
-            [&value, &config](auto & f)
+        auto operation = [this, &value, config]()
+        {
+            auto visit_fn = [&value, &config](auto & f)
             {
                 f.add_flag(value, config);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds a positional option to the sharg::parser.
@@ -318,6 +313,7 @@ public:
      * \throws sharg::design_error if the option is advanced or hidden.
      * \throws sharg::design_error if the option has a default_message.
      * \throws sharg::design_error if there already is a positional list option.
+     * \throws sharg::design_error if there are subcommands.
      *
      * \details
      *
@@ -336,14 +332,17 @@ public:
         if constexpr (detail::is_container_option<option_type>)
             has_positional_list_option = true; // keep track of a list option because there must be only one!
 
-        // copy variables into the lambda because the calls are pushed to a stack
-        // and the references would go out of scope.
-        std::visit(
-            [&value, &config](auto & f)
+        auto operation = [this, &value, config]()
+        {
+            auto visit_fn = [&value, &config](auto & f)
             {
                 f.add_positional_option(value, config);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
     //!\}
 
@@ -360,6 +359,7 @@ public:
      * \throws sharg::too_many_arguments if the command line call contained more arguments than expected.
      * \throws sharg::too_few_arguments if the command line call contained less arguments than expected.
      * \throws sharg::validation_error if the argument was not excepted by the provided validator.
+     * \throws sharg::user_input_error if a subparser was configured at construction but a subcommand is missing.
      *
      * \details
      *
@@ -427,7 +427,18 @@ public:
                                 "(regex: \"^[a-zA-Z0-9_-]+$\").")};
         }
 
+        for (auto & sub : this->subcommands)
+        {
+            if (!std::regex_match(sub, app_name_regex))
+            {
+                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
+                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
+            }
+        }
+
         detail::version_checker app_version{info.app_name, info.version, info.url};
+
+        init();
 
         if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
         {
@@ -451,6 +462,10 @@ public:
             version_check_future = app_version_prom.get_future();
             app_version(std::move(app_version_prom));
         }
+
+        for (auto & operation : operations)
+            operation();
+
         std::visit(
             [this]<typename T>(T & f)
             {
@@ -561,12 +576,17 @@ public:
     {
         check_parse_not_called("add_section");
 
-        std::visit(
-            [&title, advanced_only](auto & f)
+        auto operation = [this, title, advanced_only]()
+        {
+            auto visit_fn = [&title, advanced_only](auto & f)
             {
                 f.add_section(title, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds an help page subsection to the sharg::parser.
@@ -583,12 +603,17 @@ public:
     {
         check_parse_not_called("add_subsection");
 
-        std::visit(
-            [&title, advanced_only](auto & f)
+        auto operation = [this, title, advanced_only]()
+        {
+            auto visit_fn = [&title, advanced_only](auto & f)
             {
                 f.add_subsection(title, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds an help page text line to the sharg::parser.
@@ -606,12 +631,17 @@ public:
     {
         check_parse_not_called("add_line");
 
-        std::visit(
-            [&text, is_paragraph, advanced_only](auto & f)
+        auto operation = [this, text, is_paragraph, advanced_only]()
+        {
+            auto visit_fn = [&text, is_paragraph, advanced_only](auto & f)
             {
                 f.add_line(text, is_paragraph, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds an help page list item (key-value) to the sharg::parser.
@@ -638,12 +668,17 @@ public:
     {
         check_parse_not_called("add_list_item");
 
-        std::visit(
-            [&key, &desc, advanced_only](auto & f)
+        auto operation = [this, key, desc, advanced_only]()
+        {
+            auto visit_fn = [&key, &desc, advanced_only](auto & f)
             {
                 f.add_list_item(key, desc, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
     //!\}
 
@@ -759,12 +794,14 @@ private:
     //!\brief The command that lead to calling this parser, e.g. [./build/bin/raptor, build]
     std::vector<std::string> executable_name{};
 
+    //!\brief Vector of functions that stores all calls.
+    std::vector<std::function<void()>> operations;
+
     /*!\brief Initializes the sharg::parser class on construction.
      * \throws sharg::too_few_arguments if option --export-help was specified without a value
      * \throws sharg::too_few_arguments if option --version-check was specified without a value
      * \throws sharg::validation_error if the value passed to option --export-help was invalid.
      * \throws sharg::validation_error if the value passed to option --version-check was invalid.
-     * \throws sharg::too_few_arguments if a sub parser was configured at construction but a subcommand is missing.
      * \details
      *
      * This function adds all command line parameters to the format_arguments member variable
@@ -970,7 +1007,7 @@ private:
     template <typename validator_t>
     void verify_option_config(config<validator_t> const & config)
     {
-        if (sub_parser != nullptr)
+        if (!subcommands.empty())
             throw design_error{"You may only specify flags for the top-level parser."};
 
         verify_identifiers(config.short_id, config.long_id);
@@ -1000,7 +1037,7 @@ private:
         if (config.advanced || config.hidden)
             throw design_error{"Positional options are always required and therefore cannot be advanced nor hidden!"};
 
-        if (sub_parser != nullptr)
+        if (!subcommands.empty())
             throw design_error{"You may only specify flags for the top-level parser."};
 
         if (has_positional_list_option)
