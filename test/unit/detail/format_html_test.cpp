@@ -215,7 +215,7 @@ TEST_F(format_html_test, parse_error)
     parser = get_parser("./help_add_test", "--export-help", "atml");
     EXPECT_THROW(parser.parse(), sharg::validation_error);
 
-    // Currently not checking for `=`
+    // wrong separator
     parser = get_parser("./help_add_test", "--export-help#html");
-    EXPECT_NE(get_parse_cout_on_exit(parser), "");
+    EXPECT_THROW(parser.parse(), sharg::unknown_option);
 }

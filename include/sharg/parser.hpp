@@ -423,7 +423,8 @@ public:
         // User input sanitization must happen before version check!
         verify_app_and_subcommand_names();
 
-        init();
+        // Determine the format and subcommand.
+        determine_format_and_subcommand();
 
         // If a subcommand was provided, check that it is valid.
         verify_subcommand();
@@ -741,7 +742,7 @@ private:
                  detail::format_man,
                  detail::format_tdl,
                  detail::format_copyright>
-        format{detail::format_help{{}, {}, false}}; // Will be overwritten in any case.
+        format{detail::format_short_help{}};
 
     //!\brief List of option/flag identifiers that are already used.
     std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
@@ -784,98 +785,104 @@ private:
      *
      * If `--export-help` is specified with a value other than html, man, cwl or ctd, an sharg::parser_error is thrown.
      */
-    void init()
+    void determine_format_and_subcommand()
     {
         assert(!arguments.empty());
+        auto it = arguments.begin();
 
-        executable_name.emplace_back(arguments[0]);
-
-        bool special_format_was_set{false};
+        executable_name.emplace_back(*it);
+        ++it;
 
         // Helper function for going to the next argument. This makes it more obvious that we are
         // incrementing `it` (version-check, and export-help).
-        auto go_to_next_arg = [this](auto & it, std::string_view message) -> auto
+        auto go_to_next_arg = [this, &it](std::string_view message) -> auto
         {
+            assert(it != arguments.end());
+
             if (++it == arguments.end())
                 throw too_few_arguments{message.data()};
         };
 
-        // start at 1 to skip binary name
-        for (auto it = ++arguments.begin(); it != arguments.end(); ++it)
+        // Helper function for finding and processing subcommands.
+        auto found_and_processed_subcommand = [this, &it](std::string_view arg) -> bool
         {
-            std::string_view arg{*it};
+            if (subcommands.empty())
+                return false;
 
-            if (!subcommands.empty()) // this is a top_level parser
+            if (std::ranges::find(subcommands, arg) != subcommands.end())
             {
-                if (std::ranges::find(subcommands, arg) != subcommands.end()) // identified subparser
-                {
-                    sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
-                                                          std::vector<std::string>{it, arguments.end()},
-                                                          update_notifications::off);
+                sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
+                                                      std::vector<std::string>{it, arguments.end()},
+                                                      update_notifications::off);
 
-                    // Add the original calls to the front, e.g. ["raptor"],
-                    // s.t. ["raptor", "build"] will be the list after constructing the subparser
-                    sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
-                                                       executable_name.begin(),
-                                                       executable_name.end());
-                    break;
-                }
-                else
+                // Add the original calls to the front, e.g. ["raptor"],
+                // s.t. ["raptor", "build"] will be the list after constructing the subparser
+                sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
+                                                   executable_name.begin(),
+                                                   executable_name.end());
+                return true;
+            }
+            else
+            {
+                // Positional options are forbidden by design. Todo: Allow options. Forbidden in check_option_config.
+                // Flags and options, which both start with '-', are allowed for the top-level parser.
+                // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
+                if (!arg.starts_with('-'))
                 {
-                    // Options and positional options are forbidden by design.
-                    // Flags starting with '-' are allowed for the top-level parser.
-                    // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
-                    if (!arg.empty() && arg[0] != '-')
-                    {
-                        format_arguments.emplace_back(arg);
-                        break;
-                    }
+                    format_arguments.emplace_back(arg);
+                    return true;
                 }
             }
 
+            return false;
+        };
+
+        // Process the arguments.
+        for (; it != arguments.end(); ++it)
+        {
+            std::string_view arg{*it};
+
+            if (found_and_processed_subcommand(arg))
+                break;
+
             if (arg == "-h" || arg == "--help")
             {
-                special_format_was_set = true;
                 format = detail::format_help{subcommands, version_check_dev_decision, false};
             }
             else if (arg == "-hh" || arg == "--advanced-help")
             {
-                special_format_was_set = true;
                 format = detail::format_help{subcommands, version_check_dev_decision, true};
             }
             else if (arg == "--version")
             {
-                special_format_was_set = true;
                 format = detail::format_version{};
             }
             else if (arg == "--copyright")
             {
-                special_format_was_set = true;
                 format = detail::format_copyright{};
             }
-            else if (arg.substr(0, 13) == "--export-help") // --export-help=man is also allowed
+            else if (arg == "--export-help" || arg.starts_with("--export-help="))
             {
-                special_format_was_set = true;
+                arg.remove_prefix(std::string_view{"--export-help"}.size());
 
-                std::string_view export_format;
-
-                if (arg.size() > 13)
+                // --export-help man
+                if (arg.empty())
                 {
-                    export_format = arg.substr(14);
+                    go_to_next_arg("Option --export-help must be followed by a value.");
+                    arg = *it;
                 }
-                else
+                else // --export-help=man
                 {
-                    go_to_next_arg(it, "Option --export-help must be followed by a value.");
-                    export_format = *it;
+                    arg.remove_prefix(1u);
                 }
 
-                if (export_format == "html")
+                if (arg == "html")
                     format = detail::format_html{subcommands, version_check_dev_decision};
-                else if (export_format == "man")
+                else if (arg == "man")
                     format = detail::format_man{subcommands, version_check_dev_decision};
-                else if (export_format == "ctd")
+                else if (arg == "ctd")
                     format = detail::format_tdl{detail::format_tdl::FileFormat::CTD};
-                else if (export_format == "cwl")
+                else if (arg == "cwl")
                     format = detail::format_tdl{detail::format_tdl::FileFormat::CWL};
                 else
                     throw validation_error{"Validation failed for option --export-help: "
@@ -884,7 +891,7 @@ private:
             }
             else if (arg == "--version-check")
             {
-                go_to_next_arg(it, "Option --version-check must be followed by a value.");
+                go_to_next_arg("Option --version-check must be followed by a value.");
                 arg = *it;
 
                 if (arg == "1" || arg == "true")
@@ -900,14 +907,13 @@ private:
             }
         }
 
-        if (special_format_was_set)
+        // A special format was set. We do not need to parse the format_arguments.
+        if (!std::holds_alternative<detail::format_short_help>(format))
             return;
 
-        // All special options have been handled. If there are no arguments left and we do not have a subparser,
-        // we call the short help.
-        if (format_arguments.empty() && !sub_parser)
-            format = detail::format_short_help{};
-        else
+        // All special options have been handled. If there are arguments left or we have a subparser,
+        // we call format_parse. Oterhwise, we print the short help (default variant).
+        if (!format_arguments.empty() || sub_parser)
             format = detail::format_parse(format_arguments);
     }
 
