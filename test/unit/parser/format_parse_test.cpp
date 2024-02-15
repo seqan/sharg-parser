@@ -681,16 +681,16 @@ TEST_F(format_parse_test, subcommand_parser_success)
 TEST_F(format_parse_test, subcommand_parser_error)
 {
     // incorrect sub command regardless of following arguments, https://github.com/seqan/seqan3/issues/2172
-    auto top_level_parser = get_subcommand_parser({"subiddysub", "-f"}, {"sub1"});
-    EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
+    auto parser = get_subcommand_parser({"subiddysub", "-f"}, {"sub1"});
+    EXPECT_THROW(parser.parse(), sharg::parser_error);
 
     // incorrect sub command with no other arguments
-    top_level_parser = get_subcommand_parser({"subiddysub"}, {"sub1"});
-    EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
+    parser = get_subcommand_parser({"subiddysub"}, {"sub1"});
+    EXPECT_THROW(parser.parse(), sharg::parser_error);
 
     // incorrect sub command with trailing special option, https://github.com/seqan/sharg-parser/issues/171
-    top_level_parser = get_subcommand_parser({"subiddysub", "-h"}, {"sub1"});
-    EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
+    parser = get_subcommand_parser({"subiddysub", "-h"}, {"sub1"});
+    EXPECT_THROW(parser.parse(), sharg::parser_error);
 }
 
 TEST_F(format_parse_test, issue1544)

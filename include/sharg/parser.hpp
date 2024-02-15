@@ -359,7 +359,6 @@ public:
      * \throws sharg::too_many_arguments if the command line call contained more arguments than expected.
      * \throws sharg::too_few_arguments if the command line call contained less arguments than expected.
      * \throws sharg::validation_error if the argument was not excepted by the provided validator.
-     * \throws sharg::user_input_error if a subparser was configured at construction but a subcommand is missing.
      *
      * \details
      *
@@ -419,63 +418,25 @@ public:
         if (parse_was_called)
             throw design_error("The function parse() must only be called once!");
 
-        // Before creating the detail::version_checker, we have to make sure that
-        // malicious code cannot be injected through the app name.
-        if (!std::regex_match(info.app_name, app_name_regex))
-        {
-            throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
-                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
-        }
+        parse_was_called = true;
 
-        for (auto & sub : this->subcommands)
-        {
-            if (!std::regex_match(sub, app_name_regex))
-            {
-                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
-                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
-            }
-        }
-
-        detail::version_checker app_version{info.app_name, info.version, info.url};
+        // User input sanitization must happen before version check!
+        verify_app_and_subcommand_names();
 
         init();
 
-        if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
-        {
-            assert(!subcommands.empty());
-            std::string subcommands_str{"["};
-            for (std::string const & command : subcommands)
-                subcommands_str += command + ", ";
-            subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
+        // If a subcommand was provided, check that it is valid.
+        verify_subcommand();
 
-            throw too_few_arguments{"You misspelled the subcommand! Please specify which sub-program "
-                                    "you want to use: one of "
-                                    + subcommands_str
-                                    + ". Use -h/--help for more "
-                                      "information."};
-        }
-
-        if (app_version.decide_if_check_is_performed(version_check_dev_decision, version_check_user_decision))
-        {
-            // must be done before calling parse on the format because this might std::exit
-            std::promise<bool> app_version_prom;
-            version_check_future = app_version_prom.get_future();
-            app_version(std::move(app_version_prom));
-        }
-
+        // Apply all defered operations to the parser, e.g., `add_option`, `add_flag`, `add_positional_option`.
         for (auto & operation : operations)
             operation();
 
-        std::visit(
-            [this]<typename T>(T & f)
-            {
-                if constexpr (std::same_as<T, detail::format_tdl>)
-                    f.parse(info, executable_name);
-                else
-                    f.parse(info);
-            },
-            format);
-        parse_was_called = true;
+        // The version check, which might exit the program, must be called before calling parse on the format.
+        run_version_check();
+
+        // Parse the command line arguments.
+        parse_format();
 
         // Exit after parsing any special format.
         if (!std::holds_alternative<detail::format_parse>(format))
@@ -1061,6 +1022,95 @@ private:
     {
         if (parse_was_called)
             throw design_error{detail::to_string(function_name.data(), " may only be used before calling parse().")};
+    }
+
+    /*!\brief Verifies that the app and subcommand names are correctly formatted.
+     * \throws sharg::design_error if the app name is not correctly formatted.
+     * \throws sharg::design_error if the subcommand names are not correctly formatted.
+     * \details
+     * The app name must only contain alphanumeric characters, '_', or '-'.
+     * The subcommand names must only contain alphanumeric characters, '_', or '-'.
+     */
+    inline void verify_app_and_subcommand_names() const
+    {
+        // Before creating the detail::version_checker, we have to make sure that
+        // malicious code cannot be injected through the app name.
+        if (!std::regex_match(info.app_name, app_name_regex))
+        {
+            throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
+                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
+        }
+
+        for (auto & sub : this->subcommands)
+        {
+            if (!std::regex_match(sub, app_name_regex))
+            {
+                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
+                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
+            }
+        }
+    }
+
+    /*!\brief Runs the version check if the user has not disabled it.
+     * \details
+     * If the user has not disabled the version check, the function will start a detached thread that will call the
+     * sharg::detail::version_checker and print a message if a new version is available.
+     */
+    inline void run_version_check()
+    {
+        detail::version_checker app_version{info.app_name, info.version, info.url};
+
+        if (app_version.decide_if_check_is_performed(version_check_dev_decision, version_check_user_decision))
+        {
+            // must be done before calling parse on the format because this might std::exit
+            std::promise<bool> app_version_prom;
+            version_check_future = app_version_prom.get_future();
+            app_version(std::move(app_version_prom));
+        }
+    }
+
+    /*!\brief Verifies that the subcommand was correctly specified.
+     * \throws sharg::too_few_arguments if a subparser was configured at construction but a subcommand is missing.
+     */
+    inline void verify_subcommand()
+    {
+        if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
+        {
+            assert(!subcommands.empty());
+            std::string subcommands_str{"["};
+            for (std::string const & command : subcommands)
+                subcommands_str += command + ", ";
+            subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
+
+            throw too_few_arguments{"You misspelled the subcommand! Please specify which sub-program "
+                                    "you want to use: one of "
+                                    + subcommands_str
+                                    + ". Use -h/--help for more "
+                                      "information."};
+        }
+    }
+
+    /*!\brief Parses the command line arguments according to the format.
+     * \throws sharg::option_declared_multiple_times if an option that is not a list was declared multiple times.
+     * \throws sharg::user_input_error if an incorrect argument is given as (positional) option value.
+     * \throws sharg::required_option_missing if the user did not provide a required option.
+     * \throws sharg::too_many_arguments if the command line call contained more arguments than expected.
+     * \throws sharg::too_few_arguments if the command line call contained less arguments than expected.
+     * \throws sharg::validation_error if the argument was not excepted by the provided validator.
+     * \details
+     * This function calls the parse function of the format member variable.
+     */
+    inline void parse_format()
+    {
+        auto format_parse_fn = [this]<typename format_t>(format_t & f)
+        {
+            if constexpr (std::same_as<format_t, detail::format_tdl>)
+                f.parse(info, executable_name);
+            else
+                f.parse(info);
+        };
+
+        std::visit(std::move(format_parse_fn), format);
     }
 };
 
