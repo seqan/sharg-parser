@@ -11,9 +11,11 @@
 // Some test namespace to check if namespace information are preserved within the naming.
 namespace foo
 {
+
 template <typename... type>
 struct bar
 {};
+
 } // namespace foo
 
 // Some types to test if type inspection works as expected.
@@ -30,24 +32,23 @@ using reflection_types = ::testing::Types<char,
 template <typename param_type>
 class type_inspection : public ::testing::Test
 {
-
 public:
     // Returns the name of the type according to the list of names defined above.
     std::string const expected_name() const
     {
-        if constexpr (std::is_same_v<param_type, char>)
+        if constexpr (std::same_as<param_type, char>)
             return "char";
-        else if constexpr (std::is_same_v<param_type, char16_t const>)
+        else if constexpr (std::same_as<param_type, char16_t const>)
             return "char16_t const";
-        else if constexpr (std::is_same_v<param_type, char32_t &>)
+        else if constexpr (std::same_as<param_type, char32_t &>)
             return "char32_t &";
-        else if constexpr (std::is_same_v<param_type, short *>)
+        else if constexpr (std::same_as<param_type, short *>)
             return "short*";
-        else if constexpr (std::is_same_v<param_type, double const * const>)
+        else if constexpr (std::same_as<param_type, double const * const>)
             return "double const* const";
-        else if constexpr (std::is_same_v<param_type, foo::bar<char> const &>)
+        else if constexpr (std::same_as<param_type, foo::bar<char> const &>)
             return "foo::bar<char> const &";
-        else if constexpr (std::is_same_v<param_type, foo::bar<foo::bar<char, double>>>)
+        else if constexpr (std::same_as<param_type, foo::bar<foo::bar<char, double>>>)
 #ifdef _LIBCPP_VERSION
             return "foo::bar<foo::bar<char, double>>";
 #else
