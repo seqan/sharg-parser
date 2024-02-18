@@ -5,27 +5,25 @@
 #include <gtest/gtest.h>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/test_fixture.hpp>
 
-TEST(html_format, empty_information)
+class format_html_test : public sharg::test::test_fixture
+{};
+
+TEST_F(format_html_test, empty_information)
 {
-    std::string my_stdout;
-    std::string expected;
-
     // Empty html help page.
-    std::array const argv0{"./help_add_test", "--version-check", "false", "--export-help", "html"};
-    sharg::parser parser0{"empty_options", argv0.size(), argv0.data()};
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser0.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-    my_stdout = testing::internal::GetCapturedStdout();
-    expected =
+    auto parser = get_parser("--version-check", "false", "--export-help", "html");
+
+    std::string expected =
         std::string("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" http://www.w3.org/TR/html4/strict.dtd\">\n"
                     "<html lang=\"en\">\n"
                     "<head>\n"
                     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n"
-                    "<title>empty_options &mdash; </title>\n"
+                    "<title>test_parser &mdash; </title>\n"
                     "</head>\n"
                     "<body>\n"
-                    "<h1>empty_options</h1>\n"
+                    "<h1>test_parser</h1>\n"
                     "<div></div>\n"
                     "<h2>Options</h2>\n"
                     "<h3>Common options</h3>\n"
@@ -45,14 +43,12 @@ TEST(html_format, empty_information)
 #else
                     "[html, man].</dd>\n"
 #endif
-                    "<dt><strong>--version-check</strong> (bool)</dt>\n"
-                    "<dd>Whether to check for the newest app version. Default: true</dd>\n"
                     "</dl>\n"
                     "<h2>Version</h2>\n"
                     "<p>\n"
                     "<strong>Last update: </strong>\n"
                     "<br>\n"
-                    "<strong>empty_options version: </strong>\n"
+                    "<strong>test_parser version: </strong>\n"
                     "<br>\n"
                     "<strong>Sharg version: </strong>"
                     + std::string{sharg::sharg_version_cstring}
@@ -60,68 +56,58 @@ TEST(html_format, empty_information)
                       "<br>\n"
                       "</p>\n"
                       "</body></html>");
-    EXPECT_EQ(my_stdout, expected);
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
-    std::array const argv1{"./help_add_test", "--version-check", "false", "--export-help=html"};
-    sharg::parser parser1{"empty_options", argv1.size(), argv1.data()};
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-    my_stdout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(my_stdout, expected);
+    parser = get_parser("--version-check", "false", "--export-help=html");
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
-TEST(html_format, full_information_information)
+TEST_F(format_html_test, full_information_information)
 {
-    std::string my_stdout;
-    std::string expected;
     int option_value{5};
     bool flag_value{false};
     int8_t non_list_pos_opt_value{1};
     std::vector<std::string> list_pos_opt_value{};
 
     // Full html help page.
-    std::array const argv0{"./help_add_test", "--version-check", "false", "--export-help", "html"};
-    sharg::parser parser1{"program_full_options", argv0.size(), argv0.data()};
-    parser1.info.synopsis.push_back("./some_binary_name synopsis");
-    parser1.info.synopsis.push_back("./some_binary_name synopsis2");
-    parser1.info.description.push_back("description");
-    parser1.info.description.push_back("description2");
-    parser1.info.short_description = "short description";
-    parser1.info.url = "https://seqan.de";
-    parser1.info.short_copyright = "short copyright";
-    parser1.info.long_copyright = "long_copyright";
-    parser1.info.citation = "citation";
-    parser1.info.author = "author";
-    parser1.info.email = "email";
-    parser1.add_option(option_value,
-                       sharg::config{.short_id = 'i',
-                                     .long_id = "int",
-                                     .description = "this is a int option.",
-                                     .default_message = "A number"});
-    parser1.add_option(option_value,
-                       sharg::config{.short_id = 'j',
-                                     .long_id = "jint",
-                                     .description = "this is a required int option.",
-                                     .required = true});
-    parser1.add_flag(flag_value, sharg::config{.short_id = 'f', .long_id = "flag", .description = "this is a flag."});
-    parser1.add_flag(flag_value, sharg::config{.short_id = 'k', .long_id = "kflag", .description = "this is a flag."});
-    parser1.add_positional_option(non_list_pos_opt_value, sharg::config{.description = "this is a positional option."});
-    parser1.add_positional_option(list_pos_opt_value, sharg::config{.description = "this is a positional option."});
-    parser1.info.examples.push_back("example");
-    parser1.info.examples.push_back("example2");
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+    auto parser = get_parser("--version-check", "false", "--export-help", "html");
+    parser.info.synopsis.push_back("./some_binary_name synopsis");
+    parser.info.synopsis.push_back("./some_binary_name synopsis2");
+    parser.info.description.push_back("description");
+    parser.info.description.push_back("description2");
+    parser.info.short_description = "short description";
+    parser.info.url = "https://seqan.de";
+    parser.info.short_copyright = "short copyright";
+    parser.info.long_copyright = "long_copyright";
+    parser.info.citation = "citation";
+    parser.info.author = "author";
+    parser.info.email = "email";
+    parser.add_option(option_value,
+                      sharg::config{.short_id = 'i',
+                                    .long_id = "int",
+                                    .description = "this is a int option.",
+                                    .default_message = "A number"});
+    parser.add_option(option_value,
+                      sharg::config{.short_id = 'j',
+                                    .long_id = "jint",
+                                    .description = "this is a required int option.",
+                                    .required = true});
+    parser.add_flag(flag_value, sharg::config{.short_id = 'f', .long_id = "flag", .description = "this is a flag."});
+    parser.add_flag(flag_value, sharg::config{.short_id = 'k', .long_id = "kflag", .description = "this is a flag."});
+    parser.add_positional_option(non_list_pos_opt_value, sharg::config{.description = "this is a positional option."});
+    parser.add_positional_option(list_pos_opt_value, sharg::config{.description = "this is a positional option."});
+    parser.info.examples.push_back("example");
+    parser.info.examples.push_back("example2");
 
-    my_stdout = testing::internal::GetCapturedStdout();
-    expected = std::string(
+    std::string expected = std::string(
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" http://www.w3.org/TR/html4/strict.dtd\">\n"
         "<html lang=\"en\">\n"
         "<head>\n"
         "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n"
-        "<title>program_full_options &mdash; short description</title>\n"
+        "<title>test_parser &mdash; short description</title>\n"
         "</head>\n"
         "<body>\n"
-        "<h1>program_full_options</h1>\n"
+        "<h1>test_parser</h1>\n"
         "<div>short description</div>\n"
         "<h2>Synopsis</h2>\n"
         "<p>\n"
@@ -172,8 +158,6 @@ TEST(html_format, full_information_information)
 #else
         "[html, man].</dd>\n"
 #endif
-        "<dt><strong>--version-check</strong> (bool)</dt>\n"
-        "<dd>Whether to check for the newest app version. Default: true</dd>\n"
         "</dl>\n"
         "<h2>Examples</h2>\n"
         "<p>\n"
@@ -186,7 +170,7 @@ TEST(html_format, full_information_information)
         "<p>\n"
         "<strong>Last update: </strong>\n"
         "<br>\n"
-        "<strong>program_full_options version: </strong>\n"
+        "<strong>test_parser version: </strong>\n"
         "<br>\n"
         "<strong>Sharg version: </strong>"
         + std::string{sharg::sharg_version_cstring}
@@ -200,7 +184,7 @@ TEST(html_format, full_information_information)
           "</p>\n"
           "<h2>Legal</h2>\n"
           "<p>\n"
-          "<strong>program_full_options Copyright: </strong>short copyright\n"
+          "<strong>test_parser Copyright: </strong>short copyright\n"
           "<br>\n"
           "<strong>Author: </strong>author\n"
           "<br>\n"
@@ -214,21 +198,25 @@ TEST(html_format, full_information_information)
           "<br>\n"
           "</p>\n"
           "</body></html>");
-    EXPECT_EQ(my_stdout, expected);
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
-TEST(export_help, parse_error)
+TEST_F(format_html_test, parse_error)
 {
-    std::array const argv{"./help_add_test", "--version-check", "false", "--export-help"};
-    std::array const argv2{"./help_add_test", "--version-check", "false", "--export-help=atml"};
-    std::array const argv3{"./help_add_test", "--version-check", "false", "--export-help", "atml"};
+    std::vector<std::string> argv1{"./help_add_test", "--version-check", "false", "--export-help"};
+    std::vector<std::string> argv2{"./help_add_test", "--version-check", "false", "--export-help=atml"};
+    std::vector<std::string> argv3{"./help_add_test", "--version-check", "false", "--export-help", "atml"};
+    std::vector<std::string> argv4{"./help_add_test", "--version-check", "false", "--export-help#html"};
 
     // no value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", argv.size(), argv.data()}), sharg::parser_error);
+    EXPECT_THROW((sharg::parser{"test_parser", argv1}), sharg::parser_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", argv2.size(), argv2.data()}), sharg::validation_error);
+    EXPECT_THROW((sharg::parser{"test_parser", argv2}), sharg::validation_error);
 
     // wrong value after --export-help
-    EXPECT_THROW((sharg::parser{"test_parser", argv3.size(), argv3.data()}), sharg::validation_error);
+    EXPECT_THROW((sharg::parser{"test_parser", argv3}), sharg::validation_error);
+
+    // Currently not checking for `=`
+    EXPECT_NO_THROW((sharg::parser{"test_parser", argv4}));
 }
