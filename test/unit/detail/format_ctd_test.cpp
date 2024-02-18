@@ -5,27 +5,22 @@
 #include <gtest/gtest.h>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/test_fixture.hpp>
 
-#if !SHARG_HAS_TDL
-TEST(format_ctd_test, skipped)
-{
-    GTEST_SKIP() << "TDL is not available.";
-}
-#else
 // Reused global variables
-struct format_ctd_test : public ::testing::Test
+class format_ctd_test : public sharg::test::test_fixture
 {
+protected:
     int option_value{5};
     bool flag_value{false};
     int8_t non_list_pos_opt_value{1};
     std::vector<std::string> list_pos_opt_value{};
     std::string my_stdout{};
-    static constexpr std::array argv{"./format_ctd_test", "--version-check", "false", "--export-help", "ctd"};
     std::string const version_str{sharg::sharg_version_cstring};
-    std::string expected =
+    std::string const expected =
         R"del(<?xml version="1.0" encoding="UTF-8"?>)del"
         "\n"
-        R"del(<tool ctdVersion="1.7" version="01.01.01" name="default">)del"
+        R"del(<tool ctdVersion="1.7" version="01.01.01" name="test_parser">)del"
         "\n"
         R"del(    <description><![CDATA[description)del"
         "\n"
@@ -39,7 +34,7 @@ struct format_ctd_test : public ::testing::Test
         "\n"
         R"del(]]></manual>)del"
         "\n"
-        R"del(    <executableName><![CDATA[./format_ctd_test]]></executableName>)del"
+        R"del(    <executableName><![CDATA[./test_parser]]></executableName>)del"
         "\n"
         R"del(    <citations />)del"
         "\n"
@@ -108,10 +103,16 @@ struct format_ctd_test : public ::testing::Test
     }
 };
 
+#if !SHARG_HAS_TDL
+TEST_F(format_ctd_test, skipped)
+{
+    GTEST_SKIP() << "TDL is not available.";
+}
+#else
 TEST_F(format_ctd_test, empty_information)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", argv.size(), argv.data()};
+    auto parser = get_parser("--export-help", "ctd");
     parser.info.date = "December 01, 1994";
     parser.info.version = "1.1.2-rc.1";
     parser.info.man_page_title = "default_man_page_title";
@@ -123,9 +124,9 @@ TEST_F(format_ctd_test, empty_information)
         "\n"
         R"(<tool ctdVersion="1.7" version=")"
         + version_str
-        + R"(" name="default">)"
+        + R"(" name="test_parser">)"
           "\n"
-          R"(    <executableName><![CDATA[./format_ctd_test]]></executableName>)"
+          R"(    <executableName><![CDATA[./test_parser]]></executableName>)"
           "\n"
           R"(    <citations />)"
           "\n"
@@ -135,25 +136,18 @@ TEST_F(format_ctd_test, empty_information)
           "\n";
 
     // Test the dummy parser with minimal information.
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-
-    my_stdout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(my_stdout, expected_short);
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected_short);
 }
 
 TEST_F(format_ctd_test, full_information)
 {
     // Create the dummy parser.
-    sharg::parser parser{"default", argv.size(), argv.data()};
+    auto parser = get_parser("--export-help", "ctd");
 
     // Fill out the dummy parser with options and flags and sections and subsections.
     dummy_init(parser);
-    // Test the dummy parser without any copyright or citations.
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
 
-    my_stdout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(my_stdout, expected);
+    // Test the dummy parser without any copyright or citations.
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 #endif
