@@ -5,25 +5,27 @@
 #include <gtest/gtest.h>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/test_fixture.hpp>
+
+class format_cwl_test : public sharg::test::test_fixture
+{};
 
 #if !SHARG_HAS_TDL
-TEST(format_cwl_test, skipped)
+TEST_F(format_cwl_test, skipped)
 {
     GTEST_SKIP() << "TDL is not available.";
 }
 #else
-TEST(format_cwl_test, empty_information)
+TEST_F(format_cwl_test, empty_information)
 {
-    auto argv = std::array{"./format_cwl_test", "--version-check", "false", "--export-help", "cwl"};
-
     // Create the dummy parser.
-    auto parser = sharg::parser{"default", argv.size(), argv.data()};
+    auto parser = get_parser("--export-help", "cwl");
     parser.info.date = "December 01, 1994";
     parser.info.version = "1.1.2-rc.1";
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 
-    std::string expected_short = "label: default\n"
+    std::string expected_short = "label: test_parser\n"
                                  "doc: \"\"\n"
                                  "inputs:\n"
                                  "  []\n"
@@ -32,20 +34,14 @@ TEST(format_cwl_test, empty_information)
                                  "cwlVersion: v1.2\n"
                                  "class: CommandLineTool\n"
                                  "baseCommand:\n"
-                                 "  - format_cwl_test\n";
+                                 "  - test_parser\n";
 
     // Test the dummy parser with minimal information.
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-
-    auto my_stdout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(my_stdout, expected_short);
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected_short);
 }
 
-TEST(format_cwl_test, full_information)
+TEST_F(format_cwl_test, full_information)
 {
-    auto argv = std::array{"./format_cwl_test", "--version-check", "false", "--export-help", "cwl"};
-
     // Create variables for the arguments
     int option_value{5};
     bool flag_value{false};
@@ -53,7 +49,7 @@ TEST(format_cwl_test, full_information)
     auto list_pos_opt_value = std::vector<std::string>{};
 
     // Create the dummy parser.
-    auto parser = sharg::parser{"default", argv.size(), argv.data()};
+    auto parser = get_parser("--export-help", "cwl");
     parser.info.date = "December 01, 1994";
     parser.info.version = "01.01.01";
     parser.info.man_page_title = "default_ctd_page_title";
@@ -78,7 +74,7 @@ TEST(format_cwl_test, full_information)
     parser.info.examples.push_back("example");
     parser.info.examples.push_back("example2");
 
-    std::string expected_short = "label: default\n"
+    std::string expected_short = "label: test_parser\n"
                                  "doc: \"description\\n"
                                  "description2\\n"
                                  "\"\n"
@@ -110,20 +106,14 @@ TEST(format_cwl_test, full_information)
                                  "cwlVersion: v1.2\n"
                                  "class: CommandLineTool\n"
                                  "baseCommand:\n"
-                                 "  - format_cwl_test\n";
+                                 "  - test_parser\n";
 
     // Test the dummy parser with minimal information.
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-
-    auto my_stdout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(my_stdout, expected_short);
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected_short);
 }
 
-TEST(format_cwl_test, subparser)
+TEST_F(format_cwl_test, subparser)
 {
-    auto argv = std::array{"./format_cwl_test", "index", "--export-help", "cwl"};
-
     // Create variables for the arguments
     int option_value{5};
     float option_value_float{0};
@@ -134,7 +124,7 @@ TEST(format_cwl_test, subparser)
     auto list_pos_opt_value = std::vector<std::string>{};
 
     // Create the dummy parser.
-    auto parser = sharg::parser{"default", argv.size(), argv.data(), sharg::update_notifications::off, {"index"}};
+    auto parser = get_subcommand_parser({"index", "--export-help", "cwl"}, {"index"});
     parser.info.date = "December 01, 1994";
     parser.info.version = "01.01.01";
     parser.info.man_page_title = "default_ctd_page_title";
@@ -144,12 +134,10 @@ TEST(format_cwl_test, subparser)
     parser.info.description.push_back("description");
     parser.info.description.push_back("description2");
 
-    parser.parse();
+    EXPECT_NO_THROW(parser.parse());
+
     auto & sub_parser = parser.get_sub_parser();
-    if (sub_parser.info.app_name != std::string_view{"default-index"})
-    {
-        return;
-    }
+    ASSERT_EQ(sub_parser.info.app_name, "test_parser-index");
     sub_parser.add_option(option_value, sharg::config{'i', "int", "this is a int option."});
     sub_parser.add_option(option_value,
                           sharg::config{.short_id = 'j',
@@ -210,7 +198,7 @@ TEST(format_cwl_test, subparser)
     sub_parser.info.examples.push_back("example2");
 
     std::string expected_short =
-        "label: default-index\n"
+        "label: test_parser-index\n"
         "doc: \"\"\n"
         "inputs:\n"
         "  positional_0:\n"
@@ -285,13 +273,8 @@ TEST(format_cwl_test, subparser)
         "cwlVersion: v1.2\n"
         "class: CommandLineTool\n"
         "baseCommand:\n"
-        "  - format_cwl_test\n"
+        "  - test_parser\n"
         "  - index\n";
-    testing::internal::CaptureStdout();
-    //    sub_parser.parse();
-    EXPECT_EXIT(sub_parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-
-    auto my_stdout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(my_stdout, expected_short);
+    EXPECT_EQ(get_parse_cout_on_exit(sub_parser), expected_short);
 }
 #endif
