@@ -66,6 +66,8 @@ sharg_append_gcovr_args ("--exclude-lines-by-pattern" [['^\\s*[{}]{0,2}\\s*;*\\s
 sharg_append_gcovr_args ("--exclude-unreachable-branches")
 # Will exclude branches that are only generated for exception handling.
 sharg_append_gcovr_args ("--exclude-throw-branches")
+# Will exclude non-code lines, e.g. lines with closing braces.
+sharg_append_gcovr_args ("--exclude-noncode-lines")
 # Run up to this many gcov instances in parallel.
 sharg_append_gcovr_args ("-j" "${SHARG_COVERAGE_PARALLEL_LEVEL}")
 

@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/test_fixture.hpp>
 
 #if !__has_include(<seqan3/version.hpp>)
 #    error "seqan3/version.hpp is not available"
@@ -22,12 +23,10 @@ std::string const basic_options_str = "  Common options\n"
                                       "    --export-help (std::string)\n"
                                       "          Export the help page information. Value must be one of "
 #if SHARG_HAS_TDL
-                                      "[html, man,\n          ctd, cwl].\n"
+                                      "[html, man,\n          ctd, cwl].\n";
 #else
-                                      "[html, man].\n"
+                                      "[html, man].\n";
 #endif
-                                      "    --version-check (bool)\n"
-                                      "          Whether to check for the newest app version. Default: true\n";
 
 std::string const basic_version_str = "VERSION\n"
                                       "    Last update:\n"
@@ -38,34 +37,15 @@ std::string const basic_version_str = "VERSION\n"
                                       "    SeqAn version: "
                                     + std::string{seqan3::seqan3_version_cstring} + "\n";
 
-namespace sharg::detail
-{
-struct test_accessor
-{
-    static void set_terminal_width(sharg::parser & parser, unsigned terminal_width)
-    {
-        std::visit(
-            [terminal_width](auto & f)
-            {
-                if constexpr (std::is_same_v<decltype(f), sharg::detail::format_help &>)
-                    f.layout = sharg::detail::format_help::console_layout_struct{terminal_width};
-            },
-            parser.format);
-    }
-};
-} // namespace sharg::detail
+class seqan3_test : public sharg::test::test_fixture
+{};
 
-TEST(help_page_printing, no_information)
+TEST_F(seqan3_test, version_string)
 {
-    std::array const argv{"./help_add_test", "--version-check", "false", "-h"};
-    sharg::parser parser1{"test_parser", argv.size(), argv.data()};
-    sharg::detail::test_accessor::set_terminal_width(parser1, 80);
-    testing::internal::CaptureStdout();
-    EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
-    std::string std_cout = testing::internal::GetCapturedStdout();
+    auto parser = get_parser("-h");
     std::string expected = "test_parser\n"
                            "===========\n"
                            "\nOPTIONS\n\n"
                          + basic_options_str + "\n" + basic_version_str;
-    EXPECT_EQ(std_cout, expected);
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }

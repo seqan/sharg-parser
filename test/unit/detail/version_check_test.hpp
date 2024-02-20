@@ -4,116 +4,107 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include <sharg/parser.hpp>
+#include <sharg/test/test_fixture.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
 //------------------------------------------------------------------------------
 // test fixtures
 //------------------------------------------------------------------------------
 
-namespace sharg::detail
+class version_check_test : public sharg::test::test_fixture
 {
-struct test_accessor
-{
-    static auto & version_check_future(sharg::parser & parser)
-    {
-        return parser.version_check_future;
-    }
-};
-} // namespace sharg::detail
+protected:
+    std::string const OPTION_VERSION_CHECK = "--version-check";
+    std::string const OPTION_OFF = "false";
+    std::string const OPTION_ON = "true";
 
-bool wait_for(sharg::parser & parser)
-{
-    auto & future = sharg::detail::test_accessor::version_check_future(parser);
-
-    if (future.valid())
-        return future.get();
-    return false;
-}
-
-struct version_check : public ::testing::Test
-{
-    char const * const OPTION_VERSION_CHECK = "--version-check";
-    char const * const OPTION_OFF = "false";
-    char const * const OPTION_ON = "true";
-
-    std::string const app_name = std::string{"test_version_check"};
+    std::string const app_name = "test_version_check";
 
     // This tmp_filename will create the file "version_checker.tmpfile" in a unique folder.
     sharg::test::tmp_filename tmp_file{"version_checker.tmpfile"};
 
     void randomise_home_folder()
     {
-        using namespace std::string_literals;
         auto tmp_directory = tmp_file.get_path().parent_path();
+        std::string const base_path = tmp_directory.string();
 
-        int result = setenv(sharg::detail::version_checker::home_env_name, tmp_directory.c_str(), 1);
-        if (result != 0)
-            throw std::runtime_error{"Couldn't set environment variable 'home_env_name' (="s
-                                     + sharg::detail::version_checker::home_env_name + ")"s};
+        if (setenv(sharg::detail::version_checker::home_env_name, base_path.data(), 1))
+            throw std::runtime_error{"Couldn't set environment variable 'home_env_name' (="
+                                     + std::string{sharg::detail::version_checker::home_env_name} + ")"};
 
-        auto is_prefix_path = [](std::string const & base_path, std::string const & path)
-        {
-            auto && it_pair = std::mismatch(base_path.begin(), base_path.end(), path.begin(), path.end());
-            return it_pair.first + 1 == base_path.end();
-        };
+        std::string const path = app_tmp_path().string(); // Must be string because app_tmp_path() returns a temporary.
 
-        if (is_prefix_path(tmp_directory, app_tmp_path()))
+        if (!path.starts_with(base_path))
             throw std::runtime_error{"Setting the environment variable 'home_env_name' didn't have the correct effect"
-                                     " ("s
-                                     + std::string{tmp_directory} + " is not a prefix of "s
-                                     + std::string{app_tmp_path()} + ")"s};
+                                     " ("
+                                     + base_path + " is not a prefix of " + path + ")"};
+    }
+
+    static bool wait_for(sharg::parser & parser)
+    {
+        auto & future = sharg::detail::test_accessor::version_check_future(parser);
+
+        if (future.valid())
+            return future.get();
+        return false;
     }
 
     void SetUp() override
     {
-        ::testing::Test::SetUp();
-
         // set HOME environment to a random home folder before starting each test case
         randomise_home_folder();
     }
 
-    std::filesystem::path app_tmp_path()
+    static std::filesystem::path app_tmp_path()
     {
         return sharg::detail::version_checker::get_path();
     }
 
-    std::filesystem::path app_version_filename()
+    std::filesystem::path app_version_filename() const
     {
         return app_tmp_path() / (app_name + ".version");
     }
 
-    std::filesystem::path app_timestamp_filename()
+    std::filesystem::path app_timestamp_filename() const
     {
         return sharg::detail::version_checker{app_name, std::string{}}.timestamp_filename;
     }
 
-    std::chrono::duration<long int>::rep current_unix_timestamp()
+    static auto current_unix_timestamp()
     {
         return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
     }
 
-    std::regex timestamp_regex{"^[[:digit:]]+$"}; // only digits
+    static inline std::regex const timestamp_regex{"^[[:digit:]]+$"}; // only digits
 
-    std::tuple<std::string, std::string, bool> simulate_parser(int argc, char const ** argv)
+    template <typename... arg_ts>
+    std::tuple<std::string, std::string, bool> simulate_parser(arg_ts &&... args)
     {
-        // make sure that the environment variable is not set
-        std::string previous_value{};
-        if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
-        {
-            previous_value = env;
-            unsetenv("SHARG_NO_VERSION_CHECK");
-        }
-
         bool app_call_succeeded{false};
+        bool dummy_flag{false};
 
-        sharg::parser parser{app_name, argc, argv};
+        // make sure that the environment variable is not set
+        std::string const cached_env_var = []()
+        {
+            std::string result{};
+            if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
+            {
+                result = env;
+                unsetenv("SHARG_NO_VERSION_CHECK");
+            }
+            return result;
+        }();
+
+        std::vector<std::string> arguments{app_name, std::forward<arg_ts>(args)...};
+        sharg::parser parser{app_name, std::move(arguments), sharg::update_notifications::on};
         parser.info.version = "2.3.4";
 
         // In case we don't want to specify --version-check but avoid that short help format will be set (no arguments)
-        bool dummy{false};
-        parser.add_flag(dummy, sharg::config{.short_id = 'f'});
+        parser.add_flag(dummy_flag, sharg::config{.short_id = 'f'});
 
         testing::internal::CaptureStdout();
         testing::internal::CaptureStderr();
@@ -125,13 +116,13 @@ struct version_check : public ::testing::Test
         // any interference with following tests
         app_call_succeeded = wait_for(parser);
 
-        if (!previous_value.empty())
-            setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
+        if (!cached_env_var.empty())
+            setenv("SHARG_NO_VERSION_CHECK", cached_env_var.c_str(), 1);
 
         return {out, err, app_call_succeeded};
     }
 
-    bool remove_files_from_path()
+    bool remove_files_from_path() const
     {
         return (!std::filesystem::exists(app_version_filename()) || std::filesystem::remove(app_version_filename()))
             && (!std::filesystem::exists(app_timestamp_filename())
@@ -139,7 +130,7 @@ struct version_check : public ::testing::Test
     }
 
     template <typename message_type>
-    bool create_file(std::filesystem::path const & filename, message_type const & message)
+    static bool create_file(std::filesystem::path const & filename, message_type const & message)
     {
         std::ofstream out_file{filename};
 
@@ -152,7 +143,7 @@ struct version_check : public ::testing::Test
         return true;
     }
 
-    std::string read_file(std::filesystem::path const & filename)
+    static std::string read_first_line(std::filesystem::path const & filename)
     {
         std::ifstream in_file{filename};
         std::string line{};
@@ -167,25 +158,22 @@ struct version_check : public ::testing::Test
     }
 };
 
-struct sanity_checks : public version_check
-{};
-
 //------------------------------------------------------------------------------
 // sanity checks
 //------------------------------------------------------------------------------
 
 // even if the homedir might not be writable at least the tmp dir should be
-TEST_F(sanity_checks, path_availability)
+TEST_F(version_check_test, sanity_path_availability)
 {
     EXPECT_FALSE(app_tmp_path().empty()) << "No writable directory found. All other tests cannot be trusted!";
 }
 
-TEST_F(sanity_checks, create_and_delete_files)
+TEST_F(version_check_test, sanity_create_and_delete_files)
 {
     EXPECT_TRUE(create_file(app_version_filename(), "20.5.9"));
-    EXPECT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp()));
-
     EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
+
+    EXPECT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp()));
     EXPECT_TRUE(std::filesystem::exists(app_timestamp_filename()));
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
@@ -193,10 +181,9 @@ TEST_F(sanity_checks, create_and_delete_files)
     EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename()));
 }
 
-TEST_F(sanity_checks, cookie)
+TEST_F(version_check_test, sanity_cookie)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
 
     if (app_call_succeeded)
     {
@@ -208,15 +195,18 @@ TEST_F(sanity_checks, cookie)
         // ```
         // This should not be tested via EXPECT_EQ(..) because then sharg tests fail if the server wasn't
         // configured correctly and we want to be independent of the server.
-        std::cout << "Cookie:" << std::endl;
+        std::string line{};
+        std::cout << "Cookie:\n";
+
         std::ifstream app_version_file{app_version_filename()};
-        std::string line;
         std::getline(app_version_file, line);
-        std::cout << line << " <-- Should be UNREGISTERED_APP!" << std::endl;
+        std::cout << line << " <-- Should be UNREGISTERED_APP!\n";
+
+        std::cout << app_version_filename().string() << '\n';
+
         std::getline(app_version_file, line);
         std::cout << line << " <-- Should be the latest Sharg version! "
-                  << "Updates done here: https://github.com/OpenMS/usage_plots/blob/master/seqan_versions.txt"
-                  << std::endl;
+                  << "Updates done here: https://github.com/OpenMS/usage_plots/blob/master/seqan_versions.txt\n";
     }
 }
 
@@ -224,69 +214,46 @@ TEST_F(sanity_checks, cookie)
 // version checks
 //------------------------------------------------------------------------------
 
-TEST_F(version_check, option_on)
+TEST_F(version_check_test, option_on)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "");
 
     // no timestamp is written since the decision was made explicitly
     if (app_call_succeeded)
-    {
         EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
-    }
     else
-    {
-        std::cout << "App call did not succeed (server offline?) and could thus not be tested.\n";
-    }
+        GTEST_SKIP() << "App call did not succeed (server offline?) and could thus not be tested.";
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
 // Note that we cannot test interactiveness because google test captures std::cin and thus
 // sharg::detail::input_is_terminal() is always false
-TEST_F(version_check, option_implicitely_on)
+TEST_F(version_check_test, option_implicitely_on)
 {
-    char const * argv[2] = {app_name.c_str(), "-f"};
-
-    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
 
     EXPECT_EQ(out, "");
-    EXPECT_EQ(err,
-              "\n#######################################################################\n"
-              "   Automatic Update Notifications\n"
-              "#######################################################################\n"
-              " This app performs automatic checks for updates. For more information\n"
-              " see: https://docs.seqan.de/sharg/main_user/about_update_notifications.html\n"
-              "#######################################################################\n\n");
+    EXPECT_EQ(err, "");
 
     // make sure that all files now exist
     EXPECT_TRUE(std::filesystem::exists(app_timestamp_filename())) << app_timestamp_filename();
-    EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
+    EXPECT_TRUE(std::regex_match(read_first_line(app_timestamp_filename()), timestamp_regex));
 
-    if (app_call_succeeded)
-    {
-        EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
-    }
-    else
-    {
-        std::cout << "App call did not succeed (server offline?) and could thus not be tested.\n";
-    }
+    EXPECT_FALSE(app_call_succeeded);
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, time_out) // while implicitly on
+TEST_F(version_check_test, time_out) // while implicitly on
 {
-    char const * argv[2] = {app_name.c_str(), "-f"};
-
     // create timestamp files
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp()));
 
-    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -297,20 +264,22 @@ TEST_F(version_check, time_out) // while implicitly on
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, environment_variable_set)
+TEST_F(version_check_test, environment_variable_set)
 {
+    bool dummy{false};
+
     // store variable for resetting it
-    std::string previous_value{};
-    if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
-        previous_value = env;
+    std::string const cached_env_var = []()
+    {
+        if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
+            return std::string{env};
+        return std::string{};
+    }();
 
     setenv("SHARG_NO_VERSION_CHECK", "foo", 1);
 
-    char const * argv[2] = {app_name.c_str(), "-f"};
-
-    sharg::parser parser{app_name, 2, argv};
+    sharg::parser parser{app_name, {app_name, "-f"}, sharg::update_notifications::on};
     parser.info.version = "2.3.4";
-    bool dummy{false};
     parser.add_flag(dummy, sharg::config{.short_id = 'f'});
 
     testing::internal::CaptureStdout();
@@ -330,19 +299,17 @@ TEST_F(version_check, environment_variable_set)
     EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename())) << app_timestamp_filename();
     EXPECT_FALSE(std::filesystem::exists(app_version_filename()));
 
-    if (previous_value.empty())
+    if (cached_env_var.empty())
         unsetenv("SHARG_NO_VERSION_CHECK");
     else
-        setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
+        setenv("SHARG_NO_VERSION_CHECK", cached_env_var.c_str(), 1);
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, option_off)
+TEST_F(version_check_test, option_off)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_OFF};
-
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_OFF, "-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
@@ -355,29 +322,34 @@ TEST_F(version_check, option_off)
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, option_off_with_help_page)
+TEST_F(version_check_test, option_off_with_help_page)
 {
     // Version check option always needs to be parsed, even if special formats get selected
-    char const * argv[4] = {app_name.c_str(), "-h", OPTION_VERSION_CHECK, OPTION_OFF};
-
-    std::string previous_value{};
-    if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
+    std::string const cached_env_var = []()
     {
-        previous_value = env;
-        unsetenv("SHARG_NO_VERSION_CHECK");
-    }
+        std::string result{};
+        if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
+        {
+            result = env;
+            unsetenv("SHARG_NO_VERSION_CHECK");
+        }
+        return result;
+    }();
 
-    sharg::parser parser{app_name, 4, argv};
+    sharg::parser parser{app_name, {app_name, "-h", OPTION_VERSION_CHECK, OPTION_OFF}, sharg::update_notifications::on};
     parser.info.version = "2.3.4";
 
-    EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+    // flag = true;
+    std::string const help_message = get_parse_cout_on_exit(parser);
+    // flag = false;
+    EXPECT_NE(help_message, "");
 
     // call future.get() to artificially wait for the thread to finish and avoid
     // any interference with following tests
     EXPECT_FALSE(wait_for(parser));
 
-    if (!previous_value.empty())
-        setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
+    if (!cached_env_var.empty())
+        setenv("SHARG_NO_VERSION_CHECK", cached_env_var.c_str(), 1);
 
     // no timestamp is written since the decision was made explicitly
     EXPECT_FALSE(std::filesystem::exists(app_version_filename())) << app_version_filename();
@@ -387,66 +359,60 @@ TEST_F(version_check, option_off_with_help_page)
 
 // case: the current parser has a smaller Sharg version than is present in the version file
 #if !defined(NDEBUG)
-TEST_F(version_check, smaller_sharg_version)
+TEST_F(version_check_test, smaller_sharg_version)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-
     // create version file with euqal app version and a greater Sharg version than the current
     create_file(app_version_filename(), std::string{"2.3.4\n20.5.9"});
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, sharg::detail::version_checker::message_sharg_update);
 
-    EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
+    EXPECT_TRUE(std::regex_match(read_first_line(app_timestamp_filename()), timestamp_regex));
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
 // case: the current parser has a greater app version than is present in the version file
-TEST_F(version_check, greater_app_version)
+TEST_F(version_check_test, greater_app_version)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-
     // create version file with equal Sharg version and a smaller app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"1.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401)); // one day = 86400 seconds
 
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, sharg::detail::version_checker::message_registered_app_update);
 
-    EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
+    EXPECT_TRUE(std::regex_match(read_first_line(app_timestamp_filename()), timestamp_regex));
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, unregistered_app)
+TEST_F(version_check_test, unregistered_app)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-
     // create version file with equal Sharg version and a smaller app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"UNREGISTERED_APP\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401)); // one day = 86400 seconds
 
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, sharg::detail::version_checker::message_unregistered_app);
 
-    EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
+    EXPECT_TRUE(std::regex_match(read_first_line(app_timestamp_filename()), timestamp_regex));
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
@@ -454,29 +420,28 @@ TEST_F(version_check, unregistered_app)
 
 // case: the current parser has a smaller app version than is present in the version file
 #if defined(NDEBUG)
-TEST_F(version_check, smaller_app_version)
+TEST_F(version_check_test, smaller_app_version)
 {
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-
     // create version file with equal Sharg version and a greater app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    auto [out, err, app_call_succeeded] = simulate_parser(3, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, (sharg::detail::version_checker{app_name, "2.3.4"}.message_app_update));
 
-    EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
+    EXPECT_TRUE(std::regex_match(read_first_line(app_timestamp_filename()), timestamp_regex));
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, smaller_app_version_custom_url)
+TEST_F(version_check_test, smaller_app_version_custom_url)
 {
+    bool dummy_flag{false};
     std::string previous_value{};
     if (char * env = std::getenv("SHARG_NO_VERSION_CHECK"))
     {
@@ -484,15 +449,14 @@ TEST_F(version_check, smaller_app_version_custom_url)
         unsetenv("SHARG_NO_VERSION_CHECK");
     }
 
-    char const * argv[3] = {app_name.c_str(), OPTION_VERSION_CHECK, OPTION_ON};
-
     // create version file with equal Sharg version and a greater app version than the current
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.5.9\n"} + sharg::sharg_version_cstring));
 
     // create timestamp file that dates one day before current to trigger a message (one day = 86400 seconds)
     ASSERT_TRUE(create_file(app_timestamp_filename(), current_unix_timestamp() - 100401));
 
-    sharg::parser parser{app_name, 3, argv};
+    sharg::parser parser{app_name, {app_name, OPTION_VERSION_CHECK, OPTION_ON, "-f"}};
+    parser.add_flag(dummy_flag, sharg::config{.short_id = 'f'});
     parser.info.version = "2.3.4";
     parser.info.url = "https//foo.de";
 
@@ -509,7 +473,7 @@ TEST_F(version_check, smaller_app_version_custom_url)
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, (sharg::detail::version_checker{app_name, parser.info.version, parser.info.url}.message_app_update));
 
-    EXPECT_TRUE(std::regex_match(read_file(app_timestamp_filename()), timestamp_regex));
+    EXPECT_TRUE(std::regex_match(read_first_line(app_timestamp_filename()), timestamp_regex));
 
     if (!previous_value.empty())
         setenv("SHARG_NO_VERSION_CHECK", previous_value.c_str(), 1);
@@ -518,33 +482,29 @@ TEST_F(version_check, smaller_app_version_custom_url)
 }
 #endif // defined(NDEBUG)
 
-TEST_F(version_check, user_specified_never)
+TEST_F(version_check_test, user_specified_never)
 {
-    char const * argv[2] = {app_name.c_str(), "-f"}; // no explicit version check option
-
     // create timestamp files
     ASSERT_TRUE(create_file(app_timestamp_filename(), "NEVER"));
 
-    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "");
 
     EXPECT_FALSE(std::filesystem::exists(app_version_filename()));
-    EXPECT_EQ(read_file(app_timestamp_filename()), "NEVER"); // should not be modified
+    EXPECT_EQ(read_first_line(app_timestamp_filename()), "NEVER"); // should not be modified
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, user_specified_always)
+TEST_F(version_check_test, user_specified_always)
 {
-    char const * argv[2] = {app_name.c_str(), "-f"}; // no explicit version check option
-
     // create timestamp files
     ASSERT_TRUE(create_file(app_timestamp_filename(), "ALWAYS"));
 
-    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "");
@@ -558,21 +518,19 @@ TEST_F(version_check, user_specified_always)
         std::cout << "App call did not succeed (server offline?) and could thus not be tested.\n";
     }
 
-    EXPECT_EQ(read_file(app_timestamp_filename()), "ALWAYS"); // should not be modified
-    EXPECT_TRUE(remove_files_from_path());                    // clear files again
+    EXPECT_EQ(read_first_line(app_timestamp_filename()), "ALWAYS"); // should not be modified
+    EXPECT_TRUE(remove_files_from_path());                          // clear files again
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
 
-TEST_F(version_check, wrong_version_string)
+TEST_F(version_check_test, wrong_version_string)
 {
-    char const * argv[2] = {app_name.c_str(), "-f"}; // no explicit version check option
-
     // create a corrupted version file. Nothing should be printed, it is just ignored
     ASSERT_TRUE(create_file(app_version_filename(), std::string{"20.wrong.9\nalso.wrong.4"}));
     ASSERT_TRUE(create_file(app_timestamp_filename(), "ALWAYS"));
 
-    auto [out, err, app_call_succeeded] = simulate_parser(2, argv);
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
     (void)app_call_succeeded;
 
     EXPECT_EQ(out, "");
