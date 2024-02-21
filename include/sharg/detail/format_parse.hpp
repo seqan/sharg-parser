@@ -715,7 +715,9 @@ private:
      */
     void get_flag(bool & value, char const short_id, std::string const & long_id)
     {
-        value = flag_is_set(short_id) || flag_is_set(long_id);
+        // `|| value` is needed to keep the value if it was set before.
+        // It must be last because `flag_is_set` removes the flag from the arguments.
+        value = flag_is_set(short_id) || flag_is_set(long_id) || value;
     }
 
     /*!\brief Handles command line positional option retrieval.
