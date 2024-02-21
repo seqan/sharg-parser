@@ -881,3 +881,79 @@ TEST_F(format_parse_test, executable_name)
     EXPECT_EQ(executable_name[0], "parser_test");
     EXPECT_EQ(executable_name[1], "build");
 }
+
+TEST_F(format_parse_test, flag_independence)
+{
+    bool flag_value{false};
+
+    auto parser = get_parser("-a", "-z");
+    parser.add_flag(flag_value, sharg::config{.short_id = 'a'});
+    parser.add_flag(flag_value, sharg::config{.short_id = 'z'});
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, true);
+
+    flag_value = false;
+
+    parser = get_parser("-a");
+    parser.add_flag(flag_value, sharg::config{.short_id = 'a'});
+    parser.add_flag(flag_value, sharg::config{.short_id = 'z'});
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, true);
+
+    flag_value = false;
+
+    parser = get_parser("-z");
+    parser.add_flag(flag_value, sharg::config{.short_id = 'a'});
+    parser.add_flag(flag_value, sharg::config{.short_id = 'z'});
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, true);
+}
+
+TEST_F(format_parse_test, parse_order_example)
+{
+    bool flag_value{false};
+
+    // Flags are evaluated after options
+    auto parser = get_parser("-f", "-o", "false");
+
+    EXPECT_NO_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}));
+    EXPECT_NO_THROW(parser.add_flag(flag_value, sharg::config{.short_id = 'f'}));
+    EXPECT_EQ(flag_value, false);
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, true); // option sets to false, but flag sets to true
+
+    flag_value = false;
+
+    // Because this option syntax is also allowed
+    parser = get_parser("-otrue");
+
+    EXPECT_NO_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}));
+    EXPECT_EQ(flag_value, false);
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, true);
+
+    flag_value = false;
+
+    // And this flag syntax is allowed
+    parser = get_parser("-otrue");
+    std::array<bool, 5> flag_values{false, false, false, false, false};
+
+    EXPECT_NO_THROW(parser.add_flag(flag_values[0], sharg::config{.short_id = 'o'}));
+    EXPECT_NO_THROW(parser.add_flag(flag_values[1], sharg::config{.short_id = 't'}));
+    EXPECT_NO_THROW(parser.add_flag(flag_values[2], sharg::config{.short_id = 'r'}));
+    EXPECT_NO_THROW(parser.add_flag(flag_values[3], sharg::config{.short_id = 'u'}));
+    EXPECT_NO_THROW(parser.add_flag(flag_values[4], sharg::config{.short_id = 'e'}));
+    EXPECT_TRUE(std::ranges::none_of(flag_values, std::identity{})); // All false
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_TRUE(std::ranges::all_of(flag_values, std::identity{})); // All true
+
+    // Positional options are evaluated last
+    parser = get_parser("false", "-o", "true", "-f");
+
+    EXPECT_NO_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}));
+    EXPECT_NO_THROW(parser.add_flag(flag_value, sharg::config{.short_id = 'f'}));
+    EXPECT_NO_THROW(parser.add_positional_option(flag_value, sharg::config{}));
+    EXPECT_EQ(flag_value, false);
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, false);
+}
