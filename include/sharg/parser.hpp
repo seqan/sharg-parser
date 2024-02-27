@@ -188,18 +188,7 @@ public:
         subcommands{std::move(subcommands)},
         arguments{arguments}
     {
-        for (auto & sub : this->subcommands)
-        {
-            if (!std::regex_match(sub, app_name_regex))
-            {
-                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
-                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
-            }
-        }
-
         info.app_name = app_name;
-
-        init();
     }
 
     //!\overload
@@ -256,14 +245,17 @@ public:
         check_parse_not_called("add_option");
         verify_option_config(config);
 
-        // copy variables into the lambda because the calls are pushed to a stack
-        // and the references would go out of scope.
-        std::visit(
-            [&value, &config](auto & f)
+        auto operation = [this, &value, config]()
+        {
+            auto visit_fn = [&value, &config](auto & f)
             {
                 f.add_option(value, config);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds a flag to the sharg::parser.
@@ -289,14 +281,17 @@ public:
         if (value)
             throw design_error("A flag's default value must be false.");
 
-        // copy variables into the lambda because the calls are pushed to a stack
-        // and the references would go out of scope.
-        std::visit(
-            [&value, &config](auto & f)
+        auto operation = [this, &value, config]()
+        {
+            auto visit_fn = [&value, &config](auto & f)
             {
                 f.add_flag(value, config);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds a positional option to the sharg::parser.
@@ -318,6 +313,7 @@ public:
      * \throws sharg::design_error if the option is advanced or hidden.
      * \throws sharg::design_error if the option has a default_message.
      * \throws sharg::design_error if there already is a positional list option.
+     * \throws sharg::design_error if there are subcommands.
      *
      * \details
      *
@@ -336,14 +332,17 @@ public:
         if constexpr (detail::is_container_option<option_type>)
             has_positional_list_option = true; // keep track of a list option because there must be only one!
 
-        // copy variables into the lambda because the calls are pushed to a stack
-        // and the references would go out of scope.
-        std::visit(
-            [&value, &config](auto & f)
+        auto operation = [this, &value, config]()
+        {
+            auto visit_fn = [&value, &config](auto & f)
             {
                 f.add_positional_option(value, config);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
     //!\}
 
@@ -419,48 +418,26 @@ public:
         if (parse_was_called)
             throw design_error("The function parse() must only be called once!");
 
-        // Before creating the detail::version_checker, we have to make sure that
-        // malicious code cannot be injected through the app name.
-        if (!std::regex_match(info.app_name, app_name_regex))
-        {
-            throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
-                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
-        }
-
-        detail::version_checker app_version{info.app_name, info.version, info.url};
-
-        if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
-        {
-            assert(!subcommands.empty());
-            std::string subcommands_str{"["};
-            for (std::string const & command : subcommands)
-                subcommands_str += command + ", ";
-            subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
-
-            throw too_few_arguments{"You misspelled the subcommand! Please specify which sub-program "
-                                    "you want to use: one of "
-                                    + subcommands_str
-                                    + ". Use -h/--help for more "
-                                      "information."};
-        }
-
-        if (app_version.decide_if_check_is_performed(version_check_dev_decision, version_check_user_decision))
-        {
-            // must be done before calling parse on the format because this might std::exit
-            std::promise<bool> app_version_prom;
-            version_check_future = app_version_prom.get_future();
-            app_version(std::move(app_version_prom));
-        }
-        std::visit(
-            [this]<typename T>(T & f)
-            {
-                if constexpr (std::same_as<T, detail::format_tdl>)
-                    f.parse(info, executable_name);
-                else
-                    f.parse(info);
-            },
-            format);
         parse_was_called = true;
+
+        // User input sanitization must happen before version check!
+        verify_app_and_subcommand_names();
+
+        // Determine the format and subcommand.
+        determine_format_and_subcommand();
+
+        // If a subcommand was provided, check that it is valid.
+        verify_subcommand();
+
+        // Apply all defered operations to the parser, e.g., `add_option`, `add_flag`, `add_positional_option`.
+        for (auto & operation : operations)
+            operation();
+
+        // The version check, which might exit the program, must be called before calling parse on the format.
+        run_version_check();
+
+        // Parse the command line arguments.
+        parse_format();
 
         // Exit after parsing any special format.
         if (!std::holds_alternative<detail::format_parse>(format))
@@ -561,12 +538,17 @@ public:
     {
         check_parse_not_called("add_section");
 
-        std::visit(
-            [&title, advanced_only](auto & f)
+        auto operation = [this, title, advanced_only]()
+        {
+            auto visit_fn = [&title, advanced_only](auto & f)
             {
                 f.add_section(title, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds an help page subsection to the sharg::parser.
@@ -583,12 +565,17 @@ public:
     {
         check_parse_not_called("add_subsection");
 
-        std::visit(
-            [&title, advanced_only](auto & f)
+        auto operation = [this, title, advanced_only]()
+        {
+            auto visit_fn = [&title, advanced_only](auto & f)
             {
                 f.add_subsection(title, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds an help page text line to the sharg::parser.
@@ -606,12 +593,17 @@ public:
     {
         check_parse_not_called("add_line");
 
-        std::visit(
-            [&text, is_paragraph, advanced_only](auto & f)
+        auto operation = [this, text, is_paragraph, advanced_only]()
+        {
+            auto visit_fn = [&text, is_paragraph, advanced_only](auto & f)
             {
                 f.add_line(text, is_paragraph, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
 
     /*!\brief Adds an help page list item (key-value) to the sharg::parser.
@@ -638,12 +630,17 @@ public:
     {
         check_parse_not_called("add_list_item");
 
-        std::visit(
-            [&key, &desc, advanced_only](auto & f)
+        auto operation = [this, key, desc, advanced_only]()
+        {
+            auto visit_fn = [&key, &desc, advanced_only](auto & f)
             {
                 f.add_list_item(key, desc, advanced_only);
-            },
-            format);
+            };
+
+            std::visit(std::move(visit_fn), format);
+        };
+
+        operations.push_back(std::move(operation));
     }
     //!\}
 
@@ -745,7 +742,7 @@ private:
                  detail::format_man,
                  detail::format_tdl,
                  detail::format_copyright>
-        format{detail::format_help{{}, {}, false}}; // Will be overwritten in any case.
+        format{detail::format_short_help{}};
 
     //!\brief List of option/flag identifiers that are already used.
     std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
@@ -759,12 +756,14 @@ private:
     //!\brief The command that lead to calling this parser, e.g. [./build/bin/raptor, build]
     std::vector<std::string> executable_name{};
 
+    //!\brief Vector of functions that stores all calls.
+    std::vector<std::function<void()>> operations;
+
     /*!\brief Initializes the sharg::parser class on construction.
      * \throws sharg::too_few_arguments if option --export-help was specified without a value
      * \throws sharg::too_few_arguments if option --version-check was specified without a value
      * \throws sharg::validation_error if the value passed to option --export-help was invalid.
      * \throws sharg::validation_error if the value passed to option --version-check was invalid.
-     * \throws sharg::too_few_arguments if a sub parser was configured at construction but a subcommand is missing.
      * \details
      *
      * This function adds all command line parameters to the format_arguments member variable
@@ -786,98 +785,104 @@ private:
      *
      * If `--export-help` is specified with a value other than html, man, cwl or ctd, an sharg::parser_error is thrown.
      */
-    void init()
+    void determine_format_and_subcommand()
     {
         assert(!arguments.empty());
+        auto it = arguments.begin();
 
-        executable_name.emplace_back(arguments[0]);
-
-        bool special_format_was_set{false};
+        executable_name.emplace_back(*it);
+        ++it;
 
         // Helper function for going to the next argument. This makes it more obvious that we are
         // incrementing `it` (version-check, and export-help).
-        auto go_to_next_arg = [this](auto & it, std::string_view message) -> auto
+        auto go_to_next_arg = [this, &it](std::string_view message) -> auto
         {
+            assert(it != arguments.end());
+
             if (++it == arguments.end())
                 throw too_few_arguments{message.data()};
         };
 
-        // start at 1 to skip binary name
-        for (auto it = ++arguments.begin(); it != arguments.end(); ++it)
+        // Helper function for finding and processing subcommands.
+        auto found_and_processed_subcommand = [this, &it](std::string_view arg) -> bool
         {
-            std::string_view arg{*it};
+            if (subcommands.empty())
+                return false;
 
-            if (!subcommands.empty()) // this is a top_level parser
+            if (std::ranges::find(subcommands, arg) != subcommands.end())
             {
-                if (std::ranges::find(subcommands, arg) != subcommands.end()) // identified subparser
-                {
-                    sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
-                                                          std::vector<std::string>{it, arguments.end()},
-                                                          update_notifications::off);
+                sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
+                                                      std::vector<std::string>{it, arguments.end()},
+                                                      update_notifications::off);
 
-                    // Add the original calls to the front, e.g. ["raptor"],
-                    // s.t. ["raptor", "build"] will be the list after constructing the subparser
-                    sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
-                                                       executable_name.begin(),
-                                                       executable_name.end());
-                    break;
-                }
-                else
+                // Add the original calls to the front, e.g. ["raptor"],
+                // s.t. ["raptor", "build"] will be the list after constructing the subparser
+                sub_parser->executable_name.insert(sub_parser->executable_name.begin(),
+                                                   executable_name.begin(),
+                                                   executable_name.end());
+                return true;
+            }
+            else
+            {
+                // Positional options are forbidden by design. Todo: Allow options. Forbidden in check_option_config.
+                // Flags and options, which both start with '-', are allowed for the top-level parser.
+                // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
+                if (!arg.starts_with('-'))
                 {
-                    // Options and positional options are forbidden by design.
-                    // Flags starting with '-' are allowed for the top-level parser.
-                    // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
-                    if (!arg.empty() && arg[0] != '-')
-                    {
-                        format_arguments.emplace_back(arg);
-                        break;
-                    }
+                    format_arguments.emplace_back(arg);
+                    return true;
                 }
             }
 
+            return false;
+        };
+
+        // Process the arguments.
+        for (; it != arguments.end(); ++it)
+        {
+            std::string_view arg{*it};
+
+            if (found_and_processed_subcommand(arg))
+                break;
+
             if (arg == "-h" || arg == "--help")
             {
-                special_format_was_set = true;
                 format = detail::format_help{subcommands, version_check_dev_decision, false};
             }
             else if (arg == "-hh" || arg == "--advanced-help")
             {
-                special_format_was_set = true;
                 format = detail::format_help{subcommands, version_check_dev_decision, true};
             }
             else if (arg == "--version")
             {
-                special_format_was_set = true;
                 format = detail::format_version{};
             }
             else if (arg == "--copyright")
             {
-                special_format_was_set = true;
                 format = detail::format_copyright{};
             }
-            else if (arg.substr(0, 13) == "--export-help") // --export-help=man is also allowed
+            else if (arg == "--export-help" || arg.starts_with("--export-help="))
             {
-                special_format_was_set = true;
+                arg.remove_prefix(std::string_view{"--export-help"}.size());
 
-                std::string_view export_format;
-
-                if (arg.size() > 13)
+                // --export-help man
+                if (arg.empty())
                 {
-                    export_format = arg.substr(14);
+                    go_to_next_arg("Option --export-help must be followed by a value.");
+                    arg = *it;
                 }
-                else
+                else // --export-help=man
                 {
-                    go_to_next_arg(it, "Option --export-help must be followed by a value.");
-                    export_format = *it;
+                    arg.remove_prefix(1u);
                 }
 
-                if (export_format == "html")
+                if (arg == "html")
                     format = detail::format_html{subcommands, version_check_dev_decision};
-                else if (export_format == "man")
+                else if (arg == "man")
                     format = detail::format_man{subcommands, version_check_dev_decision};
-                else if (export_format == "ctd")
+                else if (arg == "ctd")
                     format = detail::format_tdl{detail::format_tdl::FileFormat::CTD};
-                else if (export_format == "cwl")
+                else if (arg == "cwl")
                     format = detail::format_tdl{detail::format_tdl::FileFormat::CWL};
                 else
                     throw validation_error{"Validation failed for option --export-help: "
@@ -886,7 +891,7 @@ private:
             }
             else if (arg == "--version-check")
             {
-                go_to_next_arg(it, "Option --version-check must be followed by a value.");
+                go_to_next_arg("Option --version-check must be followed by a value.");
                 arg = *it;
 
                 if (arg == "1" || arg == "true")
@@ -902,14 +907,13 @@ private:
             }
         }
 
-        if (special_format_was_set)
+        // A special format was set. We do not need to parse the format_arguments.
+        if (!std::holds_alternative<detail::format_short_help>(format))
             return;
 
-        // All special options have been handled. If there are no arguments left and we do not have a subparser,
-        // we call the short help.
-        if (format_arguments.empty() && !sub_parser)
-            format = detail::format_short_help{};
-        else
+        // All special options have been handled. If there are arguments left or we have a subparser,
+        // we call format_parse. Oterhwise, we print the short help (default variant).
+        if (!format_arguments.empty() || sub_parser)
             format = detail::format_parse(format_arguments);
     }
 
@@ -970,7 +974,7 @@ private:
     template <typename validator_t>
     void verify_option_config(config<validator_t> const & config)
     {
-        if (sub_parser != nullptr)
+        if (!subcommands.empty())
             throw design_error{"You may only specify flags for the top-level parser."};
 
         verify_identifiers(config.short_id, config.long_id);
@@ -1000,7 +1004,7 @@ private:
         if (config.advanced || config.hidden)
             throw design_error{"Positional options are always required and therefore cannot be advanced nor hidden!"};
 
-        if (sub_parser != nullptr)
+        if (!subcommands.empty())
             throw design_error{"You may only specify flags for the top-level parser."};
 
         if (has_positional_list_option)
@@ -1024,6 +1028,95 @@ private:
     {
         if (parse_was_called)
             throw design_error{detail::to_string(function_name.data(), " may only be used before calling parse().")};
+    }
+
+    /*!\brief Verifies that the app and subcommand names are correctly formatted.
+     * \throws sharg::design_error if the app name is not correctly formatted.
+     * \throws sharg::design_error if the subcommand names are not correctly formatted.
+     * \details
+     * The app name must only contain alphanumeric characters, '_', or '-'.
+     * The subcommand names must only contain alphanumeric characters, '_', or '-'.
+     */
+    inline void verify_app_and_subcommand_names() const
+    {
+        // Before creating the detail::version_checker, we have to make sure that
+        // malicious code cannot be injected through the app name.
+        if (!std::regex_match(info.app_name, app_name_regex))
+        {
+            throw design_error{("The application name must only contain alpha-numeric characters or '_' and '-' "
+                                "(regex: \"^[a-zA-Z0-9_-]+$\").")};
+        }
+
+        for (auto & sub : this->subcommands)
+        {
+            if (!std::regex_match(sub, app_name_regex))
+            {
+                throw design_error{"The subcommand name must only contain alpha-numeric characters or '_' and '-' "
+                                   "(regex: \"^[a-zA-Z0-9_-]+$\")."};
+            }
+        }
+    }
+
+    /*!\brief Runs the version check if the user has not disabled it.
+     * \details
+     * If the user has not disabled the version check, the function will start a detached thread that will call the
+     * sharg::detail::version_checker and print a message if a new version is available.
+     */
+    inline void run_version_check()
+    {
+        detail::version_checker app_version{info.app_name, info.version, info.url};
+
+        if (app_version.decide_if_check_is_performed(version_check_dev_decision, version_check_user_decision))
+        {
+            // must be done before calling parse on the format because this might std::exit
+            std::promise<bool> app_version_prom;
+            version_check_future = app_version_prom.get_future();
+            app_version(std::move(app_version_prom));
+        }
+    }
+
+    /*!\brief Verifies that the subcommand was correctly specified.
+     * \throws sharg::too_few_arguments if a subparser was configured at construction but a subcommand is missing.
+     */
+    inline void verify_subcommand()
+    {
+        if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
+        {
+            assert(!subcommands.empty());
+            std::string subcommands_str{"["};
+            for (std::string const & command : subcommands)
+                subcommands_str += command + ", ";
+            subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
+
+            throw too_few_arguments{"You misspelled the subcommand! Please specify which sub-program "
+                                    "you want to use: one of "
+                                    + subcommands_str
+                                    + ". Use -h/--help for more "
+                                      "information."};
+        }
+    }
+
+    /*!\brief Parses the command line arguments according to the format.
+     * \throws sharg::option_declared_multiple_times if an option that is not a list was declared multiple times.
+     * \throws sharg::user_input_error if an incorrect argument is given as (positional) option value.
+     * \throws sharg::required_option_missing if the user did not provide a required option.
+     * \throws sharg::too_many_arguments if the command line call contained more arguments than expected.
+     * \throws sharg::too_few_arguments if the command line call contained less arguments than expected.
+     * \throws sharg::validation_error if the argument was not excepted by the provided validator.
+     * \details
+     * This function calls the parse function of the format member variable.
+     */
+    inline void parse_format()
+    {
+        auto format_parse_fn = [this]<typename format_t>(format_t & f)
+        {
+            if constexpr (std::same_as<format_t, detail::format_tdl>)
+                f.parse(info, executable_name);
+            else
+                f.parse(info);
+        };
+
+        std::visit(std::move(format_parse_fn), format);
     }
 };
 
