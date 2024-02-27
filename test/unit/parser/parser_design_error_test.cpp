@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/expect_throw_msg.hpp>
 #include <sharg/test/test_fixture.hpp>
 
 class design_error_test : public sharg::test::test_fixture
@@ -295,30 +296,23 @@ TEST_F(design_error_test, not_allowed_after_parse)
     parser.add_option(value, sharg::config{.short_id = 'i'});
     EXPECT_NO_THROW(parser.parse());
 
-    auto check_error = [](auto call_fn, std::string const function_name)
-    {
-        try
-        {
-            call_fn();
-            FAIL();
-        }
-        catch (sharg::design_error const & exception)
-        {
-            EXPECT_EQ(function_name + " may only be used before calling parse().", exception.what());
-        }
-        catch (...)
-        {
-            FAIL();
-        }
-    };
-
-    // clang-format off
-    check_error([&parser, &value]() { parser.add_option(value, sharg::config{.short_id = 'i'}); }, "add_option");
-    check_error([&parser, &flag]() { parser.add_flag(flag, sharg::config{.short_id = 'i'}); }, "add_flag");
-    check_error([&parser, &value]() { parser.add_positional_option(value, sharg::config{}); }, "add_positional_option");
-    check_error([&parser]() { parser.add_section(""); }, "add_section");
-    check_error([&parser]() { parser.add_subsection(""); }, "add_subsection");
-    check_error([&parser]() { parser.add_line(""); }, "add_line");
-    check_error([&parser]() { parser.add_list_item("", ""); }, "add_list_item");
-    // clang-format on
+    EXPECT_THROW_MSG(parser.add_option(value, sharg::config{.short_id = 'i'}),
+                     sharg::design_error,
+                     "add_option may only be used before calling parse().");
+    EXPECT_THROW_MSG(parser.add_flag(flag, sharg::config{.short_id = 'i'}),
+                     sharg::design_error,
+                     "add_flag may only be used before calling parse().");
+    EXPECT_THROW_MSG(parser.add_positional_option(value, sharg::config{}),
+                     sharg::design_error,
+                     "add_positional_option may only be used before calling parse().");
+    EXPECT_THROW_MSG(parser.add_section(""),
+                     sharg::design_error,
+                     "add_section may only be used before calling parse().");
+    EXPECT_THROW_MSG(parser.add_subsection(""),
+                     sharg::design_error,
+                     "add_subsection may only be used before calling parse().");
+    EXPECT_THROW_MSG(parser.add_line(""), sharg::design_error, "add_line may only be used before calling parse().");
+    EXPECT_THROW_MSG(parser.add_list_item("", ""),
+                     sharg::design_error,
+                     "add_list_item may only be used before calling parse().");
 }

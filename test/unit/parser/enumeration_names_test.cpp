@@ -7,6 +7,7 @@
 #include <ranges>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/expect_throw_msg.hpp>
 #include <sharg/test/test_fixture.hpp>
 
 namespace foo
@@ -112,34 +113,19 @@ TEST_F(enumeration_names_test, enum_error_message)
     foo::bar value{};
     Other::bar value2{};
 
-    auto parser = get_parser();
-
-    auto check_error = [&parser](std::string_view const expected)
-    {
-        try
-        {
-            parser.parse();
-            FAIL();
-        }
-        catch (sharg::user_input_error const & exception)
-        {
-            EXPECT_EQ(expected, exception.what());
-        }
-        catch (...)
-        {
-            FAIL();
-        }
-    };
-
     // foo::bar does not contain duplicate values
-    parser = get_parser("-e", "nine");
+    auto parser = get_parser("-e", "nine");
     parser.add_option(value, sharg::config{.short_id = 'e'});
-    check_error("You have chosen an invalid input value: nine. Please use one of: [one, two, three]");
+    EXPECT_THROW_MSG(parser.parse(),
+                     sharg::user_input_error,
+                     "You have chosen an invalid input value: nine. Please use one of: [one, two, three]");
 
     // Other::bar does contain duplicate values
     parser = get_parser("-e", "nine");
     parser.add_option(value2, sharg::config{.short_id = 'e'});
-    check_error("You have chosen an invalid input value: nine. Please use one of: [1, one, 2, two]");
+    EXPECT_THROW_MSG(parser.parse(),
+                     sharg::user_input_error,
+                     "You have chosen an invalid input value: nine. Please use one of: [1, one, 2, two]");
 }
 
 // https://github.com/seqan/seqan3/pull/2381
