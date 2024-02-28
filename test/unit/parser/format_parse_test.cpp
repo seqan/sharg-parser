@@ -7,6 +7,7 @@
 #include <ranges>
 
 #include <sharg/parser.hpp>
+#include <sharg/test/expect_throw_msg.hpp>
 #include <sharg/test/test_fixture.hpp>
 
 class format_parse_test : public sharg::test::test_fixture
@@ -770,22 +771,10 @@ TEST_F(format_parse_test, error_message_parsing)
 
     auto parser = get_parser("--value", "-30");
     parser.add_option(option_value, sharg::config{.long_id = "value"});
-
-    try
-    {
-        parser.parse();
-        FAIL();
-    }
-    catch (sharg::user_input_error const & exception)
-    {
-        std::string_view const expected_message{"Value parse failed for --value: Argument -30 could not be parsed as "
-                                                "type unsigned 64 bit integer."};
-        EXPECT_EQ(expected_message, exception.what());
-    }
-    catch (...)
-    {
-        FAIL();
-    }
+    EXPECT_THROW_MSG(parser.parse(),
+                     sharg::user_input_error,
+                     "Value parse failed for --value: Argument -30 could "
+                     "not be parsed as type unsigned 64 bit integer.");
 }
 
 // https://github.com/seqan/seqan3/pull/2381
