@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <set>
+#include <unordered_set>
 #include <variant>
 
 #include <sharg/config.hpp>
@@ -426,9 +426,6 @@ public:
         // Determine the format and subcommand.
         determine_format_and_subcommand();
 
-        // If a subcommand was provided, check that it is valid.
-        verify_subcommand();
-
         // Apply all defered operations to the parser, e.g., `add_option`, `add_flag`, `add_positional_option`.
         for (auto & operation : operations)
             operation();
@@ -512,7 +509,7 @@ public:
             }
         }
 
-        if (std::find(used_option_ids.begin(), used_option_ids.end(), std::string{id}) == used_option_ids.end())
+        if (!used_ids.contains(std::string{id}))
             throw design_error{"You can only ask for option identifiers that you added with add_option() before."};
 
         // we only need to search for an option before the `option_end_identifier` (`--`)
@@ -744,8 +741,8 @@ private:
                  detail::format_copyright>
         format{detail::format_short_help{}};
 
-    //!\brief List of option/flag identifiers that are already used.
-    std::set<std::string> used_option_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
+    //!\brief List of option/flag identifiers (excluding -/--) that are already used.
+    std::unordered_set<std::string> used_ids{"h", "hh", "help", "advanced-help", "export-help", "version", "copyright"};
 
     //!\brief The command line arguments that will be passed to the format.
     std::vector<std::string> format_arguments{};
@@ -756,14 +753,18 @@ private:
     //!\brief The command that lead to calling this parser, e.g. [./build/bin/raptor, build]
     std::vector<std::string> executable_name{};
 
+    //!\brief Set of option identifiers (including -/--) that have been added via `add_option`.
+    std::unordered_set<std::string> options{};
+
     //!\brief Vector of functions that stores all calls.
     std::vector<std::function<void()>> operations;
 
-    /*!\brief Initializes the sharg::parser class on construction.
+    /*!\brief Handles format and subcommand detection.
      * \throws sharg::too_few_arguments if option --export-help was specified without a value
      * \throws sharg::too_few_arguments if option --version-check was specified without a value
      * \throws sharg::validation_error if the value passed to option --export-help was invalid.
      * \throws sharg::validation_error if the value passed to option --version-check was invalid.
+     * \throws sharg::user_input_error if the subcommand is unknown.
      * \details
      *
      * This function adds all command line parameters to the format_arguments member variable
@@ -788,23 +789,27 @@ private:
     void determine_format_and_subcommand()
     {
         assert(!arguments.empty());
+
         auto it = arguments.begin();
+        std::string_view arg{*it};
 
-        executable_name.emplace_back(*it);
-        ++it;
+        executable_name.emplace_back(arg);
 
-        // Helper function for going to the next argument. This makes it more obvious that we are
+        // Helper function for reading the next argument. This makes it more obvious that we are
         // incrementing `it` (version-check, and export-help).
-        auto go_to_next_arg = [this, &it](std::string_view message) -> auto
+        auto read_next_arg = [this, &it, &arg]() -> bool
         {
             assert(it != arguments.end());
 
             if (++it == arguments.end())
-                throw too_few_arguments{message.data()};
+                return false;
+
+            arg = *it;
+            return true;
         };
 
         // Helper function for finding and processing subcommands.
-        auto found_and_processed_subcommand = [this, &it](std::string_view arg) -> bool
+        auto found_subcommand = [this, &it, &arg]() -> bool
         {
             if (subcommands.empty())
                 return false;
@@ -824,13 +829,17 @@ private:
             }
             else
             {
-                // Positional options are forbidden by design. Todo: Allow options. Forbidden in check_option_config.
+                // Positional options are forbidden by design.
                 // Flags and options, which both start with '-', are allowed for the top-level parser.
-                // Otherwise, this is a wrongly spelled subcommand. The error will be thrown in parse().
+                // Otherwise, this is an unknown subcommand.
                 if (!arg.starts_with('-'))
                 {
-                    format_arguments.emplace_back(arg);
-                    return true;
+                    std::string message = "You specified an unknown subcommand! Available subcommands are: [";
+                    for (std::string const & command : subcommands)
+                        message += command + ", ";
+                    message.replace(message.size() - 2, 2, "]. Use -h/--help for more information.");
+
+                    throw user_input_error{message};
                 }
             }
 
@@ -838,11 +847,28 @@ private:
         };
 
         // Process the arguments.
-        for (; it != arguments.end(); ++it)
+        for (; read_next_arg();)
         {
-            std::string_view arg{*it};
+            // The argument is a known option.
+            if (options.contains(std::string{arg}))
+            {
+                // No futher checks are needed.
+                format_arguments.emplace_back(arg);
 
-            if (found_and_processed_subcommand(arg))
+                // Consume the next argument (the option value) if possible.
+                if (read_next_arg())
+                {
+                    format_arguments.emplace_back(arg);
+                    continue;
+                }
+                else // Too few arguments. This is handled by format_parse.
+                {
+                    break;
+                }
+            }
+
+            // If we have a subcommand, all further arguments are passed to the subparser.
+            if (found_subcommand())
                 break;
 
             if (arg == "-h" || arg == "--help")
@@ -868,8 +894,8 @@ private:
                 // --export-help man
                 if (arg.empty())
                 {
-                    go_to_next_arg("Option --export-help must be followed by a value.");
-                    arg = *it;
+                    if (!read_next_arg())
+                        throw too_few_arguments{"Option --export-help must be followed by a value."};
                 }
                 else // --export-help=man
                 {
@@ -891,8 +917,8 @@ private:
             }
             else if (arg == "--version-check")
             {
-                go_to_next_arg("Option --version-check must be followed by a value.");
-                arg = *it;
+                if (!read_next_arg())
+                    throw too_few_arguments{"Option --version-check must be followed by a value."};
 
                 if (arg == "1" || arg == "true")
                     version_check_user_decision = true;
@@ -903,6 +929,7 @@ private:
             }
             else
             {
+                // Flags, positional options, options using an alternative syntax (--optionValue, --option=value), etc.
                 format_arguments.emplace_back(arg);
             }
         }
@@ -927,7 +954,7 @@ private:
     {
         if (detail::format_parse::is_empty_id(id))
             return false;
-        return (!(used_option_ids.insert(std::string({id}))).second);
+        return (!(used_ids.insert(std::string({id}))).second);
     }
 
     /*!\brief Verifies that the short and the long identifiers are correctly formatted.
@@ -941,43 +968,46 @@ private:
      */
     void verify_identifiers(char const short_id, std::string const & long_id)
     {
-        constexpr std::string_view valid_chars{"@_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
-        auto is_valid = [&valid_chars](char const c)
+        auto is_valid = [](char const c) -> bool
         {
-            return valid_chars.find(c) != std::string::npos;
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') // alphanumeric
+                || c == '@' || c == '_' || c == '-';                                          // additional characters
         };
 
-        if (id_exists(short_id))
-            throw design_error("Option Identifier '" + std::string(1, short_id) + "' was already used before.");
-        if (id_exists(long_id))
-            throw design_error("Option Identifier '" + long_id + "' was already used before.");
-        if (long_id.length() == 1)
-            throw design_error("Long IDs must be either empty, or longer than one character.");
-        if ((short_id != '\0') && !is_valid(short_id))
-            throw design_error("Option identifiers may only contain alphanumeric characters, '_', or '@'.");
-        if (long_id.size() > 0 && (long_id[0] == '-'))
-            throw design_error("First character of long ID cannot be '-'.");
+        if (short_id == '\0' && long_id.empty())
+            throw design_error{"Short and long identifiers may not both be empty."};
 
-        std::for_each(long_id.begin(),
-                      long_id.end(),
-                      [&is_valid](char c)
-                      {
-                          if (!((c == '-') || is_valid(c)))
-                              throw design_error(
-                                  "Long identifiers may only contain alphanumeric characters, '_', '-', or '@'.");
-                      });
-        if (detail::format_parse::is_empty_id(short_id) && detail::format_parse::is_empty_id(long_id))
-            throw design_error("Option Identifiers cannot both be empty.");
+        if (short_id != '\0')
+        {
+            if (short_id == '-' || !is_valid(short_id))
+                throw design_error{"Short identifiers may only contain alphanumeric characters, '_', or '@'."};
+            if (id_exists(short_id))
+                throw design_error{"Short identifier '" + std::string(1, short_id) + "' was already used before."};
+        }
+
+        if (!long_id.empty())
+        {
+            if (long_id.size() == 1)
+                throw design_error{"Long identifiers must be either empty or longer than one character."};
+            if (long_id[0] == '-')
+                throw design_error{"Long identifiers may not use '-' as first character."};
+            if (!std::ranges::all_of(long_id, is_valid))
+                throw design_error{"Long identifiers may only contain alphanumeric characters, '_', '-', or '@'."};
+            if (id_exists(long_id))
+                throw design_error{"Long identifier '" + long_id + "' was already used before."};
+        }
     }
 
     //!brief Verify the configuration given to a sharg::parser::add_option call.
     template <typename validator_t>
     void verify_option_config(config<validator_t> const & config)
     {
-        if (!subcommands.empty())
-            throw design_error{"You may only specify flags for the top-level parser."};
-
         verify_identifiers(config.short_id, config.long_id);
+
+        if (config.short_id != '\0')
+            options.emplace(std::string{"-"} + config.short_id);
+        if (!config.long_id.empty())
+            options.emplace(std::string{"--"} + config.long_id);
 
         if (config.required && !config.default_message.empty())
             throw design_error{"A required option cannot have a default message."};
@@ -1005,7 +1035,7 @@ private:
             throw design_error{"Positional options are always required and therefore cannot be advanced nor hidden!"};
 
         if (!subcommands.empty())
-            throw design_error{"You may only specify flags for the top-level parser."};
+            throw design_error{"You may only specify flags and options for the top-level parser."};
 
         if (has_positional_list_option)
             throw design_error{"You added a positional option with a list value before so you cannot add "
@@ -1072,27 +1102,6 @@ private:
             std::promise<bool> app_version_prom;
             version_check_future = app_version_prom.get_future();
             app_version(std::move(app_version_prom));
-        }
-    }
-
-    /*!\brief Verifies that the subcommand was correctly specified.
-     * \throws sharg::too_few_arguments if a subparser was configured at construction but a subcommand is missing.
-     */
-    inline void verify_subcommand()
-    {
-        if (std::holds_alternative<detail::format_parse>(format) && !subcommands.empty() && sub_parser == nullptr)
-        {
-            assert(!subcommands.empty());
-            std::string subcommands_str{"["};
-            for (std::string const & command : subcommands)
-                subcommands_str += command + ", ";
-            subcommands_str.replace(subcommands_str.size() - 2, 2, "]"); // replace last ", " by "]"
-
-            throw too_few_arguments{"You misspelled the subcommand! Please specify which sub-program "
-                                    "you want to use: one of "
-                                    + subcommands_str
-                                    + ". Use -h/--help for more "
-                                      "information."};
         }
     }
 
