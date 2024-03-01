@@ -19,29 +19,6 @@ protected:
     bool flag_value{false};
     std::vector<std::string> pos_opt_value{};
 
-    static inline std::string basic_options_str = "  Common options\n"
-                                                  "    -h, --help\n"
-                                                  "          Prints the help page.\n"
-                                                  "    -hh, --advanced-help\n"
-                                                  "          Prints the help page including advanced options.\n"
-                                                  "    --version\n"
-                                                  "          Prints the version information.\n"
-                                                  "    --copyright\n"
-                                                  "          Prints the copyright/license information.\n"
-                                                  "    --export-help (std::string)\n"
-                                                  "          Export the help page information. Value must be one of "
-#if SHARG_HAS_TDL
-                                                  "[html, man,\n          ctd, cwl].\n";
-#else
-                                                  "[html, man].\n";
-#endif
-
-    static inline std::string basic_version_str = "VERSION\n"
-                                                  "    Last update:\n"
-                                                  "    test_parser version:\n"
-                                                  "    Sharg version: "
-                                                + std::string{sharg::sharg_version_cstring} + "\n";
-
     static inline std::string license_text = []()
     {
         std::ifstream license_file{std::string{SHARG_TEST_LICENSE_DIR} + "/LICENSE.md"};
@@ -120,7 +97,7 @@ TEST_F(format_help_test, quote_strings)
                "          Default: [\"Some\", \"other\", \"string\"]\n"
                "    -e, --string5 (List of std::string)\n"
                "          Default: None\n\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -155,7 +132,7 @@ TEST_F(format_help_test, quote_paths)
                "          Default: [\"/some\", \"/other\", \"/path\"]\n"
                "    -e, --path5 (List of std::filesystem::path)\n"
                "          Default: None\n\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -166,7 +143,7 @@ TEST_F(format_help_test, no_information)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -179,7 +156,7 @@ TEST_F(format_help_test, with_short_copyright)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str + "\n"
+             + basic_options_str + "\n" + version_str() + "\n"
              + "LEGAL\n"
                "    test_parser Copyright: short\n"
                "    SeqAn Copyright: 2006-2024 Knut Reinert, FU-Berlin; released under the\n"
@@ -195,7 +172,7 @@ TEST_F(format_help_test, with_long_copyright)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str + "\n"
+             + basic_options_str + "\n" + version_str() + "\n"
              + "LEGAL\n"
                "    SeqAn Copyright: 2006-2024 Knut Reinert, FU-Berlin; released under the\n"
                "    3-clause BSDL.\n"
@@ -211,7 +188,7 @@ TEST_F(format_help_test, with_citation)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str + "\n"
+             + basic_options_str + "\n" + version_str() + "\n"
              + "LEGAL\n"
                "    SeqAn Copyright: 2006-2024 Knut Reinert, FU-Berlin; released under the\n"
                "    3-clause BSDL.\n"
@@ -227,7 +204,7 @@ TEST_F(format_help_test, with_author)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str + "\n"
+             + basic_options_str + "\n" + version_str() + "\n"
              + "LEGAL\n"
                "    Author: author\n"
                "    SeqAn Copyright: 2006-2024 Knut Reinert, FU-Berlin; released under the\n"
@@ -243,7 +220,7 @@ TEST_F(format_help_test, with_email)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str + "\n"
+             + basic_options_str + "\n" + version_str() + "\n"
              + "LEGAL\n"
                "    Contact: email\n"
                "    SeqAn Copyright: 2006-2024 Knut Reinert, FU-Berlin; released under the\n"
@@ -258,7 +235,7 @@ TEST_F(format_help_test, empty_advanced_help)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -269,7 +246,7 @@ TEST_F(format_help_test, empty_version_call)
     expected = "test_parser\n"
                "===========\n"
                "\n"
-             + basic_version_str;
+             + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -285,7 +262,7 @@ TEST_F(format_help_test, version_call)
     expected = "test_parser\n"
                "===========\n"
                "\n"
-             + basic_version_str + "\n"
+             + version_str() + "\n"
              + "URL\n"
                "    https://seqan.de\n";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
@@ -301,7 +278,7 @@ TEST_F(format_help_test, do_not_print_hidden_options)
     expected = "test_parser\n"
                "===========\n"
                "\nOPTIONS\n\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -359,7 +336,7 @@ TEST_F(format_help_test, advanced_options)
                "          list item.\n"
                "    some line.\n"
                "\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // with -hh everything is shown
@@ -392,7 +369,7 @@ TEST_F(format_help_test, advanced_options)
                "          list item.\n"
                "    some line.\n"
                "\n"
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -486,7 +463,7 @@ TEST_F(format_help_test, full_information)
                "\n"
                "    example2\n"
                "\n"
-             + basic_version_str;
+             + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -540,10 +517,12 @@ TEST_F(format_help_test, copyright)
 TEST_F(format_help_test, subcommand_parser)
 {
     bool flag_value{false};
+    int option_value{};
 
     auto parser = get_subcommand_parser({"-h"}, {"sub1", "sub2"});
     parser.info.description.push_back("description");
     parser.add_flag(flag_value, sharg::config{.short_id = 'f', .long_id = "foo", .description = "A flag."});
+    parser.add_option(option_value, sharg::config{.short_id = 'o', .long_id = "option", .description = "An option."});
 
     std::string expected = "test_parser\n"
                            "===========\n"
@@ -561,11 +540,12 @@ TEST_F(format_help_test, subcommand_parser)
                            "    The following options belong to the top-level parser and need to be\n"
                            "    specified before the subcommand key word. Every argument after the\n"
                            "    subcommand key word is passed on to the corresponding sub-parser.\n"
-                           "\n"
-                           "OPTIONS\n"
+                           "\nOPTIONS\n"
                            "    -f, --foo\n"
                            "          A flag.\n"
+                           "    -o, --option (signed 32 bit integer)\n"
+                           "          An option. Default: 0\n"
                            "\n"
-                         + basic_options_str + "\n" + basic_version_str;
+                         + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
