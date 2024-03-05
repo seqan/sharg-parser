@@ -81,6 +81,7 @@ int main(int argc, char const ** argv)
 {
     //![construction]
     sharg::parser top_level_parser{"mygit", argc, argv, sharg::update_notifications::on, {"push", "pull"}};
+
     //![construction]
 
     // Add information and flags, but no (positional) options to your top-level parser.
@@ -100,7 +101,8 @@ int main(int argc, char const ** argv)
     }
 
     //![get_sub_parser]
-    sharg::parser & sub_parser = top_level_parser.get_sub_parser(); // hold a reference to the sub_parser
+    // hold a reference to the sub_parser
+    sharg::parser & sub_parser = top_level_parser.get_sub_parser();
     //![get_sub_parser]
 
     std::cout << "Proceed to sub parser.\n";
