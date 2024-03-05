@@ -81,7 +81,7 @@ int main(int argc, char const ** argv)
 {
     //![construction]
     sharg::parser top_level_parser{"mygit", argc, argv, sharg::update_notifications::on, {"push", "pull"}};
-    
+
     //![construction]
 
     // Add information and flags, but no (positional) options to your top-level parser.
