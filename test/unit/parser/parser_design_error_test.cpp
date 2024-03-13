@@ -267,7 +267,7 @@ TEST_F(design_error_test, subcommand_parser_error)
     parser = get_subcommand_parser({"-f", "foo"}, {"foo"});
 
     EXPECT_THROW(parser.add_positional_option(flag_value, sharg::config{}), sharg::design_error);
-    EXPECT_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}), sharg::design_error);
+    EXPECT_NO_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}));
     EXPECT_NO_THROW(parser.add_flag(flag_value, sharg::config{.short_id = 'f'}));
     EXPECT_THROW(parser.get_sub_parser(), sharg::design_error);
     EXPECT_EQ(flag_value, false);
@@ -277,14 +277,14 @@ TEST_F(design_error_test, subcommand_parser_error)
 
     flag_value = false;
 
-    // no options are allowed
+    // options are allowed
     parser = get_subcommand_parser({"-o", "true"}, {"foo"});
 
     EXPECT_THROW(parser.add_positional_option(flag_value, sharg::config{}), sharg::design_error);
-    EXPECT_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}), sharg::design_error);
+    EXPECT_NO_THROW(parser.add_option(flag_value, sharg::config{.short_id = 'o'}));
     EXPECT_EQ(flag_value, false);
-    EXPECT_THROW(parser.parse(), sharg::too_few_arguments);
-    EXPECT_EQ(flag_value, false);
+    EXPECT_NO_THROW(parser.parse());
+    EXPECT_EQ(flag_value, true);
 }
 
 TEST_F(design_error_test, not_allowed_after_parse)

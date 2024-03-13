@@ -11,29 +11,6 @@
 #include <sharg/test/test_fixture.hpp>
 #include <sharg/test/tmp_filename.hpp>
 
-std::string const basic_options_str = "  Common options\n"
-                                      "    -h, --help\n"
-                                      "          Prints the help page.\n"
-                                      "    -hh, --advanced-help\n"
-                                      "          Prints the help page including advanced options.\n"
-                                      "    --version\n"
-                                      "          Prints the version information.\n"
-                                      "    --copyright\n"
-                                      "          Prints the copyright/license information.\n"
-                                      "    --export-help (std::string)\n"
-                                      "          Export the help page information. Value must be one of "
-#if SHARG_HAS_TDL
-                                      "[html, man,\n          ctd, cwl].\n";
-#else
-                                      "[html, man].\n";
-#endif
-
-std::string const basic_version_str = "VERSION\n"
-                                      "    Last update:\n"
-                                      "    test_parser version:\n"
-                                      "    Sharg version: "
-                                    + std::string{sharg::sharg_version_cstring} + "\n";
-
 class validator_test : public sharg::test::test_fixture
 {};
 
@@ -136,7 +113,7 @@ TEST_F(validator_test, input_file)
                                        "          desc. The input file must exist and read permissions must be\n"
                                        "          granted. Valid file extensions are: [fa, sam, fasta, fasta.txt].\n"
                                        "\nOPTIONS\n\n"}
-                         + basic_options_str + "\n" + basic_version_str;
+                         + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // get help page message (file extensions)
@@ -256,7 +233,7 @@ TEST_F(validator_test, output_file)
                                        "          must be granted. Valid file extensions are: [fa, sam, fasta,\n"
                                        "          fasta.txt].\n"
                                        "\nOPTIONS\n\n"}
-                         + basic_options_str + "\n" + basic_version_str;
+                         + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // get help page message (overwriting allowed)
@@ -271,7 +248,7 @@ TEST_F(validator_test, output_file)
                            "          desc. Write permissions must be granted. Valid file extensions are:\n"
                            "          [fa, sam, fasta, fasta.txt].\n"
                            "\nOPTIONS\n\n"}
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // get help page message (file extensions)
@@ -337,7 +314,7 @@ TEST_F(validator_test, input_directory)
                                        "    ARGUMENT-1 (std::filesystem::path)\n"
                                        "          desc. An existing, readable path for the input directory.\n"
                                        "\nOPTIONS\n\n"}
-                         + basic_options_str + "\n" + basic_version_str;
+                         + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -391,7 +368,7 @@ TEST_F(validator_test, output_directory)
                                        "    ARGUMENT-1 (std::filesystem::path)\n"
                                        "          desc. A valid path for the output directory.\n"
                                        "\nOPTIONS\n\n"}
-                         + basic_options_str + "\n" + basic_version_str;
+                         + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -623,7 +600,7 @@ TEST_F(validator_test, arithmetic_range_validator_success)
                                        "    ARGUMENT-1 (List of signed 32 bit integer)\n"
                                        "          desc Default: []. Value must be in range [-20,20].\n"
                                        "\nOPTIONS\n\n"
-                                       + basic_options_str + "\n" + basic_version_str);
+                                       + basic_options_str + '\n' + version_str());
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // option - double value
@@ -787,7 +764,7 @@ TEST_F(validator_test, value_list_validator_success)
                                        "\nOPTIONS\n"
                                        "    -i, --int-option (List of signed 32 bit integer)\n"
                                        "          desc Default: []. Value must be one of [-10, 48, 50].\n\n"
-                                       + basic_options_str + "\n" + basic_version_str);
+                                       + basic_options_str + '\n' + version_str());
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -909,7 +886,7 @@ TEST_F(validator_test, regex_validator_success)
                                        "          desc Default: []. Value must match the pattern\n"
                                        "          '[a-zA-Z]+@[a-zA-Z]+\\.com'.\n"
                                        "\n"
-                                       + basic_options_str + "\n" + basic_version_str);
+                                       + basic_options_str + '\n' + version_str());
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
@@ -1096,7 +1073,7 @@ TEST_F(validator_test, chaining_validators)
                     "          write permissions must be granted. Valid file extensions are: [sa,\n"
                     "          so]. Value must match the pattern '.*'.\n"
                     "\n"}
-        + basic_options_str + "\n" + basic_version_str;
+        + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // help page message (allow overwriting)
@@ -1118,7 +1095,7 @@ TEST_F(validator_test, chaining_validators)
                            "          '(/[^/]+)+/.*\\.[^/\\.]+$'. Write permissions must be granted. Valid\n"
                            "          file extensions are: [sa, so]. Value must match the pattern '.*'.\n"
                            "\n"}
-             + basic_options_str + "\n" + basic_version_str;
+             + basic_options_str + '\n' + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 
     // chaining with a container option value type

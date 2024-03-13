@@ -86,6 +86,39 @@ protected:
         toggle_guardian();
         return testing::internal::GetCapturedStdout();
     }
+
+    static inline std::string basic_options_str = "  Common options\n"
+                                                  "    -h, --help\n"
+                                                  "          Prints the help page.\n"
+                                                  "    -hh, --advanced-help\n"
+                                                  "          Prints the help page including advanced options.\n"
+                                                  "    --version\n"
+                                                  "          Prints the version information.\n"
+                                                  "    --copyright\n"
+                                                  "          Prints the copyright/license information.\n"
+                                                  "    --export-help (std::string)\n"
+                                                  "          Export the help page information. Value must be one of "
+#if SHARG_HAS_TDL
+                                                  "[html, man,\n          ctd, cwl].\n";
+#else
+                                                  "[html, man].\n";
+#endif
+
+    static inline std::string version_str(std::string_view const subcommand_with_dash)
+    {
+        return std::string{"VERSION\n"}
+             + "    Last update:\n"
+               "    test_parser"
+             + subcommand_with_dash.data()
+             + " version:\n"
+               "    Sharg version: "
+             + sharg::sharg_version_cstring + '\n';
+    }
+
+    static inline std::string version_str()
+    {
+        return version_str("");
+    }
 };
 
 class early_exit_guardian

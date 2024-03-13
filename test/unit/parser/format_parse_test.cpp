@@ -681,17 +681,20 @@ TEST_F(format_parse_test, subcommand_parser_success)
 
 TEST_F(format_parse_test, subcommand_parser_error)
 {
+    constexpr std::string_view expected_message = "You specified an unknown subcommand! Available subcommands are: "
+                                                  "[sub1]. Use -h/--help for more information.";
+
     // incorrect sub command regardless of following arguments, https://github.com/seqan/seqan3/issues/2172
     auto parser = get_subcommand_parser({"subiddysub", "-f"}, {"sub1"});
-    EXPECT_THROW(parser.parse(), sharg::parser_error);
+    EXPECT_THROW_MSG(parser.parse(), sharg::user_input_error, expected_message);
 
     // incorrect sub command with no other arguments
     parser = get_subcommand_parser({"subiddysub"}, {"sub1"});
-    EXPECT_THROW(parser.parse(), sharg::parser_error);
+    EXPECT_THROW_MSG(parser.parse(), sharg::user_input_error, expected_message);
 
     // incorrect sub command with trailing special option, https://github.com/seqan/sharg-parser/issues/171
     parser = get_subcommand_parser({"subiddysub", "-h"}, {"sub1"});
-    EXPECT_THROW(parser.parse(), sharg::parser_error);
+    EXPECT_THROW_MSG(parser.parse(), sharg::user_input_error, expected_message);
 }
 
 TEST_F(format_parse_test, issue1544)
