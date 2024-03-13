@@ -740,6 +740,7 @@ private:
     //!\brief List of option/flag identifiers that are already used.
     std::unordered_set<detail::id_pair> used_option_ids{{'h', "help"},
                                                         {'\0' /*hh*/, "advanced-help"},
+                                                        {'\0', "hh"},
                                                         {'\0', "export-help"},
                                                         {'\0', "version"},
                                                         {'\0', "copyright"}};
