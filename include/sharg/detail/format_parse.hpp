@@ -202,7 +202,12 @@ public:
             return false;
         };
 
+// Bogus stringop-overread
+#if SHARG_COMPILER_IS_GCC && (__GNUC__ == 11)
+        return std::find_if(begin_it, end_it, cmp);
+#else
         return std::ranges::find_if(begin_it, end_it, cmp);
+#endif
     }
 
 private:

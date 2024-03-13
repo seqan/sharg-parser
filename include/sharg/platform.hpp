@@ -23,6 +23,25 @@ static_assert(__cplusplus >= 201709L, "SHARG requires C++20, make sure that you 
 #include <version>
 
 // ============================================================================
+//  Compiler support general
+// ============================================================================
+
+/*!\def SHARG_COMPILER_IS_GCC
+ * \brief Whether the current compiler is GCC.
+ * \ingroup core
+ * \details
+ * __GNUC__ is also used to indicate the support for GNU compiler extensions. To detect the presence of the GCC
+ * compiler, one has to rule out other compilers.
+ *
+ * \sa https://sourceforge.net/p/predef/wiki/Compilers
+ */
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER)
+#    define SHARG_COMPILER_IS_GCC 1
+#else
+#    define SHARG_COMPILER_IS_GCC 0
+#endif
+
+// ============================================================================
 //  Dependencies
 // ============================================================================
 
