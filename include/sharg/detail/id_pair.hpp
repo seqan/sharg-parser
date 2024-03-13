@@ -12,6 +12,8 @@
 #include <string>
 #include <unordered_set>
 
+#include <sharg/platform.hpp>
+
 //!\cond
 
 namespace sharg::detail
@@ -22,40 +24,65 @@ namespace sharg::detail
  */
 struct id_pair
 {
-    std::string short_id{}; //!< The short identifier for the option.
-    std::string long_id{};  //!< The long identifier for the option.
+    char short_id{};       //!< The short identifier for the option.
+    std::string long_id{}; //!< The long identifier for the option.
 
     id_pair() = default;
     id_pair(id_pair const &) = default;
-    id_pair(id_pair &&) = default;
     id_pair & operator=(id_pair const &) = default;
+    id_pair(id_pair &&) = default;
     id_pair & operator=(id_pair &&) = default;
     ~id_pair() = default;
 
-    id_pair(std::string id_short, std::string id_long) : short_id{std::move(id_short)}, long_id{std::move(id_long)}
+    id_pair(char const short_id) : short_id{short_id}
     {}
 
-    id_pair(char const id_short, std::string id_long) :
-        short_id{std::string(id_short != '\0', id_short)},
-        long_id{std::move(id_long)}
+    id_pair(std::string long_id) : long_id{std::move(long_id)}
     {}
 
-    id_pair(char const id_short) : short_id{std::string(id_short != '\0', id_short)}
-    {}
-
-    id_pair(std::string id_long) : long_id{std::move(id_long)}
+    id_pair(char const short_id, std::string long_id) : short_id{short_id}, long_id{std::move(long_id)}
     {}
 
     //!\brief Compares two id_pairs for equality.
-    friend auto operator<=>(id_pair const &, id_pair const &) = default;
+    friend bool operator==(id_pair const & lhs, id_pair const & rhs)
+    {
+        return (!lhs.empty_short_id() && lhs.short_id == rhs.short_id)
+            || (!lhs.empty_long_id() && lhs.long_id == rhs.long_id);
+    }
 
-    static auto find(std::unordered_set<id_pair> const & used_ids, char const short_id);
+    friend bool operator==(id_pair const & lhs, char const & rhs)
+    {
+        return !lhs.empty_short_id() && lhs.short_id == rhs;
+    }
 
-    static auto find(std::unordered_set<id_pair> const & used_ids, std::string const & long_id);
+    friend bool operator==(id_pair const & lhs, std::string const & rhs)
+    {
+        return !lhs.empty_long_id() && lhs.long_id == rhs;
+    }
 
-    static bool contains(std::unordered_set<id_pair> const & used_ids, char const short_id);
+    bool empty_short_id() const
+    {
+        return empty(short_id);
+    }
 
-    static bool contains(std::unordered_set<id_pair> const & used_ids, std::string const & long_id);
+    bool empty_long_id() const
+    {
+        return empty(long_id);
+    }
+
+    bool empty() const
+    {
+        return empty_short_id() && empty_long_id();
+    }
+
+    template <typename id_type>
+    static bool empty(id_type const & id);
+
+    template <typename id_type>
+    static auto find(std::unordered_set<id_pair> const & used_ids, id_type const & id);
+
+    template <typename id_type>
+    static bool contains(std::unordered_set<id_pair> const & used_ids, id_type const & id);
 };
 
 } // namespace sharg::detail
@@ -68,8 +95,8 @@ struct hash<sharg::detail::id_pair>
 {
     size_t operator()(sharg::detail::id_pair const & value) const noexcept
     {
-        size_t h1 = std::hash<std::string>{}(value.short_id);
-        size_t h2 = std::hash<std::string>{}(value.long_id);
+        size_t const h1 = std::hash<char>{}(value.short_id);
+        size_t const h2 = std::hash<std::string>{}(value.long_id);
         return h1 ^ (h2 << 1);
     }
 };
@@ -79,35 +106,34 @@ struct hash<sharg::detail::id_pair>
 namespace sharg::detail
 {
 
-inline auto id_pair::find(std::unordered_set<id_pair> const & used_ids, char const short_id)
+template <typename id_type>
+inline bool id_pair::empty(id_type const & id)
 {
-    std::string const id_str(1, short_id);
-    auto it = std::ranges::find_if(used_ids,
-                                   [&id_str](id_pair const & id)
-                                   {
-                                       return id.short_id == id_str;
-                                   });
-    return it;
+    if constexpr (std::same_as<id_type, id_pair>)
+        return id.empty();
+    else if constexpr (std::same_as<id_type, char>)
+        return id == '\0';
+    else
+        return id.empty();
 }
 
-inline auto id_pair::find(std::unordered_set<id_pair> const & used_ids, std::string const & long_id)
+template <typename id_type>
+inline auto id_pair::find(std::unordered_set<id_pair> const & used_ids, id_type const & id)
 {
-    auto it = std::ranges::find_if(used_ids,
-                                   [&long_id](id_pair const & id)
-                                   {
-                                       return id.long_id == long_id;
-                                   });
-    return it;
+    if (empty(id))
+        return used_ids.end();
+
+    return std::ranges::find_if(used_ids,
+                                [&id](id_pair const & pair)
+                                {
+                                    return pair == id;
+                                });
 }
 
-inline bool id_pair::contains(std::unordered_set<id_pair> const & used_ids, char const short_id)
+template <typename id_type>
+inline bool id_pair::contains(std::unordered_set<id_pair> const & used_ids, id_type const & id)
 {
-    return id_pair::find(used_ids, short_id) != used_ids.end();
-}
-
-inline bool id_pair::contains(std::unordered_set<id_pair> const & used_ids, std::string const & long_id)
-{
-    return id_pair::find(used_ids, long_id) != used_ids.end();
+    return find(used_ids, id) != used_ids.end();
 }
 
 } // namespace sharg::detail

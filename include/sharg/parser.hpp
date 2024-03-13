@@ -495,34 +495,23 @@ public:
         if (!parse_was_called)
             throw design_error{"You can only ask which options have been set after calling the function `parse()`."};
 
-        constexpr bool id_is_long = !std::same_as<id_type, char>;
+        detail::id_pair const id_pair{id};
 
-        // the detail::format_parse::find_option_id call in the end expects either a char or std::string
-        using char_or_string_t = std::conditional_t<id_is_long, std::string, char>;
-        char_or_string_t const short_or_long_id{id}; // e.g. convert char * to string here if necessary
-
-        if constexpr (id_is_long) // long id was given
+        if (id_pair.long_id.size() == 1u)
         {
-            if (short_or_long_id.size() == 1)
-            {
-                throw design_error{"Long option identifiers must be longer than one character! If " + short_or_long_id
-                                   + "' was meant to be a short identifier, please pass it as a char ('') not a string"
-                                     " (\"\")!"};
-            }
+            throw design_error{"Long option identifiers must be longer than one character! If " + id_pair.long_id
+                               + "' was meant to be a short identifier, please pass it as a char ('') not a string"
+                                 " (\"\")!"};
         }
 
-        detail::id_pair const & ids = [this, &short_or_long_id]()
-        {
-            auto it = detail::id_pair::find(used_option_ids, short_or_long_id);
-            if (it == used_option_ids.end())
-                throw design_error{"You can only ask for option identifiers that you added with add_option() before."};
-            return *it;
-        }();
+        auto const it = detail::id_pair::find(used_option_ids, id_pair);
+        if (it == used_option_ids.end())
+            throw design_error{"You can only ask for option identifiers that you added with add_option() before."};
 
         // we only need to search for an option before the `option_end_identifier` (`--`)
-        auto end_of_options = std::find(format_arguments.begin(), format_arguments.end(), option_end_identifier);
-        auto option_it = detail::format_parse::find_option_id(format_arguments.begin(), end_of_options, ids);
-        return option_it != end_of_options;
+        auto option_end = std::ranges::find(format_arguments, option_end_identifier);
+        auto option_it = detail::format_parse::find_option_id(format_arguments.begin(), option_end, *it);
+        return option_it != option_end;
     }
 
     //!\name Structuring the Help Page
@@ -749,11 +738,11 @@ private:
         format{detail::format_short_help{}};
 
     //!\brief List of option/flag identifiers that are already used.
-    std::unordered_set<detail::id_pair> used_option_ids{{"h", "help"},
-                                                        {"hh", "advanced-help"},
-                                                        {"", "export-help"},
-                                                        {"", "version"},
-                                                        {"", "copyright"}};
+    std::unordered_set<detail::id_pair> used_option_ids{{'h', "help"},
+                                                        {'\0' /*hh*/, "advanced-help"},
+                                                        {'\0', "export-help"},
+                                                        {'\0', "version"},
+                                                        {'\0', "copyright"}};
 
     //!\brief The command line arguments that will be passed to the format.
     std::vector<std::string> format_arguments{};

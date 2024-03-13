@@ -758,9 +758,12 @@ TEST_F(format_parse_test, is_option_set)
     EXPECT_FALSE(parser.is_option_set("bar")); // --bar is behind the `--`
 
     // errors:
+    size_t counter{};
+
     auto expect_design_error = [&](auto && option)
     {
-        EXPECT_THROW(parser.is_option_set(option), sharg::design_error);
+        EXPECT_THROW(parser.is_option_set(option), sharg::design_error) << counter;
+        ++counter;
     };
 
     expect_design_error("l"); // short identifiers are passed as chars not strings

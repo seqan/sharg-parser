@@ -173,27 +173,33 @@ public:
     template <typename iterator_type>
     static iterator_type find_option_id(iterator_type begin_it, iterator_type end_it, detail::id_pair const & id)
     {
-        bool const short_id_empty{id.short_id.empty()};
-        bool const long_id_empty{id.long_id.empty()};
+        bool const short_id_empty{id.empty_short_id()};
+        bool const long_id_empty{id.empty_long_id()};
 
         if (short_id_empty && long_id_empty)
             return end_it;
 
-        auto cmp = [&](std::string const & current_arg)
+        std::string const short_id = prepend_dash(id.short_id);
+        std::string const long_id_equals = prepend_dash(id.long_id) + "=";
+        std::string_view const long_id_space = [&long_id_equals]()
+        {
+            std::string_view tmp{long_id_equals};
+            tmp.remove_suffix(1u);
+            return tmp;
+        }();
+
+        auto cmp = [&](std::string_view const current_arg)
         {
             // check if current_arg starts with "-o", i.e. it correctly identifies all short notations:
             // "-ovalue", "-o=value", and "-o value".
-            bool const short_id_found = !short_id_empty && current_arg.starts_with("-")
-                                     && current_arg.substr(1, id.short_id.size()) == id.short_id;
+            if (!short_id_empty && current_arg.starts_with(short_id))
+                return true;
 
             // only "--opt Value" or "--opt=Value" are valid
-            bool const long_id_found = !short_id_found // Don't need to check long_id if short_id was found
-                                    && !long_id_empty && current_arg.starts_with("--")
-                                    && current_arg.substr(2, id.long_id.size()) == id.long_id // prefix is the same
-                                    && (current_arg.size() == id.long_id.size() + 2
-                                        || current_arg[id.long_id.size() + 2] == '='); // space or `=`
+            if (!long_id_empty && (current_arg == long_id_space || current_arg.starts_with(long_id_equals)))
+                return true;
 
-            return short_id_found || long_id_found;
+            return false;
         };
 
         return std::ranges::find_if(begin_it, end_it, cmp);
