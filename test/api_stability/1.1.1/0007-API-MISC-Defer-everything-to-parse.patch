@@ -1,0 +1,149 @@
+From 458dd383728e5fbffda9c4f3a1470b321bb75386 Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Mon, 29 Apr 2024 16:37:15 +0200
+Subject: [PATCH 7/8] [API][MISC] Defer everything to parse()
+
+---
+ test/unit/detail/format_help_test.cpp         |  2 +-
+ test/unit/detail/format_html_test.cpp         | 10 ++++--
+ test/unit/parser/format_parse_test.cpp        | 34 ++++++++++++-------
+ test/unit/parser/parser_design_error_test.cpp |  4 +--
+ 4 files changed, 31 insertions(+), 19 deletions(-)
+
+diff --git a/test/unit/detail/format_help_test.cpp b/test/unit/detail/format_help_test.cpp
+index be31399..20f4c39 100644
+--- a/test/unit/detail/format_help_test.cpp
++++ b/test/unit/detail/format_help_test.cpp
+@@ -575,7 +575,7 @@ TEST(parse_test, subcommand_parser)
+                            "    See the respective help page for further details (e.g. by calling\n"
+                            "    test_parser sub1 -h).\n"
+                            "\n"
+-                           "    The following options below belong to the top-level parser and need to be\n"
++                           "    The following options belong to the top-level parser and need to be\n"
+                            "    specified before the subcommand key word. Every argument after the\n"
+                            "    subcommand key word is passed on to the corresponding sub-parser.\n"
+                            "\nOPTIONS\n"
+diff --git a/test/unit/detail/format_html_test.cpp b/test/unit/detail/format_html_test.cpp
+index 6fd41d1..6f485cc 100644
+--- a/test/unit/detail/format_html_test.cpp
++++ b/test/unit/detail/format_html_test.cpp
+@@ -217,11 +217,15 @@ TEST(export_help, parse_error)
+     std::array const argv3{"./help_add_test", "--version-check", "false", "--export-help", "atml"};
+ 
+     // no value after --export-help
+-    EXPECT_THROW((sharg::parser{"test_parser", argv.size(), argv.data()}), sharg::parser_error);
++    auto parser = sharg::parser{"test_parser", argv.size(), argv.data()};
++    EXPECT_THROW(parser.parse(), sharg::parser_error);
+ 
+     // wrong value after --export-help
+-    EXPECT_THROW((sharg::parser{"test_parser", argv2.size(), argv2.data()}), sharg::validation_error);
++    parser = sharg::parser{"test_parser", argv2.size(), argv2.data()};
++    EXPECT_THROW(parser.parse(), sharg::validation_error);
+ 
+     // wrong value after --export-help
+-    EXPECT_THROW((sharg::parser{"test_parser", argv3.size(), argv3.data()}), sharg::validation_error);
++    parser = sharg::parser{"test_parser", argv3.size(), argv3.data()};
++    EXPECT_THROW(parser.parse(), sharg::validation_error);
++
+ }
+diff --git a/test/unit/parser/format_parse_test.cpp b/test/unit/parser/format_parse_test.cpp
+index 8e5a286..f63fa61 100644
+--- a/test/unit/parser/format_parse_test.cpp
++++ b/test/unit/parser/format_parse_test.cpp
+@@ -815,12 +815,14 @@ TEST(parse_test, version_check_option_error)
+ {
+     { // version-check must be followed by a value
+         char const * argv[] = {"./parser_test", "--version-check"};
+-        EXPECT_THROW((sharg::parser{"test_parser", 2, argv}), sharg::parser_error);
++        auto parser = sharg::parser{"test_parser", 2, argv};
++        EXPECT_THROW(parser.parse(), sharg::parser_error);
+     }
+ 
+     { // version-check value must be 0 or 1
+         char const * argv[] = {"./parser_test", "--version-check", "foo"};
+-        EXPECT_THROW((sharg::parser{"test_parser", 3, argv}), sharg::parser_error);
++        auto parser = sharg::parser{"test_parser", 3, argv};
++        EXPECT_THROW(parser.parse(), sharg::parser_error);
+     }
+ }
+ 
+@@ -1107,44 +1109,50 @@ TEST(parse_test, container_default)
+ 
+ TEST(parse_test, executable_name)
+ {
+-    testing::internal::CaptureStdout();
+     {
+-        std::array argv{"parser_test"};
++        bool flag{false};
++        std::array argv{"parser_test", "-t"};
+         sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off};
+-        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
++        parser.add_flag(flag, sharg::config{.short_id = 't'});
++        EXPECT_NO_THROW(parser.parse());
+         auto & executable_name = sharg::detail::test_accessor::executable_name(parser);
+         ASSERT_EQ(executable_name.size(), 1);
+         EXPECT_EQ(executable_name[0], "parser_test");
+     }
+ 
+     {
+-        std::array argv{"./parser_test"};
++        bool flag{false};
++        std::array argv{"./parser_test", "-t"};
+         sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off};
+-        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
++        parser.add_flag(flag, sharg::config{.short_id = 't'});
++        EXPECT_NO_THROW(parser.parse());
+         auto & executable_name = sharg::detail::test_accessor::executable_name(parser);
+         ASSERT_EQ(executable_name.size(), 1);
+         EXPECT_EQ(executable_name[0], "./parser_test");
+     }
+ 
+     {
+-        std::array argv{"./bin/parser_test"};
++        bool flag{false};
++        std::array argv{"./bin/parser_test", "-t"};
+         sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off};
+-        EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
++        parser.add_flag(flag, sharg::config{.short_id = 't'});
++        EXPECT_NO_THROW(parser.parse());
+         auto & executable_name = sharg::detail::test_accessor::executable_name(parser);
+         ASSERT_EQ(executable_name.size(), 1);
+         EXPECT_EQ(executable_name[0], "./bin/parser_test");
+     }
+ 
+     {
+-        std::array argv{"./bin/parser_test", "build"};
++        bool flag{false};
++        std::array argv{"./bin/parser_test", "build", "-t"};
+         sharg::parser parser{"test_parser", argv.size(), argv.data(), sharg::update_notifications::off, {"build"}};
+-        parser.parse();
++        EXPECT_NO_THROW(parser.parse());
+         auto & sub_parser = parser.get_sub_parser();
+-        EXPECT_EXIT(sub_parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
++        sub_parser.add_flag(flag, sharg::config{.short_id = 't'});
++        EXPECT_NO_THROW(sub_parser.parse());
+         auto & executable_name = sharg::detail::test_accessor::executable_name(sub_parser);
+         ASSERT_EQ(executable_name.size(), 2);
+         EXPECT_EQ(executable_name[0], "./bin/parser_test");
+         EXPECT_EQ(executable_name[1], "build");
+     }
+-    testing::internal::GetCapturedStdout();
+ }
+diff --git a/test/unit/parser/parser_design_error_test.cpp b/test/unit/parser/parser_design_error_test.cpp
+index 4c3406f..4d81119 100644
+--- a/test/unit/parser/parser_design_error_test.cpp
++++ b/test/unit/parser/parser_design_error_test.cpp
+@@ -272,8 +272,8 @@ TEST(parse_test, subcommand_parser_error)
+     // subcommand key word must only contain alpha numeric characters
+     {
+         char const * argv[]{"./top_level", "-f"};
+-        EXPECT_THROW((sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"with space"}}),
+-                     sharg::design_error);
++        auto parser = sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"with space"}};
++        EXPECT_THROW(parser.parse(), sharg::design_error);
+     }
+ 
+     // no positional/options are allowed
+-- 
+2.43.2
+

@@ -1,0 +1,62 @@
+From 28c35ece0450603abf08bf2705aecbd8365f935a Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Mon, 29 Apr 2024 16:37:30 +0200
+Subject: [PATCH 8/8] [API][MISC] Allow options for subcommands
+
+---
+ test/unit/parser/format_parse_test.cpp        | 6 +++---
+ test/unit/parser/parser_design_error_test.cpp | 9 ---------
+ 2 files changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/test/unit/parser/format_parse_test.cpp b/test/unit/parser/format_parse_test.cpp
+index f63fa61..c2a8f58 100644
+--- a/test/unit/parser/format_parse_test.cpp
++++ b/test/unit/parser/format_parse_test.cpp
+@@ -899,7 +899,7 @@ TEST(parse_test, subcommand_parser_error)
+         std::array argv{"./top_level", "subiddysub", "-f"};
+         sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+ 
+-        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
++        EXPECT_THROW(top_level_parser.parse(), sharg::user_input_error);
+     }
+ 
+     // incorrect sub command with no other arguments
+@@ -907,7 +907,7 @@ TEST(parse_test, subcommand_parser_error)
+         std::array argv{"./top_level", "subiddysub"};
+         sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+ 
+-        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
++        EXPECT_THROW(top_level_parser.parse(), sharg::user_input_error);
+     }
+ 
+     // incorrect sub command with trailing special option
+@@ -915,7 +915,7 @@ TEST(parse_test, subcommand_parser_error)
+         std::array argv{"./top_level", "subiddysub", "-h"};
+         sharg::parser top_level_parser{"top", argv.size(), argv.data(), sharg::update_notifications::off, {"sub1"}};
+ 
+-        EXPECT_THROW(top_level_parser.parse(), sharg::parser_error);
++        EXPECT_THROW(top_level_parser.parse(), sharg::user_input_error);
+     }
+ }
+ 
+diff --git a/test/unit/parser/parser_design_error_test.cpp b/test/unit/parser/parser_design_error_test.cpp
+index 4d81119..e31a2e7 100644
+--- a/test/unit/parser/parser_design_error_test.cpp
++++ b/test/unit/parser/parser_design_error_test.cpp
+@@ -275,13 +275,4 @@ TEST(parse_test, subcommand_parser_error)
+         auto parser = sharg::parser{"top_level", 2, argv, sharg::update_notifications::off, {"with space"}};
+         EXPECT_THROW(parser.parse(), sharg::design_error);
+     }
+-
+-    // no positional/options are allowed
+-    {
+-        char const * argv[]{"./top_level", "foo"};
+-        sharg::parser top_level_parser{"top_level", 2, argv, sharg::update_notifications::off, {"foo"}};
+-
+-        EXPECT_THROW((top_level_parser.add_option(flag_value, sharg::config{.short_id = 'f'})), sharg::design_error);
+-        EXPECT_THROW((top_level_parser.add_positional_option(flag_value, sharg::config{})), sharg::design_error);
+-    }
+ }
+-- 
+2.43.2
+
