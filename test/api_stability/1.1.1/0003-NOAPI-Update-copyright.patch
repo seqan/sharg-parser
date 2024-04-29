@@ -1,7 +1,7 @@
-From a4fffdf64380b018822b13a9ad72586f0564385f Mon Sep 17 00:00:00 2001
+From 69dfcfa3a693a398200dc7cac0ec6d76b1ecb443 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 7 Feb 2024 13:31:22 +0100
-Subject: [PATCH 3/6] [NOAPI] Update copyright
+Subject: [PATCH 3/8] [NOAPI] Update copyright
 
 ---
  test/unit/detail/format_help_test.cpp | 10 +++++-----
@@ -121,5 +121,5 @@ index 307b58b..eefffd6 100644
      testing::internal::CaptureStdout();
      EXPECT_EXIT(parser.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
 -- 
-2.43.0
+2.43.2
 
