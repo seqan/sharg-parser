@@ -167,14 +167,3 @@ VERSION
 |**compiler**       | [Clang](https://clang.llvm.org/)                          | ≥ 17     |                                             |
 |**build system**   | [CMake](https://cmake.org)                                | ≥ 3.16   | optional, but recommended                   |
 |**optional libs**  | [TDL](https://github.com/deNBI-cibi/tool_description_lib) | ≥ 1.0.0  | required for CWL and CTD export             |
-
-
-## Sponsorships
-
-[![Vercel][vercel_badge]][vercel_website]
-
-[vercel_badge]: https://raw.githubusercontent.com/seqan/sharg-parser/main/test/documentation/.vercel/powered-by-vercel.svg "Powered by Vercel"
-[vercel_website]: https://vercel.com/?utm_source=seqan&utm_campaign=oss
-
-Vercel is kind enough to build and host our documentation and even provide preview-builds within our pull requests.
-Check them out!

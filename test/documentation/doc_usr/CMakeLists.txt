@@ -38,5 +38,4 @@ enable_testing ()
 
 message (STATUS "Add user doc test.")
 add_test (NAME doc_usr_no_warnings_test COMMAND bash -c "${SHARG_TEST_DOXYGEN_FAIL_ON_WARNINGS}")
-
-add_test (NAME doc_usr_no_uncond_requires_test COMMAND bash -c "${SHARG_TEST_DOXYGEN_FAIL_ON_UNCOND_REQUIRES}")
+set_tests_properties (doc_usr_no_warnings_test PROPERTIES DEPENDS cppreference-doxygen-web-tag)

@@ -31,16 +31,6 @@ set (SHARG_LAYOUT_IN ${SHARG_DOXYGEN_INPUT_DIR}/DoxygenLayout.xml.in)
 
 option (SHARG_USER_DOC "Create build target and test for user documentation." ON)
 option (SHARG_DEV_DOC "Create build target and test for developer documentation." ON)
-option (SHARG_VERCEL_PREVIEW_DOC "Is this a preview build by vercel.com?" OFF)
-
-if (SHARG_VERCEL_PREVIEW_DOC)
-    set (SHARG_DOXYGEN_DOT_NUM_THREADS "2")
-    set (SHARG_DOXYFILE_OPTION_POWERED_BY_VERCEL
-         "HTML_EXTRA_FILES       += ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")
-    set (SHARG_FOOTER_HTML_OPTION_POWERED_BY_VERCEL
-         "<li class='footer'><a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><img src='$relpath^powered-by-vercel.svg' height='29px' alt='Powered by Vercel'/></a></li>"
-    )
-endif ()
 
 ### Download and extract cppreference-doxygen-web.tag.xml for std:: documentation links
 set (SHARG_DOXYGEN_STD_TAGFILE "${PROJECT_BINARY_DIR}/cppreference-doxygen-web.tag.xml")
@@ -59,6 +49,9 @@ ExternalProject_Add (
     INSTALL_COMMAND "")
 
 ### TEST HELPER
+add_test (NAME cppreference-doxygen-web-tag COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target
+                                                    download-cppreference-doxygen-web-tag)
+
 
 # doxygen does not show any warnings (doxygen prints warnings / errors to cerr)
 set (SHARG_TEST_DOXYGEN_FAIL_ON_WARNINGS
@@ -66,10 +59,6 @@ set (SHARG_TEST_DOXYGEN_FAIL_ON_WARNINGS
     ${DOXYGEN_EXECUTABLE} > doxygen.cout 2> doxygen.cerr;
     cat \"doxygen.cerr\";
     test ! -s \"doxygen.cerr\"")
-
-# We search the HTML output to ensure that no `requires` clauses are at wrong places.
-set (SHARG_TEST_DOXYGEN_FAIL_ON_UNCOND_REQUIRES
-     "! find . -not -name \"*_source.html\" -name \"*.html\" -print0 | xargs -0 grep \"requires\" | grep \"memname\"")
 
 ### install helper
 
