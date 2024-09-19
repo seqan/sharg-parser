@@ -277,4 +277,74 @@ TEST_F(format_cwl_test, subparser)
         "  - index\n";
     EXPECT_EQ(get_parse_cout_on_exit(sub_parser), expected_short);
 }
+
+TEST_F(format_cwl_test, subsubparser)
+{
+    // Create variables for the arguments
+    int option_value{5};
+    std::string option_value_string{};
+    std::filesystem::path option_value_path{};
+
+    // Create the dummy parser.
+    auto parser = get_subcommand_parser({"index", "show", "--export-help", "cwl"}, {"index"});
+
+    EXPECT_NO_THROW(parser.parse());
+
+    auto & sub_parser = parser.get_sub_parser();
+    ASSERT_EQ(sub_parser.info.app_name, "test_parser-index");
+
+    sub_parser.add_subcommands({"show"});
+    EXPECT_NO_THROW(sub_parser.parse());
+
+    auto & sub_sub_parser = sub_parser.get_sub_parser();
+    sub_sub_parser.add_option(option_value,
+                              sharg::config{.short_id = 'j',
+                                            .long_id = "jint",
+                                            .description = "this is a required int option.",
+                                            .required = true});
+    sub_sub_parser.add_option(option_value_string,
+                              sharg::config{.short_id = 's',
+                                            .long_id = "string",
+                                            .description = "this is a string option (advanced).",
+                                            .advanced = true,
+                                            .required = false});
+    sub_sub_parser.add_option(option_value_path,
+                              sharg::config{.short_id = '\0',
+                                            .long_id = "path04",
+                                            .description = "a output file.",
+                                            .validator = sharg::output_file_validator{}});
+
+    std::string expected_short =
+        "label: test_parser-index-show\n"
+        "doc: \"\"\n"
+        "inputs:\n"
+        "  jint:\n"
+        "    doc: this is a required int option.\n"
+        "    type: long\n"
+        "    inputBinding:\n"
+        "      prefix: --jint\n"
+        "  string:\n"
+        "    doc: \"this is a string option (advanced). Default: \\\"\\\"\"\n"
+        "    type: string?\n"
+        "    inputBinding:\n"
+        "      prefix: --string\n"
+        "  path04:\n"
+        "    doc: \"a output file. Default: \\\"\\\". The output file must not exist already and write permissions "
+        "must be granted.\"\n"
+        "    type: string?\n"
+        "    inputBinding:\n"
+        "      prefix: --path04\n"
+        "outputs:\n"
+        "  path04:\n"
+        "    type: File?\n"
+        "    outputBinding:\n"
+        "      glob: $(inputs.path04)\n"
+        "cwlVersion: v1.2\n"
+        "class: CommandLineTool\n"
+        "baseCommand:\n"
+        "  - test_parser\n"
+        "  - index\n"
+        "  - show\n";
+    EXPECT_EQ(get_parse_cout_on_exit(sub_sub_parser), expected_short);
+}
 #endif
