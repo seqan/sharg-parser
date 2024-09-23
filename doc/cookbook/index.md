@@ -35,6 +35,7 @@ Invalid values throw a sharg::validation_error.
 The following lists all snippets that appear in our documentation. Search for keywords with Strg + F.
 
 <!-- ALL SNIPPETS START -->
+\include test/snippet/add_subcommands.cpp
 \include test/snippet/auxiliary.cpp
 \include test/snippet/custom_enumeration.cpp
 \include test/snippet/custom_parsing_enumeration.cpp
