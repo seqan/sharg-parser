@@ -51,3 +51,10 @@ followed by the keyword `push` which in this case triggers printing the help pag
 That's it. Here is a full example of a subcommand parser you can try and adjust to your needs:
 
 \include doc/howto/subcommand_parser/subcommand_parse.cpp
+
+# Recursive subcommands
+
+If you want to have subcommands with subcommands, you can add subcommands to the sub-parser
+with sharg::parser::add_subcommands():
+
+\include test/snippet/add_subcommands.cpp

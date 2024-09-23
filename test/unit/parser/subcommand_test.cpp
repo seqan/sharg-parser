@@ -245,3 +245,29 @@ TEST_F(subcommand_test, option_value_is_special_command)
     EXPECT_NO_THROW(parser.parse());
     EXPECT_EQ(value, "--help");
 }
+
+TEST_F(subcommand_test, recursive_subcommands)
+{
+    auto parser = get_subcommand_parser({"index", "show", "--help"}, {"index"});
+    EXPECT_NO_THROW(parser.parse());
+
+    auto & sub_parser = parser.get_sub_parser();
+    ASSERT_EQ(sub_parser.info.app_name, "test_parser-index");
+    sub_parser.add_subcommands({"show"});
+    EXPECT_NO_THROW(sub_parser.parse());
+
+    auto & sub_sub_parser = sub_parser.get_sub_parser();
+    ASSERT_EQ(sub_sub_parser.info.app_name, "test_parser-index-show");
+    clear_and_add_option(sub_sub_parser);
+
+    std::string expected_sub_sub_full_help = "test_parser-index-show\n"
+                                             "======================\n"
+                                             "\n"
+                                             "OPTIONS\n"
+                                             "    -o (std::string)\n"
+                                             "          Default: \"\"\n"
+                                             "\n"
+                                           + basic_options_str + '\n' + version_str("-index-show");
+
+    EXPECT_EQ(get_parse_cout_on_exit(sub_sub_parser), expected_sub_sub_full_help);
+}

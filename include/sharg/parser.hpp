@@ -169,8 +169,6 @@ public:
      * \param[in] version_updates Notify users about version updates (default sharg::update_notifications::on).
      * \param[in] subcommands A list of subcommands (see \link subcommand_parse subcommand parsing \endlink).
      *
-     * \throws sharg::design_error if the application name contains illegal characters.
-     *
      * The application name must only contain alpha-numeric characters, `_` or `-` ,
      * i.e. the following regex must evaluate to true: `"^[a-zA-Z0-9_-]+$"` .
      *
@@ -185,9 +183,9 @@ public:
            update_notifications version_updates = update_notifications::on,
            std::vector<std::string> subcommands = {}) :
         version_check_dev_decision{version_updates},
-        subcommands{std::move(subcommands)},
         arguments{arguments}
     {
+        add_subcommands(subcommands);
         info.app_name = app_name;
     }
 
@@ -352,7 +350,7 @@ public:
      * related code and should be enclosed in a try catch block as the parser may throw.
      *
      * \throws sharg::design_error if this function was already called before.
-     *
+     * \throws sharg::design_error if the application name or subcommands contain illegal characters.
      * \throws sharg::option_declared_multiple_times if an option that is not a list was declared multiple times.
      * \throws sharg::user_input_error if an incorrect argument is given as (positional) option value.
      * \throws sharg::required_option_missing if the user did not provide a required option.
@@ -638,6 +636,27 @@ public:
         };
 
         operations.push_back(std::move(operation));
+    }
+
+    /*!\brief Adds subcommands to the parser.
+     * \param[in] subcommands A list of subcommands.
+     * \details
+     * Adds subcommands to the current parser. The list of subcommands is sorted and duplicates are removed.
+     *
+     * ### Example
+     *
+     * \include test/snippet/add_subcommands.cpp
+     *
+     * \experimentalapi{Experimental since version 1.1.2}
+     */
+    void add_subcommands(std::vector<std::string> const & subcommands)
+    {
+        auto & parser_subcommands = this->subcommands;
+        parser_subcommands.insert(parser_subcommands.end(), subcommands.cbegin(), subcommands.cend());
+
+        std::ranges::sort(parser_subcommands);
+        auto const [first, last] = std::ranges::unique(parser_subcommands);
+        parser_subcommands.erase(first, last);
     }
     //!\}
 
