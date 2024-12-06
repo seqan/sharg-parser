@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: Sharg API-Stability
+name: API-Stability
 
 on:
   # Will always run on the default branch
@@ -16,96 +16,82 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CMAKE_VERSION: 3.16.9
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
   ISSUE: 146 # Issue number to use for reporting failures
 
 defaults:
   run:
-    shell: bash -exo pipefail {0}
+    shell: bash -Eeuxo pipefail {0}
 
 jobs:
   build:
-    name: API-Stability gcc${{ matrix.compiler }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 300
+    name: API-Stability ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
-        compiler: [11, 12, 13]
-
+        compiler: ["gcc-14", "gcc-13", "gcc-12"]
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
-      - name: Checkout Sharg
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: sharg
-          fetch-depth: 1
           submodules: true
-
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
-        with:
-          compiler: gcc-${{ matrix.compiler }}
-          ccache_size: 75M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.16.9
 
       - name: Configure tests
         run: |
-          mkdir sharg-build
-          cd sharg-build
-          cmake ../sharg/test/api_stability -DCMAKE_BUILD_TYPE=Release
+          mkdir build && cd build
+          cmake ../test/api_stability -DCMAKE_BUILD_TYPE=Release
 
       - name: Build tests
-        run: |
-          cd sharg-build
-          CMAKE_BUILD_PARALLEL_LEVEL=2 cmake --build . -- -k 2>&1 | tee build.log
-
-      - name: Setup Python
-        if: ${{ failure() }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Process Log
-        if: ${{ failure() }}
-        run: |
-          FILE="seqan3/.github/ISSUE_TEMPLATE/cron_comment_template.md"
-          python3 seqan3/.github/workflows/scripts/process_compiler_error_log.py sharg-build/build.log >> $FILE
+        working-directory: build
+        run: make -k 2>&1 | tee build.log
 
       - name: Create comment body
-        if: ${{ failure() }}
+        if: always()
         id: comment-body
         run: |
-          FILE="sharg/.github/ISSUE_TEMPLATE/cron_comment_template.md"
-          URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          sed -i "s@{{ build }}@${{ matrix.build }}@" $FILE
-          sed -i "s@{{ compiler }}@${{ matrix.compiler }}@" $FILE
-          sed -i "s@{{ url }}@$URL@" $FILE
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          cat $FILE >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "body=Success ${{ matrix.build }} on ${{ matrix.compiler }}" >> $GITHUB_OUTPUT
+          else
+            FILE=".github/ISSUE_TEMPLATE/cron_comment_template.md"
+            python3 .github/workflows/scripts/process_compiler_error_log.py build/build.log >> ${FILE}
+            URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            sed -i "s@{{ build }}@${{ matrix.build }}@" ${FILE}
+            sed -i "s@{{ compiler }}@${{ matrix.compiler }}@" ${FILE}
+            sed -i "s@{{ url }}@$URL@" ${FILE}
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            cat ${FILE} >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
 
       - name: Reopen issue
-        if: ${{ failure() }}
-        uses: octokit/request-action@v2.x
-        with:
-          route: PATCH /repos/{owner}/{repo}/issues/{issue_number}
-          owner: ${{ github.repository_owner }}
-          repo: sharg-parser
-          issue_number: ${{ env.ISSUE }}
-          state: "open"
+        if: failure()
+        run: gh issue reopen ${{ env.ISSUE }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SEQAN_ACTIONS_PAT }}
+          GH_REPO: ${{ github.repository }}
 
-      - name: Create comment
-        if: ${{ failure() }}
-        uses: peter-evans/create-or-update-comment@v4
+      - name: Find Comment
+        if: always()
+        uses: peter-evans/find-comment@v3
+        id: find_comment
         with:
           issue-number: ${{ env.ISSUE }}
+          body-includes: ${{ matrix.build }} on ${{ matrix.compiler }}
+
+      - name: Update comment
+        if: always()
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ env.ISSUE }}
           body: ${{ steps.comment-body.outputs.body }}
+          edit-mode: replace
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
+

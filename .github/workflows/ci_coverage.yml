@@ -7,21 +7,15 @@ name: Coverage
 on:
   push:
     branches:
-      # Push events to branches matching refs/heads/main
       - 'main'
-      # Push events to branches matching refs/heads/release*
-      - 'release*'
-  # Trigger after PR was unlabeled
   pull_request:
     types:
       - unlabeled
-  # Enables a manual trigger, may run on any branch
   workflow_dispatch:
 
-# Do not cancel on push events
 concurrency:
   group: coverage-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false # PRs will be canceled by the clang-format CI
+  cancel-in-progress: false
 
 env:
   SHARG_NO_VERSION_CHECK: 1
@@ -33,70 +27,72 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    name: ${{ matrix.compiler }}
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        include:
-          - name: "gcc13"
-            compiler: "gcc-13"
-            build: coverage
-            build_type: Coverage
-
+        compiler: ["gcc-14"]
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
-      # How many commits do we need to fetch to also fetch the branch point?
-      - name: Get fetch depth
-        id: fetch_depth
-        run: echo "depth=$(( ${{ github.event.pull_request.commits }} + 2 ))" >> $GITHUB_OUTPUT
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: sharg
-          fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
+          fetch-depth: 0
           submodules: true
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
+      - name: Load ccache
+        uses: actions/cache@v4
         with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 125M
+          path: /home/runner/.ccache
+          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
+            ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}
 
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.16.9
-
-      - name: Install gcovr
-        run: |
-          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==6.0
+      - name: Increase ccache size
+        run: echo "CCACHE_MAXSIZE=300M" >> "${GITHUB_ENV}"
 
       - name: Configure tests
         run: |
-          mkdir sharg-build
-          cd sharg-build
-          cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                  -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF \
-                                                  -DSHARG_COVERAGE_PARALLEL_LEVEL=2
-          make -j2 gtest_build yaml-cpp
+          mkdir build && cd build
+          cmake ../test/coverage -DCMAKE_BUILD_TYPE=Coverage
+          make gtest_build yaml-cpp
 
       - name: Build tests
-        env:
-          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
-          GCOV: ${{ github.workspace }}/sharg/.github/workflows/scripts/gcov.sh
+        working-directory: build
         run: |
           ccache -z
-          cd sharg-build
-          make -k -j2
-          ccache -sv
+          make -k
+          ccache -svvx
+
+      - name: Run tests
+        working-directory: build
+        run: ctest . -j --output-on-failure --no-tests=error
+
+      - name: Generate coverage report
+        run: |
+          gcovr --root ${GITHUB_WORKSPACE}/test/coverage \
+                ${GITHUB_WORKSPACE}/build \
+                --filter ${GITHUB_WORKSPACE}/include/sharg \
+                --filter ${GITHUB_WORKSPACE}/test/include/sharg/test \
+                --exclude ${GITHUB_WORKSPACE}/include/sharg/contrib \
+                --exclude ${GITHUB_WORKSPACE}/include/sharg/std \
+                --exclude-lines-by-pattern '^\s*$' \
+                --exclude-lines-by-pattern '^\s*};$' \
+                --exclude-unreachable-branches \
+                --exclude-throw-branches \
+                --exclude-noncode-lines \
+                -j \
+                --cobertura \
+                --output ${GITHUB_WORKSPACE}/build/coverage_report.xml
 
       - name: Submit coverage build
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.5
         with:
-          files: ${{ github.workspace }}/sharg-build/sharg_coverage.xml
-          root_dir: ${{ github.workspace }}/sharg
+          files: build/coverage_report.xml
+          fail_ci_if_error: false

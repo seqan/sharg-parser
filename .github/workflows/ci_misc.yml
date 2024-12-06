@@ -2,20 +2,15 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: Linux
+name: Misc
 
 on:
   push:
     branches:
-      # Push events to branches matching refs/heads/main
       - 'main'
-      # Push events to branches matching refs/heads/release*
-      - 'release*'
-  # Trigger after PR was unlabeled
   pull_request:
     types:
       - unlabeled
-  # Enables a manual trigger, may run on any branch
   workflow_dispatch:
 
 concurrency:
@@ -28,105 +23,54 @@ env:
 
 defaults:
   run:
-    shell: bash -Eexuo pipefail {0}
+    shell: bash -Eeuxo pipefail {0}
 
 jobs:
   build:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    name: ${{ matrix.build }} ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
+        compiler: ["clang-19", "gcc-14", "gcc-12", "intel"]
+        build: ["snippet", "header"]
         include:
-          - name: "Snippet clang17"
-            compiler: "clang-17"
-            build: snippet
-            build_type: Release
-            cxx_flags: "-stdlib=libc++"
-            test_threads: 1
-
-          - name: "Snippet gcc11"
-            compiler: "gcc-11"
-            build: snippet
-            build_type: Release
-            test_threads: 1 # snippets create and delete files and some separate tests create/delete the same files
-
-          - name: "Header clang17 cpp23"
-            compiler: "clang-17"
-            build: header
-            build_type: Release
-            cxx_flags: "-stdlib=libc++ -std=c++23"
-            test_threads: 2
-
-          - name: "Header clang17"
-            compiler: "clang-17"
-            build: header
-            build_type: Release
-            cxx_flags: "-stdlib=libc++"
-            test_threads: 2
-
-          - name: "Header gcc13 cpp23"
-            compiler: "gcc-13"
-            build: header
-            build_type: Debug
-            cxx_flags: "-std=c++23"
-            test_threads: 2
-
-          - name: "Header gcc13"
-            compiler: "gcc-13"
-            build: header
-            build_type: Debug
-            test_threads: 2
-
-          - name: "Header gcc11"
-            compiler: "gcc-11"
-            build: header
-            build_type: Debug
-            test_threads: 2
-
+          - compiler: "intel"
+            cxx_flags: "-fp-model=strict -Wno-overriding-option"
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: sharg
-          fetch-depth: 1
           submodules: true
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
+      - name: Load ccache
+        uses: actions/cache@v4
         with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 75M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.16.9
+          path: /home/runner/.ccache
+          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.build }}-${{ matrix.compiler }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.build }}-${{ matrix.compiler }}-${{ github.ref }}
+            ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.build }}-${{ matrix.compiler }}
 
       - name: Configure tests
         run: |
-          mkdir sharg-build
-          cd sharg-build
-          cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                  -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF \
-                                                  ${{ contains(matrix.name, 'Header') && '-DSHARG_NO_TDL=ON' || '' }}
-
-          case "${{ matrix.build }}" in
-            snippet) make -j2 gtest_build yaml-cpp;;
-            header) make -j2 gtest_build gbenchmark_build;;
-          esac
+          mkdir build && cd build
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release \
+                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          make gtest_build yaml-cpp
 
       - name: Build tests
+        working-directory: build
         run: |
           ccache -z
-          cd sharg-build
-          make -k -j2
-          ccache -sv
+          make -k
+          ccache -svvx
 
       - name: Run tests
-        run: |
-          cd sharg-build
-          ctest . -j${{ matrix.test_threads }} --output-on-failure
+        working-directory: build
+        run: ctest . -j${{ matrix.build == 'snippet' && '1' || '' }} --output-on-failure --no-tests=error
