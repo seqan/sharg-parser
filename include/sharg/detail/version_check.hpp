@@ -343,10 +343,10 @@ public:
  This app can look for updates automatically in the background,
  do you want to do that?
 
-    [a] Always perform version checks for this app (the default).
+    [a] Always perform version checks for this app.
     [n] Never perform version checks for this app.
     [y] Yes, perform a version check now, and ask again tomorrow.
-    [s] Skip the version check now, but ask again tomorrow.
+    [s] Skip the version check now, but ask again tomorrow (the default).
 
  Please enter one of [a, n, y, s] and press [RETURN].
 
