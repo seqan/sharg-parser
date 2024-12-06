@@ -51,15 +51,6 @@ if (NOT TARGET sharg::test)
     add_library (sharg::test ALIAS sharg_test)
 endif ()
 
-# sharg::test::performance specifies required flags, includes and libraries
-# needed for performance test cases in sharg/test/performance
-if (NOT TARGET sharg::test::performance)
-    add_library (sharg_test_performance INTERFACE)
-    target_link_libraries (sharg_test_performance INTERFACE "sharg::test" "benchmark_main" "benchmark")
-
-    add_library (sharg::test::performance ALIAS sharg_test_performance)
-endif ()
-
 # sharg::test::unit specifies required flags, includes and libraries
 # needed for unit test cases in sharg/test/unit
 if (NOT TARGET sharg::test::unit)
@@ -91,7 +82,6 @@ endif ()
 if (NOT TARGET sharg::test::header)
     add_library (sharg_test_header INTERFACE)
     target_link_libraries (sharg_test_header INTERFACE "sharg::test::unit")
-    target_link_libraries (sharg_test_header INTERFACE "sharg::test::performance")
     target_compile_options (sharg_test_header INTERFACE "-Wno-unused-const-variable")
     target_compile_definitions (sharg_test_header INTERFACE -DSHARG_DISABLE_DEPRECATED_WARNINGS)
     target_compile_definitions (sharg_test_header INTERFACE -DSHARG_HEADER_TEST)
@@ -115,6 +105,5 @@ list (APPEND SHARG_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE
 include (sharg_test_component)
 include (sharg_test_files)
 include (sharg_require_ccache)
-include (sharg_require_benchmark)
 include (sharg_require_test)
 include (add_subdirectories)

@@ -32,7 +32,6 @@ endif ()
 file (APPEND "${HEADER_TARGET_SOURCE}"
       "
 #include <gtest/gtest.h>
-#include <benchmark/benchmark.h>
 TEST(${HEADER_TEST_NAME_SAFE}) {}")
 
 # test that sharg headers include platform.hpp

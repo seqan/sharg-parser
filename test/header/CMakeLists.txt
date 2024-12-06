@@ -64,7 +64,6 @@ macro (sharg_header_test component header_base_path exclude_regex)
 endmacro ()
 
 sharg_require_ccache ()
-sharg_require_benchmark ()
 sharg_require_test ()
 
 sharg_header_test (sharg "${SHARG_INCLUDE_DIR}" "")

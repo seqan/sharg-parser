@@ -2,20 +2,15 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: Unit Linux
+name: Linux
 
 on:
   push:
     branches:
-      # Push events to branches matching refs/heads/main
       - 'main'
-      # Push events to branches matching refs/heads/release*
-      - 'release*'
-  # Trigger after PR was unlabeled
   pull_request:
     types:
       - unlabeled
-  # Enables a manual trigger, may run on any branch
   workflow_dispatch:
 
 concurrency:
@@ -23,99 +18,61 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
-  SHARG_NO_VERSION_CHECK: 1
+  SEQAN3_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
 defaults:
   run:
-    shell: bash -Eexuo pipefail {0}
+    shell: bash -Eeuxo pipefail {0}
 
 jobs:
   build:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    name: ${{ matrix.compiler }}${{ matrix.name_append }}
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
+        compiler: ["clang-19", "clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "intel"]
         include:
-          - name: "clang17"
-            compiler: "clang-17"
-            build: unit
-            build_type: Release
-            cxx_flags: "-stdlib=libc++"
-
-          - name: "clang17 no TDL"
-            compiler: "clang-17"
-            build: unit
-            build_type: Release
-            cxx_flags: "-stdlib=libc++"
-
-          - name: "gcc13"
-            compiler: "gcc-13"
-            build: unit
-            build_type: Release
-
-          - name: "gcc13 no TDL"
-            compiler: "gcc-13"
-            build: unit
-            build_type: Release
-
-          - name: "gcc12"
-            compiler: "gcc-12"
-            build: unit
-            build_type: Release
-
-          - name: "gcc11"
-            compiler: "gcc-11"
-            build: unit
-            build_type: Release
-
-          - name: "IntelLLVM"
-            compiler: "intel"
-            build: unit
-            build_type: Release
-            cxx_flags: "-fp-model=strict"
-
+          - compiler: "intel"
+            cxx_flags: "-fp-model=strict -Wno-overriding-option"
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: sharg
-          fetch-depth: 1
           submodules: true
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
+      - name: Load ccache
+        uses: actions/cache@v4
         with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 75M
-
-      - name: Install CMake
-        if: contains(matrix.compiler, 'intel') == false
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.16.9
+          path: /home/runner/.ccache
+          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
+            ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}
 
       - name: Configure tests
         run: |
-          mkdir sharg-build
-          cd sharg-build
-          cmake ../sharg/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                  -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                  -DSHARG_VERBOSE_TESTS=OFF \
-                                                  ${{ contains(matrix.name, 'no TDL') && '-DSHARG_NO_TDL=ON' || '' }}
-          make -j2 gtest_build ${{ contains(matrix.name, 'no TDL') == false && 'yaml-cpp' || '' }}
+          $CXX --version || true
+          cmake --version || true
+          mkdir build && cd build
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release \
+                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          make gtest_build yaml-cpp
 
       - name: Build tests
+        working-directory: build
         run: |
           ccache -z
-          cd sharg-build
-          make -k -j2
-          ccache -sv
+          make -k
+          ccache -svvx
 
       - name: Run tests
-        run: |
-          cd sharg-build
-          ctest . -j2 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure --no-tests=error
+

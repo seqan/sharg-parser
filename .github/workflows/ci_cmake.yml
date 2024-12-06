@@ -28,59 +28,42 @@ defaults:
 jobs:
   build:
     name: "External project ${{ contains(matrix.SHARG_NO_TDL, 'OFF') && 'with TDL' || 'without TDL' }}"
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
         SHARG_NO_TDL: [ON, OFF]
-
+    container:
+      image: ghcr.io/seqan/gcc-14
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: sharg-parser
-          fetch-depth: 1
           submodules: true
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.16.9
-
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
-        with:
-          compiler: gcc-13
 
       - name: Install dependencies
         if: matrix.SHARG_NO_TDL == 'OFF'
         run: |
           git clone --depth 1 --single-branch --branch 0.8.0 https://github.com/jbeder/yaml-cpp.git
-          cd yaml-cpp
-          mkdir build
-          cd build
+          cd yaml-cpp && mkdir build && cd build
           cmake ../ -DCMAKE_BUILD_TYPE=Debug \
                     -DYAML_CPP_BUILD_CONTRIB=OFF \
                     -DYAML_CPP_BUILD_TOOLS=OFF \
                     -DYAML_BUILD_SHARED_LIBS=OFF \
                     -DYAML_CPP_INSTALL=ON \
-                    -DYAML_CPP_BUILD_TESTS=OFF \
-                    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-          make -j2
-          sudo make install
+                    -DYAML_CPP_BUILD_TESTS=OFF
+          make install
 
       - name: Configure tests
         run: |
-          mkdir sharg-build
-          cd sharg-build
-          cmake ../sharg-parser/test/external_project -DCMAKE_BUILD_TYPE=Debug \
-                                                      -DSHARG_NO_TDL=${{ matrix.SHARG_NO_TDL }}
-          make -j2 sharg_test_prerequisite
+          mkdir build && cd build
+          cmake ../test/external_project -DCMAKE_BUILD_TYPE=Debug \
+                                         -DSHARG_NO_TDL=${{ matrix.SHARG_NO_TDL }}
+          make -k sharg_test_prerequisite
 
       - name: Build tests
-        run: |
-          cd sharg-build
-          make -k -j2
-
+        working-directory: build
+        run: make -k
