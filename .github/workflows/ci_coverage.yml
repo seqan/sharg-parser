@@ -61,7 +61,7 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ../test/coverage -DCMAKE_BUILD_TYPE=Coverage
-          make gtest_build yaml-cpp
+          make gtest_main yaml-cpp
 
       - name: Build tests
         working-directory: build

@@ -7,6 +7,8 @@ project (sharg_header_test CXX)
 
 include (../sharg-test.cmake)
 
+CPMGetPackage (googletest)
+
 macro (sharg_header_test component header_base_path exclude_regex)
     set (target "${component}_header_test")
 
@@ -62,8 +64,5 @@ macro (sharg_header_test component header_base_path exclude_regex)
     unset (header_target_source)
     unset (header_target)
 endmacro ()
-
-sharg_require_ccache ()
-sharg_require_test ()
 
 sharg_header_test (sharg "${SHARG_INCLUDE_DIR}" "")

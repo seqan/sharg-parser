@@ -8,6 +8,8 @@ project (sharg_test_unit CXX)
 include (../sharg-test.cmake)
 include (GoogleTest OPTIONAL)
 
+CPMGetPackage (googletest)
+
 include (diagnostics/list_missing_unit_tests)
 include (diagnostics/list_unused_unit_tests)
 include (include_dependencies/add_include_dependencies)
@@ -42,9 +44,6 @@ macro (sharg_test unit_test_cpp)
     unset (target)
     unset (test_name)
 endmacro ()
-
-sharg_require_ccache ()
-sharg_require_test ()
 
 add_subdirectories ()
 

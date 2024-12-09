@@ -11,6 +11,11 @@ cmake_minimum_required (VERSION 3.10)
 # require Sharg package
 find_package (Sharg REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../cmake)
 
+enable_testing ()
+
+set (CPM_INDENT "CMake Package Manager CPM: ")
+CPMUsePackageLock ("${CMAKE_CURRENT_LIST_DIR}/../cmake/package-lock.cmake")
+
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
 include (FindPackageMessage)
@@ -55,7 +60,7 @@ endif ()
 # needed for unit test cases in sharg/test/unit
 if (NOT TARGET sharg::test::unit)
     add_library (sharg_test_unit INTERFACE)
-    target_link_libraries (sharg_test_unit INTERFACE "sharg::test" "gtest_main" "gtest")
+    target_link_libraries (sharg_test_unit INTERFACE "sharg::test" "GTest::gtest_main")
     add_library (sharg::test::unit ALIAS sharg_test_unit)
 endif ()
 
@@ -105,5 +110,4 @@ list (APPEND SHARG_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE
 include (sharg_test_component)
 include (sharg_test_files)
 include (sharg_require_ccache)
-include (sharg_require_test)
 include (add_subdirectories)

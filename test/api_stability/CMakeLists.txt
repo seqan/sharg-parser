@@ -36,6 +36,7 @@ macro (sharg_api_stability_test test_suite git_apply)
                    -DSHARG_VERBOSE_TESTS=OFF
         PATCH_COMMAND ${CMAKE_COMMAND} -E echo "<SOURCE_DIR>"
         COMMAND ${CMAKE_COMMAND} -E remove_directory "<SOURCE_DIR>/include"
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "<SOURCE_DIR>/build_system"
         COMMAND ${CMAKE_COMMAND} -E remove_directory "<SOURCE_DIR>/cmake"
         COMMAND sh -c "${git_apply}"
         TEST_BEFORE_INSTALL TRUE
