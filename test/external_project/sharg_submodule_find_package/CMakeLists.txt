@@ -10,7 +10,7 @@ include (../find-package-diagnostics.cmake)
 # ---
 
 # add sharg to search path
-list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/submodules/sharg/build_system") # change this value
+list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/submodules/sharg/cmake")
 
 # require sharg with a version between >=1.0.0 and <2.0.0
 find_package (sharg 1.0 REQUIRED)

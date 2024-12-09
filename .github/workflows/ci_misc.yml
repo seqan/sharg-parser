@@ -62,7 +62,7 @@ jobs:
           mkdir build && cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-          make gtest_build yaml-cpp
+          make gtest_main yaml-cpp
 
       - name: Build tests
         working-directory: build

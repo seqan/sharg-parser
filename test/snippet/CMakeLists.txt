@@ -8,6 +8,8 @@ project (sharg_test_snippet CXX)
 include (../sharg-test.cmake)
 include (../cmake/diagnostics/list_unused_snippets.cmake)
 
+CPMGetPackage (googletest)
+
 add_library (snippet_main snippet_main.cpp)
 target_link_libraries (snippet_main PUBLIC sharg::test gtest)
 
@@ -53,9 +55,6 @@ macro (sharg_snippets test_name_prefix snippet_base_path_)
         sharg_snippet ("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
     endforeach ()
 endmacro ()
-
-sharg_require_ccache ()
-sharg_require_test ()
 
 sharg_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
 sharg_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")

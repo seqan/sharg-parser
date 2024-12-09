@@ -20,7 +20,7 @@ cmake_minimum_required (VERSION 3.5)
 project (sharg_tutorial CXX)
 
 # add sharg to search path
-list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../sharg-parser/build_system")
+list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../sharg-parser/cmake")
 
 # require sharg with a version between >=1.0.0 and <2.0.0
 find_package (sharg 1.0 REQUIRED)

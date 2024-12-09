@@ -109,28 +109,32 @@ macro (sharg_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
+# CPM
+# ----------------------------------------------------------------------------
+
+# This will be true for git clones and source packages, but not for installed packages.
+if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/CPM.cmake")
+    set (SHARG_HAS_CPM TRUE)
+else ()
+    set (SHARG_HAS_CPM FALSE)
+endif ()
+
+if (SHARG_HAS_CPM)
+    set (CPM_INDENT "  CMake Package Manager CPM: ")
+    include ("${CMAKE_CURRENT_LIST_DIR}/CPM.cmake")
+    CPMUsePackageLock ("${CMAKE_CURRENT_LIST_DIR}/package-lock.cmake")
+endif ()
+
+# ----------------------------------------------------------------------------
 # Find SHARG include path
 # ----------------------------------------------------------------------------
 
 # Note that sharg-config.cmake can be standalone and thus SHARG_CLONE_DIR might be empty.
-# * `SHARG_CLONE_DIR` was already found in sharg-config-version.cmake
 # * `SHARG_INCLUDE_DIR` was already found in sharg-config-version.cmake
-find_path (SHARG_SUBMODULES_DIR
-           NAMES submodules/tool_description_lib
-           HINTS "${SHARG_CLONE_DIR}" "${SHARG_INCLUDE_DIR}/sharg")
-
 if (SHARG_INCLUDE_DIR)
     sharg_config_print ("SHARG include dir found:   ${SHARG_INCLUDE_DIR}")
 else ()
     sharg_config_error ("SHARG include directory could not be found (SHARG_INCLUDE_DIR: '${SHARG_INCLUDE_DIR}')")
-endif ()
-
-# ----------------------------------------------------------------------------
-# Detect if we are a clone of repository and if yes auto-add submodules
-# ----------------------------------------------------------------------------
-
-if (SHARG_CLONE_DIR)
-    sharg_config_print ("Detected as running from a repository checkout…")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -206,22 +210,13 @@ endif ()
 set (SHARG_USE_TDL FALSE)
 
 if (NOT SHARG_NO_TDL)
-    find_package (TDL QUIET HINTS ${SHARG_HINT_TDL})
-
-    if (NOT TDL_FOUND)
-        if (EXISTS ${SHARG_SUBMODULES_DIR}/submodules/tool_description_lib)
-            include (FetchContent)
-            FetchContent_Declare (tdl SOURCE_DIR ${SHARG_SUBMODULES_DIR}/submodules/tool_description_lib)
-            set (SHARG_LOG_LEVEL ${CMAKE_MESSAGE_LOG_LEVEL})
-            set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
-            option (INSTALL_TDL "Enable installation of TDL." ${INSTALL_SHARG})
-            FetchContent_MakeAvailable (tdl)
-            set (CMAKE_MESSAGE_LOG_LEVEL ${SHARG_LOG_LEVEL})
-            set (TDL_FOUND TRUE)
-        endif ()
+    if (NOT SHARG_HAS_CPM)
+        find_package (tdl QUIET)
+    else ()
+        CPMGetPackage (tdl)
     endif ()
 
-    if (TDL_FOUND)
+    if (TDL_FOUND OR tdl_ADDED)
         sharg_config_print ("Optional dependency:        TDL found.")
         set (SHARG_USE_TDL TRUE)
         list (APPEND SHARG_LIBRARIES tdl::tdl)
@@ -323,12 +318,6 @@ if (SHARG_FOUND AND NOT TARGET sharg::sharg)
     target_link_libraries (sharg_sharg INTERFACE ${SHARG_LIBRARIES})
     target_include_directories (sharg_sharg INTERFACE "${SHARG_INCLUDE_DIR}")
     add_library (sharg::sharg ALIAS sharg_sharg)
-
-    if (SHARG_USE_TDL)
-        # Include TDL as system header to suppress warnings.
-        get_target_property (tdl_include_dir tdl::tdl INTERFACE_INCLUDE_DIRECTORIES)
-        target_include_directories (sharg_sharg SYSTEM INTERFACE ${tdl_include_dir})
-    endif ()
 endif ()
 
 set (CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})

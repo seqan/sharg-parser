@@ -17,8 +17,7 @@ install (FILES "${SHARG_CLONE_DIR}/CHANGELOG.md" #
          TYPE DOC)
 
 # install cmake files in /share/cmake
-install (FILES "${SHARG_CLONE_DIR}/build_system/sharg-config.cmake"
-               "${SHARG_CLONE_DIR}/build_system/sharg-config-version.cmake"
+install (FILES "${SHARG_CLONE_DIR}/cmake/sharg-config.cmake" "${SHARG_CLONE_DIR}/cmake/sharg-config-version.cmake"
          DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/sharg")
 
 # install sharg header files in /include/sharg

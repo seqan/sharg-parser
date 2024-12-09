@@ -200,14 +200,14 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg_header.html
 HTML_FOOTER            = ${SHARG_DOXYGEN_OUTPUT_DIR}/sharg_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome.css \
+HTML_EXTRA_STYLESHEET  = ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome.css \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/sharg.css
 ### Extra files that we can link to
-HTML_EXTRA_FILES       = ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
-                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
-                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
-                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js \
-                         ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js \
+HTML_EXTRA_FILES       = ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-darkmode-toggle.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-fragment-copy-button.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-paragraph-link.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-interactive-toc.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-tabs.js \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.js \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/version.php \
                          ${SHARG_DOXYGEN_SOURCE_DIR}/test/documentation/api-stability.js

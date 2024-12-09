@@ -8,7 +8,7 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-find_path (SHARG_MODULE_PATH "sharg-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/build_system/")
+find_path (SHARG_MODULE_PATH "sharg-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/")
 list (APPEND CMAKE_MODULE_PATH "${SHARG_MODULE_PATH}")
 
 include (sharg-config-version)
