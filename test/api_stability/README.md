@@ -38,7 +38,7 @@ The workflow entails these steps:
    `<sharg_git_source>/test/api_stability/1.1.1`.
   * These patches will only apply changes on the tests.
   * This step is necessary as some of our tests also test non-public / non-stable API.
-3. Use the current version of `find_package (Sharg)` found in `<sharg_git_source>/build_system`.
+3. Use the current version of `find_package (Sharg)` found in `<sharg_git_source>/cmake`.
 4. Configure the tests `<sharg_lsr_source>/test/unit` with our current sharg header-library
    (e.g. `<sharg_git_source>/include`).
   * But use the test cases from the LSR.

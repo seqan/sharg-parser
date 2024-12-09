@@ -30,7 +30,7 @@ ExternalProject_Add (
                "-DSHARG_NO_TDL=${SHARG_NO_TDL}")
 
 # 2) This tests test/external_project/sharg_submodule_find_package/CMakeLists.txt
-#    We have a sharg checkout somewhere and we point CMAKE_PREFIX_PATH to <checkout>/sharg/build_system
+#    We have a sharg checkout somewhere and we point CMAKE_PREFIX_PATH to <checkout>/sharg/cmake
 #    and then use `find_package` to find `sharg-config.cmake` which exposes our `sharg::sharg` target.
 #    This is expected to work with CMake >= 3.4.
 # (ExternalProject_Add simulates a fresh and separate invocation of cmake ../)
@@ -40,7 +40,7 @@ ExternalProject_Add (
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/sharg_submodule_find_package"
     CMAKE_ARGS ${SHARG_EXTERNAL_PROJECT_CMAKE_ARGS} #
                "-DCMAKE_FIND_DEBUG_MODE=${SHARG_EXTERNAL_PROJECT_FIND_DEBUG_MODE}" #
-               "-DCMAKE_PREFIX_PATH=${SHARG_ROOT}/build_system" #
+               "-DCMAKE_PREFIX_PATH=${SHARG_ROOT}/cmake" #
                "-DSHARG_NO_TDL=${SHARG_NO_TDL}")
 
 # 3) This tests test/external_project/sharg_installed/CMakeLists.txt

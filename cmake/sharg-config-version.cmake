@@ -10,7 +10,7 @@
 
 # Note that sharg-config.cmake can be standalone and thus SHARG_CLONE_DIR might be empty.
 find_path (SHARG_CLONE_DIR
-           NAMES build_system/sharg-config.cmake
+           NAMES cmake/sharg-config.cmake
            HINTS "${CMAKE_CURRENT_LIST_DIR}/..")
 find_path (SHARG_INCLUDE_DIR
            NAMES sharg/version.hpp

@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.7)
 
 ### Find sharg
-include (../../build_system/sharg-config-version.cmake)
+include (../../cmake/sharg-config-version.cmake)
 set (SHARG_VERSION "${PACKAGE_VERSION}")
 
 project (sharg

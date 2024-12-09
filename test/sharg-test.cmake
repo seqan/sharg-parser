@@ -9,7 +9,7 @@
 cmake_minimum_required (VERSION 3.10)
 
 # require Sharg package
-find_package (Sharg REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../build_system)
+find_package (Sharg REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../cmake)
 
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
