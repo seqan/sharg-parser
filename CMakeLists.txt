@@ -19,7 +19,7 @@ project (sharg
          DESCRIPTION "Sharg -- hungrily eating away your arguments"
          HOMEPAGE_URL "https://github.com/seqan/sharg-parser")
 
-find_package (Sharg 1.0 REQUIRED HINTS ${SHARG_MODULE_PATH})
+include (sharg-config)
 
 option (INSTALL_SHARG "Enable installation of Sharg. (Projects embedding Sharg may want to turn this OFF.)" ON)
 

@@ -288,30 +288,33 @@ endif ()
 # Finish find_package call
 # ----------------------------------------------------------------------------
 
-find_package_handle_standard_args (${CMAKE_FIND_PACKAGE_NAME} REQUIRED_VARS SHARG_INCLUDE_DIR)
+if (CMAKE_FIND_PACKAGE_NAME)
+    find_package_handle_standard_args (${CMAKE_FIND_PACKAGE_NAME} REQUIRED_VARS SHARG_INCLUDE_DIR)
 
-# Set SHARG_* variables with the content of ${CMAKE_FIND_PACKAGE_NAME}_(FOUND|...|VERSION)
-# This needs to be done, because `find_package(SHARG)` might be called in any case-sensitive way and we want to
-# guarantee that SHARG_* are always set.
-foreach (package_var
-         FOUND
-         DIR
-         ROOT
-         CONFIG
-         VERSION
-         VERSION_MAJOR
-         VERSION_MINOR
-         VERSION_PATCH
-         VERSION_TWEAK
-         VERSION_COUNT)
-    set (SHARG_${package_var} "${${CMAKE_FIND_PACKAGE_NAME}_${package_var}}")
-endforeach ()
-
+    # Set SHARG_* variables with the content of ${CMAKE_FIND_PACKAGE_NAME}_(FOUND|...|VERSION)
+    # This needs to be done, because `find_package(SHARG)` might be called in any case-sensitive way and we want to
+    # guarantee that SHARG_* are always set.
+    foreach (package_var
+             FOUND
+             DIR
+             ROOT
+             CONFIG
+             VERSION
+             VERSION_MAJOR
+             VERSION_MINOR
+             VERSION_PATCH
+             VERSION_TWEAK
+             VERSION_COUNT)
+        set (SHARG_${package_var} "${${CMAKE_FIND_PACKAGE_NAME}_${package_var}}")
+    endforeach ()
+else ()
+    set (SHARG_VERSION "${PACKAGE_VERSION}")
+endif ()
 # ----------------------------------------------------------------------------
 # Export targets
 # ----------------------------------------------------------------------------
 
-if (SHARG_FOUND AND NOT TARGET sharg::sharg)
+if (NOT TARGET sharg::sharg)
     add_library (sharg_sharg INTERFACE)
     target_compile_definitions (sharg_sharg INTERFACE ${SHARG_DEFINITIONS})
     target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS})
