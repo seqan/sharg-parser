@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.12)
 
 include ("${CMAKE_CURRENT_LIST_DIR}/../cmake/sharg_path_longest_stem.cmake")
 
