@@ -8,6 +8,18 @@
 
 cmake_minimum_required (VERSION 3.12)
 
+if (NOT DEFINED CMAKE_CXX_STANDARD)
+    set (CMAKE_CXX_STANDARD 23)
+endif ()
+
+if (NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
+    set (CMAKE_CXX_STANDARD_REQUIRED ON)
+endif ()
+
+if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
+    set (CMAKE_CXX_EXTENSIONS OFF)
+endif ()
+
 # require Sharg package
 find_package (Sharg REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../cmake)
 
@@ -21,6 +33,8 @@ include (FindPackageHandleStandardArgs)
 include (FindPackageMessage)
 
 option (SHARG_TEST_BUILD_OFFLINE "Skip the update step of external projects." OFF)
+
+option (SHARG_WITH_WERROR "Report compiler warnings as errors." ON)
 
 # ----------------------------------------------------------------------------
 # Paths to folders.
@@ -42,12 +56,22 @@ list (APPEND CMAKE_MODULE_PATH "${SHARG_TEST_CMAKE_MODULE_DIR}")
 # libraries which are in common for **all** seqan3 tests
 if (NOT TARGET sharg::test)
     add_library (sharg_test INTERFACE)
-    target_compile_options (sharg_test INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
+    target_compile_options (sharg_test INTERFACE "-pedantic" "-Wall" "-Wextra")
 
-    # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
+    if (SHARG_WITH_WERROR)
+        target_compile_options (sharg_test INTERFACE "-Werror")
+        message (STATUS "Building tests with -Werror.")
+    endif ()
+
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
             target_compile_options (sharg_test INTERFACE "-Wno-interference-size")
+        endif ()
+
+        # Warn about failed return value optimization.
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+            target_compile_options (sharg_test INTERFACE "-Wnrvo")
         endif ()
     endif ()
 
@@ -62,24 +86,6 @@ if (NOT TARGET sharg::test::unit)
     add_library (sharg_test_unit INTERFACE)
     target_link_libraries (sharg_test_unit INTERFACE "sharg::test" "GTest::gtest_main")
     add_library (sharg::test::unit ALIAS sharg_test_unit)
-endif ()
-
-# sharg::test::coverage specifies required flags, includes and libraries
-# needed for coverage test cases in sharg/test/coverage
-if (NOT TARGET sharg::test::coverage)
-    add_library (sharg_test_coverage INTERFACE)
-    target_compile_options (sharg_test_coverage INTERFACE "--coverage" "-fprofile-arcs" "-ftest-coverage")
-    # -fprofile-abs-path requires at least gcc8, it forces gcov to report absolute instead of relative paths.
-    # gcovr has trouble detecting the headers otherwise.
-    # ccache is not aware of this option, so it needs to be skipped with `--ccache-skip`.
-    find_program (CCACHE_PROGRAM ccache)
-    if (CCACHE_PROGRAM)
-        target_compile_options (sharg_test_coverage INTERFACE "--ccache-skip" "-fprofile-abs-path")
-    else ()
-        target_compile_options (sharg_test_coverage INTERFACE "-fprofile-abs-path")
-    endif ()
-    target_link_libraries (sharg_test_coverage INTERFACE "sharg::test::unit" "gcov")
-    add_library (sharg::test::coverage ALIAS sharg_test_coverage)
 endif ()
 
 # sharg::test::header specifies required flags, includes and libraries

@@ -40,7 +40,6 @@
 #   SHARG_INCLUDE_DIRS     -- to be passed to include_directories ()
 #   SHARG_LIBRARIES        -- to be passed to target_link_libraries ()
 #   SHARG_DEFINITIONS      -- to be passed to add_definitions ()
-#   SHARG_CXX_FLAGS        -- to be added to CMAKE_CXX_FLAGS
 #
 # Additionally, the following [IMPORTED][IMPORTED] targets are defined:
 #
@@ -50,7 +49,6 @@
 #                                  target_include_directories(target $SHARG_INCLUDE_DIRS),
 #                                  target_link_libraries(target $SHARG_LIBRARIES),
 #                                  target_compile_definitions(target $SHARG_DEFINITIONS) and
-#                                  target_compile_options(target $SHARG_CXX_FLAGS)
 #                              for a target.
 #
 #   [IMPORTED]: https://cmake.org/cmake/help/v3.10/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED
@@ -154,46 +152,25 @@ set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 option (SHARG_NO_TDL "Do not use TDL, even if present." OFF)
 
 # ----------------------------------------------------------------------------
-# Require C++20
+# Check supported compilers
 # ----------------------------------------------------------------------------
 
-set (SHARG_CXX_FLAGS "")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12)
+    message (FATAL_ERROR "GCC < 12 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
+endif ()
 
-set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
-
-set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 202002)
-      #error NOCXX20
-      #endif
-      int main() {}")
-
-check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CXX20_BUILTIN)
-
-if (CXX20_BUILTIN)
-    sharg_config_print ("C++ Standard-20 support:    builtin")
-else ()
-    set (CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE} -std=c++20")
-
-    check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CXX20_FLAG)
-
-    if (CXX20_FLAG)
-        sharg_config_print ("C++ Standard-20 support:    via -std=c++20")
-    else ()
-        sharg_config_error ("SHARG requires C++20, but your compiler does not support it.")
-    endif ()
-
-    list (APPEND SHARG_CXX_FLAGS "-std=c++20")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
+    message (FATAL_ERROR "Clang < 17 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
 endif ()
 
 # ----------------------------------------------------------------------------
 # thread support (pthread, windows threads)
 # ----------------------------------------------------------------------------
-set (SHARG_LIBRARIES "")
 
 set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package (Threads QUIET)
 
-if (Threads_FOUND)
+if (TARGET Threads::Threads)
     list (APPEND SHARG_LIBRARIES Threads::Threads)
     if ("${CMAKE_THREAD_LIBS_INIT}" STREQUAL "")
         sharg_config_print ("Thread support:             builtin.")
@@ -207,7 +184,6 @@ endif ()
 # ----------------------------------------------------------------------------
 # tool description lib (tdl) dependency
 # ----------------------------------------------------------------------------
-set (SHARG_USE_TDL FALSE)
 
 if (NOT SHARG_NO_TDL)
     if (NOT SHARG_HAS_CPM)
@@ -216,21 +192,17 @@ if (NOT SHARG_NO_TDL)
         CPMGetPackage (tdl)
     endif ()
 
-    if (TDL_FOUND OR tdl_ADDED)
+    if (TARGET tdl::tdl)
         sharg_config_print ("Optional dependency:        TDL found.")
-        set (SHARG_USE_TDL TRUE)
+        list (APPEND SHARG_DEFINITIONS "-DSHARG_HAS_TDL=1")
         list (APPEND SHARG_LIBRARIES tdl::tdl)
     else ()
         sharg_config_print ("Optional dependency:        TDL not found.")
+        list (APPEND SHARG_DEFINITIONS "-DSHARG_HAS_TDL=0")
     endif ()
 else ()
     sharg_config_print ("Optional dependency:        TDL deactivated.")
-endif ()
-
-if (SHARG_USE_TDL)
-    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_TDL=1")
-else ()
-    set (SHARG_DEFINITIONS ${SHARG_DEFINITIONS} "-DSHARG_HAS_TDL=0")
+    list (APPEND SHARG_DEFINITIONS "-DSHARG_HAS_TDL=0")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -238,20 +210,16 @@ endif ()
 # ----------------------------------------------------------------------------
 
 # librt
-if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    OR (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
-    OR (${CMAKE_SYSTEM_NAME} STREQUAL "GNU"))
-    list (APPEND SHARG_LIBRARIES rt)
+find_library (SHARG_RT_LIB rt)
+if (SHARG_RT_LIB)
+    list (APPEND SHARG_LIBRARIES ${SHARG_RT_LIB})
 endif ()
 
 # libexecinfo -- implicit
-check_include_file_cxx (execinfo.h _SHARG_HAVE_EXECINFO)
-mark_as_advanced (_SHARG_HAVE_EXECINFO)
-if (_SHARG_HAVE_EXECINFO)
+find_package (Backtrace QUIET)
+if (TARGET Backtrace::Backtrace)
+    list (APPEND SHARG_LIBRARIES Backtrace::Backtrace)
     sharg_config_print ("Optional dependency:        libexecinfo found.")
-    if ((${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD"))
-        list (APPEND SHARG_LIBRARIES execinfo elf)
-    endif ()
 else ()
     sharg_config_print ("Optional dependency:        libexecinfo not found.")
 endif ()
@@ -260,22 +228,22 @@ endif ()
 # Perform compilability test of platform.hpp (tests some requirements)
 # ----------------------------------------------------------------------------
 
-set (CXXSTD_TEST_SOURCE "#include <sharg/platform.hpp>
-     int main() {}")
+# cmake-format: off
+# Note: With CMake >= 3.25, the file WRITE can be removed, the second and third line in try_compile can be replaced by
+# SOURCE_FROM_CONTENT "platform_test.cpp" "#include <sharg/platform.hpp>\nint main() {}"
+file (WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/platform_test.cpp"
+            "#include <sharg/platform.hpp>\nint main() {}")
 
-# using try_compile instead of check_cxx_source_compiles to capture output in case of failure
-file (WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx" "${CXXSTD_TEST_SOURCE}\n")
-
-# Can't find tdl::tdl in try_compile, so we need to remove it from SHARG_LIBRARIES
-set (SHARG_TRY_COMPILE_LIBRARIES ${SHARG_LIBRARIES})
-list (REMOVE_ITEM SHARG_TRY_COMPILE_LIBRARIES tdl::tdl)
-try_compile (SHARG_PLATFORM_TEST ${CMAKE_BINARY_DIR}
-             ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
-             CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${SHARG_CXX_FLAGS}"
-                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SHARG_INCLUDE_DIR}"
+try_compile (SHARG_PLATFORM_TEST
+             ${CMAKE_BINARY_DIR}
+             ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/platform_test.cpp
+             CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${SHARG_INCLUDE_DIR}"
              COMPILE_DEFINITIONS ${SHARG_DEFINITIONS}
-             LINK_LIBRARIES ${SHARG_TRY_COMPILE_LIBRARIES}
+             CXX_STANDARD 23
+             CXX_STANDARD_REQUIRED ON
+             CXX_EXTENSIONS OFF
              OUTPUT_VARIABLE SHARG_PLATFORM_TEST_OUTPUT)
+# cmake-format: on
 
 if (SHARG_PLATFORM_TEST)
     sharg_config_print ("SHARG platform.hpp build:   passed.")
@@ -310,6 +278,7 @@ if (CMAKE_FIND_PACKAGE_NAME)
 else ()
     set (SHARG_VERSION "${PACKAGE_VERSION}")
 endif ()
+
 # ----------------------------------------------------------------------------
 # Export targets
 # ----------------------------------------------------------------------------
@@ -317,7 +286,7 @@ endif ()
 if (NOT TARGET sharg::sharg)
     add_library (sharg_sharg INTERFACE)
     target_compile_definitions (sharg_sharg INTERFACE ${SHARG_DEFINITIONS})
-    target_compile_options (sharg_sharg INTERFACE ${SHARG_CXX_FLAGS})
+    target_compile_features (sharg_sharg INTERFACE cxx_std_23)
     target_link_libraries (sharg_sharg INTERFACE ${SHARG_LIBRARIES})
     target_include_directories (sharg_sharg INTERFACE "${SHARG_INCLUDE_DIR}")
     add_library (sharg::sharg ALIAS sharg_sharg)
@@ -338,7 +307,6 @@ if (SHARG_FIND_DEBUG)
     message ("  SHARG_INCLUDE_DIR          ${SHARG_INCLUDE_DIR}")
     message ("  SHARG_LIBRARIES            ${SHARG_LIBRARIES}")
     message ("  SHARG_DEFINITIONS          ${SHARG_DEFINITIONS}")
-    message ("  SHARG_CXX_FLAGS            ${SHARG_CXX_FLAGS}")
     message ("")
     message ("  SHARG_VERSION              ${SHARG_VERSION}")
     message ("  SHARG_VERSION_MAJOR        ${SHARG_VERSION_MAJOR}")

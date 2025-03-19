@@ -54,14 +54,16 @@ inline std::string const type_name_as_string = []()
     // We exclude status != 0, because this code can't be reached normally, only if there is a defect in the compiler
     // itself, since the type is directly given by the compiler. See https://github.com/seqan/seqan3/pull/2311.
     // LCOV_EXCL_START
-    // clang-format off
     if (status != 0)
-        return std::string{typeid(type).name()} +
-               " (abi::__cxa_demangle error status (" + std::to_string(status) + "): " +
-               (status == -1 ? "A memory allocation failure occurred." :
-                   (status == -2 ? "mangled_name is not a valid name under the C++ ABI mangling rules." :
-                       (status == -3 ? "One of the arguments is invalid." : "Unknown Error"))) + ")";
-    // clang-format on
+    {
+        demangled_name =
+            std::string{typeid(type).name()} + " (abi::__cxa_demangle error status (" + std::to_string(status) + "): "
+            + (status == -1 ? "A memory allocation failure occurred."
+                            : (status == -2 ? "mangled_name is not a valid name under the C++ ABI mangling rules."
+                                            : (status == -3 ? "One of the arguments is invalid." : "Unknown Error")))
+            + ")";
+        return demangled_name;
+    }
     // LCOV_EXCL_STOP
 
     demangled_name = std::string{std::addressof(*demangled_name_ptr)};
