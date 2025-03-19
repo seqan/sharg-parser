@@ -185,7 +185,7 @@ public:
         version_check_dev_decision{version_updates},
         arguments{arguments}
     {
-        add_subcommands(subcommands);
+        add_subcommands(std::move(subcommands));
         info.app_name = app_name;
     }
 

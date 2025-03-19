@@ -339,7 +339,7 @@ public:
             .description = std::accumulate(begin(meta.description),
                                            end(meta.description),
                                            std::string{},
-                                           [](auto a, auto v)
+                                           [](auto const & a, auto const & v)
                                            {
                                                return a + v + '\n';
                                            }),

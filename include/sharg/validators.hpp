@@ -660,7 +660,7 @@ public:
      * \details
      * \experimentalapi{Experimental since version 1.0.}
      */
-    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> const & extensions) :
+    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> extensions) :
         open_mode{mode}
     {
         file_validator_base::extensions_str = detail::to_string(extensions);

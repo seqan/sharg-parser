@@ -44,10 +44,10 @@ TEST_F(validator_test, input_file)
     sharg::test::tmp_filename const tmp_name_hidden{".testbox.fasta"};
     sharg::test::tmp_filename const tmp_name_multiple{"testbox.fasta.txt"};
 
-    std::filesystem::path const tmp_path{tmp_name.get_path()};
-    std::filesystem::path const tmp_path_2{tmp_name_2.get_path()};
-    std::filesystem::path const tmp_path_hidden{tmp_name_hidden.get_path()};
-    std::filesystem::path const tmp_path_multiple{tmp_name_multiple.get_path()};
+    std::filesystem::path const & tmp_path{tmp_name.get_path()};
+    std::filesystem::path const & tmp_path_2{tmp_name_2.get_path()};
+    std::filesystem::path const & tmp_path_hidden{tmp_name_hidden.get_path()};
+    std::filesystem::path const & tmp_path_multiple{tmp_name_multiple.get_path()};
 
     { // Open fstream to create files.
         std::ofstream tmp_file{tmp_path};
@@ -133,8 +133,8 @@ TEST_F(validator_test, output_file)
     sharg::test::tmp_filename const tmp_name_3{"testbox_3.fa"};
     sharg::test::tmp_filename const hidden_name{".testbox.fasta"};
 
-    std::filesystem::path const not_existing_path{tmp_name.get_path()};
-    std::filesystem::path const existing_path{tmp_name_2.get_path()};
+    std::filesystem::path const & not_existing_path{tmp_name.get_path()};
+    std::filesystem::path const & existing_path{tmp_name_2.get_path()};
 
     { // Open fstream to create files.
         std::ofstream tmp_file{existing_path};
@@ -279,7 +279,7 @@ TEST_F(validator_test, output_file)
 TEST_F(validator_test, input_directory)
 {
     sharg::test::tmp_filename const tmp_name{"testbox.fasta"};
-    std::filesystem::path const tmp_path{tmp_name.get_path()};
+    std::filesystem::path const & tmp_path{tmp_name.get_path()};
 
     { // Open fstream to create files.
         std::ofstream tmp_file{tmp_path};
@@ -321,7 +321,7 @@ TEST_F(validator_test, input_directory)
 TEST_F(validator_test, output_directory)
 {
     sharg::test::tmp_filename const tmp_name{"testbox.fasta"};
-    std::filesystem::path const tmp_path{tmp_name.get_path()};
+    std::filesystem::path const & tmp_path{tmp_name.get_path()};
 
     { // Open fstream to create files.
         std::ofstream tmp_file{tmp_path};
@@ -348,8 +348,8 @@ TEST_F(validator_test, output_directory)
 
     // Parent path exists and is writable.
     sharg::test::tmp_filename tmp_child_name{"dir/child_dir"};
-    std::filesystem::path tmp_child_dir{tmp_child_name.get_path()};
-    std::filesystem::path tmp_parent_path{tmp_child_dir.parent_path()};
+    std::filesystem::path const & tmp_child_dir{tmp_child_name.get_path()};
+    std::filesystem::path const tmp_parent_path{tmp_child_dir.parent_path()};
 
     EXPECT_FALSE(std::filesystem::exists(tmp_parent_path));
     EXPECT_THROW(my_validator(tmp_child_dir), sharg::validation_error);
@@ -375,7 +375,7 @@ TEST_F(validator_test, output_directory)
 TEST_F(validator_test, inputfile_not_readable)
 {
     sharg::test::tmp_filename const tmp_name{"my_file.test"};
-    std::filesystem::path const tmp_path{tmp_name.get_path()};
+    std::filesystem::path const & tmp_path{tmp_name.get_path()};
 
     { // Open fstream to create files.
         std::ofstream tmp_file{tmp_path};
@@ -413,7 +413,7 @@ TEST_F(validator_test, inputfile_not_regular)
 TEST_F(validator_test, inputdir_not_existing)
 {
     sharg::test::tmp_filename const tmp_name{"dir"};
-    std::filesystem::path const not_existing_dir{tmp_name.get_path()};
+    std::filesystem::path const & not_existing_dir{tmp_name.get_path()};
 
     EXPECT_THROW(sharg::input_directory_validator{}(not_existing_dir), sharg::validation_error);
 }
@@ -421,7 +421,7 @@ TEST_F(validator_test, inputdir_not_existing)
 TEST_F(validator_test, inputdir_not_readable)
 {
     sharg::test::tmp_filename const tmp_name{"dir"};
-    std::filesystem::path const tmp_dir{tmp_name.get_path()};
+    std::filesystem::path const & tmp_dir{tmp_name.get_path()};
 
     std::filesystem::create_directory(tmp_dir);
 
@@ -448,7 +448,7 @@ TEST_F(validator_test, inputdir_not_readable)
 TEST_F(validator_test, outputfile_not_writable)
 {
     sharg::test::tmp_filename const tmp_name{"my_file.test"};
-    std::filesystem::path const tmp_file{tmp_name.get_path()};
+    std::filesystem::path const & tmp_file{tmp_name.get_path()};
 
     sharg::output_file_validator my_validator{sharg::output_file_open_options::create_new};
 
@@ -475,7 +475,7 @@ TEST_F(validator_test, outputfile_not_writable)
 TEST_F(validator_test, output_parent_dir_not_writable)
 {
     sharg::test::tmp_filename const tmp_name{"dir"};
-    std::filesystem::path const tmp_dir{tmp_name.get_path()};
+    std::filesystem::path const & tmp_dir{tmp_name.get_path()};
 
     sharg::output_file_validator my_validator{};
 
@@ -517,7 +517,7 @@ TEST_F(validator_test, output_parent_dir_not_writable)
 TEST_F(validator_test, outputdir_not_writable)
 {
     sharg::test::tmp_filename const tmp_name{"dir"};
-    std::filesystem::path const tmp_dir{tmp_name.get_path()};
+    std::filesystem::path const & tmp_dir{tmp_name.get_path()};
 
     std::filesystem::create_directory(tmp_dir);
 
