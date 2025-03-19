@@ -79,7 +79,7 @@ private:
         std::cout << " " << meta.version << "\" \"" << meta.man_page_title << "\"\n";
 
         // Print NAME section.
-        std::cout << ".SH NAME\n" << meta.app_name << " \\- " << meta.short_description << std::endl;
+        std::cout << ".SH NAME\n" << meta.app_name << " \\- " << meta.short_description << '\n';
     }
 
     /*!\brief Prints a section title in man page format to std::cout.
