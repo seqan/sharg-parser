@@ -87,7 +87,7 @@ inline from_chars_result from_chars_floating_point(char const * first,
     if (*first == '+') // + is permitted in function strto[d/f/ld] but not in from_chars
         return {last, std::errc::invalid_argument};
 
-    float tmp{};
+    value_type tmp{};
     constexpr ptrdiff_t buffer_size = 100;
     char buffer[buffer_size];
 
