@@ -7,6 +7,7 @@ analyze:
   - --enable=bugprone
   - --enable=clang-diagnostic-shadow
   - --disable=bugprone-easily-swappable-parameters
+  - --disable=cert-dcl58-cpp
   - --disable=clang-diagnostic-implicit-int-float-conversion
   - --disable=clang-diagnostic-float-conversion
   - --disable=clang-diagnostic-implicit-int-conversion
