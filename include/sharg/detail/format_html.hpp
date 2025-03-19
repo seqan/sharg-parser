@@ -172,7 +172,8 @@ private:
      */
     std::string to_html(std::string const & input)
     {
-        std::string buffer = escape_special_xml_chars(input);
+        // Todo: Input is escaped, but then not used. Same in SeqAn2. Why?
+        // std::string buffer = escape_special_xml_chars(input);
         std::string result;
         std::vector<std::string> open_tags; // acts as a stack of html tags
 

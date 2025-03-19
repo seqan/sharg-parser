@@ -846,9 +846,9 @@ TEST_F(format_parse_test, executable_name)
     bool flag{false};
     auto parser = get_parser();
 
-    auto check = [&](std::string_view expected)
+    auto check = [&](std::string expected)
     {
-        parser = sharg::parser{"test_parser", {expected.data(), "-t"}, sharg::update_notifications::off};
+        parser = sharg::parser{"test_parser", {expected, std::string{"-t"}}, sharg::update_notifications::off};
         parser.add_flag(flag, sharg::config{.short_id = 't'});
         EXPECT_NO_THROW(parser.parse());
         auto & executable_name = sharg::detail::test_accessor::executable_name(parser);

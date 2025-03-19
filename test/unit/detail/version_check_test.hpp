@@ -28,7 +28,7 @@ protected:
 
     void randomise_home_folder()
     {
-        auto tmp_directory = tmp_file.get_path().parent_path();
+        auto const tmp_directory = tmp_file.get_path().parent_path();
         std::string const base_path = tmp_directory.string();
 
         if (setenv(sharg::detail::version_checker::home_env_name, base_path.data(), 1))

@@ -331,7 +331,7 @@ private:
 
                 std::string result{'['};
                 for (auto const & [key, value] : key_value_pairs)
-                    result += std::string{key.data()} + ", ";
+                    result += std::string{key} + ", ";
                 result.replace(result.size() - 2, 2, "]"); // replace last ", " by "]"
                 return result;
             }();
@@ -402,11 +402,11 @@ private:
         requires std::is_arithmetic_v<option_t> && istreamable<option_t>
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
-        auto res = std::from_chars(&in[0], &in[in.size()], value);
+        auto res = std::from_chars(in.data(), in.data() + in.size(), value);
 
         if (res.ec == std::errc::result_out_of_range)
             return option_parse_result::overflow_error;
-        else if (res.ec == std::errc::invalid_argument || res.ptr != &in[in.size()])
+        else if (res.ec == std::errc::invalid_argument || res.ptr != in.data() + in.size())
             return option_parse_result::error;
 
         return option_parse_result::success;
@@ -424,14 +424,10 @@ private:
      */
     option_parse_result parse_option_value(bool & value, std::string const & in)
     {
-        if (in == "0")
+        if (in == "0" || in == "false")
             value = false;
-        else if (in == "1")
+        else if (in == "1" || in == "true")
             value = true;
-        else if (in == "true")
-            value = true;
-        else if (in == "false")
-            value = false;
         else
             return option_parse_result::error;
 

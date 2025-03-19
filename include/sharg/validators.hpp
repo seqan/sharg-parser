@@ -387,7 +387,7 @@ protected:
             file_path.erase(0, 1);
 
         // Store a string_view containing all extensions for a better error message.
-        std::string const all_extensions{file_path.substr(file_path.find(".") + 1)};
+        std::string const all_extensions{file_path.substr(file_path.find('.') + 1)};
 
         // Compares the extensions in lower case.
         auto case_insensitive_ends_with = [&](std::string const & ext)
@@ -601,7 +601,7 @@ public:
  * \details
  * \experimentalapi{Experimental since version 1.0.}
  */
-enum class output_file_open_options
+enum class output_file_open_options : uint8_t
 {
     //!\brief Allow to overwrite the output file
     open_or_create,
@@ -660,7 +660,7 @@ public:
      * \details
      * \experimentalapi{Experimental since version 1.0.}
      */
-    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> const & extensions) :
+    explicit output_file_validator(output_file_open_options const mode, std::vector<std::string> extensions) :
         open_mode{mode}
     {
         file_validator_base::extensions_str = detail::to_string(extensions);

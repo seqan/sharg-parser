@@ -79,7 +79,7 @@ auto to_tdl(std::integral auto v)
 //!\copydetails sharg::detail::to_tdl
 auto to_tdl(std::floating_point auto v)
 {
-    return tdl::DoubleValue(v);
+    return tdl::DoubleValue(static_cast<double>(v));
 }
 
 //!\copydetails sharg::detail::to_tdl
@@ -339,7 +339,7 @@ public:
             .description = std::accumulate(begin(meta.description),
                                            end(meta.description),
                                            std::string{},
-                                           [](auto a, auto v)
+                                           [](auto const & a, auto const & v)
                                            {
                                                return a + v + '\n';
                                            }),
