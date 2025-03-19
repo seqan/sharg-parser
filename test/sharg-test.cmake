@@ -20,13 +20,20 @@ if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
     set (CMAKE_CXX_EXTENSIONS OFF)
 endif ()
 
+set (SHARG_TEST_CPM_DIR
+     "${CMAKE_CURRENT_LIST_DIR}/../cmake/"
+     CACHE STRING "Path to directory containing CPM.cmake.")
+
+set (CPM_INDENT "CMake Package Manager CPM: ")
+include ("${SHARG_TEST_CPM_DIR}/CPM.cmake")
+CPMUsePackageLock ("${SHARG_TEST_CPM_DIR}/package-lock.cmake")
+
+include (${CMAKE_CURRENT_LIST_DIR}/cmake/sharg_require_ccache.cmake)
+
 # require Sharg package
 find_package (Sharg REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../cmake)
 
 enable_testing ()
-
-set (CPM_INDENT "CMake Package Manager CPM: ")
-CPMUsePackageLock ("${CMAKE_CURRENT_LIST_DIR}/../cmake/package-lock.cmake")
 
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
@@ -115,5 +122,4 @@ list (APPEND SHARG_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE
 
 include (sharg_test_component)
 include (sharg_test_files)
-include (sharg_require_ccache)
 include (add_subdirectories)
