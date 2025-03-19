@@ -106,7 +106,7 @@ class format_tdl : format_base
 {
 public:
     //!\brief Supported tool description file formats.
-    enum class FileFormat
+    enum class FileFormat : uint8_t
     {
         CTD, //!<Support for CTD format
         CWL, //!<Support for CWL format
@@ -324,11 +324,11 @@ public:
         meta = parser_meta;
 
         // each call will evaluate the function print_list_item()
-        for (auto f : positional_option_calls)
+        for (auto && f : positional_option_calls)
             f(meta.app_name);
 
         // each call will evaluate the function print_list_item()
-        for (auto f : parser_set_up_calls)
+        for (auto && f : parser_set_up_calls)
             f(meta.app_name);
 
         info.metaInfo = tdl::MetaInfo{

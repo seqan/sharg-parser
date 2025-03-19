@@ -48,7 +48,7 @@ int main(int argc, char const ** argv)
         return -1;
     }
 
-    std::cout << "my_bar was initialised with a = " << my_bar.a << std::endl;
+    std::cout << "my_bar was initialised with a = " << my_bar.a << '\n';
 
     return 0;
 }

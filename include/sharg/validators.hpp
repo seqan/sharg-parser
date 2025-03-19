@@ -246,7 +246,7 @@ public:
     {
         std::for_each(std::ranges::begin(range),
                       std::ranges::end(range),
-                      [&](auto cmp)
+                      [&](auto && cmp)
                       {
                           (*this)(cmp);
                       });
@@ -353,7 +353,7 @@ public:
     {
         std::for_each(v.begin(),
                       v.end(),
-                      [&](auto cmp)
+                      [&](auto && cmp)
                       {
                           this->operator()(cmp);
                       });

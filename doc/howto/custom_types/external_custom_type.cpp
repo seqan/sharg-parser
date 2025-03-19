@@ -52,7 +52,7 @@ int main(int argc, char const ** argv)
         return -1;
     }
 
-    std::cout << "ext_bar was initialised with a = " << ext_bar.a << std::endl;
+    std::cout << "ext_bar was initialised with a = " << ext_bar.a << '\n';
 
     return 0;
 }

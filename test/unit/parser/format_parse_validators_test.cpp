@@ -404,7 +404,7 @@ TEST_F(validator_test, inputfile_not_readable)
 TEST_F(validator_test, inputfile_not_regular)
 {
     sharg::test::tmp_filename const tmp{"my_file.test"};
-    std::filesystem::path const filename = tmp.get_path();
+    std::filesystem::path const & filename = tmp.get_path();
     mkfifo(filename.c_str(), 0644);
 
     EXPECT_THROW(sharg::input_file_validator{}(filename), sharg::validation_error);
@@ -662,7 +662,7 @@ TEST_F(validator_test, arithmetic_range_validator_error)
     EXPECT_FLOAT_EQ(value2, 0.9);
 }
 
-enum class foo
+enum class foo : uint8_t
 {
     one,
     two,

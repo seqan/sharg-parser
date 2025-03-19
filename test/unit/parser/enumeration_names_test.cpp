@@ -13,7 +13,7 @@
 namespace foo
 {
 
-enum class bar
+enum class bar : uint8_t
 {
     one,
     two,
@@ -30,7 +30,7 @@ auto enumeration_names(bar)
 namespace Other
 {
 
-enum class bar
+enum class bar : uint8_t
 {
     one,
     two

@@ -22,7 +22,7 @@ namespace sharg
  * \details
  * \stableapi{Since version 1.0.}
  */
-enum class update_notifications
+enum class update_notifications : uint8_t
 {
     on, //!< Automatic update notifications should be enabled.
     off //!< Automatic update notifications should be disabled.

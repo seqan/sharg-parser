@@ -373,7 +373,7 @@ TEST_F(format_help_test, advanced_options)
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
-enum class foo
+enum class foo : uint8_t
 {
     one,
     two,

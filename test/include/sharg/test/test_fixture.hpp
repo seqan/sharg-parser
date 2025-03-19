@@ -50,12 +50,9 @@ class test_fixture : public ::testing::Test
 private:
     friend class early_exit_guardian;
 
-    static sharg::parser impl(std::vector<std::string> arguments, std::vector<std::string> subcommands = {})
+    static sharg::parser impl(std::vector<std::string> arguments, std::vector<std::string> const & subcommands = {})
     {
-        sharg::parser parser{"test_parser",
-                             std::move(arguments),
-                             sharg::update_notifications::off,
-                             std::move(subcommands)};
+        sharg::parser parser{"test_parser", std::move(arguments), sharg::update_notifications::off, subcommands};
         sharg::detail::test_accessor::set_terminal_width(parser, 80u);
         return parser;
     }
@@ -69,10 +66,11 @@ protected:
         return impl(std::vector<std::string>{"./test_parser", std::forward<arg_ts>(arguments)...});
     }
 
-    static sharg::parser get_subcommand_parser(std::vector<std::string> arguments, std::vector<std::string> subcommands)
+    static sharg::parser get_subcommand_parser(std::vector<std::string> arguments,
+                                               std::vector<std::string> const & subcommands)
     {
         arguments.insert(arguments.begin(), "./test_parser");
-        return impl(std::move(arguments), std::move(subcommands));
+        return impl(std::move(arguments), subcommands);
     }
 
     static std::string get_parse_cout_on_exit(sharg::parser & parser)
