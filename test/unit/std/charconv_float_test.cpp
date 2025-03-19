@@ -32,138 +32,138 @@ TYPED_TEST(from_char_real_test, real_numbers)
     {
         TypeParam val{};
         std::string str = "1234";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{1234});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "1.2e3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{1200});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "1.2e-3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{0.0012});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "1.e2";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{100});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "1.";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{1});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = ".2e3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{200});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "2e3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{2000});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "2";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{2});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "4em";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{4});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + 1);
+        EXPECT_EQ(res.ptr, str.data() + 1);
     }
 
     {
         TypeParam val{};
         std::string str = "-1.2e3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{-1200});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{42};
         std::string str = "-.3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{-0.3});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{42};
         std::string str = "1.2e";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{1.2});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + 3);
+        EXPECT_EQ(res.ptr, str.data() + 3);
     }
 
     {
         TypeParam val{42};
         std::string str = "0.0";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{0});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     // Read only until a certain position
     {
         TypeParam val{42};
         std::string str = "3.194357";
-        auto res = std::from_chars(&str[0], &str[0] + 4, val);
+        auto res = std::from_chars(str.data(), str.data() + 4, val);
         EXPECT_FLOAT_EQ(val, TypeParam{3.19});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + 4);
+        EXPECT_EQ(res.ptr, str.data() + 4);
     }
 
     // Partial Parsing
     {
         TypeParam val{42};
         std::string str = "3.19abc";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{3.19});
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + 4);
+        EXPECT_EQ(res.ptr, str.data() + 4);
     }
 }
 
@@ -172,37 +172,37 @@ TYPED_TEST(from_char_real_test, infinity_value)
     {
         TypeParam val{};
         std::string str = "inf";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_EQ(val, std::numeric_limits<TypeParam>::infinity());
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "infinity";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_EQ(val, std::numeric_limits<TypeParam>::infinity());
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "INF";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_EQ(val, std::numeric_limits<TypeParam>::infinity());
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "INFINITY";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_EQ(val, std::numeric_limits<TypeParam>::infinity());
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 }
 
@@ -215,37 +215,37 @@ TYPED_TEST(from_char_real_test, nan_value)
     {
         TypeParam val{};
         std::string str = "nan";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_TRUE(std::isnan(val));
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "NAN";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_TRUE(std::isnan(val));
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "nan(abc)";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_TRUE(std::isnan(val));
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 
     {
         TypeParam val{};
         std::string str = "NAN(abc)";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_TRUE(std::isnan(val));
         EXPECT_EQ(res.ec, std::errc{});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
     }
 }
 
@@ -254,7 +254,7 @@ TYPED_TEST(from_char_real_test, non_valid_strings)
     {
         TypeParam val{42};
         std::string str = "e3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{42});
         EXPECT_EQ(res.ec, std::errc::invalid_argument);
     }
@@ -262,7 +262,7 @@ TYPED_TEST(from_char_real_test, non_valid_strings)
     {
         TypeParam val{42};
         std::string str = "+1.2e3";
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), val);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), val);
         EXPECT_FLOAT_EQ(val, TypeParam{42});
         EXPECT_EQ(res.ec, std::errc::invalid_argument);
     }

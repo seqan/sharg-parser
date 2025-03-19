@@ -32,29 +32,29 @@ TYPED_TEST(integral_from_char_test, postive_number)
 
     {
         std::vector<char> const str{'1', '2', '3'};
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
         EXPECT_EQ(value, TypeParam{123});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
         EXPECT_EQ(res.ec, std::errc{});
     }
 
     {
         std::vector<char> const str{'0', '2', '3'};
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
         EXPECT_EQ(value, TypeParam{23});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
         EXPECT_EQ(res.ec, std::errc{});
     }
 
     // Read only up to a certain point
     {
         std::vector<char> const str{'0', '2', '3', '4', '5', '6'};
-        auto res = std::from_chars(&str[0], &str[0] + 3, value);
+        auto res = std::from_chars(str.data(), str.data() + 3, value);
 
         EXPECT_EQ(value, TypeParam{23});
-        EXPECT_EQ(res.ptr, &str[0] + 3);
+        EXPECT_EQ(res.ptr, str.data() + 3);
         EXPECT_EQ(res.ec, std::errc{});
     }
 }
@@ -63,18 +63,18 @@ TYPED_TEST(integral_from_char_test, negative_number)
 {
     TypeParam value{42};
     std::vector<char> const str{'-', '1', '2', '3'};
-    auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+    auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
     if constexpr (std::is_unsigned_v<TypeParam>)
     {
-        EXPECT_EQ(res.ptr, &str[0]);
+        EXPECT_EQ(res.ptr, str.data());
         EXPECT_EQ(res.ec, std::errc::invalid_argument);
         EXPECT_EQ(value, TypeParam{42});
     }
     else
     {
         EXPECT_EQ(value, TypeParam{-123});
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
         EXPECT_EQ(res.ec, std::errc{});
     }
 }
@@ -85,9 +85,9 @@ TYPED_TEST(integral_from_char_test, overflow_error)
     std::vector<char> const str{'1', '2', '3', '0', '0', '0', '0', '0', '0', '0', '0',
                                 '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'};
 
-    auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+    auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
-    EXPECT_EQ(res.ptr, &str[0] + str.size());
+    EXPECT_EQ(res.ptr, str.data() + str.size());
     EXPECT_EQ(res.ec, std::errc::result_out_of_range);
     EXPECT_EQ(value, TypeParam{42});
 }
@@ -99,7 +99,7 @@ TYPED_TEST(integral_from_char_test, partial_parsing)
     { // interleaved char
         std::vector<char> const str{'1', 'a', '3'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
         EXPECT_EQ(res.ptr, &str[1]);
         EXPECT_EQ(res.ec, std::errc{});
@@ -110,7 +110,7 @@ TYPED_TEST(integral_from_char_test, partial_parsing)
     {           // trailing char
         std::vector<char> const str{'1', '2', 'a'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
         EXPECT_EQ(res.ptr, &str[2]);
         EXPECT_EQ(res.ec, std::errc{});
@@ -121,7 +121,7 @@ TYPED_TEST(integral_from_char_test, partial_parsing)
     {           // float
         std::vector<char> const str{'1', '.', '3'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
         EXPECT_EQ(res.ptr, &str[1]);
         EXPECT_EQ(res.ec, std::errc{});
@@ -131,7 +131,7 @@ TYPED_TEST(integral_from_char_test, partial_parsing)
     { // hexadecimal 0x prefix is not recognized
         std::vector<char> const str{'0', 'x', '3', 'f'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value, 16);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value, 16);
 
         EXPECT_EQ(res.ptr, &str[1]);
         EXPECT_EQ(res.ec, std::errc{});
@@ -141,7 +141,7 @@ TYPED_TEST(integral_from_char_test, partial_parsing)
     { // hexadecimal 0X prefix is not recognized
         std::vector<char> const str{'0', 'X', '3', 'f'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value, 16);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value, 16);
 
         EXPECT_EQ(res.ptr, &str[1]);
         EXPECT_EQ(res.ec, std::errc{});
@@ -156,9 +156,9 @@ TYPED_TEST(integral_from_char_test, invalid_argument_error)
     { // leading char
         std::vector<char> const str{'a', '1', '3'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
-        EXPECT_EQ(res.ptr, &str[0]);
+        EXPECT_EQ(res.ptr, str.data());
         EXPECT_EQ(res.ec, std::errc::invalid_argument);
         EXPECT_EQ(value, TypeParam{42});
     }
@@ -166,9 +166,9 @@ TYPED_TEST(integral_from_char_test, invalid_argument_error)
     { // leading + sign (or do we want this to succeed?)
         std::vector<char> const str{'+', '1', '3'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value);
 
-        EXPECT_EQ(res.ptr, &str[0]);
+        EXPECT_EQ(res.ptr, str.data());
         EXPECT_EQ(res.ec, std::errc::invalid_argument);
         EXPECT_EQ(value, TypeParam{42});
     }
@@ -176,9 +176,9 @@ TYPED_TEST(integral_from_char_test, invalid_argument_error)
     { // hexadecimal x prefix is not recognized
         std::vector<char> const str{'x', '3', 'f'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value, 16);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value, 16);
 
-        EXPECT_EQ(res.ptr, &str[0]);
+        EXPECT_EQ(res.ptr, str.data());
         EXPECT_EQ(res.ec, std::errc::invalid_argument);
         EXPECT_EQ(value, TypeParam{42});
     }
@@ -189,9 +189,9 @@ TYPED_TEST(integral_from_char_test, binary_number)
     TypeParam value{42};
     std::vector<char> const str{'1', '1', '0', '1'};
 
-    auto res = std::from_chars(&str[0], &str[0] + str.size(), value, 2);
+    auto res = std::from_chars(str.data(), str.data() + str.size(), value, 2);
 
-    EXPECT_EQ(res.ptr, &str[0] + str.size());
+    EXPECT_EQ(res.ptr, str.data() + str.size());
     EXPECT_EQ(res.ec, std::errc{});
     EXPECT_EQ(value, TypeParam{13});
 }
@@ -206,9 +206,9 @@ TYPED_TEST(integral_from_char_test, hexadicimal_number)
         // be updated when <charconv> header is included into the stl.
         std::vector<char> const str{'3', 'F'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value, 16);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value, 16);
 
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
         EXPECT_EQ(res.ec, std::errc{});
         EXPECT_EQ(value, TypeParam{63});
     }
@@ -217,9 +217,9 @@ TYPED_TEST(integral_from_char_test, hexadicimal_number)
     {
         std::vector<char> const str{'3', 'f'};
 
-        auto res = std::from_chars(&str[0], &str[0] + str.size(), value, 16);
+        auto res = std::from_chars(str.data(), str.data() + str.size(), value, 16);
 
-        EXPECT_EQ(res.ptr, &str[0] + str.size());
+        EXPECT_EQ(res.ptr, str.data() + str.size());
         EXPECT_EQ(res.ec, std::errc{});
         EXPECT_EQ(value, TypeParam{63});
     }

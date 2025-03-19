@@ -402,11 +402,11 @@ private:
         requires std::is_arithmetic_v<option_t> && istreamable<option_t>
     option_parse_result parse_option_value(option_t & value, std::string const & in)
     {
-        auto res = std::from_chars(&in[0], &in[in.size()], value);
+        auto res = std::from_chars(in.data(), in.data() + in.size(), value);
 
         if (res.ec == std::errc::result_out_of_range)
             return option_parse_result::overflow_error;
-        else if (res.ec == std::errc::invalid_argument || res.ptr != &in[in.size()])
+        else if (res.ec == std::errc::invalid_argument || res.ptr != in.data() + in.size())
             return option_parse_result::error;
 
         return option_parse_result::success;

@@ -19,7 +19,7 @@ number_type to_number(range_type && range)
         return s;
     }();
     number_type num;
-    auto res = std::from_chars(&str[0], &str[0] + str.size(), num);
+    auto res = std::from_chars(str.data(), str.data() + str.size(), num);
 
     if (res.ec != std::errc{})
     {
