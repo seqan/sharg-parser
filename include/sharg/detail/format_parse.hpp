@@ -424,14 +424,10 @@ private:
      */
     option_parse_result parse_option_value(bool & value, std::string const & in)
     {
-        if (in == "0")
+        if (in == "0" || in == "false")
             value = false;
-        else if (in == "1")
+        else if (in == "1" || in == "true")
             value = true;
-        else if (in == "true")
-            value = true;
-        else if (in == "false")
-            value = false;
         else
             return option_parse_result::error;
 
