@@ -199,7 +199,7 @@ public:
 
 private:
     //!\brief Describes the result of parsing the user input string given the respective option value type.
-    enum class option_parse_result
+    enum class option_parse_result : uint8_t
     {
         success,       //!< Parsing of user input was successful.
         error,         //!< There was some error while trying to parse the user input.
@@ -605,7 +605,7 @@ private:
     {
         for (auto it = arguments.begin(); it != end_of_options_it; ++it)
         {
-            std::string arg{*it};
+            std::string & arg{*it};
             if (!arg.empty() && arg[0] == '-') // may be an identifier
             {
                 if (arg == "-")

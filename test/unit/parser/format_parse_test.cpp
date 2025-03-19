@@ -637,7 +637,7 @@ TEST_F(format_parse_test, subcommand_parser_success)
     bool flag_value{false};
     std::string option_value{};
 
-    auto check_and_reset_options = [&](bool flag, std::string option)
+    auto check_and_reset_options = [&](bool flag, std::string const & option)
     {
         EXPECT_EQ(flag_value, flag);
         EXPECT_EQ(option_value, option);
@@ -846,7 +846,7 @@ TEST_F(format_parse_test, executable_name)
     bool flag{false};
     auto parser = get_parser();
 
-    auto check = [&](std::string expected)
+    auto check = [&](std::string const & expected)
     {
         parser = sharg::parser{"test_parser", {expected, std::string{"-t"}}, sharg::update_notifications::off};
         parser.add_flag(flag, sharg::config{.short_id = 't'});

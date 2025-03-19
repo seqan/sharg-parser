@@ -246,7 +246,7 @@ public:
     {
         std::for_each(std::ranges::begin(range),
                       std::ranges::end(range),
-                      [&](auto cmp)
+                      [&](auto && cmp)
                       {
                           (*this)(cmp);
                       });
@@ -353,7 +353,7 @@ public:
     {
         std::for_each(v.begin(),
                       v.end(),
-                      [&](auto cmp)
+                      [&](auto && cmp)
                       {
                           this->operator()(cmp);
                       });
@@ -414,7 +414,8 @@ protected:
         if (std::filesystem::is_directory(path))
         {
             std::error_code ec{};
-            std::filesystem::directory_iterator{path, ec}; // if directory iterator cannot be created, ec will be set.
+            // if directory iterator cannot be created, ec will be set.
+            std::filesystem::directory_iterator{path, ec}; // NOLINT(bugprone-unused-raii)
             if (static_cast<bool>(ec))
                 throw validation_error{"Cannot read the directory \"" + path.string() + "\"!"};
         }

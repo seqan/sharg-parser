@@ -178,24 +178,24 @@ public:
      * \details
      * \stableapi{Since version 1.0.}
      */
-    parser(std::string const & app_name,
-           std::vector<std::string> const & arguments,
+    parser(std::string app_name,
+           std::vector<std::string> arguments,
            update_notifications version_updates = update_notifications::on,
-           std::vector<std::string> subcommands = {}) :
+           std::vector<std::string> const & subcommands = {}) :
         version_check_dev_decision{version_updates},
-        arguments{arguments}
+        arguments{std::move(arguments)}
     {
-        add_subcommands(std::move(subcommands));
-        info.app_name = app_name;
+        add_subcommands(subcommands);
+        info.app_name = std::move(app_name);
     }
 
     //!\overload
-    parser(std::string const & app_name,
+    parser(std::string app_name,
            int const argc,
            char const * const * const argv,
            update_notifications version_updates = update_notifications::on,
-           std::vector<std::string> subcommands = {}) :
-        parser{app_name, std::vector<std::string>{argv, argv + argc}, version_updates, std::move(subcommands)}
+           std::vector<std::string> const & subcommands = {}) :
+        parser{std::move(app_name), std::vector<std::string>{argv, argv + argc}, version_updates, subcommands}
     {}
 
     //!\brief The destructor.
