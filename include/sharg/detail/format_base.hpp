@@ -373,7 +373,7 @@ public:
         if (!meta.description.empty())
         {
             derived_t().print_section("Description");
-            for (auto desc : meta.description)
+            for (auto && desc : meta.description)
                 print_line(desc);
         }
 
@@ -397,14 +397,14 @@ public:
             derived_t().print_section("Positional Arguments");
 
         // each call will evaluate the function derived_t().print_list_item()
-        for (auto f : positional_option_calls)
+        for (auto && f : positional_option_calls)
             f();
 
         // There are always options because of the common options
         derived_t().print_section("Options");
 
         // each call will evaluate the function derived_t().print_list_item()
-        for (auto f : parser_set_up_calls)
+        for (auto && f : parser_set_up_calls)
             f();
 
         // print Common options after developer options
@@ -424,7 +424,7 @@ public:
         if (!meta.examples.empty())
         {
             derived_t().print_section("Examples");
-            for (auto example : meta.examples)
+            for (auto && example : meta.examples)
                 print_line(example);
         }
 
