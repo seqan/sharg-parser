@@ -331,7 +331,7 @@ private:
 
                 std::string result{'['};
                 for (auto const & [key, value] : key_value_pairs)
-                    result += std::string{key.data()} + ", ";
+                    result += std::string{key} + ", ";
                 result.replace(result.size() - 2, 2, "]"); // replace last ", " by "]"
                 return result;
             }();
