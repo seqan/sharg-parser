@@ -89,7 +89,7 @@ inline auto to_tdl(std::string const & v)
 }
 
 //!\copydetails sharg::detail::to_tdl
-auto to_tdl(auto SHARG_DOXYGEN_ONLY(v))
+auto to_tdl(auto SHARG_DOXYGEN_ONLY(v)) // NOLINT(performance-unnecessary-value-param)
 {
     return tdl::BoolValue(false);
 }

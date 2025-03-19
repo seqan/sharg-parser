@@ -238,7 +238,7 @@ private:
     };
 };
 
-early_exit_guardian early_exit_guard{};
+early_exit_guardian early_exit_guard{}; // NOLINT(misc-definitions-in-headers)
 
 inline void test_fixture::toggle_guardian()
 {
