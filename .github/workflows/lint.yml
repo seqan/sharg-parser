@@ -35,7 +35,7 @@ jobs:
       group: lint-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     needs: cancel_running_workflows
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Run lint

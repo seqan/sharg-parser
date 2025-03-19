@@ -2,12 +2,17 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: Sharg lint
+name: Sharg Cookbook
 
 on:
   push:
     branches:
       - 'main'
+  workflow_dispatch:
+
+concurrency:
+  group: update-cookbook-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   TZ: Europe/Berlin
@@ -19,11 +24,9 @@ defaults:
 jobs:
   update-cookbook:
     name: Update Cookbook
-    concurrency:
-      group: update-cookbook-${{ github.ref }}
-      cancel-in-progress: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Sharg
         uses: actions/checkout@v4
