@@ -232,9 +232,10 @@ public:
                     parameters.push_back(tdl::Node{
                         .name = config.long_id,
                         .description = description,
-                        .tags = std::move(tags),
                         .value = to_tdl(value),
                     });
+                    // gcc 15 with hardened flags (fedora-flags) doesn't like having the move in the tdl::Node ctor.
+                    parameters.back().tags = std::move(tags);
                     info.cliMapping.emplace_back("--" + config.long_id, config.long_id);
                 },
                 config);
