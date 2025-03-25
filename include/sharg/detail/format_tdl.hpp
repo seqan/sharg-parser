@@ -229,13 +229,13 @@ public:
             store_help_page_element(
                 [this, config, value, description, tags](std::string_view)
                 {
-                    parameters.push_back(tdl::Node{
-                        .name = config.long_id,
-                        .description = description,
-                        .value = to_tdl(value),
-                    });
-                    // gcc 15 with hardened flags (fedora-flags) doesn't like having the move in the tdl::Node ctor.
-                    parameters.back().tags = std::move(tags);
+                    // gcc 15 with hardened flags (fedora-flags) doesn't like having the push_back as a one-liner.
+                    parameters.push_back(tdl::Node{.name = config.long_id, .description = description});
+
+                    auto & node = parameters.back();
+                    node.tags = std::move(tags);
+                    node.value = to_tdl(value);
+
                     info.cliMapping.emplace_back("--" + config.long_id, config.long_id);
                 },
                 config);
