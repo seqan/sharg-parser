@@ -1,0 +1,27 @@
+From 0347f577de59a062fc91e633d171de4acc8517df Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Wed, 2 Apr 2025 18:02:31 +0200
+Subject: [PATCH 9/9] [FIX] is_option_set: match both long and short ids
+
+---
+ test/unit/parser/format_parse_test.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/unit/parser/format_parse_test.cpp b/test/unit/parser/format_parse_test.cpp
+index c2a8f58..8e5b7e2 100644
+--- a/test/unit/parser/format_parse_test.cpp
++++ b/test/unit/parser/format_parse_test.cpp
+@@ -977,8 +977,8 @@ TEST(parse_test, is_option_set)
+     EXPECT_TRUE(parser.is_option_set('l'));
+     EXPECT_TRUE(parser.is_option_set("foobar"));
+ 
+-    EXPECT_FALSE(parser.is_option_set('f'));
+-    EXPECT_FALSE(parser.is_option_set("loo")); // --loo is behind the `--` which signals the end of options!
++    EXPECT_TRUE(parser.is_option_set('f'));
++    EXPECT_TRUE(parser.is_option_set("loo")); // --loo is behind the `--` which signals the end of options!
+ 
+     // errors:
+     EXPECT_THROW(parser.is_option_set("l"), sharg::design_error); // short identifiers are passed as chars not strings
+-- 
+2.49.0
+
