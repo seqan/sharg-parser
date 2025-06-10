@@ -214,12 +214,13 @@ public:
                         tags.insert("output");
                     }
 
-                    parameters.push_back(tdl::Node{
-                        .name = config.long_id,
-                        .description = description,
-                        .tags = std::move(tags),
-                        .value = tdl::StringValue{valueAsStr},
-                    });
+                    // gcc 15 doesn't like having the push_back as a one-liner.
+                    parameters.push_back(tdl::Node{.name = config.long_id, .description = description});
+
+                    auto & node = parameters.back();
+                    node.tags = std::move(tags);
+                    node.value = tdl::StringValue{valueAsStr};
+
                     info.cliMapping.emplace_back("--" + config.long_id, config.long_id);
                 },
                 config);

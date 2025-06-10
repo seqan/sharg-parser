@@ -33,15 +33,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["clang-19", "gcc-14", "gcc-12", "intel"]
+        compiler: ["clang-latest", "gcc-latest", "gcc-third-latest", "intel"]
         build: ["snippet", "header"]
-        include:
-          - compiler: "intel"
-            cxx_flags: "-fp-model=strict -Wno-overriding-option"
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
-      volumes:
-        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
