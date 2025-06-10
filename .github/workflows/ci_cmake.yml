@@ -35,9 +35,7 @@ jobs:
       matrix:
         SHARG_NO_TDL: [ON, OFF]
     container:
-      image: ghcr.io/seqan/gcc-14
-      volumes:
-        - /home/runner:/home/runner
+      image: ghcr.io/seqan/gcc-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,7 +45,7 @@ jobs:
       - name: Install dependencies
         if: matrix.SHARG_NO_TDL == 'OFF'
         run: |
-          git clone --depth 1 --single-branch --branch 0.8.0 https://github.com/jbeder/yaml-cpp.git
+          git clone --depth 1 --single-branch --branch master https://github.com/jbeder/yaml-cpp.git
           cd yaml-cpp && mkdir build && cd build
           cmake ../ -DCMAKE_BUILD_TYPE=Debug \
                     -DYAML_CPP_BUILD_CONTRIB=OFF \
