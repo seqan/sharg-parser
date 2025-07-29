@@ -1,7 +1,7 @@
-From 2ef2616e6041875e7ca2c376e134addb902ca588 Mon Sep 17 00:00:00 2001
+From dc7baaed59c26a8ae600beebf5ef0b9f3f9f8524 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Fri, 9 Feb 2024 18:13:36 +0100
-Subject: [PATCH 5/9] [INFRA] Use seqan3 main branch
+Subject: [PATCH 05/10] [INFRA] Use seqan3 main branch
 
 ---
  test/unit/detail/CMakeLists.txt | 2 +-
@@ -21,5 +21,5 @@ index 392f878..1f9a8e0 100644
  sharg_test (seqan3_test.cpp)
  target_include_directories (seqan3_test SYSTEM PUBLIC ${CMAKE_BINARY_DIR}/include)
 -- 
-2.49.0
+2.47.2
 
