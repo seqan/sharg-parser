@@ -1,7 +1,7 @@
-From 0347f577de59a062fc91e633d171de4acc8517df Mon Sep 17 00:00:00 2001
+From 4508f7d320f8c772322a93f401049443bbebdd13 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 2 Apr 2025 18:02:31 +0200
-Subject: [PATCH 9/9] [FIX] is_option_set: match both long and short ids
+Subject: [PATCH 09/11] [FIX] is_option_set: match both long and short ids
 
 ---
  test/unit/parser/format_parse_test.cpp | 4 ++--
@@ -23,5 +23,5 @@ index c2a8f58..8e5b7e2 100644
      // errors:
      EXPECT_THROW(parser.is_option_set("l"), sharg::design_error); // short identifiers are passed as chars not strings
 -- 
-2.49.0
+2.47.2
 

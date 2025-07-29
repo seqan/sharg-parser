@@ -1,7 +1,7 @@
-From fa7be0f2f41cdfa8d8633f50bd847bb9e279f82d Mon Sep 17 00:00:00 2001
+From e017d182f0d6ffb1c64d5a079dd9753de7d376a3 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 5 Feb 2024 16:02:03 +0100
-Subject: [PATCH 2/9] [API] Quoted strings and paths
+Subject: [PATCH 02/11] [API] Quoted strings and paths
 
 ---
  test/snippet/readme_sneak_peek.out            |  6 ++---
@@ -341,5 +341,5 @@ index cade0f9..ba1694d 100644
              + basic_options_str + "\n" + basic_version_str;
          EXPECT_EQ(my_stdout, expected);
 -- 
-2.49.0
+2.47.2
 

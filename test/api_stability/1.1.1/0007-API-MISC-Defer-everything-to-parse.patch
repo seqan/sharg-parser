@@ -1,7 +1,7 @@
-From c4278c4bd49e102046e3709883943e692a949c4f Mon Sep 17 00:00:00 2001
+From 57a727d581ed2d6d0a3949d7d570a863698e2f4f Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 29 Apr 2024 16:37:15 +0200
-Subject: [PATCH 7/9] [API][MISC] Defer everything to parse()
+Subject: [PATCH 07/11] [API][MISC] Defer everything to parse()
 
 ---
  test/unit/detail/format_help_test.cpp         |  2 +-
@@ -145,5 +145,5 @@ index 4c3406f..4d81119 100644
  
      // no positional/options are allowed
 -- 
-2.49.0
+2.47.2
 

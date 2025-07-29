@@ -6,8 +6,8 @@
 [![twitter][twitter_badge]][twitter_link]
 
 <!--
-    SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-    SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+    SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+    SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
     SPDX-License-Identifier: CC-BY-4.0
 -->
 
@@ -155,7 +155,7 @@ OPTIONS
 VERSION
     Last update:
     Eat-Me-App version:
-    Sharg version: 1.1.2-rc.1
+    Sharg version: 1.2.0-rc.1
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 

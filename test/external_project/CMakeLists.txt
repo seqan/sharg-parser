@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 cmake_minimum_required (VERSION 3.16)
@@ -49,7 +49,7 @@ ExternalProject_Add (
 #    This test assumes that `sharg-config.cmake` can be found by cmake in some global paths like /usr/share/cmake/.
 #
 #    We simulate this by using our `make package` release, e.g. the one we release under
-#    https://github.com/seqan/sharg/releases, and unzipping it to some folder and making
+#    https://github.com/seqan/sharg-parser/releases, and unzipping it to some folder and making
 #    that path globally accessible by CMAKE_SYSTEM_PREFIX_PATH.
 # (ExternalProject_Add simulates a fresh and separate invocation of cmake ../)
 ExternalProject_Add (
@@ -64,7 +64,7 @@ add_dependencies (sharg_installed sharg_test_prerequisite)
 
 # 4) This tests test/external_project/sharg_fetch_content_zip/CMakeLists.txt
 #    It uses fetch_content (a CMake 3.14 feature) to download our zip-release (e.g. zip, tar.xz) from
-#    https://github.com/seqan/sharg/releases. fetch_content will automatically download, verify, extract it.
+#    https://github.com/seqan/sharg-parser/releases. fetch_content will automatically download, verify, extract it.
 #    The user only needs to define CMAKE_PREFIX_PATH to be able to find our `sharg-config.cmake`.
 #    Note that FetchContent is a CMake >= 3.14 feature.
 #    This is expected to work with CMake >= 3.14.
