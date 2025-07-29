@@ -18,7 +18,7 @@ index 8b51ee2..8debcce 100644
      Last update:
      Eat-Me-App version:
 -    Sharg version: 1.1.2-rc.1
-+    Sharg version: 1.2.0-rc.1
++    Sharg version: 1.2.0-rc.2
 diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
 index 4e9261a..cfa93e1 100644
 --- a/test/unit/detail/format_ctd_test.cpp
@@ -28,7 +28,7 @@ index 4e9261a..cfa93e1 100644
      sharg::parser parser{"default", argv.size(), argv.data()};
      parser.info.date = "December 01, 1994";
 -    parser.info.version = "1.1.2-rc.1";
-+    parser.info.version = "1.2.0-rc.1";
++    parser.info.version = "1.2.0-rc.2";
      parser.info.man_page_title = "default_man_page_title";
      parser.info.short_description = "A short description here.";
  
@@ -41,7 +41,7 @@ index 52079db..1e63141 100644
      auto parser = sharg::parser{"default", argv.size(), argv.data()};
      parser.info.date = "December 01, 1994";
 -    parser.info.version = "1.1.1";
-+    parser.info.version = "1.2.0-rc.1";
++    parser.info.version = "1.2.0-rc.2";
      parser.info.man_page_title = "default_man_page_title";
      parser.info.short_description = "A short description here.";
  

@@ -114,7 +114,7 @@ TEST_F(format_ctd_test, empty_information)
     // Create the dummy parser.
     auto parser = get_parser("--export-help", "ctd");
     parser.info.date = "December 01, 1994";
-    parser.info.version = "1.2.0-rc.1";
+    parser.info.version = "1.2.0-rc.2";
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 
