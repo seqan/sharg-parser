@@ -1,7 +1,7 @@
-From 01dec5a5b9dc3940d6795de861db3c336a635459 Mon Sep 17 00:00:00 2001
+From 4508f7d320f8c772322a93f401049443bbebdd13 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 2 Apr 2025 18:02:31 +0200
-Subject: [PATCH 09/10] [FIX] is_option_set: match both long and short ids
+Subject: [PATCH 09/11] [FIX] is_option_set: match both long and short ids
 
 ---
  test/unit/parser/format_parse_test.cpp | 4 ++--

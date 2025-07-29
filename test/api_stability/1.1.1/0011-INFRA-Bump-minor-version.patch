@@ -1,0 +1,50 @@
+From 576592820c278c5ba94739ef956ac5e1a7c72adb Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Tue, 29 Jul 2025 14:45:23 +0200
+Subject: [PATCH 11/11] [INFRA] Bump minor version
+
+---
+ test/snippet/readme_sneak_peek.out   | 2 +-
+ test/unit/detail/format_ctd_test.cpp | 2 +-
+ test/unit/detail/format_cwl_test.cpp | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/test/snippet/readme_sneak_peek.out b/test/snippet/readme_sneak_peek.out
+index 8b51ee2..8debcce 100644
+--- a/test/snippet/readme_sneak_peek.out
++++ b/test/snippet/readme_sneak_peek.out
+@@ -25,4 +25,4 @@ OPTIONS
+ VERSION
+     Last update:
+     Eat-Me-App version:
+-    Sharg version: 1.1.2-rc.1
++    Sharg version: 1.2.0-rc.1
+diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
+index 4e9261a..cfa93e1 100644
+--- a/test/unit/detail/format_ctd_test.cpp
++++ b/test/unit/detail/format_ctd_test.cpp
+@@ -110,7 +110,7 @@ TEST_F(format_ctd_test, empty_information)
+     // Create the dummy parser.
+     sharg::parser parser{"default", argv.size(), argv.data()};
+     parser.info.date = "December 01, 1994";
+-    parser.info.version = "1.1.2-rc.1";
++    parser.info.version = "1.2.0-rc.1";
+     parser.info.man_page_title = "default_man_page_title";
+     parser.info.short_description = "A short description here.";
+ 
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index 52079db..1e63141 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -16,7 +16,7 @@ TEST(format_cwl_test, empty_information)
+     // Create the dummy parser.
+     auto parser = sharg::parser{"default", argv.size(), argv.data()};
+     parser.info.date = "December 01, 1994";
+-    parser.info.version = "1.1.1";
++    parser.info.version = "1.2.0-rc.1";
+     parser.info.man_page_title = "default_man_page_title";
+     parser.info.short_description = "A short description here.";
+ 
+-- 
+2.47.2
+
