@@ -196,7 +196,7 @@ protected:
         // Print term.
         std::fill_n(out, layout.leftPadding, ' ');
         std::cout << to_text(term);
-        unsigned pos = layout.leftPadding + term.size();
+        unsigned pos = layout.leftPadding + text_width(term);
         if (pos + layout.centerPadding > layout.rightColumnTab)
         {
             std::cout << '\n';

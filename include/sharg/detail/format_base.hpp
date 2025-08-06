@@ -595,8 +595,17 @@ protected:
 
             if (!empty(meta.citation))
             {
-                derived_t().print_line(derived_t().in_bold("In your academic works please cite: ") + meta.citation,
-                                       false);
+                derived_t().print_line(derived_t().in_bold("In your academic works please cite: "), false);
+                for (size_t i = 0; i < meta.citation.size(); ++i)
+                {
+                    // Using `\\fB` and `\\fP` instead of `derived_t().in_bold()` here.
+                    // `format_help::print_list_item` uses `format_help::text_width` to determine whether
+                    // there should be a new line after the key ("[i]").
+                    // `format_help::text_width` ignores special sequences such as `\\fB` and `\\fP`,
+                    // but not the actual control sequences produced by `derived_t().in_bold()`.
+                    // All formats support `\\fB` and `\\fP`.
+                    derived_t().print_list_item("\\fB[" + std::to_string(i + 1u) + "]\\fP", meta.citation[i]);
+                }
             }
 
             if (!empty(meta.long_copyright))

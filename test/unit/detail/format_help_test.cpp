@@ -192,7 +192,23 @@ TEST_F(format_help_test, with_citation)
              + "LEGAL\n"
                "    SeqAn Copyright: 2006-2025 Knut Reinert, FU-Berlin; released under the\n"
                "    3-clause BSDL.\n"
-               "    In your academic works please cite: citation\n";
+               "    In your academic works please cite:\n    [1]   citation\n";
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
+}
+
+TEST_F(format_help_test, with_multiple_citation)
+{
+    auto parser = get_parser("-h");
+    parser.info.citation = {"citation1", "citation2"};
+
+    expected = "test_parser\n"
+               "===========\n"
+               "\nOPTIONS\n\n"
+             + basic_options_str + "\n" + version_str() + "\n"
+             + "LEGAL\n"
+               "    SeqAn Copyright: 2006-2025 Knut Reinert, FU-Berlin; released under the\n"
+               "    3-clause BSDL.\n"
+               "    In your academic works please cite:\n    [1]   citation1\n    [2]   citation2\n";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
 
