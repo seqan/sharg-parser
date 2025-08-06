@@ -298,7 +298,10 @@ TEST_F(format_man_test, full_info_short_and_citation)
 .br
 \fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 .br
-\fBIn your academic works please cite: \fRcitation
+\fBIn your academic works please cite: \fR
+.TP
+\fB[1]\fP
+citation
 )";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
@@ -321,7 +324,10 @@ TEST_F(format_man_test, full_info_short_long_and_citation)
 .br
 \fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 .br
-\fBIn your academic works please cite: \fRcitation
+\fBIn your academic works please cite: \fR
+.TP
+\fB[1]\fP
+citation
 .br
 For full copyright and/or warranty information see \fB--copyright\fR.
 )";

@@ -28,6 +28,45 @@ enum class update_notifications : uint8_t
     off //!< Automatic update notifications should be disabled.
 };
 
+/*!\brief A `std::vector<std::string>` that can also be constructed from `std::string`.
+ * \ingroup misc
+ * \details
+ * \experimentalapi{Experimental since version 1.2.0.}
+ */
+class vector_of_string : public std::vector<std::string>
+{
+private:
+    //!\brief The base type.
+    using base_t = std::vector<std::string>;
+
+public:
+    using base_t::base_t;
+
+    vector_of_string() = default;                                     //!< Defaulted.
+    vector_of_string(vector_of_string const &) = default;             //!< Defaulted.
+    vector_of_string & operator=(vector_of_string const &) = default; //!< Defaulted.
+    vector_of_string(vector_of_string &&) = default;                  //!< Defaulted.
+    vector_of_string & operator=(vector_of_string &&) = default;      //!< Defaulted.
+    ~vector_of_string() = default;                                    //!< Defaulted.
+
+    //!\brief Delegate to `std::string` constructor if possible.
+    template <typename... t>
+        requires std::constructible_from<std::string, t...>
+    constexpr vector_of_string(t &&... str) : base_t{std::string(std::forward<t>(str)...)}
+    {}
+
+    //!\brief Construct from iterator pair.
+    template <typename Iter>
+        requires std::constructible_from<std::string, Iter, Iter>
+              && std::same_as<std::decay_t<Iter>, std::string::value_type *>
+    constexpr vector_of_string(Iter begin, Iter end) : base_t{std::string(begin, end)}
+    {}
+
+    //!\brief Construct from an initializer list.
+    constexpr vector_of_string(std::initializer_list<std::string::value_type> il) : base_t{{il}}
+    {}
+};
+
 /*!\brief Stores all parser related meta information of the sharg::parser.
  * \ingroup parser
  * \details
@@ -78,8 +117,8 @@ struct parser_meta_data // holds all meta information
      */
     std::string long_copyright;
 
-    //!\brief How  users shall cite your application.
-    std::string citation;
+    //!\brief How users shall cite your application.
+    vector_of_string citation;
 
     /*!\brief The title of your man page when exported by specifying
      *        "--export-help man" on the common line.
