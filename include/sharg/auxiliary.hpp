@@ -19,6 +19,7 @@ namespace sharg
 
 /*!\brief Indicates whether application allows automatic update notifications by the sharg::parser.
  * \ingroup misc
+ * \sa https://docs.seqan.de/sharg/main_user/about_update_notifications.html
  * \details
  * \stableapi{Since version 1.0.}
  */

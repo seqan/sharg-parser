@@ -21,8 +21,10 @@ have fewer bugs, and we receive fewer bug reports on outdated versions.
 Upon starting an application using the `sharg::parser`, it is determined whether the app was built in release
 mode (we assume a user is running it) or in debug mode (we assume the developer is running it).
 
-We then send a web-request to our server with the following information:
+The user/developer is then asked whether they want to perform a version check. The default answer, which is also used
+if the terminal is not interactive, is to skip the version check.
 
+If the user/developer agrees, we then send a web-request to our server with the following information:
  * The application name
  * The application version
  * The Sharg version that the application was built with
@@ -37,6 +39,8 @@ We inform the developer about new Sharg versions, if the app is running in debug
 Additionally, we recommend registering your app with us (support@seqan.de).
 
 ## Privacy Implications
+
+**No data is transmitted unless the user _explicitly_ allows it.**
 
 Only the information listed above is transmitted; no data is gathered about the usage of the app, and, of course, no
 information regarding your input/output files is transmitted. All our code is open source, and hence this can be
@@ -63,3 +67,6 @@ variable `SHARG_NO_VERSION_CHECK` to any value.
 Application developers may opt out of the version check for their app permanently (independent of user choice) by
 passing `sharg::update_notifications::off` as the fourth argument to sharg::parser.
 See the respective API documentation of the `sharg::parser`.
+
+Note that `sharg::update_notifications::on` does not mean that the version check is performed, but rather that the
+application is allowed to perform the version check if the user chooses to do so.
