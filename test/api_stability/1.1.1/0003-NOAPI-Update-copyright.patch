@@ -1,7 +1,7 @@
-From 945b0f37bd687e94f7b3dfd24fac4e158e3c496c Mon Sep 17 00:00:00 2001
+From c66472eb8e3b78ab43b0f895d7537938e4dfa096 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 7 Feb 2024 13:31:22 +0100
-Subject: [PATCH 03/11] [NOAPI] Update copyright
+Subject: [PATCH 03/12] [NOAPI] Update copyright
 
 ---
  test/unit/detail/format_help_test.cpp | 10 +++++-----
