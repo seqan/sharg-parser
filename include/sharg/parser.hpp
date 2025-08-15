@@ -136,6 +136,9 @@ namespace sharg
  * which means that applications ship with less bugs.
  * For privacy implications, please see: https://docs.seqan.de/sharg/main_user/about_update_notifications.html.
  *
+ * In brief, an enabled version check will not transmit any data unless it is *explicitly* granted permission to do so.
+ * `sharg::update_notifications` therefore controls whether an application may ask for that permission.
+ *
  * Developers that wish to disable this feature permanently can pass an extra constructor argument:
  *
  * \include doc/tutorial/parser/disable_version_check.cpp
@@ -144,6 +147,7 @@ namespace sharg
  *
  *  * disabling it for a specific application simply by setting the option `--version-check false/0` or
  *  * disabling it for all applications by setting the `SHARG_NO_VERSION_CHECK` environment variable.
+ *  * selecting `n` (never) when asked by the application.
  *
  * Note that in case there is no `--version-check` option (display available options with `-h/--help)`,
  * then the developer already disabled the version check functionality.
