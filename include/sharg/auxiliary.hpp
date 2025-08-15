@@ -88,43 +88,43 @@ struct parser_meta_data // holds all meta information
      * The application name must only contain alpha-numeric characters, '_' or '-',
      * i.e. the following regex must evaluate to true: `\"^[a-zA-Z0-9_-]+$\"`.
      */
-    std::string app_name;
+    std::string app_name{};
 
     //!\brief The version information `MAJOR.MINOR.PATH` (e.g. 3.1.3)
-    std::string version;
+    std::string version{};
 
     //!\brief A short description of the application (e.g. "A tool for mapping reads to the genome").
-    std::string short_description;
+    std::string short_description{};
 
     //!\brief Your name ;-)
-    std::string author;
+    std::string author{};
 
     //!\brief The author's e-mail address for correspondence.
-    std::string email;
+    std::string email{};
 
     /*!\brief The date that the application was last updated. Keep this updated,
      *!          since it will tell your users that the application is maintained.
      */
-    std::string date;
+    std::string date{};
 
     //!\brief A link to  your github/gitlab project with the newest release.
-    std::string url;
+    std::string url{};
 
     //!\brief Brief copyright (and/or license) information.
-    std::string short_copyright;
+    std::string short_copyright{};
 
     /*!\brief Detailed copyright information that will be displayed
      *        when the user specifies "--copyright" on the command line.
      */
-    std::string long_copyright;
+    std::string long_copyright{};
 
     //!\brief How users shall cite your application.
-    vector_of_string citation;
+    vector_of_string citation{};
 
     /*!\brief The title of your man page when exported by specifying
      *        "--export-help man" on the common line.
      */
-    std::string man_page_title;
+    std::string man_page_title{};
 
     //!\brief The man page section info (type `man man` on the command line for more information).
     unsigned man_page_section{1};
@@ -134,18 +134,18 @@ struct parser_meta_data // holds all meta information
      *        to the description vector will be treated as a paragraph and
      *        is separated by a new line.
      */
-    std::vector<std::string> description;
+    std::vector<std::string> description{};
 
     /*!\brief Add lines of usage to the synopsis section of the help page (e.g.
      *        "./my_read_mapper [OPTIONS] FILE1 FILE1").
      */
-    std::vector<std::string> synopsis;
+    std::vector<std::string> synopsis{};
 
     /*!\brief Provide some examples on how to use your tool and what standard
      *        parameters might be appropriate in different cases (e.g.
      *        "./my_read_mapper -s 3 --my_flag path/infile1").
      */
-    std::vector<std::string> examples;
+    std::vector<std::string> examples{};
 };
 
 } // namespace sharg
