@@ -271,3 +271,56 @@ TEST_F(subcommand_test, recursive_subcommands)
 
     EXPECT_EQ(get_parse_cout_on_exit(sub_sub_parser), expected_sub_sub_full_help);
 }
+
+TEST_F(subcommand_test, copy_meta_data)
+{
+    sharg::parser_meta_data info{.version = "1.0.0",
+                                 .author = "SeqAn-Team",
+                                 .email = "mail@example.org",
+                                 .date = "1970-01-01",
+                                 .url = "example.org",
+                                 .short_copyright = "BSD 3-Clause",
+                                 .long_copyright = "BSD 3-Clause Text",
+                                 .citation = "Cite me!"};
+
+    auto parser = get_subcommand_parser({"index", "--help"}, {"index"});
+    info.app_name = parser.info.app_name;
+    parser.info = info;
+    EXPECT_EQ(parser.info.app_name, "test_parser");
+    ASSERT_EQ(parser.info, info); // Sanity check for test setup
+    EXPECT_NO_THROW(parser.parse());
+
+    auto & sub_parser = parser.get_sub_parser();
+    EXPECT_EQ(sub_parser.info.app_name, "test_parser-index");
+    info.app_name = sub_parser.info.app_name;
+    EXPECT_EQ(sub_parser.info, info);
+
+    std::string expected_sub_full_help = "test_parser-index\n"
+                                         "=================\n"
+                                         "\n"
+                                         "OPTIONS\n"
+                                         "\n"
+                                       + basic_options_str
+                                       + "\n"
+                                         "VERSION\n"
+                                         "    Last update: 1970-01-01\n"
+                                         "    test_parser-index version: 1.0.0\n"
+                                         "    Sharg version: "
+                                       + sharg::sharg_version_cstring
+                                       + "\n"
+                                         "\n"
+                                         "URL\n"
+                                         "    example.org\n"
+                                         "\n"
+                                         "LEGAL\n"
+                                         "    test_parser-index Copyright: BSD 3-Clause\n"
+                                         "    Author: SeqAn-Team\n"
+                                         "    Contact: mail@example.org\n"
+                                         "    SeqAn Copyright: 2006-2025 Knut Reinert, FU-Berlin; released under the\n"
+                                         "    3-clause BSDL.\n"
+                                         "    In your academic works please cite:\n"
+                                         "    [1]   Cite me!\n"
+                                         "    For full copyright and/or warranty information see --copyright.\n";
+
+    EXPECT_EQ(get_parse_cout_on_exit(sub_parser), expected_sub_full_help);
+}

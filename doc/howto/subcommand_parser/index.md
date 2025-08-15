@@ -48,6 +48,16 @@ max$ ./mygit push -h
 then the sub-parser will be named `mygit-push` and will be instantiated with all arguments
 followed by the keyword `push` which in this case triggers printing the help page (`-h`).
 
+Additionally, the following metadata will be copied from the top-level parser to the sub-parser:
+  * sharg::parser::info::version
+  * sharg::parser::info::author
+  * sharg::parser::info::email
+  * sharg::parser::info::date
+  * sharg::parser::info::url
+  * sharg::parser::info::short_copyright
+  * sharg::parser::info::long_copyright
+  * sharg::parser::info::citation
+
 That's it. Here is a full example of a subcommand parser you can try and adjust to your needs:
 
 \include doc/howto/subcommand_parser/subcommand_parse.cpp

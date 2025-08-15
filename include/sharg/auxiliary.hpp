@@ -77,6 +77,20 @@ public:
  * The meta information is assembled in a struct to provide a central access
  * point that can be easily extended.
  *
+ * ### Subparser
+ *
+ * When \link subcommand_parse using a subparser \endlink, the subcommand will be appended to the
+ * subparser's #app_name.
+ * Additionally, the following metadata will be copied from the top-level parser to the sub-parser:
+ * * #version
+ * * #author
+ * * #email
+ * * #date
+ * * #url
+ * * #short_copyright
+ * * #long_copyright
+ * * #citation
+ *
  * \remark For a complete overview, take a look at \ref parser
  *
  * \stableapi{Since version 1.0.}

@@ -838,11 +838,24 @@ private:
             if (subcommands.empty())
                 return false;
 
+            auto copy_metadata_to_subparser = [this](parser & sub_parser)
+            {
+                sub_parser.info.version = info.version;
+                sub_parser.info.author = info.author;
+                sub_parser.info.email = info.email;
+                sub_parser.info.date = info.date;
+                sub_parser.info.url = info.url;
+                sub_parser.info.short_copyright = info.short_copyright;
+                sub_parser.info.long_copyright = info.long_copyright;
+                sub_parser.info.citation = info.citation;
+            };
+
             if (std::ranges::find(subcommands, arg) != subcommands.end())
             {
                 sub_parser = std::make_unique<parser>(info.app_name + "-" + arg.data(),
                                                       std::vector<std::string>{it, arguments.end()},
                                                       update_notifications::off);
+                copy_metadata_to_subparser(get_sub_parser());
 
                 // Add the original calls to the front, e.g. ["raptor"],
                 // s.t. ["raptor", "build"] will be the list after constructing the subparser
