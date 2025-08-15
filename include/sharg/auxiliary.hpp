@@ -146,6 +146,10 @@ struct parser_meta_data // holds all meta information
      *        "./my_read_mapper -s 3 --my_flag path/infile1").
      */
     std::vector<std::string> examples{};
+
+    //!\cond
+    constexpr friend bool operator==(parser_meta_data, parser_meta_data) = default;
+    //!\endcond
 };
 
 } // namespace sharg
