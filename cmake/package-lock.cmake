@@ -30,7 +30,7 @@ CPMDeclarePackage (googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # doxygen-awesome
-set (SHARG_DOXYGEN_AWESOME_VERSION 2.3.4)
+set (SHARG_DOXYGEN_AWESOME_VERSION 2.4.0)
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${SHARG_DOXYGEN_AWESOME_VERSION}
