@@ -236,6 +236,72 @@ protected:
 
         return message.str();
     }
+
+    /*!\brief Prints a string to std::cout converted to lowercase.
+     * \param[in] str The string to print in lowercase.
+     * \details
+     * This could also be generalized:
+     *
+     * ```cpp
+     * template <std::ranges::input_range range_t>
+     * static void print_transform(range_t && range, int (*fun)(int))
+     * {
+     *     std::ranges::transform(std::forward<range_t>(range),
+     *                            std::ostream_iterator<char>(std::cout),
+     *                            [fun](unsigned char c)
+     *                            {
+     *                                 return fun(c);
+     *                            });
+     * }
+     *
+     * // Usage:
+     * std::string s{"Hello World"};
+     * print_transform(s, std::toupper);
+     * ```
+     *
+     * Using `std::function<int(int)> fun` wouldn't work the same way because
+     * `std::toupper` also has a templatized overload.
+     * For the function pointer, the overload can be infered, from std::function not.
+     *
+     * ```cpp
+     * template <std::ranges::input_range range_t>
+     * static void print_transform(range_t && range, std::function<int(int)> fun)
+     * {
+     *     // ...
+     * }
+     *
+     * // Usage:
+     * std::string s{"Hello World"};
+     * print_transform(s, static_cast<int(*)(int)>(std::toupper));
+     * ```
+     *
+     * Because `int (*fun)(int)` seems a bit sketchy, and other solutions, like
+     * using strong types/enums to decide between upper- and lowercase are more
+     * complex, we just have two separate functions.
+     */
+    static void print_as_lowercase(std::string const & str)
+    {
+        std::ranges::transform(str,
+                               std::ostream_iterator<char>(std::cout),
+                               [](unsigned char c)
+                               {
+                                   return std::tolower(c);
+                               });
+    }
+
+    /*!\brief Prints a string to std::cout converted to uppercase.
+     * \param[in] str The string to print in uppercase.
+     * \copydetails print_as_lowercase
+     */
+    static void print_as_uppercase(std::string const & str)
+    {
+        std::ranges::transform(str,
+                               std::ostream_iterator<char>(std::cout),
+                               [](unsigned char c)
+                               {
+                                   return std::toupper(c);
+                               });
+    }
 };
 
 /*!\brief The format that contains all helper functions needed in all formats for

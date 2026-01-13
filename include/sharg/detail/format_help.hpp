@@ -131,15 +131,8 @@ protected:
      */
     void print_section(std::string const & title)
     {
-        std::ostream_iterator<char> out(std::cout);
         std::cout << '\n' << to_text("\\fB");
-        std::transform(title.begin(),
-                       title.end(),
-                       out,
-                       [](unsigned char c)
-                       {
-                           return std::toupper(c);
-                       });
+        print_as_uppercase(title);
         std::cout << to_text("\\fP") << '\n';
         prev_was_paragraph = false;
     }
