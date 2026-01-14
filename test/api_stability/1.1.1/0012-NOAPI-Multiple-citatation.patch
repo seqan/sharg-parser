@@ -1,7 +1,7 @@
-From be7cc9205b6b40572d1fc0bba4ca0f6678507210 Mon Sep 17 00:00:00 2001
+From d9399e148665d184f56c4a270cdf8af6a831926a Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 6 Aug 2025 10:29:26 +0200
-Subject: [PATCH 12/12] [NOAPI] Multiple citatation
+Subject: [PATCH 12/13] [NOAPI] Multiple citatation
 
 ---
  test/unit/detail/format_help_test.cpp |  2 +-
@@ -66,5 +66,5 @@ index df48961..154adfc 100644
  For full copyright and/or warranty information see \fB--copyright\fR.
  )";
 -- 
-2.47.2
+2.47.3
 

@@ -1,0 +1,498 @@
+From cf96efeb9af817062291b9aea4b16e7a1852e9eb Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Wed, 14 Jan 2026 21:20:35 +0100
+Subject: [PATCH 13/13] [NOAPI] Default synopsis
+
+---
+ doc/cookbook/basic_arg_parse.out                    |  1 +
+ doc/howto/custom_types/custom_type.out              |  1 +
+ doc/howto/custom_types/external_custom_type.out     |  1 +
+ doc/howto/subcommand_parser/subcommand_parse.out    |  1 +
+ doc/tutorial/concepts/custom_validator_solution.out |  1 +
+ doc/tutorial/parser/solution3.out                   |  2 ++
+ doc/tutorial/parser/solution4.out                   |  2 ++
+ doc/tutorial/parser/solution5.out                   |  2 ++
+ doc/tutorial/parser/solution6.out                   |  2 ++
+ test/snippet/custom_enumeration.out                 |  1 +
+ test/snippet/custom_parsing_enumeration.out         |  1 +
+ test/snippet/is_option_set.out                      |  1 +
+ test/snippet/parser_1.out                           |  1 +
+ test/snippet/parser_2.out                           |  1 +
+ test/snippet/parser_3.out                           |  2 ++
+ test/snippet/readme_sneak_peek.out                  |  3 +++
+ test/snippet/validators_1.out                       |  1 +
+ test/snippet/validators_2.out                       |  1 +
+ test/snippet/validators_3.out                       |  1 +
+ test/snippet/validators_4.out                       |  1 +
+ test/snippet/validators_chaining.out                |  1 +
+ test/snippet/validators_input_directory.out         |  1 +
+ test/snippet/validators_input_file.out              |  1 +
+ test/snippet/validators_output_directory.out        |  1 +
+ test/snippet/validators_output_file.out             |  1 +
+ test/unit/detail/format_ctd_test.cpp                |  1 +
+ test/unit/detail/format_cwl_test.cpp                |  1 +
+ test/unit/detail/format_help_test.cpp               |  8 ++++++++
+ test/unit/detail/format_html_test.cpp               |  2 ++
+ test/unit/detail/format_man_test.cpp                |  1 +
+ test/unit/detail/seqan3_test.cpp                    |  1 +
+ test/unit/parser/format_parse_validators_test.cpp   | 10 ++++++++++
+ 32 files changed, 56 insertions(+)
+
+diff --git a/doc/cookbook/basic_arg_parse.out b/doc/cookbook/basic_arg_parse.out
+index b630715..deebe74 100644
+--- a/doc/cookbook/basic_arg_parse.out
++++ b/doc/cookbook/basic_arg_parse.out
+@@ -1,3 +1,4 @@
+ Indexer - Creates an index over a reference.
+ ============================================
++    basic_arg_parse_snippet -r|--reference path [-o|--output path]
+     Try -h or --help for more information.
+diff --git a/doc/howto/custom_types/custom_type.out b/doc/howto/custom_types/custom_type.out
+index a556d45..76f0fd5 100644
+--- a/doc/howto/custom_types/custom_type.out
++++ b/doc/howto/custom_types/custom_type.out
+@@ -1,3 +1,4 @@
+ my_foobar_parser
+ ================
++    custom_type_snippet [-f|--foo-bar foo::bar]
+     Try -h or --help for more information.
+diff --git a/doc/howto/custom_types/external_custom_type.out b/doc/howto/custom_types/external_custom_type.out
+index 8451721..87b598c 100644
+--- a/doc/howto/custom_types/external_custom_type.out
++++ b/doc/howto/custom_types/external_custom_type.out
+@@ -1,3 +1,4 @@
+ my_ext_bar_parser
+ =================
++    external_custom_type_snippet [-f|--ext-bar external::bar]
+     Try -h or --help for more information.
+diff --git a/doc/howto/subcommand_parser/subcommand_parse.out b/doc/howto/subcommand_parser/subcommand_parse.out
+index b60cad3..17bf306 100644
+--- a/doc/howto/subcommand_parser/subcommand_parse.out
++++ b/doc/howto/subcommand_parser/subcommand_parse.out
+@@ -1,3 +1,4 @@
+ mygit
+ =====
++    subcommand_parse_snippet -f|--flag
+     Try -h or --help for more information.
+diff --git a/doc/tutorial/concepts/custom_validator_solution.out b/doc/tutorial/concepts/custom_validator_solution.out
+index 7769243..e7e2348 100644
+--- a/doc/tutorial/concepts/custom_validator_solution.out
++++ b/doc/tutorial/concepts/custom_validator_solution.out
+@@ -1,3 +1,4 @@
+ Test-Parser
+ ===========
++    custom_validator_solution_snippet [-i int32] [-j int16]
+     Try -h or --help for more information.
+diff --git a/doc/tutorial/parser/solution3.out b/doc/tutorial/parser/solution3.out
+index 388c9fa..72d5642 100644
+--- a/doc/tutorial/parser/solution3.out
++++ b/doc/tutorial/parser/solution3.out
+@@ -1,3 +1,5 @@
+ Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
+ ======================================================================
++    solution3_snippet -H|--header-is-set [-y|--year uint32] [-a|--aggregate-by
++    string] [--] path
+     Try -h or --help for more information.
+diff --git a/doc/tutorial/parser/solution4.out b/doc/tutorial/parser/solution4.out
+index 388c9fa..1a2eb13 100644
+--- a/doc/tutorial/parser/solution4.out
++++ b/doc/tutorial/parser/solution4.out
+@@ -1,3 +1,5 @@
+ Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
+ ======================================================================
++    solution4_snippet -H|--header-is-set [-s|--season uint8]...
++    [-a|--aggregate-by string] [--] path
+     Try -h or --help for more information.
+diff --git a/doc/tutorial/parser/solution5.out b/doc/tutorial/parser/solution5.out
+index 388c9fa..25601ce 100644
+--- a/doc/tutorial/parser/solution5.out
++++ b/doc/tutorial/parser/solution5.out
+@@ -1,3 +1,5 @@
+ Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
+ ======================================================================
++    solution5_snippet -H|--header-is-set -s|--season uint8 [-s|--season
++    uint8]... [-a|--aggregate-by string] [--] path
+     Try -h or --help for more information.
+diff --git a/doc/tutorial/parser/solution6.out b/doc/tutorial/parser/solution6.out
+index 388c9fa..02689dc 100644
+--- a/doc/tutorial/parser/solution6.out
++++ b/doc/tutorial/parser/solution6.out
+@@ -1,3 +1,5 @@
+ Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
+ ======================================================================
++    solution6_snippet -H|--header-is-set -s|--season uint8 [-s|--season
++    uint8]... [-a|--aggregate-by string] [--] path
+     Try -h or --help for more information.
+diff --git a/test/snippet/custom_enumeration.out b/test/snippet/custom_enumeration.out
+index d2c89ff..0159cdc 100644
+--- a/test/snippet/custom_enumeration.out
++++ b/test/snippet/custom_enumeration.out
+@@ -1,3 +1,4 @@
+ my_program
+ ==========
++    custom_enumeration_snippet [-f|--foo enum]
+     Try -h or --help for more information.
+diff --git a/test/snippet/custom_parsing_enumeration.out b/test/snippet/custom_parsing_enumeration.out
+index d2c89ff..93abd82 100644
+--- a/test/snippet/custom_parsing_enumeration.out
++++ b/test/snippet/custom_parsing_enumeration.out
+@@ -1,3 +1,4 @@
+ my_program
+ ==========
++    custom_parsing_enumeration_snippet [-e|--errc enum]
+     Try -h or --help for more information.
+diff --git a/test/snippet/is_option_set.out b/test/snippet/is_option_set.out
+index 3255ec5..6e97748 100644
+--- a/test/snippet/is_option_set.out
++++ b/test/snippet/is_option_set.out
+@@ -1,3 +1,4 @@
+ awesome-app
+ ===========
++    is_option_set_snippet [-a|--aint int32]
+     Try -h or --help for more information.
+diff --git a/test/snippet/parser_1.out b/test/snippet/parser_1.out
+index 84a563e..29f8528 100644
+--- a/test/snippet/parser_1.out
++++ b/test/snippet/parser_1.out
+@@ -1,3 +1,4 @@
+ Grade-Average
+ =============
++    parser_1_snippet [-n|--name string] -b|--bonus [--] double...
+     Try -h or --help for more information.
+diff --git a/test/snippet/parser_2.out b/test/snippet/parser_2.out
+index b92fc13..a88378e 100644
+--- a/test/snippet/parser_2.out
++++ b/test/snippet/parser_2.out
+@@ -1,3 +1,4 @@
+ The-Age-App
+ ===========
++    parser_2_snippet [-a|--user-age int32]
+     Try -h or --help for more information.
+diff --git a/test/snippet/parser_3.out b/test/snippet/parser_3.out
+index 6f8c253..718d13b 100644
+--- a/test/snippet/parser_3.out
++++ b/test/snippet/parser_3.out
+@@ -1,3 +1,5 @@
+ Penguin_Parade - Organize your penguin parade
+ =============================================
++    parser_3_snippet [-d|--day int32] [-m|--month int32] [-y|--year int32]
++    [--] string...
+     Try -h or --help for more information.
+diff --git a/test/snippet/readme_sneak_peek.out b/test/snippet/readme_sneak_peek.out
+index 9f8c7e4..2863180 100644
+--- a/test/snippet/readme_sneak_peek.out
++++ b/test/snippet/readme_sneak_peek.out
+@@ -1,6 +1,9 @@
+ Eat-Me-App
+ ==========
+ 
++SYNOPSIS
++    Eat-Me-App [-i|--int int32]
++
+ OPTIONS
+ 
+   Eating Numbers
+diff --git a/test/snippet/validators_1.out b/test/snippet/validators_1.out
+index bd6934a..d13f7b9 100644
+--- a/test/snippet/validators_1.out
++++ b/test/snippet/validators_1.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_1_snippet [-i|--integer int32]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_2.out b/test/snippet/validators_2.out
+index bd6934a..816e911 100644
+--- a/test/snippet/validators_2.out
++++ b/test/snippet/validators_2.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_2_snippet [-i|--integer int32]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_3.out b/test/snippet/validators_3.out
+index bd6934a..e8948ba 100644
+--- a/test/snippet/validators_3.out
++++ b/test/snippet/validators_3.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_3_snippet [-f|--file path]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_4.out b/test/snippet/validators_4.out
+index bd6934a..7187ada 100644
+--- a/test/snippet/validators_4.out
++++ b/test/snippet/validators_4.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_4_snippet [-s|--str string]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_chaining.out b/test/snippet/validators_chaining.out
+index bd6934a..d210432 100644
+--- a/test/snippet/validators_chaining.out
++++ b/test/snippet/validators_chaining.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_chaining_snippet [-f|--file string]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_input_directory.out b/test/snippet/validators_input_directory.out
+index bd6934a..7646831 100644
+--- a/test/snippet/validators_input_directory.out
++++ b/test/snippet/validators_input_directory.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_input_directory_snippet [-d|--dir path]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_input_file.out b/test/snippet/validators_input_file.out
+index bd6934a..0f462b6 100644
+--- a/test/snippet/validators_input_file.out
++++ b/test/snippet/validators_input_file.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_input_file_snippet [-f|--file path]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_output_directory.out b/test/snippet/validators_output_directory.out
+index bd6934a..e2fb242 100644
+--- a/test/snippet/validators_output_directory.out
++++ b/test/snippet/validators_output_directory.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_output_directory_snippet [-d|--dir path]
+     Try -h or --help for more information.
+diff --git a/test/snippet/validators_output_file.out b/test/snippet/validators_output_file.out
+index bd6934a..0951e4e 100644
+--- a/test/snippet/validators_output_file.out
++++ b/test/snippet/validators_output_file.out
+@@ -1,3 +1,4 @@
+ Test
+ ====
++    validators_output_file_snippet [-f|--file path] [-g|--file2 path]
+     Try -h or --help for more information.
+diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
+index b42fd53..a7cdf33 100644
+--- a/test/unit/detail/format_ctd_test.cpp
++++ b/test/unit/detail/format_ctd_test.cpp
+@@ -109,6 +109,7 @@ TEST_F(format_ctd_test, empty_information)
+ {
+     // Create the dummy parser.
+     sharg::parser parser{"default", argv.size(), argv.data()};
++    parser.info.synopsis = {""};
+     parser.info.date = "December 01, 1994";
+     parser.info.version = "1.2.0-rc.2";
+     parser.info.man_page_title = "default_man_page_title";
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index 925d869..8937866 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -15,6 +15,7 @@ TEST(format_cwl_test, empty_information)
+ 
+     // Create the dummy parser.
+     auto parser = sharg::parser{"default", argv.size(), argv.data()};
++    parser.info.synopsis = {""};
+     parser.info.date = "December 01, 1994";
+     parser.info.version = "1.2.0-rc.2";
+     parser.info.man_page_title = "default_man_page_title";
+diff --git a/test/unit/detail/format_help_test.cpp b/test/unit/detail/format_help_test.cpp
+index a0f6fc8..1b57621 100644
+--- a/test/unit/detail/format_help_test.cpp
++++ b/test/unit/detail/format_help_test.cpp
+@@ -109,6 +109,7 @@ TEST(help_page_printing, no_information)
+ {
+     // Empty help call with -h
+     sharg::parser parser1{"test_parser", 2, argv_with_h};
++    parser1.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser1, 80);
+     testing::internal::CaptureStdout();
+     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+@@ -220,6 +221,7 @@ TEST(help_page_printing, empty_advanced_help)
+ {
+     // Empty help call with -hh
+     sharg::parser parser2{"test_parser", 2, argv_with_hh};
++    parser2.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser2, 80);
+     testing::internal::CaptureStdout();
+     EXPECT_EXIT(parser2.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+@@ -235,6 +237,7 @@ TEST(help_page_printing, empty_version_call)
+ {
+     // Empty version call
+     sharg::parser parser3{"test_parser", 2, argv_with_version};
++    parser3.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser3, 80);
+     testing::internal::CaptureStdout();
+     EXPECT_EXIT(parser3.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+@@ -250,6 +253,7 @@ TEST(help_page_printing, version_call)
+ {
+     // Version call with url and options.
+     sharg::parser parser4{"test_parser", 2, argv_with_version};
++    parser4.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser4, 80);
+     parser4.info.url = "https://seqan.de";
+     parser4.add_option(option_value, sharg::config{.short_id = 'i'});
+@@ -271,6 +275,7 @@ TEST(help_page_printing, do_not_print_hidden_options)
+ {
+     // Add an option and request help.
+     sharg::parser parser5{"test_parser", 2, argv_with_h};
++    parser5.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser5, 80);
+     parser5.add_option(option_value, sharg::config{.short_id = 'i', .hidden = true});
+     parser5.add_flag(flag_value, sharg::config{.short_id = 'f', .hidden = true});
+@@ -321,6 +326,7 @@ TEST(help_page_printing, advanced_options)
+ 
+     // without -hh, only the non/advanced information are shown
+     sharg::parser parser_normal_help{"test_parser", 2, argv_with_h};
++    parser_normal_help.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser_normal_help, 80);
+     set_up(parser_normal_help);
+     testing::internal::CaptureStdout();
+@@ -346,6 +352,7 @@ TEST(help_page_printing, advanced_options)
+ 
+     // with -hh everything is shown
+     sharg::parser parser_advanced_help{"test_parser", 2, argv_with_hh};
++    parser_advanced_help.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser_advanced_help, 80);
+     set_up(parser_advanced_help);
+     testing::internal::CaptureStdout();
+@@ -553,6 +560,7 @@ TEST(parse_test, subcommand_parser)
+ 
+     char const * argv[]{"./test_parser", "-h"};
+     sharg::parser top_level_parser{"test_parser", 2, argv, sharg::update_notifications::on, {"sub1", "sub2"}};
++    top_level_parser.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(top_level_parser, 80);
+     top_level_parser.info.description.push_back("description");
+     top_level_parser.add_option(option_value,
+diff --git a/test/unit/detail/format_html_test.cpp b/test/unit/detail/format_html_test.cpp
+index aa38a45..ffbce19 100644
+--- a/test/unit/detail/format_html_test.cpp
++++ b/test/unit/detail/format_html_test.cpp
+@@ -17,6 +17,7 @@ TEST(html_format, empty_information)
+     // Empty html help page.
+     std::array const argv0{"./help_add_test", "--version-check", "false", "--export-help", "html"};
+     sharg::parser parser0{"empty_options", argv0.size(), argv0.data()};
++    parser0.info.synopsis = {""};
+     testing::internal::CaptureStdout();
+     EXPECT_EXIT(parser0.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+     my_stdout = testing::internal::GetCapturedStdout();
+@@ -62,6 +63,7 @@ TEST(html_format, empty_information)
+ 
+     std::array const argv1{"./help_add_test", "--version-check", "false", "--export-help=html"};
+     sharg::parser parser1{"empty_options", argv1.size(), argv1.data()};
++    parser1.info.synopsis = {""};
+     testing::internal::CaptureStdout();
+     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+     my_stdout = testing::internal::GetCapturedStdout();
+diff --git a/test/unit/detail/format_man_test.cpp b/test/unit/detail/format_man_test.cpp
+index 154adfc..25f1d9d 100644
+--- a/test/unit/detail/format_man_test.cpp
++++ b/test/unit/detail/format_man_test.cpp
+@@ -186,6 +186,7 @@ TEST_F(format_man_test, empty_information)
+ {
+     // Create the dummy parser.
+     sharg::parser parser{"default", argv.size(), argv.data()};
++    parser.info.synopsis = {""};
+     parser.info.date = "December 01, 1994";
+     parser.info.version = "01.01.01";
+     parser.info.man_page_title = "default_man_page_title";
+diff --git a/test/unit/detail/seqan3_test.cpp b/test/unit/detail/seqan3_test.cpp
+index 6c228f5..9c2fff9 100644
+--- a/test/unit/detail/seqan3_test.cpp
++++ b/test/unit/detail/seqan3_test.cpp
+@@ -54,6 +54,7 @@ TEST(help_page_printing, no_information)
+ {
+     std::array const argv{"./help_add_test", "--version-check", "false", "-h"};
+     sharg::parser parser1{"test_parser", argv.size(), argv.data()};
++    parser1.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser1, 80);
+     testing::internal::CaptureStdout();
+     EXPECT_EXIT(parser1.parse(), ::testing::ExitedWithCode(EXIT_SUCCESS), "");
+diff --git a/test/unit/parser/format_parse_validators_test.cpp b/test/unit/parser/format_parse_validators_test.cpp
+index ba1694d..a32d707 100644
+--- a/test/unit/parser/format_parse_validators_test.cpp
++++ b/test/unit/parser/format_parse_validators_test.cpp
+@@ -153,6 +153,7 @@ TEST(validator_test, input_file)
+         std::filesystem::path path;
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_positional_option(
+             path,
+@@ -303,6 +304,7 @@ TEST(validator_test, output_file)
+         std::filesystem::path path;
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_positional_option(
+             path,
+@@ -332,6 +334,7 @@ TEST(validator_test, output_file)
+         std::filesystem::path path;
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_positional_option(
+             path,
+@@ -427,6 +430,7 @@ TEST(validator_test, input_directory)
+     std::filesystem::path path;
+     char const * argv[] = {"./parser_test", "-h"};
+     sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++    parser.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser, 80);
+     parser.add_positional_option(path,
+                                  sharg::config{.description = "desc", .validator = sharg::input_directory_validator{}});
+@@ -488,6 +492,7 @@ TEST(validator_test, output_directory)
+         std::filesystem::path path;
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_positional_option(
+             path,
+@@ -762,6 +767,7 @@ TEST(validator_test, arithmetic_range_validator_success)
+     option_vector.clear();
+     char const * argv7[] = {"./parser_test", "-h"};
+     sharg::parser parser7{"test_parser", 2, argv7, sharg::update_notifications::off};
++    parser7.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
+     parser7.add_positional_option(
+         option_vector,
+@@ -979,6 +985,7 @@ TEST(validator_test, value_list_validator_success)
+     option_vector_int.clear();
+     char const * argv7[] = {"./parser_test", "-h"};
+     sharg::parser parser7{"test_parser", 2, argv7, sharg::update_notifications::off};
++    parser7.info.synopsis = {""};
+     sharg::detail::test_accessor::set_terminal_width(parser7, 80);
+     parser7.add_option(option_vector_int,
+                        sharg::config{.short_id = 'i',
+@@ -1151,6 +1158,7 @@ TEST(validator_test, regex_validator_success)
+         option_vector.clear();
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_option(option_vector,
+                           sharg::config{.short_id = 's',
+@@ -1384,6 +1392,7 @@ TEST(validator_test, chaining_validators)
+         option_value.clear();
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_option(
+             option_value,
+@@ -1417,6 +1426,7 @@ TEST(validator_test, chaining_validators)
+         option_value.clear();
+         char const * argv[] = {"./parser_test", "-h"};
+         sharg::parser parser{"test_parser", 2, argv, sharg::update_notifications::off};
++        parser.info.synopsis = {""};
+         sharg::detail::test_accessor::set_terminal_width(parser, 80);
+         parser.add_option(
+             option_value,
+-- 
+2.47.3
+
