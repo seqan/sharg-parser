@@ -131,6 +131,9 @@ user$ ./Eat-Me-App -h
 Eat-Me-App
 ==========
 
+SYNOPSIS
+    Eat-Me-App [-i|--int int32]
+
 OPTIONS
 
   Eating Numbers
