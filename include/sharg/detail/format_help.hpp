@@ -401,14 +401,20 @@ class format_short_help : public format_help
 public:
     /*!\brief Initiates the printing of a short help message to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed version information.
+     * \param[in] executable_name A list of arguments that form together the call to the executable.
+     *                            For example: [raptor, build]
      */
-    void parse(parser_meta_data const & parser_meta)
+    void parse(parser_meta_data const & parser_meta, std::vector<std::string> const & executable_name)
     {
         meta = parser_meta;
 
         print_header();
 
-        if (!parser_meta.synopsis.empty())
+        if (meta.synopsis.empty())
+            generate_default_synopsis(executable_name);
+
+        // Synopsis can be disabled by setting `parser.info.synopsis = {""};`
+        if (!meta.synopsis.empty() && !meta.synopsis.front().empty())
             print_synopsis();
 
         print_line("Try -h or --help for more information.\n", true);
@@ -432,7 +438,7 @@ public:
     /*!\brief Initiates the printing of the version information to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed version information.
      */
-    void parse(parser_meta_data & parser_meta)
+    void parse(parser_meta_data & parser_meta, std::vector<std::string> const & /*executable_name*/)
     {
         meta = parser_meta;
 
@@ -458,7 +464,7 @@ public:
     /*!\brief Initiates the printing of the copyright message to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed version information.
      */
-    void parse(parser_meta_data const & parser_meta)
+    void parse(parser_meta_data const & parser_meta, std::vector<std::string> const & /*executable_name*/)
     {
         meta = parser_meta;
         std::string seqan_license{

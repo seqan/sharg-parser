@@ -47,7 +47,7 @@ TEST_F(format_help_test, short_help)
     // even if required options exist.
     auto check_expected_short_help = [&]()
     {
-        parser.info.synopsis.push_back("./some_binary_name synopsis");
+        parser.info.synopsis = {"./some_binary_name synopsis"};
         int option_value{};
         parser.add_option(option_value, sharg::config{.short_id = 'i', .required = true});
 
@@ -409,7 +409,7 @@ TEST_F(format_help_test, full_information)
 
     // Add synopsis, description, short description, positional option, option, flag, and example.
     auto parser = get_parser("-h");
-    parser.info.synopsis.push_back("./some_binary_name synopsis");
+    parser.info.synopsis = {"./some_binary_name synopsis"};
     parser.info.synopsis.push_back("./some_binary_name synopsis2");
     parser.info.description.push_back("description");
     parser.info.description.push_back("description2");

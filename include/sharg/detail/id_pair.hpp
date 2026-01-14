@@ -88,6 +88,12 @@ struct id_pair
         return empty_short_id() && empty_long_id();
     }
 
+    //!\brief Returns true if both IDs are non-empty.
+    bool has_both_ids() const noexcept
+    {
+        return !empty_short_id() && !empty_long_id();
+    }
+
     //!\brief Checks whether id is empty.
     template <typename id_type>
     static bool empty(id_type const & id) noexcept;

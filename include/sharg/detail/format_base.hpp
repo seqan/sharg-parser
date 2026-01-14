@@ -13,6 +13,7 @@
 #include <sharg/auxiliary.hpp>
 #include <sharg/config.hpp>
 #include <sharg/detail/concept.hpp>
+#include <sharg/detail/id_pair.hpp>
 #include <sharg/detail/type_name_as_string.hpp>
 #include <sharg/validators.hpp>
 
@@ -31,99 +32,101 @@ class format_base
 {
 protected:
     /*!\brief Returns the input type as a string (reflection).
-     * \tparam value_type The type whose name is converted std::string.
+     * \tparam value_type The type whose name is converted to std::string.
+     * \tparam verbose Whether to use long names ("signed 8 bit integer") or short names ("int8").
      * \returns The type of the value as a string.
      */
-    template <typename value_type>
-    static std::string get_type_name_as_string(value_type const & /**/)
+    template <typename value_type, bool verbose = true>
+    static std::string get_type_name_as_string()
     {
         using type = std::decay_t<value_type>;
 
         if constexpr (std::is_same_v<type, int8_t>)
-            return "signed 8 bit integer";
+            return verbose ? "signed 8 bit integer" : "int8";
         else if constexpr (std::is_same_v<type, uint8_t>)
-            return "unsigned 8 bit integer";
+            return verbose ? "unsigned 8 bit integer" : "uint8";
         else if constexpr (std::is_same_v<type, int16_t>)
-            return "signed 16 bit integer";
+            return verbose ? "signed 16 bit integer" : "int16";
         else if constexpr (std::is_same_v<type, uint16_t>)
-            return "unsigned 16 bit integer";
+            return verbose ? "unsigned 16 bit integer" : "uint16";
         else if constexpr (std::is_same_v<type, int32_t>)
-            return "signed 32 bit integer";
+            return verbose ? "signed 32 bit integer" : "int32";
         else if constexpr (std::is_same_v<type, uint32_t>)
-            return "unsigned 32 bit integer";
+            return verbose ? "unsigned 32 bit integer" : "uint32";
         else if constexpr (std::is_same_v<type, int64_t>)
-            return "signed 64 bit integer";
+            return verbose ? "signed 64 bit integer" : "int64";
         else if constexpr (std::is_same_v<type, uint64_t>)
-            return "unsigned 64 bit integer";
+            return verbose ? "unsigned 64 bit integer" : "uint64";
         else if constexpr (std::is_same_v<type, double>)
-            return "double";
+            return verbose ? "double" : "double";
         else if constexpr (std::is_same_v<type, float>)
-            return "float";
+            return verbose ? "float" : "float";
         else if constexpr (std::is_same_v<type, bool>)
-            return "bool";
+            return verbose ? "bool" : "bool";
         else if constexpr (std::is_same_v<type, char>)
-            return "char";
+            return verbose ? "char" : "char";
         else if constexpr (std::is_same_v<type, std::string>)
-            return "std::string";
+            return verbose ? "std::string" : "string";
         else if constexpr (std::is_same_v<type, std::filesystem::path>)
-            return "std::filesystem::path";
+            return verbose ? "std::filesystem::path" : "path";
         else
             return sharg::detail::type_name_as_string<value_type>;
     }
 
     /*!\brief Returns the `value_type` of the input container as a string (reflection).
-     * \tparam container_type The container type for which to query it's value_type.
-     * \returns The type of the container value_type as a string.
+     * \tparam container_type The container type for which to query its value_type.
+     * \tparam verbose Whether to use long names ("signed 8 bit integer") or short names ("int8").
+     * \returns The type of the container's value_type as a string.
      */
-    template <detail::is_container_option container_type>
-    static std::string get_type_name_as_string(container_type const & /**/)
+    template <detail::is_container_option container_type, bool verbose = true>
+    static std::string get_type_name_as_string()
     {
-        typename container_type::value_type tmp{};
-        return get_type_name_as_string(tmp);
+        return get_type_name_as_string<std::ranges::range_value_t<container_type>, verbose>();
     }
 
     /*!\brief Formats the type of a value for the help page printing.
      * \tparam option_value_type The type of the option value to get the info for.
-     * \param[in] value The value to deduct the type from.
      * \returns The type of the value as string.
      */
     template <typename option_value_type>
-    static std::string option_type_and_list_info(option_value_type const & value)
+    static std::string option_type_and_list_info(option_value_type const &)
     {
-        return ("(\\fI" + get_type_name_as_string(value) + "\\fP)");
+        return ("(\\fI" + get_type_name_as_string<option_value_type>() + "\\fP)");
     }
 
     /*!\brief Formats the container and its value_type for the help page printing.
      * \tparam container_type A type that must satisfy the sharg::detail::is_container_option.
-     * \param[in] container The container to deduct the type from.
      *
      * \returns The type of the container value type as a string, encapsulated in "List of".
      */
     template <detail::is_container_option container_type>
-    static std::string option_type_and_list_info(container_type const & container)
+    static std::string option_type_and_list_info(container_type const &)
     {
-        return ("(\\fIList\\fP of \\fI" + get_type_name_as_string(container) + "\\fP)");
+        return ("(\\fIList\\fP of \\fI" + get_type_name_as_string<container_type>() + "\\fP)");
     }
 
     /*!\brief Formats the option/flag identifier pair for the help page printing.
-     * \param[in] short_id The short identifier of the option/flag.
-     * \param[in] long_id  The long identifier of the option/flag.
+     * \param[in] id A sharg::detail::id_pair encapsulating both short and long id.
+     * \param[in] is_synopsis Whether to use synopsis formatting.
      * \returns The name of the short and long id, prepended with (double)dash.
      *
-     * \details  e.g. "-i,--integer", "-i", or "--integer".
+     * \details
+     * For descriptions (`is_synopsis == false`): "-i, --integer", "-i", or "--integer".
+     * For synopsis (`is_synopses == true`): "-i|--integer", "-i", or "--integer".
      */
-    static std::string prep_id_for_help(char const short_id, std::string const & long_id)
+    static std::string prep_id_for_help(detail::id_pair const & id, bool const is_synopsis = false)
     {
         // Build list item term.
         std::string term;
-        if (short_id != '\0')
-            term = "\\fB-" + std::string(1, short_id) + "\\fP";
 
-        if (short_id != '\0' && !long_id.empty())
-            term.append(", ");
+        if (!id.empty_short_id())
+            term = "\\fB-" + std::string(1, id.short_id) + "\\fP";
 
-        if (!long_id.empty())
-            term.append("\\fB--" + long_id + "\\fP");
+        if (id.has_both_ids())
+            is_synopsis ? term.append("|") : term.append(", ");
+
+        if (!id.empty_long_id())
+            term.append("\\fB--" + id.long_id + "\\fP");
 
         return term;
     }
@@ -291,7 +294,7 @@ protected:
 
     /*!\brief Prints a string to std::cout converted to uppercase.
      * \param[in] str The string to print in uppercase.
-     * \copydetails print_as_lowercase
+     * \sa print_as_lowercase
      */
     static void print_as_uppercase(std::string const & str)
     {
@@ -344,7 +347,8 @@ public:
     template <typename option_type, typename validator_t>
     void add_option(option_type & value, config<validator_t> const & config)
     {
-        std::string id = prep_id_for_help(config.short_id, config.long_id) + " " + option_type_and_list_info(value);
+        detail::id_pair const id_pair{config.short_id, config.long_id};
+        std::string id = prep_id_for_help(id_pair) + " " + option_type_and_list_info(value);
         std::string info{config.description};
 
         if (config.default_message.empty())
@@ -361,6 +365,12 @@ public:
                 derived_t().print_list_item(id, info);
             },
             config);
+
+        if (!(config.hidden) && (!(config.advanced) || show_advanced_options))
+            store_synopsis_option(id_pair,
+                                  get_type_name_as_string<option_type, false>(),
+                                  config.required,
+                                  detail::is_container_option<option_type>);
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
@@ -369,12 +379,17 @@ public:
     template <typename validator_t>
     void add_flag(bool & SHARG_DOXYGEN_ONLY(value), config<validator_t> const & config)
     {
+        detail::id_pair const id_pair{config.short_id, config.long_id};
         store_help_page_element(
-            [this, id = prep_id_for_help(config.short_id, config.long_id), description = config.description]()
+            [this, id = prep_id_for_help(id_pair), description = config.description]()
             {
                 derived_t().print_list_item(id, description);
             },
             config);
+
+        // Store for synopsis generation
+        if (!(config.hidden) && (!(config.advanced) || show_advanced_options))
+            store_synopsis_flag(id_pair);
     }
 
     /*!\brief Adds a sharg::print_list_item call to be evaluated later on.
@@ -419,18 +434,28 @@ public:
                                                               option_type_and_list_info(value)),
                                             description + default_message + validator_message);
             });
+
+        // Store for synopsis generation
+        store_synopsis_positional(get_type_name_as_string<option_type, false>(),
+                                  detail::is_container_option<option_type>);
     }
 
     /*!\brief Initiates the printing of the help page to std::cout.
      * \param[in] parser_meta The meta information that are needed for a detailed help page.
+     * \param[in] executable_name A list of arguments that form together the call to the executable.
+     *                            For example: [raptor, build]
      */
-    void parse(parser_meta_data & parser_meta)
+    void parse(parser_meta_data & parser_meta, std::vector<std::string> const & executable_name)
     {
         meta = parser_meta;
 
         derived_t().print_header();
 
-        if (!meta.synopsis.empty())
+        if (meta.synopsis.empty())
+            generate_default_synopsis(executable_name);
+
+        // Synopsis can be disabled by setting `parser.info.synopsis = {""};`
+        if (!meta.synopsis.empty() && !meta.synopsis.front().empty())
         {
             derived_t().print_section("Synopsis");
             derived_t().print_synopsis();
@@ -589,11 +614,13 @@ protected:
     //!\brief Prints a synopsis in any format.
     void print_synopsis()
     {
+        constexpr std::string_view end_format_sv = "\\fP";
         for (unsigned i = 0; i < meta.synopsis.size(); ++i)
         {
             std::string text = "\\fB";
             text.append(meta.synopsis[i]);
-            text.insert(text.find_first_of(" \t"), "\\fP");
+            // Use iterator syntax instead of index. Index syntax is a segfault if there is no space or tab.
+            text.insert(text.begin() + text.find_first_of(" \t"), end_format_sv.begin(), end_format_sv.end());
 
             derived_t().print_line(text, false);
         }
@@ -683,6 +710,47 @@ protected:
         }
     }
 
+    //!\brief Generates default synopsis from stored elements.
+    void generate_default_synopsis(std::vector<std::string> executable_name)
+    {
+        if (synopsis_elements.empty())
+            return;
+
+        std::string & first = executable_name[0];
+        first = first.substr(first.find_last_of('/') + 1);
+
+#ifdef __cpp_lib_ranges_join_with
+        auto view = std::views::join_with(executable_name, ' ');
+        std::string synopsis_line{view.begin(), view.end()};
+#else // libc++ implements std::views::join_with since version 21
+        std::string synopsis_line;
+        for (size_t i = 0; i < executable_name.size(); ++i)
+        {
+            if (i > 0)
+                synopsis_line += ' ';
+            synopsis_line += executable_name[i];
+        }
+#endif
+
+        auto positional_subrange =
+            std::ranges::partition(synopsis_elements, std::logical_not{}, &synopsis_element::is_positional);
+
+        for (auto it = synopsis_elements.begin(); it != positional_subrange.begin(); ++it)
+        {
+            synopsis_line += " " + it->option_str;
+        }
+        if (!std::ranges::empty(positional_subrange))
+        {
+            synopsis_line += " [\\fB--\\fP]";
+            for (auto it = positional_subrange.begin(); it != positional_subrange.end(); ++it)
+            {
+                synopsis_line += " " + it->option_str;
+            }
+        }
+
+        meta.synopsis.emplace_back(std::move(synopsis_line));
+    }
+
     //!\brief Vector of functions that stores all calls except add_positional_option.
     std::vector<std::function<void()>> parser_set_up_calls;
     //!\brief Vector of functions that stores add_positional_option calls.
@@ -693,6 +761,15 @@ protected:
     std::vector<std::string> command_names{};
     //!\brief Whether to show advanced options or not.
     bool show_advanced_options{true};
+    //!\brief Structure to store synopsis element information.
+    struct synopsis_element
+    {
+        std::string option_str;    //!< The formatted option string.
+        bool is_positional{false}; //!< Whether it's a positional argument.
+    };
+
+    //!\brief Stores elements for automatic synopsis generation.
+    std::vector<synopsis_element> synopsis_elements{};
 
 private:
     /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `config` does not prevent it.
@@ -710,6 +787,58 @@ private:
     {
         if (!(hidden) && (!(advanced) || show_advanced_options))
             parser_set_up_calls.push_back(std::move(printer));
+    }
+
+    /*!\brief Stores option information for synopsis generation.
+     * \param[in] id A sharg::detail::id_pair encapsulating both short and long id.
+     * \param[in] type_str The type string for the option value.
+     * \param[in] required Whether the option is required.
+     * \param[in] is_list Whether it's a list of arguments.
+     */
+    void store_synopsis_option(detail::id_pair const & id,
+                               std::string const & type_str,
+                               bool const required,
+                               bool const is_list)
+    {
+        std::string opt_str = prep_id_for_help(id, true);
+
+        opt_str += " \\fI" + type_str + "\\fP";
+
+        if (!required)
+        {
+            opt_str = "[" + opt_str + "]";
+
+            if (is_list)
+                opt_str.append("...");
+        }
+        else if (is_list)
+        {
+            opt_str = opt_str + " [" + opt_str + "]...";
+        }
+
+        synopsis_elements.push_back({opt_str, false});
+    }
+
+    /*!\brief Stores flag information for synopsis generation.
+     * \param[in] id A sharg::detail::id_pair encapsulating both short and long id.
+     */
+    void store_synopsis_flag(detail::id_pair const & id)
+    {
+        synopsis_elements.push_back({prep_id_for_help(id, true), false});
+    }
+
+    /*!\brief Stores positional argument information for synopsis generation.
+     * \param[in] type_str The type string for the positional argument.
+     * \param[in] is_list Whether it's a list of arguments.
+     */
+    void store_synopsis_positional(std::string const & type_str, bool const is_list)
+    {
+        std::string pos_str = "\\fI" + type_str + "\\fP";
+
+        if (is_list)
+            pos_str += "...";
+
+        synopsis_elements.push_back({pos_str, true});
     }
 
     /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `config` does not prevent it.

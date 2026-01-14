@@ -152,7 +152,7 @@ protected:
         parser.info.version = "01.01.01";
         parser.info.man_page_title = "default_man_page_title";
         parser.info.short_description = "A short description here.";
-        parser.info.synopsis.push_back("./format_man_test synopsis");
+        parser.info.synopsis = {"./format_man_test synopsis"};
         parser.info.synopsis.push_back("./format_man_test synopsis2");
         parser.info.description.push_back("description");
         parser.info.description.push_back("description2");
