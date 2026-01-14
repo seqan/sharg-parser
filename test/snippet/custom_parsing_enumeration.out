@@ -1,3 +1,4 @@
 my_program
 ==========
+    custom_parsing_enumeration_snippet [-e|--errc enum]
     Try -h or --help for more information.

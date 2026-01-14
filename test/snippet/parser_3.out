@@ -1,3 +1,5 @@
 Penguin_Parade - Organize your penguin parade
 =============================================
+    parser_3_snippet [-d|--day int32] [-m|--month int32] [-y|--year int32]
+    [--] string...
     Try -h or --help for more information.

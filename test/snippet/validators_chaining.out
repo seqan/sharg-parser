@@ -1,3 +1,4 @@
 Test
 ====
+    validators_chaining_snippet [-f|--file string]
     Try -h or --help for more information.

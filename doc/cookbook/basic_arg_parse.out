@@ -1,3 +1,4 @@
 Indexer - Creates an index over a reference.
 ============================================
+    basic_arg_parse_snippet -r|--reference path [-o|--output path]
     Try -h or --help for more information.

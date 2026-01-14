@@ -1,3 +1,4 @@
 Grade-Average
 =============
+    parser_1_snippet [-n|--name string] -b|--bonus [--] double...
     Try -h or --help for more information.

@@ -1,3 +1,4 @@
 Test
 ====
+    validators_output_file_snippet [-f|--file path] [-g|--file2 path]
     Try -h or --help for more information.

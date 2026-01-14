@@ -1,3 +1,5 @@
 Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
 ======================================================================
+    solution5_snippet -H|--header-is-set -s|--season uint8 [-s|--season
+    uint8]... [-a|--aggregate-by string] [--] path
     Try -h or --help for more information.
