@@ -565,3 +565,108 @@ TEST_F(format_help_test, subcommand_parser)
                          + basic_options_str + "\n" + version_str();
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
+
+namespace sharg::custom
+{
+
+template <>
+struct parsing<std::errc>
+{
+    static inline std::unordered_map<std::string_view, std::errc> const enumeration_names{};
+};
+
+} // namespace sharg::custom
+
+TEST_F(format_help_test, auto_synopsis_short)
+{
+    auto parser = get_parser();
+    parser.info.synopsis.clear();
+    ASSERT_TRUE(parser.info.synopsis.empty());
+
+    foo enum_option_value{};
+    std::errc enum_option_value2{};
+    bool flag{};
+    uint16_t some_int{};
+    std::filesystem::path value1{};
+    std::string value2{};
+    std::vector<std::filesystem::path> container_value1{};
+    std::vector<std::string> container_value2{};
+
+    parser.add_option(some_int, sharg::config{.short_id = 'a', .long_id = "some_int"});
+    parser.add_option(value1, sharg::config{.short_id = 'b', .long_id = "value1"});
+    parser.add_option(value2, sharg::config{.short_id = 'c', .long_id = "value2", .required = true});
+    parser.add_option(container_value1, sharg::config{.short_id = 'd', .long_id = "container1"});
+    parser.add_option(container_value2, sharg::config{.short_id = 'e', .long_id = "container2", .required = true});
+    parser.add_flag(flag, sharg::config{.short_id = 'f', .long_id = "flag"});
+    parser.add_option(enum_option_value, sharg::config{.short_id = 'g', .long_id = "enum"});
+    parser.add_option(enum_option_value2, sharg::config{.short_id = 'i', .long_id = "errc"});
+    parser.add_positional_option(value2, sharg::config{});
+    parser.add_positional_option(container_value1, sharg::config{});
+
+    expected = "test_parser\n"
+               "===========\n"
+               "    test_parser [-a|--some_int uint16] [-b|--value1 path] -c|--value2 string\n"
+               "    [-d|--container1 path]... -e|--container2 string [-e|--container2\n"
+               "    string]... -f|--flag [-g|--enum enum] [-i|--errc enum] [--] string path...\n"
+               "    Try -h or --help for more information.\n";
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
+}
+
+TEST_F(format_help_test, auto_synopsis_full)
+{
+    auto parser = get_parser("-h");
+    parser.info.synopsis.clear();
+    ASSERT_TRUE(parser.info.synopsis.empty());
+
+    foo enum_option_value{};
+    std::errc enum_option_value2{};
+    bool flag{};
+    uint16_t some_int{};
+    std::filesystem::path value1{};
+    std::string value2{};
+    std::vector<std::filesystem::path> container_value1{};
+    std::vector<std::string> container_value2{};
+
+    parser.add_option(some_int, sharg::config{.short_id = 'a', .long_id = "some_int"});
+    parser.add_option(value1, sharg::config{.short_id = 'b', .long_id = "value1"});
+    parser.add_option(value2, sharg::config{.short_id = 'c', .long_id = "value2", .required = true});
+    parser.add_option(container_value1, sharg::config{.short_id = 'd', .long_id = "container1"});
+    parser.add_option(container_value2, sharg::config{.short_id = 'e', .long_id = "container2", .required = true});
+    parser.add_flag(flag, sharg::config{.short_id = 'f', .long_id = "flag"});
+    parser.add_option(enum_option_value, sharg::config{.short_id = 'g', .long_id = "enum"});
+    parser.add_option(enum_option_value2, sharg::config{.short_id = 'i', .long_id = "errc"});
+    parser.add_positional_option(value2, sharg::config{});
+    parser.add_positional_option(container_value1, sharg::config{});
+
+    expected = "test_parser\n"
+               "===========\n\n"
+               "SYNOPSIS\n"
+               "    test_parser [-a|--some_int uint16] [-b|--value1 path] -c|--value2 string\n"
+               "    [-d|--container1 path]... -e|--container2 string [-e|--container2\n"
+               "    string]... -f|--flag [-g|--enum enum] [-i|--errc enum] [--] string path...\n\n"
+               "POSITIONAL ARGUMENTS\n"
+               "    ARGUMENT-1 (std::string)\n"
+               "    ARGUMENT-2 (List of std::filesystem::path)\n"
+               "          Default: []\n\n"
+               "OPTIONS\n"
+               "    -a, --some_int (unsigned 16 bit integer)\n"
+               "          Default: 0\n"
+               "    -b, --value1 (std::filesystem::path)\n"
+               "          Default: \"\"\n"
+               "    -c, --value2 (std::string)\n"
+               "    -d, --container1 (List of std::filesystem::path)\n"
+               "          Default: []\n"
+               "    -e, --container2 (List of std::string)\n"
+               "    -f, --flag\n"
+               "    -g, --enum (foo)\n"
+               "          Default: one\n"
+#ifdef _LIBCPP_VERSION
+               "    -i, --errc (std::__1::errc)\n"
+#else
+               "    -i, --errc (std::errc)\n"
+#endif
+               "          Default: <UNKNOWN_VALUE>\n"
+               "\n"
+             + basic_options_str + "\n" + version_str();
+    EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
+}

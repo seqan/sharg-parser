@@ -69,6 +69,8 @@ protected:
             return verbose ? "std::string" : "string";
         else if constexpr (std::is_same_v<type, std::filesystem::path>)
             return verbose ? "std::filesystem::path" : "path";
+        else if constexpr (!verbose && std::is_enum_v<type>)
+            return "enum";
         else
             return sharg::detail::type_name_as_string<value_type>;
     }

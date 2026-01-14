@@ -195,8 +195,11 @@ protected:
             std::cout << '\n';
             pos = 0;
         }
-        std::fill_n(out, layout.rightColumnTab - pos, ' ');
-        print_text(desc, layout.rightColumnTab);
+        if (!desc.empty())
+        {
+            std::fill_n(out, layout.rightColumnTab - pos, ' ');
+            print_text(desc, layout.rightColumnTab);
+        }
 
         prev_was_paragraph = false;
     }
