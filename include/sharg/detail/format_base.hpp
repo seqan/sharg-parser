@@ -734,17 +734,20 @@ protected:
         }
 #endif
 
-        auto positional_subrange =
-            std::ranges::partition(synopsis_elements, std::logical_not{}, &synopsis_element::is_positional);
+        std::ranges::stable_sort(synopsis_elements, std::ranges::less{}, &synopsis_element::type);
+        auto const pivot = std::ranges::lower_bound(synopsis_elements,
+                                                    synopsis_element::option_type::positional,
+                                                    std::ranges::less{},
+                                                    &synopsis_element::type);
 
-        for (auto it = synopsis_elements.begin(); it != positional_subrange.begin(); ++it)
+        for (auto it = synopsis_elements.begin(); it != pivot; ++it)
         {
             synopsis_line += " " + it->option_str;
         }
-        if (!std::ranges::empty(positional_subrange))
+        if (pivot != synopsis_elements.end())
         {
             synopsis_line += " [\\fB--\\fP]";
-            for (auto it = positional_subrange.begin(); it != positional_subrange.end(); ++it)
+            for (auto it = pivot; it != synopsis_elements.end(); ++it)
             {
                 synopsis_line += " " + it->option_str;
             }
@@ -766,8 +769,15 @@ protected:
     //!\brief Structure to store synopsis element information.
     struct synopsis_element
     {
-        std::string option_str;    //!< The formatted option string.
-        bool is_positional{false}; //!< Whether it's a positional argument.
+        //!\brief Kinds of options.
+        enum class option_type : uint8_t
+        {
+            flag,      //!< Option is a flag.
+            option,    //!< Option is a option with argument.
+            positional //!< Option is a positional option.
+        };
+        std::string option_str; //!< The formatted option string.
+        option_type type;       //!< Type of the option.
     };
 
     //!\brief Stores elements for automatic synopsis generation.
@@ -796,6 +806,7 @@ private:
      * \param[in] type_str The type string for the option value.
      * \param[in] required Whether the option is required.
      * \param[in] is_list Whether it's a list of arguments.
+     * \sa https://pubs.opengroup.org/onlinepubs/9699919799
      */
     void store_synopsis_option(detail::id_pair const & id,
                                std::string const & type_str,
@@ -818,20 +829,23 @@ private:
             opt_str = opt_str + " [" + opt_str + "]...";
         }
 
-        synopsis_elements.push_back({opt_str, false});
+        synopsis_elements.push_back({std::move(opt_str), synopsis_element::option_type::option});
     }
 
     /*!\brief Stores flag information for synopsis generation.
      * \param[in] id A sharg::detail::id_pair encapsulating both short and long id.
+     * \sa https://pubs.opengroup.org/onlinepubs/9699919799
      */
     void store_synopsis_flag(detail::id_pair const & id)
     {
-        synopsis_elements.push_back({prep_id_for_help(id, true), false});
+        std::string flag_str = "[" + prep_id_for_help(id, true) + "]";
+        synopsis_elements.push_back({std::move(flag_str), synopsis_element::option_type::flag});
     }
 
     /*!\brief Stores positional argument information for synopsis generation.
      * \param[in] type_str The type string for the positional argument.
      * \param[in] is_list Whether it's a list of arguments.
+     * \sa https://pubs.opengroup.org/onlinepubs/9699919799
      */
     void store_synopsis_positional(std::string const & type_str, bool const is_list)
     {
@@ -840,7 +854,7 @@ private:
         if (is_list)
             pos_str += "...";
 
-        synopsis_elements.push_back({pos_str, true});
+        synopsis_elements.push_back({std::move(pos_str), synopsis_element::option_type::positional});
     }
 
     /*!\brief Adds a function object to parser_set_up_calls **if** the annotation in `config` does not prevent it.

@@ -1,4 +1,4 @@
-From 144e300eb69c24edeef35d914a339efb608dc5b5 Mon Sep 17 00:00:00 2001
+From 908f693bfba73bb55518ada5d3eeda0eb40f2fb7 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 29 Apr 2024 16:37:30 +0200
 Subject: [PATCH 08/13] [API][MISC] Allow options for subcommands

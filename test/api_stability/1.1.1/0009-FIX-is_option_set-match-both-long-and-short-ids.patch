@@ -1,4 +1,4 @@
-From e964af74afdc29fd977da7160964dd25def39442 Mon Sep 17 00:00:00 2001
+From b7ce32d1e4ce38a66a02c15ceb8134868370a5ea Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 2 Apr 2025 18:02:31 +0200
 Subject: [PATCH 09/13] [FIX] is_option_set: match both long and short ids

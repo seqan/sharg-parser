@@ -1,4 +1,4 @@
-From a3c99aef4133582f650f2157109f7ee4ca2f4706 Mon Sep 17 00:00:00 2001
+From 322802cd1c9cffd9aea3bea8ab6e69972fbaa00e Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Fri, 9 Feb 2024 18:13:36 +0100
 Subject: [PATCH 05/13] [INFRA] Use seqan3 main branch

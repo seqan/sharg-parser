@@ -605,9 +605,10 @@ TEST_F(format_help_test, auto_synopsis_short)
 
     expected = "test_parser\n"
                "===========\n"
-               "    test_parser [-a|--some_int uint16] [-b|--value1 path] -c|--value2 string\n"
-               "    [-d|--container1 path]... -e|--container2 string [-e|--container2\n"
-               "    string]... -f|--flag [-g|--enum enum] [-i|--errc enum] [--] string path...\n"
+               "    test_parser [-f|--flag] [-a|--some_int uint16] [-b|--value1 path]\n"
+               "    -c|--value2 string [-d|--container1 path]... -e|--container2 string\n"
+               "    [-e|--container2 string]... [-g|--enum enum] [-i|--errc enum] [--] string\n"
+               "    path...\n"
                "    Try -h or --help for more information.\n";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
@@ -641,9 +642,10 @@ TEST_F(format_help_test, auto_synopsis_full)
     expected = "test_parser\n"
                "===========\n\n"
                "SYNOPSIS\n"
-               "    test_parser [-a|--some_int uint16] [-b|--value1 path] -c|--value2 string\n"
-               "    [-d|--container1 path]... -e|--container2 string [-e|--container2\n"
-               "    string]... -f|--flag [-g|--enum enum] [-i|--errc enum] [--] string path...\n\n"
+               "    test_parser [-f|--flag] [-a|--some_int uint16] [-b|--value1 path]\n"
+               "    -c|--value2 string [-d|--container1 path]... -e|--container2 string\n"
+               "    [-e|--container2 string]... [-g|--enum enum] [-i|--errc enum] [--] string\n"
+               "    path...\n\n"
                "POSITIONAL ARGUMENTS\n"
                "    ARGUMENT-1 (std::string)\n"
                "    ARGUMENT-2 (List of std::filesystem::path)\n"

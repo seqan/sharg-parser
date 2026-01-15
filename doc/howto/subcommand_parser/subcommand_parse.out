@@ -1,4 +1,4 @@
 mygit
 =====
-    subcommand_parse_snippet -f|--flag
+    subcommand_parse_snippet [-f|--flag]
     Try -h or --help for more information.
