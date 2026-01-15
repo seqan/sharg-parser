@@ -21,7 +21,7 @@ TEST_F(format_cwl_test, empty_information)
     // Create the dummy parser.
     auto parser = get_parser("--export-help", "cwl");
     parser.info.date = "December 01, 1994";
-    parser.info.version = "1.2.0";
+    parser.info.version = "1.2.1-rc.1";
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 
