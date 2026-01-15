@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
@@ -19,7 +19,7 @@
 //!\brief The patch version as MACRO.
 #define SHARG_VERSION_PATCH 0
 //!\brief The release candidate number. 0 means stable release, >= 1 means release candidate.
-#define SHARG_RELEASE_CANDIDATE 2
+#define SHARG_RELEASE_CANDIDATE 0
 
 //!\brief The full version as MACRO (number).
 #define SHARG_VERSION (SHARG_VERSION_MAJOR * 10000 + SHARG_VERSION_MINOR * 100 + SHARG_VERSION_PATCH)

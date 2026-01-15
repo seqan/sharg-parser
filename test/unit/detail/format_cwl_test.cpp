@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -21,7 +21,7 @@ TEST_F(format_cwl_test, empty_information)
     // Create the dummy parser.
     auto parser = get_parser("--export-help", "cwl");
     parser.info.date = "December 01, 1994";
-    parser.info.version = "1.2.0-rc.2";
+    parser.info.version = "1.2.0";
     parser.info.man_page_title = "default_man_page_title";
     parser.info.short_description = "A short description here.";
 

@@ -6,8 +6,8 @@
 [![twitter][twitter_badge]][twitter_link]
 
 <!--
-    SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
-    SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
+    SPDX-FileCopyrightText: 2006-2026 Knut Reinert & Freie Universität Berlin
+    SPDX-FileCopyrightText: 2016-2026 Knut Reinert & MPI für molekulare Genetik
     SPDX-License-Identifier: CC-BY-4.0
 -->
 
@@ -158,7 +158,7 @@ OPTIONS
 VERSION
     Last update:
     Eat-Me-App version:
-    Sharg version: 1.2.0-rc.2
+    Sharg version: 1.2.0
 ```
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
@@ -166,7 +166,8 @@ VERSION
 
 |                   | requirement                                               | version  | comment                                     |
 |-------------------|-----------------------------------------------------------|----------|---------------------------------------------|
-|**compiler**       | [GCC](https://gcc.gnu.org)                                | ≥ 12     |                                             |
-|**compiler**       | [Clang](https://clang.llvm.org/)                          | ≥ 17     |                                             |
+|**compiler**       | [GCC](https://gcc.gnu.org)                                | ≥ 13     |                                             |
+|                   | [Clang](https://clang.llvm.org)                           | ≥ 19     | tested with `-stdlib=libc++`                |
+|                   | [IntelOneAPI]()                                           | ≥ 2024.0 |                                             |
 |**build system**   | [CMake](https://cmake.org)                                | ≥ 3.16   | optional, but recommended                   |
-|**optional libs**  | [TDL](https://github.com/deNBI-cibi/tool_description_lib) | ≥ 1.0.0  | required for CWL and CTD export             |
+|**optional libs**  | [TDL](https://github.com/deNBI-cibi/tool_description_lib) | ≥ 1.1.0  | required for CWL and CTD export             |
