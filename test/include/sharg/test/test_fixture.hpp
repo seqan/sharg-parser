@@ -53,6 +53,7 @@ private:
     static sharg::parser impl(std::vector<std::string> arguments, std::vector<std::string> const & subcommands = {})
     {
         sharg::parser parser{"test_parser", std::move(arguments), sharg::update_notifications::off, subcommands};
+        parser.info.synopsis = {""};
         sharg::detail::test_accessor::set_terminal_width(parser, 80u);
         return parser;
     }

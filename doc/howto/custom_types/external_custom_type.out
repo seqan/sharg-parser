@@ -1,3 +1,4 @@
 my_ext_bar_parser
 =================
+    external_custom_type_snippet [-f|--ext-bar external::bar]
     Try -h or --help for more information.

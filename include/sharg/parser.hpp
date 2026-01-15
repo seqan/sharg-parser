@@ -1143,12 +1143,10 @@ private:
      */
     inline void parse_format()
     {
+
         auto format_parse_fn = [this]<typename format_t>(format_t & f)
         {
-            if constexpr (std::same_as<format_t, detail::format_tdl>)
-                f.parse(info, executable_name);
-            else
-                f.parse(info);
+            f.parse(info, executable_name);
         };
 
         std::visit(std::move(format_parse_fn), format);

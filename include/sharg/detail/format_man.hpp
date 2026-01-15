@@ -57,29 +57,15 @@ private:
     //!\brief Prints a help page header in man page format to std::cout.
     void print_header()
     {
-        std::ostream_iterator<char> out(std::cout);
-
-        // Print .TH line.
         std::cout << ".TH ";
-        std::transform(meta.app_name.begin(),
-                       meta.app_name.end(),
-                       out,
-                       [](unsigned char c)
-                       {
-                           return std::toupper(c);
-                       });
-        std::cout << " " << std::to_string(meta.man_page_section) << " \"" << meta.date << "\" \"";
-        std::transform(meta.app_name.begin(),
-                       meta.app_name.end(),
-                       out,
-                       [](unsigned char c)
-                       {
-                           return std::tolower(c);
-                       });
-        std::cout << " " << meta.version << "\" \"" << meta.man_page_title << "\"\n";
+        print_as_uppercase(meta.app_name);
+        std::cout << ' ' << meta.man_page_section << " \"" << meta.date << "\" \"";
+        print_as_lowercase(meta.app_name);
+        std::cout << ' ' << meta.version << "\" \"" << meta.man_page_title << "\"\n";
 
-        // Print NAME section.
-        std::cout << ".SH NAME\n" << meta.app_name << " \\- " << meta.short_description << '\n';
+        std::cout << ".SH NAME\n";
+        print_as_lowercase(meta.app_name);
+        std::cout << " \\- " << meta.short_description << '\n';
     }
 
     /*!\brief Prints a section title in man page format to std::cout.
@@ -87,16 +73,9 @@ private:
      */
     void print_section(std::string const & title)
     {
-        std::ostream_iterator<char> out(std::cout);
         std::cout << ".SH ";
-        std::transform(title.begin(),
-                       title.end(),
-                       out,
-                       [](unsigned char c)
-                       {
-                           return std::toupper(c);
-                       });
-        std::cout << "\n";
+        print_as_uppercase(title);
+        std::cout << '\n';
         is_first_in_section = true;
     }
 
@@ -105,7 +84,7 @@ private:
      */
     void print_subsection(std::string const & title)
     {
-        std::cout << ".SS " << title << "\n";
+        std::cout << ".SS " << title << '\n';
         is_first_in_section = true;
     }
 
@@ -122,7 +101,7 @@ private:
         else if (!is_first_in_section && !line_is_paragraph)
             std::cout << ".br\n";
 
-        std::cout << text << "\n";
+        std::cout << text << '\n';
         is_first_in_section = false;
     }
 
@@ -137,7 +116,7 @@ private:
      */
     void print_list_item(std::string const & term, std::string const & desc)
     {
-        std::cout << ".TP\n" << term << "\n" << desc << "\n";
+        std::cout << ".TP\n" << term << '\n' << desc << '\n';
         is_first_in_section = false;
     }
 

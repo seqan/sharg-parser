@@ -53,6 +53,7 @@ protected:
     static inline void clear_and_add_option(sharg::parser & parser)
     {
         value.clear();
+        parser.info.synopsis = {""};
         parser.add_option(value, sharg::config{.short_id = 'o'});
     }
 };

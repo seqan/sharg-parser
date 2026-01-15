@@ -71,7 +71,7 @@ TEST_F(format_html_test, full_information_information)
 
     // Full html help page.
     auto parser = get_parser("--version-check", "false", "--export-help", "html");
-    parser.info.synopsis.push_back("./some_binary_name synopsis");
+    parser.info.synopsis = {"./some_binary_name synopsis"};
     parser.info.synopsis.push_back("./some_binary_name synopsis2");
     parser.info.description.push_back("description");
     parser.info.description.push_back("description2");

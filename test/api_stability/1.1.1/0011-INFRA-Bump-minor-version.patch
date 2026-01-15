@@ -1,7 +1,7 @@
-From 56df437f42727585b48586d12831241766067317 Mon Sep 17 00:00:00 2001
+From 8102b8baeec012fcd0b0f4a85477ee7a99f56f32 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Tue, 29 Jul 2025 14:45:23 +0200
-Subject: [PATCH 11/12] [INFRA] Bump minor version
+Subject: [PATCH 11/13] [INFRA] Bump minor version
 
 ---
  test/snippet/readme_sneak_peek.out   | 2 +-
@@ -46,5 +46,5 @@ index 52079db..925d869 100644
      parser.info.short_description = "A short description here.";
  
 -- 
-2.47.2
+2.47.3
 

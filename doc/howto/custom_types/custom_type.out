@@ -1,3 +1,4 @@
 my_foobar_parser
 ================
+    custom_type_snippet [-f|--foo-bar foo::bar]
     Try -h or --help for more information.

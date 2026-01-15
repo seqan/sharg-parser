@@ -104,7 +104,7 @@ public:
     }
 
     //!\brief Initiates the actual command line parsing.
-    void parse(parser_meta_data const & /*meta*/)
+    void parse(parser_meta_data const & /*meta*/, std::vector<std::string> const & /*executable_name*/)
     {
         end_of_options_it = std::find(arguments.begin(), arguments.end(), "--");
 
@@ -449,7 +449,7 @@ private:
         if (res == option_parse_result::error)
         {
             throw user_input_error{msg + "Argument " + input_value + " could not be parsed as type "
-                                   + get_type_name_as_string(option_type{}) + "."};
+                                   + get_type_name_as_string<option_type>() + "."};
         }
 
         if constexpr (std::is_arithmetic_v<option_type>)

@@ -1,7 +1,7 @@
-From 0316b2df82ed09916527bf62734d976507be47d6 Mon Sep 17 00:00:00 2001
+From 144e300eb69c24edeef35d914a339efb608dc5b5 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 29 Apr 2024 16:37:30 +0200
-Subject: [PATCH 08/12] [API][MISC] Allow options for subcommands
+Subject: [PATCH 08/13] [API][MISC] Allow options for subcommands
 
 ---
  test/unit/parser/format_parse_test.cpp        | 6 +++---
@@ -58,5 +58,5 @@ index 4d81119..e31a2e7 100644
 -    }
  }
 -- 
-2.47.2
+2.47.3
 

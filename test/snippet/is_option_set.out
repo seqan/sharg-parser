@@ -1,3 +1,4 @@
 awesome-app
 ===========
+    is_option_set_snippet [-a|--aint int32]
     Try -h or --help for more information.

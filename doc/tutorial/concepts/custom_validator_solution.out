@@ -1,3 +1,4 @@
 Test-Parser
 ===========
+    custom_validator_solution_snippet [-i int32] [-j int16]
     Try -h or --help for more information.
