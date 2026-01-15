@@ -24,6 +24,50 @@ The following API changes should be documented as such:
 If possible, provide tooling that performs the changes, e.g. a shell-script.
 -->
 
+# Release 1.2.0
+
+## Features
+
+* **Recursive subcommands**: Subcommands can now have their own subcommands, allowing for more complex command-line
+  interfaces (e.g., `git remote add`) ([#233](https://github.com/seqan/sharg-parser/pull/233)).
+* **Auto-generated synopsis**: The synopsis line shown in help pages is now automatically generated based on the
+  configured options and flags. A synopsis is only generated if no synopsis is given. You can deactivate this by
+  setting `parser.info.synopsis = {""};` ([#296](https://github.com/seqan/sharg-parser/pull/296)).
+* **Subparser metadata propagation**: Some metadata (e.g., `version`, `app_name`) is now automatically copied to
+  subparsers ([#285](https://github.com/seqan/sharg-parser/pull/285)).
+* **Multiple citations**: Applications can now specify multiple citations instead of just one
+  ([#280](https://github.com/seqan/sharg-parser/pull/280)).
+* `sharg::parser_meta_data` now supports designated initializers
+  ([#285](https://github.com/seqan/sharg-parser/pull/285)).
+
+## Bug fixes
+
+* Fixed `is_option_set()` to correctly match both long and short option identifiers
+  ([#226](https://github.com/seqan/sharg-parser/pull/226)).
+* Fixed an issue where having multiple flags refering to the same `bool value` (`add_flag(value, ...);`) resulted in
+  not setting `value` to `true` ([#243](https://github.com/seqan/sharg-parser/pull/243)).
+* Fixed CWL/CTD export to correctly mark positional options as required (positional list options remain optional)
+  ([#237](https://github.com/seqan/sharg-parser/pull/237)).
+* Fixed man page export to use lowercase application name ([#296](https://github.com/seqan/sharg-parser/pull/296)).
+
+## API changes
+
+#### Compiler
+
+* We now use C++23.
+* Compiler support (tested):
+  * GCC 13, 14, 15
+  * Clang 19, 20, 21
+  * Intel oneAPI C++ Compiler 2025.0 (IntelLLVM)
+  * Other compilers might work but are not tested, GCC < 12 and Clang < 17 are known to not work.
+
+#### Dependencies
+
+* We now use Doxygen version 1.10.0 to build our documentation
+  ([#230](https://github.com/seqan/sharg-parser/pull/230)).
+* Switched from git submodules to CPM (CMake Package Manager) for dependency management
+  ([#260](https://github.com/seqan/sharg-parser/pull/260)).
+
 # Release 1.1.2
 
 ## API changes
