@@ -1,4 +1,4 @@
-From cf96efeb9af817062291b9aea4b16e7a1852e9eb Mon Sep 17 00:00:00 2001
+From 210033b2395a014535fa9e714b9666de7c48a3ad Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Wed, 14 Jan 2026 21:20:35 +0100
 Subject: [PATCH 13/13] [NOAPI] Default synopsis
@@ -66,13 +66,13 @@ index 8451721..87b598c 100644
 +    external_custom_type_snippet [-f|--ext-bar external::bar]
      Try -h or --help for more information.
 diff --git a/doc/howto/subcommand_parser/subcommand_parse.out b/doc/howto/subcommand_parser/subcommand_parse.out
-index b60cad3..17bf306 100644
+index b60cad3..94065f9 100644
 --- a/doc/howto/subcommand_parser/subcommand_parse.out
 +++ b/doc/howto/subcommand_parser/subcommand_parse.out
 @@ -1,3 +1,4 @@
  mygit
  =====
-+    subcommand_parse_snippet -f|--flag
++    subcommand_parse_snippet [-f|--flag]
      Try -h or --help for more information.
 diff --git a/doc/tutorial/concepts/custom_validator_solution.out b/doc/tutorial/concepts/custom_validator_solution.out
 index 7769243..e7e2348 100644
@@ -84,43 +84,43 @@ index 7769243..e7e2348 100644
 +    custom_validator_solution_snippet [-i int32] [-j int16]
      Try -h or --help for more information.
 diff --git a/doc/tutorial/parser/solution3.out b/doc/tutorial/parser/solution3.out
-index 388c9fa..72d5642 100644
+index 388c9fa..cd9cf4c 100644
 --- a/doc/tutorial/parser/solution3.out
 +++ b/doc/tutorial/parser/solution3.out
 @@ -1,3 +1,5 @@
  Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
  ======================================================================
-+    solution3_snippet -H|--header-is-set [-y|--year uint32] [-a|--aggregate-by
-+    string] [--] path
++    solution3_snippet [-H|--header-is-set] [-y|--year uint32]
++    [-a|--aggregate-by string] [--] path
      Try -h or --help for more information.
 diff --git a/doc/tutorial/parser/solution4.out b/doc/tutorial/parser/solution4.out
-index 388c9fa..1a2eb13 100644
+index 388c9fa..b484816 100644
 --- a/doc/tutorial/parser/solution4.out
 +++ b/doc/tutorial/parser/solution4.out
 @@ -1,3 +1,5 @@
  Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
  ======================================================================
-+    solution4_snippet -H|--header-is-set [-s|--season uint8]...
++    solution4_snippet [-H|--header-is-set] [-s|--season uint8]...
 +    [-a|--aggregate-by string] [--] path
      Try -h or --help for more information.
 diff --git a/doc/tutorial/parser/solution5.out b/doc/tutorial/parser/solution5.out
-index 388c9fa..25601ce 100644
+index 388c9fa..94f7345 100644
 --- a/doc/tutorial/parser/solution5.out
 +++ b/doc/tutorial/parser/solution5.out
 @@ -1,3 +1,5 @@
  Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
  ======================================================================
-+    solution5_snippet -H|--header-is-set -s|--season uint8 [-s|--season
++    solution5_snippet [-H|--header-is-set] -s|--season uint8 [-s|--season
 +    uint8]... [-a|--aggregate-by string] [--] path
      Try -h or --help for more information.
 diff --git a/doc/tutorial/parser/solution6.out b/doc/tutorial/parser/solution6.out
-index 388c9fa..02689dc 100644
+index 388c9fa..a3f2898 100644
 --- a/doc/tutorial/parser/solution6.out
 +++ b/doc/tutorial/parser/solution6.out
 @@ -1,3 +1,5 @@
  Game-of-Parsing - Aggregate average Game of Thrones viewers by season.
  ======================================================================
-+    solution6_snippet -H|--header-is-set -s|--season uint8 [-s|--season
++    solution6_snippet [-H|--header-is-set] -s|--season uint8 [-s|--season
 +    uint8]... [-a|--aggregate-by string] [--] path
      Try -h or --help for more information.
 diff --git a/test/snippet/custom_enumeration.out b/test/snippet/custom_enumeration.out
@@ -151,13 +151,13 @@ index 3255ec5..6e97748 100644
 +    is_option_set_snippet [-a|--aint int32]
      Try -h or --help for more information.
 diff --git a/test/snippet/parser_1.out b/test/snippet/parser_1.out
-index 84a563e..29f8528 100644
+index 84a563e..741b7bb 100644
 --- a/test/snippet/parser_1.out
 +++ b/test/snippet/parser_1.out
 @@ -1,3 +1,4 @@
  Grade-Average
  =============
-+    parser_1_snippet [-n|--name string] -b|--bonus [--] double...
++    parser_1_snippet [-b|--bonus] [-n|--name string] [--] double...
      Try -h or --help for more information.
 diff --git a/test/snippet/parser_2.out b/test/snippet/parser_2.out
 index b92fc13..a88378e 100644

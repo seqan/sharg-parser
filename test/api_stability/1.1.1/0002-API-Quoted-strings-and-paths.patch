@@ -1,4 +1,4 @@
-From e19583fdc827f80ee5feffc17161176a512bbdbb Mon Sep 17 00:00:00 2001
+From 2821481d732dfda7ac00ce9d3089053b482ed168 Mon Sep 17 00:00:00 2001
 From: Enrico Seiler <enrico.seiler@hotmail.de>
 Date: Mon, 5 Feb 2024 16:02:03 +0100
 Subject: [PATCH 02/13] [API] Quoted strings and paths

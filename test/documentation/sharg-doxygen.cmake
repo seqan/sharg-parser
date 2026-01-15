@@ -37,8 +37,8 @@ set (SHARG_DOXYGEN_STD_TAGFILE "${PROJECT_BINARY_DIR}/cppreference-doxygen-web.t
 include (ExternalProject)
 ExternalProject_Add (
     download-cppreference-doxygen-web-tag
-    URL "https://github.com/PeterFeicht/cppreference-doc/releases/download/v20220730/html-book-20220730.tar.xz"
-    URL_HASH SHA256=71f15003c168b8dc5a00cbaf19b6480a9b3e87ab7e462aa39edb63d7511c028b
+    URL "https://github.com/PeterFeicht/cppreference-doc/releases/download/v20250209/html-book-20250209.tar.xz"
+    URL_HASH SHA256=ac50671a1f52d7f0ab0911d14450eb35e8c2f812edd0e426b2cd1e3d9db91d6f
     TLS_VERIFY ON
     DOWNLOAD_DIR "${PROJECT_BINARY_DIR}"
     DOWNLOAD_NAME "html-book.tar.xz"
@@ -53,11 +53,15 @@ add_test (NAME cppreference-doxygen-web-tag COMMAND ${CMAKE_COMMAND} --build ${C
                                                     download-cppreference-doxygen-web-tag)
 
 # doxygen does not show any warnings (doxygen prints warnings / errors to cerr)
+# Second line filters warnings from tag file.
+# Note: Because the commands are line-wise, CMake will insert a semicolon between them.
+#       If this is changed to be a single line, the semicolon must be manually inserted.
 set (SHARG_TEST_DOXYGEN_FAIL_ON_WARNINGS
-     "
-    ${DOXYGEN_EXECUTABLE} > doxygen.cout 2> doxygen.cerr;
-    cat \"doxygen.cerr\";
-    test ! -s \"doxygen.cerr\"")
+     "${DOXYGEN_EXECUTABLE} -q > doxygen.cout 2> doxygen.cerr"
+     "sed -i '/documented symbol '\\''T std::experimental::erase'\\'' was not declared or defined\\./d; /documented symbol '\\''T std::experimental::erase_if'\\'' was not declared or defined\\./d' \"doxygen.cerr\""
+     "cat \"doxygen.cerr\""
+     "test ! -s \"doxygen.cerr\""
+     CACHE INTERNAL "The doxygen test command")
 
 ### install helper
 
