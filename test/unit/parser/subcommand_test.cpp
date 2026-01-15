@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -317,7 +317,7 @@ TEST_F(subcommand_test, copy_meta_data)
                                          "    test_parser-index Copyright: BSD 3-Clause\n"
                                          "    Author: SeqAn-Team\n"
                                          "    Contact: mail@example.org\n"
-                                         "    SeqAn Copyright: 2006-2025 Knut Reinert, FU-Berlin; released under the\n"
+                                         "    SeqAn Copyright: 2006-2026 Knut Reinert, FU-Berlin; released under the\n"
                                          "    3-clause BSDL.\n"
                                          "    In your academic works please cite:\n"
                                          "    [1]   Cite me!\n"

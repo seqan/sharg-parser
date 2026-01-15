@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -276,7 +276,7 @@ TEST_F(format_man_test, full_info_short_copyright)
     std::string expected = this->expected + R"(.SH LEGAL
 \fBtest_parser Copyright: \fRshort copyright
 .br
-\fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
+\fBSeqAn Copyright: \fR2006-2026 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 )";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
@@ -296,7 +296,7 @@ TEST_F(format_man_test, full_info_short_and_citation)
     std::string expected = this->expected + R"(.SH LEGAL
 \fBtest_parser Copyright: \fRshort copyright
 .br
-\fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
+\fBSeqAn Copyright: \fR2006-2026 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 .br
 \fBIn your academic works please cite: \fR
 .TP
@@ -322,7 +322,7 @@ TEST_F(format_man_test, full_info_short_long_and_citation)
     std::string expected = this->expected + R"(.SH LEGAL
 \fBtest_parser Copyright: \fRshort copyright
 .br
-\fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
+\fBSeqAn Copyright: \fR2006-2026 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 .br
 \fBIn your academic works please cite: \fR
 .TP
@@ -348,7 +348,7 @@ TEST_F(format_man_test, full_info_author)
     std::string expected = this->expected + R"(.SH LEGAL
 \fBAuthor: \fRauthor
 .br
-\fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
+\fBSeqAn Copyright: \fR2006-2026 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 )";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
@@ -367,7 +367,7 @@ TEST_F(format_man_test, full_info_email)
     std::string expected = this->expected + R"(.SH LEGAL
 \fBContact: \fRemail
 .br
-\fBSeqAn Copyright: \fR2006-2025 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
+\fBSeqAn Copyright: \fR2006-2026 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
 )";
     EXPECT_EQ(get_parse_cout_on_exit(parser), expected);
 }
