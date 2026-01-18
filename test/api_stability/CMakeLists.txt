@@ -33,6 +33,7 @@ macro (sharg_api_stability_test test_suite git_apply)
                    -DCMAKE_CXX_FLAGS=${SHARG_API_STABILITY_CXX_FLAGS}
                    -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
                    -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_LIST_DIR}/../../cmake # use current build system
+                   -DSHARG_TEST_CPM_DIR=${CMAKE_CURRENT_LIST_DIR}/../../cmake
                    -DSHARG_VERBOSE_TESTS=OFF
         PATCH_COMMAND ${CMAKE_COMMAND} -E echo "<SOURCE_DIR>"
         COMMAND ${CMAKE_COMMAND} -E remove_directory "<SOURCE_DIR>/include"
