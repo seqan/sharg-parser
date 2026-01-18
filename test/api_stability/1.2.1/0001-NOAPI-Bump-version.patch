@@ -1,0 +1,50 @@
+From 0410716fff941cd751d4ce0135c4941d96e1eab7 Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Sun, 18 Jan 2026 19:23:23 +0100
+Subject: [PATCH] [NOAPI] Bump version
+
+---
+ test/snippet/readme_sneak_peek.out   | 2 +-
+ test/unit/detail/format_ctd_test.cpp | 2 +-
+ test/unit/detail/format_cwl_test.cpp | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/test/snippet/readme_sneak_peek.out b/test/snippet/readme_sneak_peek.out
+index 99c4be7..7e8292d 100644
+--- a/test/snippet/readme_sneak_peek.out
++++ b/test/snippet/readme_sneak_peek.out
+@@ -28,4 +28,4 @@ OPTIONS
+ VERSION
+     Last update:
+     Eat-Me-App version:
+-    Sharg version: 1.2.1
++    Sharg version: 1.2.2-rc.1
+diff --git a/test/unit/detail/format_ctd_test.cpp b/test/unit/detail/format_ctd_test.cpp
+index 6dd2aea..ad432f1 100644
+--- a/test/unit/detail/format_ctd_test.cpp
++++ b/test/unit/detail/format_ctd_test.cpp
+@@ -114,7 +114,7 @@ TEST_F(format_ctd_test, empty_information)
+     // Create the dummy parser.
+     auto parser = get_parser("--export-help", "ctd");
+     parser.info.date = "December 01, 1994";
+-    parser.info.version = "1.2.1";
++    parser.info.version = "1.2.2-rc.1";
+     parser.info.man_page_title = "default_man_page_title";
+     parser.info.short_description = "A short description here.";
+ 
+diff --git a/test/unit/detail/format_cwl_test.cpp b/test/unit/detail/format_cwl_test.cpp
+index 7c8862a..9f5ef7e 100644
+--- a/test/unit/detail/format_cwl_test.cpp
++++ b/test/unit/detail/format_cwl_test.cpp
+@@ -21,7 +21,7 @@ TEST_F(format_cwl_test, empty_information)
+     // Create the dummy parser.
+     auto parser = get_parser("--export-help", "cwl");
+     parser.info.date = "December 01, 1994";
+-    parser.info.version = "1.2.1";
++    parser.info.version = "1.2.2-rc.1";
+     parser.info.man_page_title = "default_man_page_title";
+     parser.info.short_description = "A short description here.";
+ 
+-- 
+2.47.3
+

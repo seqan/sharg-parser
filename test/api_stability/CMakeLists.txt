@@ -15,11 +15,11 @@ find_package (Git)
 include (../sharg-test.cmake)
 
 include (ExternalProject)
-set (SHARG_LAST_STABLE_VERSION "1.2.0")
+set (SHARG_LAST_STABLE_VERSION "1.2.1")
 set (SHARG_LAST_STABLE_SOURCE_URL
      "https://github.com/seqan/sharg-parser/releases/download/${SHARG_LAST_STABLE_VERSION}/sharg-${SHARG_LAST_STABLE_VERSION}-Source.tar.xz"
 )
-set (SHARG_LAST_STABLE_SOURCE_SHA256 "aac491bbde0d4d5446277c7c1f6cb4b814b2b4793b14b77f9838f139d50ae29f")
+set (SHARG_LAST_STABLE_SOURCE_SHA256 "3ff0bf3ae2b3b5f927445bca2224918c2954a716c12633be531a35e183bf94b6")
 
 set (SHARG_API_STABILITY_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSHARG_DISABLE_DEPRECATED_WARNINGS=1")
 
