@@ -13,8 +13,17 @@
 # Ideally, both are the same, which might not always be possible: https://github.com/cpm-cmake/CPM.cmake/issues/603
 # This is needed to support CPM_USE_LOCAL_PACKAGES
 
+# Each package has a (project-prefixed) version variable, which allows changing the version of a package without
+# changing the package lock file.
+# This is useful for packaging, where there might only be an older version, e.g. of googletest, available.
+# Note that the variable has to be a cache variable to work properly, but not a forced cache variable.
+# A clean reconfigure, i.e. deleting CMakeCache.txt, is needed to update the default version in an existing
+# build directory.
+
+# cmake-format: off
+
 # TDL
-set (SHARG_TDL_VERSION 1.0.1)
+set (SHARG_TDL_VERSION 1.1.0 CACHE STRING "")
 CPMDeclarePackage (tdl
                    NAME tdl
                    VERSION ${SHARG_TDL_VERSION}
@@ -22,7 +31,7 @@ CPMDeclarePackage (tdl
                    SYSTEM TRUE
                    OPTIONS "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # googletest
-set (SHARG_GOOGLETEST_VERSION 1.17.0)
+set (SHARG_GOOGLETEST_VERSION 1.17.0 CACHE STRING "")
 CPMDeclarePackage (googletest
                    NAME GTest
                    VERSION ${SHARG_GOOGLETEST_VERSION}
@@ -30,7 +39,7 @@ CPMDeclarePackage (googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # doxygen-awesome
-set (SHARG_DOXYGEN_AWESOME_VERSION 2.4.1)
+set (SHARG_DOXYGEN_AWESOME_VERSION 2.4.1 CACHE STRING "")
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${SHARG_DOXYGEN_AWESOME_VERSION}
@@ -38,7 +47,7 @@ CPMDeclarePackage (doxygen_awesome
                    DOWNLOAD_ONLY TRUE
                    QUIET YES)
 # use_ccache
-set (SHARG_USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37)
+set (SHARG_USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37 CACHE STRING "")
 CPMDeclarePackage (use_ccache
                    NAME use_ccache
                    GIT_TAG ${SHARG_USE_CCACHE_VERSION} # main
@@ -46,3 +55,5 @@ CPMDeclarePackage (use_ccache
                    SOURCE_SUBDIR ccache
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE)
+
+# cmake-format: on
