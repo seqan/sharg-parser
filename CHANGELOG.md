@@ -28,7 +28,7 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 ## Bug fixes
 
-* Resolved an issue preventing `seqan3/std/charconv' from working on macOS
+* Resolved an issue preventing `seqan3/std/charconv` from working on macOS
   ([\#304](https://github.com/seqan/sharg-parser/pull/304)).
 
 # Release 1.2.1
