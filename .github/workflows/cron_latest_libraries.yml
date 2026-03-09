@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: 2006-2026 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2026 Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+name: Latest Libraries
+
+on:
+  schedule:
+    - cron: "0 4 * * SUN"
+  workflow_dispatch:
+
+concurrency:
+  group: libs-actions
+  cancel-in-progress: true
+
+env:
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: ${{ matrix.build }} ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: ["clang-latest", "clang-second-latest", "clang-third-latest", "gcc-latest", "gcc-second-latest", "gcc-third-latest", "intel"]
+        build: [unit, snippet, header]
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Update dependencies
+        run: |
+          FILE="cmake/package-lock.cmake"
+          sed -i -E 's@(set \(SHARG_\S+_VERSION )[^\)]+\)@\1main)@g' $FILE
+          sed -i -E 's@VERSION( \$\{SHARG_\S+_VERSION\})@GIT_TAG\1@g' $FILE
+          cat $FILE
+
+      - name: Configure tests
+        run: |
+          mkdir build && cd build
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release
+          make gtest_main yaml-cpp
+
+      - name: Build tests
+        working-directory: build
+        run: |
+          make -k
+
+      - name: Run tests
+        working-directory: build
+        run: ctest . -j${{ matrix.build == 'snippet' && '1' || '' }} --output-on-failure --no-tests=error
