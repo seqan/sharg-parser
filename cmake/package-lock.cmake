@@ -23,7 +23,7 @@
 # cmake-format: off
 
 # TDL
-set (SHARG_TDL_VERSION 1.1.0 CACHE STRING "")
+set (SHARG_TDL_VERSION 1.1.1 CACHE STRING "")
 CPMDeclarePackage (tdl
                    NAME tdl
                    VERSION ${SHARG_TDL_VERSION}
