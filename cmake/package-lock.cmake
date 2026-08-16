@@ -31,7 +31,7 @@ CPMDeclarePackage (tdl
                    SYSTEM TRUE
                    OPTIONS "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # googletest
-set (SHARG_GOOGLETEST_VERSION 1.17.0 CACHE STRING "")
+set (SHARG_GOOGLETEST_VERSION 1.18.0 CACHE STRING "")
 CPMDeclarePackage (googletest
                    NAME GTest
                    VERSION ${SHARG_GOOGLETEST_VERSION}
