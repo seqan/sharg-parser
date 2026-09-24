@@ -9,13 +9,13 @@
 
 #pragma once
 
+#include <sharg/std/charconv>
 #include <array>
 #include <fstream>
 #include <future>
 #include <iostream>
 #include <optional>
 #include <regex>
-#include <sharg/std/charconv>
 
 #include <sharg/auxiliary.hpp>
 #include <sharg/detail/safe_filesystem_entry.hpp>
@@ -226,7 +226,8 @@ public:
 
         path tmp_path;
 
-        tmp_path = std::string{getenv(home_env_name)};
+        if (char * home_env = getenv(home_env_name); home_env != nullptr)
+            tmp_path = std::string{home_env};
         tmp_path /= ".config";
 
         // First, create .config if it does not already exist.
