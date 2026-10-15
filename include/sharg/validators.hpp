@@ -436,6 +436,8 @@ protected:
      * \throws sharg::validation_error if the given path is a directory.
      * \throws sharg::validation_error if the file could not be opened for writing.
      * \throws std::filesystem::filesystem_error on underlying OS API errors.
+     * \details
+     * An existing file is left unchanged. A file that does not exist is created for the check and removed afterwards.
      */
     void validate_writeability(std::filesystem::path const & path) const
     {
@@ -445,6 +447,16 @@ protected:
         if (std::filesystem::is_directory(path))
             throw validation_error{"\"" + path.string() + "\" is a directory. Cannot validate writeability."};
         // LCOV_EXCL_STOP
+
+        // Validation happens before the application runs, and the application may still fail. Truncating or removing
+        // an existing file here would destroy it. Opening it for appending checks the permissions without changing it.
+        if (std::filesystem::exists(path))
+        {
+            std::ofstream file{path, std::ios::app};
+            if (!file.is_open() || !file.good())
+                throw validation_error{"Cannot write \"" + path.string() + "\"!"};
+            return;
+        }
 
         std::ofstream file{path};
         sharg::detail::safe_filesystem_entry file_guard{path};
@@ -623,7 +635,7 @@ enum class output_file_open_options : uint8_t
  * In addition, the validator receives a sharg::output_file_open_options which allows you to specify what to do if your
  * output file already exists. sharg::output_file_open_options::create_new will throw a sharg::validation_error
  * exception if it already exists and sharg::output_file_open_options::open_or_create will skip this check (that means
- * you are allowed to overwrite the existing file).
+ * you are allowed to overwrite the existing file). The validator itself does not modify an existing file.
  *
  * \include test/snippet/validators_output_file.cpp
  *
