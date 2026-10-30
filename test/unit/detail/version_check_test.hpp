@@ -52,10 +52,24 @@ protected:
         return false;
     }
 
+    // Some tests change TMPDIR, which is restored after each test case.
+    std::optional<std::string> cached_tmpdir{};
+
     void SetUp() override
     {
+        if (char const * tmpdir = std::getenv("TMPDIR"))
+            cached_tmpdir = tmpdir;
+
         // set HOME environment to a random home folder before starting each test case
         randomise_home_folder();
+    }
+
+    void TearDown() override
+    {
+        if (cached_tmpdir.has_value())
+            setenv("TMPDIR", cached_tmpdir->c_str(), 1);
+        else
+            unsetenv("TMPDIR");
     }
 
     static std::filesystem::path app_tmp_path()
@@ -537,6 +551,73 @@ TEST_F(version_check_test, wrong_version_string)
     EXPECT_EQ(err, "");
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
+}
+
+//------------------------------------------------------------------------------
+// directory for the timestamp and version files
+//------------------------------------------------------------------------------
+
+TEST_F(version_check_test, no_writable_directory)
+{
+    // HOME/.config cannot be created and the fallback TMPDIR is not a directory.
+    std::filesystem::path const missing = tmp_file.get_path().parent_path() / "missing";
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, missing.c_str(), 1), 0);
+    ASSERT_EQ(setenv("TMPDIR", missing.c_str(), 1), 0);
+    ASSERT_TRUE(app_tmp_path().empty());
+
+    {
+        auto [out, err, app_call_succeeded] = simulate_parser("-f");
+
+        EXPECT_EQ(out, "");
+        EXPECT_EQ(err, "");
+        EXPECT_FALSE(app_call_succeeded);
+        // Without a directory, the timestamp file would be written to the current working directory.
+        EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename())) << app_timestamp_filename();
+    }
+
+    {
+        auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
+
+        EXPECT_EQ(out, "");
+        EXPECT_EQ(err, "");
+        EXPECT_FALSE(app_call_succeeded);
+        // Without a directory, the version file would be downloaded to the current working directory.
+        EXPECT_FALSE(std::filesystem::exists(app_version_filename())) << app_version_filename();
+    }
+}
+
+TEST_F(version_check_test, tmp_directory_fallback)
+{
+    // HOME/.config cannot be created, hence the temporary directory is used.
+    std::filesystem::path const missing = tmp_file.get_path().parent_path() / "missing";
+    std::filesystem::path const tmp_directory = tmp_file.get_path().parent_path() / "tmp";
+    std::filesystem::create_directory(tmp_directory);
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, missing.c_str(), 1), 0);
+    ASSERT_EQ(setenv("TMPDIR", tmp_directory.c_str(), 1), 0);
+
+    EXPECT_EQ(app_tmp_path(), tmp_directory);
+
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
+
+    EXPECT_EQ(out, "");
+    EXPECT_EQ(err, "");
+    EXPECT_FALSE(app_call_succeeded);
+    EXPECT_TRUE(std::filesystem::exists(tmp_directory / app_timestamp_filename().filename()));
+}
+
+TEST_F(version_check_test, option_off_no_directory_created)
+{
+    std::filesystem::path const home = tmp_file.get_path().parent_path() / "home";
+    std::filesystem::create_directory(home);
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, home.c_str(), 1), 0);
+
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_OFF, "-f");
+
+    EXPECT_EQ(out, "");
+    EXPECT_EQ(err, "");
+    EXPECT_FALSE(app_call_succeeded);
+    // The directory for the timestamp and version files is only determined (and created) if needed.
+    EXPECT_FALSE(std::filesystem::exists(home / ".config"));
 }
 
 //------------------------------------------------------------------------------

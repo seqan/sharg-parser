@@ -280,7 +280,15 @@ public:
 
         // .config/seqan cannot be created, try tmp directory.
         if (err)
-            tmp_path = temp_directory_path(); // choose temp dir instead
+        {
+            tmp_path = temp_directory_path(err); // choose temp dir instead
+
+            if (err) // e.g., TMPDIR is not a directory
+            {
+                tmp_path.clear(); // empty path signals no available directory to write to
+                return tmp_path;
+            }
+        }
 
         // check if files can be written inside dir
         path dummy = tmp_path / "dummy.txt";
@@ -300,6 +308,21 @@ public:
         return tmp_path;
     }
 
+    /*!\brief Whether the developer, the environment variable SHARG_NO_VERSION_CHECK or the user disabled the check.
+     * \param[in] developer_approval Whether the developer approved (update_notifications::on) or not
+     *                               (update_notifications::off).
+     * \param[in] user_approval      Whether the user approved (true) or not (false) or did not decide (unset optional).
+     *
+     * In contrast to decide_if_check_is_performed(), this does not need the directory for the timestamp and version
+     * files. Hence, the parser can call it before constructing the version_checker, which determines and creates this
+     * directory.
+     */
+    static bool is_disabled(update_notifications developer_approval, std::optional<bool> user_approval)
+    {
+        return developer_approval == update_notifications::off || std::getenv("SHARG_NO_VERSION_CHECK") != nullptr
+            || user_approval == false;
+    }
+
     /*!\brief The central decision whether to perform the version check or not.
      * \param[in] developer_approval Whether the developer approved (update_notifications::on) or not
      *                               (update_notifications::off).
@@ -314,7 +337,8 @@ public:
      * No cookie is written.
      *
      * If the user explicitly uses the --version-check option (user_approval is set) it rules out all following
-     * decisions. No cookie is written.
+     * decisions. No cookie is written. However, if there is no writable directory (see get_path()), no version check
+     * is done even if the user specified --version-check true.
      *
      * If none of the above apply, version check was not explicitly handled so cookie content is checked:
      * * NEVER: Do not perform the version check and do not change the cookie.
@@ -327,14 +351,14 @@ public:
      */
     bool decide_if_check_is_performed(update_notifications developer_approval, std::optional<bool> user_approval)
     {
-        if (developer_approval == update_notifications::off)
+        if (is_disabled(developer_approval, user_approval))
             return false;
 
-        if (std::getenv("SHARG_NO_VERSION_CHECK") != nullptr) // environment variable was set
+        if (cookie_path.empty()) // no directory to write the timestamp and version files to
             return false;
 
-        if (user_approval.has_value())
-            return user_approval.value();
+        if (user_approval.has_value()) // the user explicitly enabled the version check
+            return true;
 
         // version check was not explicitly handled so let's check the cookie
         if (std::filesystem::exists(cookie_path))
