@@ -1120,6 +1120,10 @@ private:
      */
     inline void run_version_check()
     {
+        // Constructing the version_checker determines and creates the directory for its files.
+        if (detail::version_checker::is_disabled(version_check_dev_decision, version_check_user_decision))
+            return;
+
         detail::version_checker app_version{info.app_name, info.version, info.url};
 
         if (app_version.decide_if_check_is_performed(version_check_dev_decision, version_check_user_decision))

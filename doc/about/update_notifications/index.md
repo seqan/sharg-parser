@@ -38,6 +38,15 @@ automatically determined).
 We inform the developer about new Sharg versions, if the app is running in debug mode.
 Additionally, we recommend registering your app with us (support@seqan.de).
 
+## Where the files are stored
+
+The timestamp, the user's choice, and the server's response are stored in `~/.config/seqan`, i.e., in the directory
+given by the environment variable `HOME` (`UserProfile` on Windows).
+If this environment variable is not set or empty, `.config/seqan` is created in the current working directory instead.
+If `.config/seqan` cannot be created, the temporary directory (e.g., `TMPDIR`) is used.
+If the chosen directory is not writable, no version check is performed. If the terminal is interactive, a message
+informs about this.
+
 ## Privacy Implications
 
 **No data is transmitted unless the user _explicitly_ allows it.**

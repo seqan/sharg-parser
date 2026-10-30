@@ -52,10 +52,29 @@ protected:
         return false;
     }
 
+    // Some tests change TMPDIR or the current working directory, which are restored after each test case.
+    std::optional<std::string> cached_tmpdir{};
+    std::filesystem::path const cached_working_directory{std::filesystem::current_path()};
+
     void SetUp() override
     {
+        if (char const * tmpdir = std::getenv("TMPDIR"))
+            cached_tmpdir = tmpdir;
+
         // set HOME environment to a random home folder before starting each test case
         randomise_home_folder();
+    }
+
+    void TearDown() override
+    {
+        if (cached_tmpdir.has_value())
+            setenv("TMPDIR", cached_tmpdir->c_str(), 1);
+        else
+            unsetenv("TMPDIR");
+
+        std::error_code error{};
+        std::filesystem::current_path(cached_working_directory, error);
+        EXPECT_FALSE(error) << error.message();
     }
 
     static std::filesystem::path app_tmp_path()
@@ -535,6 +554,183 @@ TEST_F(version_check_test, wrong_version_string)
 
     EXPECT_EQ(out, "");
     EXPECT_EQ(err, "");
+
+    EXPECT_TRUE(remove_files_from_path()); // clear files again
+}
+
+//------------------------------------------------------------------------------
+// directory for the timestamp and version files
+//------------------------------------------------------------------------------
+
+// Checking whether the directory is writable must not modify existing files, which might belong to someone else.
+TEST_F(version_check_test, existing_dummy_file)
+{
+    std::filesystem::path const directory = app_tmp_path();
+    std::filesystem::path const dummy_file = directory / "dummy.txt";
+    ASSERT_TRUE(create_file(dummy_file, "existing content"));
+
+    EXPECT_EQ(app_tmp_path(), directory);
+    EXPECT_EQ(read_first_line(dummy_file), "existing content");
+
+    // A file that is not writable does not affect whether the directory is writable.
+    std::filesystem::permissions(dummy_file,
+                                 std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                     | std::filesystem::perms::others_write,
+                                 std::filesystem::perm_options::remove);
+
+    EXPECT_EQ(app_tmp_path(), directory);
+    EXPECT_EQ(read_first_line(dummy_file), "existing content");
+
+    // The probe files are removed again.
+    EXPECT_EQ(std::ranges::distance(std::filesystem::directory_iterator{directory}), 1);
+}
+
+// Without a home directory, the files are stored in .config/seqan relative to the current working directory.
+TEST_F(version_check_test, home_not_set_or_empty)
+{
+    std::filesystem::path const working_directory = tmp_file.get_path().parent_path() / "working_directory";
+    std::filesystem::create_directory(working_directory);
+    ASSERT_EQ(unsetenv(sharg::detail::version_checker::home_env_name), 0);
+    std::filesystem::current_path(working_directory); // Restored in TearDown.
+
+    EXPECT_EQ(app_tmp_path(), std::filesystem::path{".config"} / "seqan");
+    EXPECT_TRUE(std::filesystem::is_directory(working_directory / ".config" / "seqan"));
+
+    // The version check writes its timestamp file there.
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
+    EXPECT_FALSE(app_call_succeeded);
+    EXPECT_TRUE(app_timestamp_filename().is_relative()) << app_timestamp_filename();
+    EXPECT_TRUE(std::filesystem::exists(working_directory / app_timestamp_filename())) << app_timestamp_filename();
+
+    // An empty home directory behaves the same.
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, "", 1), 0);
+    EXPECT_EQ(app_tmp_path(), std::filesystem::path{".config"} / "seqan");
+}
+
+TEST_F(version_check_test, no_writable_directory)
+{
+    // HOME/.config cannot be created and the fallback TMPDIR is not a directory.
+    std::filesystem::path const missing = tmp_file.get_path().parent_path() / "missing";
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, missing.c_str(), 1), 0);
+    ASSERT_EQ(setenv("TMPDIR", missing.c_str(), 1), 0);
+    ASSERT_TRUE(app_tmp_path().empty());
+
+    // version_checker::message_no_writable_directory is only printed if the terminal is interactive. The tests are
+    // not interactive because stderr is captured.
+    {
+        auto [out, err, app_call_succeeded] = simulate_parser("-f");
+
+        EXPECT_EQ(out, "");
+        EXPECT_EQ(err, "");
+        EXPECT_FALSE(app_call_succeeded);
+        // Without a directory, the timestamp file would be written to the current working directory.
+        EXPECT_FALSE(std::filesystem::exists(app_timestamp_filename())) << app_timestamp_filename();
+    }
+
+    {
+        auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
+
+        EXPECT_EQ(out, "");
+        EXPECT_EQ(err, "");
+        EXPECT_FALSE(app_call_succeeded);
+        // Without a directory, the version file would be downloaded to the current working directory.
+        EXPECT_FALSE(std::filesystem::exists(app_version_filename())) << app_version_filename();
+    }
+}
+
+TEST_F(version_check_test, tmp_directory_fallback)
+{
+    // HOME/.config cannot be created, hence the temporary directory is used.
+    std::filesystem::path const missing = tmp_file.get_path().parent_path() / "missing";
+    std::filesystem::path const tmp_directory = tmp_file.get_path().parent_path() / "tmp";
+    std::filesystem::create_directory(tmp_directory);
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, missing.c_str(), 1), 0);
+    ASSERT_EQ(setenv("TMPDIR", tmp_directory.c_str(), 1), 0);
+
+    EXPECT_EQ(app_tmp_path(), tmp_directory);
+
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
+
+    EXPECT_EQ(out, "");
+    EXPECT_EQ(err, "");
+    EXPECT_FALSE(app_call_succeeded);
+    EXPECT_TRUE(std::filesystem::exists(tmp_directory / app_timestamp_filename().filename()));
+}
+
+TEST_F(version_check_test, option_off_no_directory_created)
+{
+    std::filesystem::path const home = tmp_file.get_path().parent_path() / "home";
+    std::filesystem::create_directory(home);
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, home.c_str(), 1), 0);
+
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_OFF, "-f");
+
+    EXPECT_EQ(out, "");
+    EXPECT_EQ(err, "");
+    EXPECT_FALSE(app_call_succeeded);
+    // The directory for the timestamp and version files is only determined (and created) if needed.
+    EXPECT_FALSE(std::filesystem::exists(home / ".config"));
+}
+
+//------------------------------------------------------------------------------
+// shell quoting
+//------------------------------------------------------------------------------
+
+#if !defined(_WIN32)
+TEST_F(version_check_test, quote_argument)
+{
+    std::filesystem::path const tmp_directory = tmp_file.get_path().parent_path();
+    std::filesystem::path const out_file = tmp_directory / "quoted.out";
+    std::string const marker = (tmp_directory / "injected").string();
+
+    for (std::string const & argument : {std::string{"with space"},
+                                         std::string{"it's"},
+                                         std::string{"''"},
+                                         "a;touch " + marker + ";b",
+                                         "$(touch " + marker + ")",
+                                         "`touch " + marker + "`",
+                                         std::string{"\"double\" \\back\\slash $HOME *"},
+                                         std::string{"line\nbreak"}})
+    {
+        std::string const command = "printf '%s' " + sharg::detail::quote_argument(argument) + " > "
+                                  + sharg::detail::quote_argument(out_file.string());
+        ASSERT_EQ(std::system(command.c_str()), 0) << command;
+
+        std::ifstream file{out_file};
+        EXPECT_EQ((std::string{std::istreambuf_iterator<char>{file}, std::istreambuf_iterator<char>{}}), argument);
+    }
+
+    EXPECT_FALSE(std::filesystem::exists(marker));
+}
+#endif // !defined(_WIN32)
+
+// The path of the version file is derived from the home directory and passed to the shell.
+TEST_F(version_check_test, home_with_shell_metacharacters)
+{
+    // Without wget or curl, no command is executed and the test would pass regardless of the quoting.
+    if (std::system("/usr/bin/env -i wget --version > /dev/null 2>&1")
+        && std::system("/usr/bin/env -i curl --version > /dev/null 2>&1"))
+        GTEST_SKIP() << "Neither wget nor curl is available.";
+
+    std::filesystem::path const tmp_directory = tmp_file.get_path().parent_path();
+    std::filesystem::path const marker = tmp_directory / "injected";
+    std::filesystem::path const home = tmp_directory / ("home;touch " + marker.string() + ";x");
+
+    // The home directory must exist, otherwise the tmp directory is used.
+    std::filesystem::create_directories(home);
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, home.c_str(), 1), 0);
+    ASSERT_TRUE(app_tmp_path().string().starts_with(home.string())) << app_tmp_path();
+
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
+
+    EXPECT_EQ(out, "");
+    EXPECT_EQ(err, "");
+    EXPECT_FALSE(std::filesystem::exists(marker));
+
+    if (app_call_succeeded)
+    {
+        EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
+    }
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
