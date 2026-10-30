@@ -557,6 +557,29 @@ TEST_F(version_check_test, wrong_version_string)
 // directory for the timestamp and version files
 //------------------------------------------------------------------------------
 
+// Checking whether the directory is writable must not modify existing files, which might belong to someone else.
+TEST_F(version_check_test, existing_dummy_file)
+{
+    std::filesystem::path const directory = app_tmp_path();
+    std::filesystem::path const dummy_file = directory / "dummy.txt";
+    ASSERT_TRUE(create_file(dummy_file, "existing content"));
+
+    EXPECT_EQ(app_tmp_path(), directory);
+    EXPECT_EQ(read_first_line(dummy_file), "existing content");
+
+    // A file that is not writable does not affect whether the directory is writable.
+    std::filesystem::permissions(dummy_file,
+                                 std::filesystem::perms::owner_write | std::filesystem::perms::group_write
+                                     | std::filesystem::perms::others_write,
+                                 std::filesystem::perm_options::remove);
+
+    EXPECT_EQ(app_tmp_path(), directory);
+    EXPECT_EQ(read_first_line(dummy_file), "existing content");
+
+    // The probe files are removed again.
+    EXPECT_EQ(std::ranges::distance(std::filesystem::directory_iterator{directory}), 1);
+}
+
 TEST_F(version_check_test, no_writable_directory)
 {
     // HOME/.config cannot be created and the fallback TMPDIR is not a directory.

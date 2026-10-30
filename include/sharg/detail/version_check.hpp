@@ -11,6 +11,8 @@
 
 #include <sharg/std/charconv>
 #include <array>
+#include <cassert>
+#include <filesystem>
 #include <fstream>
 #include <future>
 #include <iostream>
@@ -18,7 +20,6 @@
 #include <regex>
 
 #include <sharg/auxiliary.hpp>
-#include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/detail/terminal.hpp>
 
 namespace sharg::detail
@@ -290,15 +291,20 @@ public:
             }
         }
 
-        // check if files can be written inside dir
-        path dummy = tmp_path / "dummy.txt";
-        std::ofstream file{dummy};
-        sharg::detail::safe_filesystem_entry file_guard{dummy};
+        // Check if files can be written inside dir. An existing file, e.g., in the temporary directory, might belong to
+        // someone else and must not be opened. Hence, the probe file gets a unique name and std::ios::noreplace fails
+        // instead of opening an existing file. In the unlikely case of a name clash, the directory is not used.
+        path const dummy =
+            tmp_path
+            / ("dummy_" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".txt");
+        std::ofstream file{dummy, std::ios::out | std::ios::noreplace};
 
         bool is_open = file.is_open();
         bool is_good = file.good();
         file.close();
-        file_guard.remove_no_throw();
+
+        if (is_open) // only remove the file if it was created here
+            remove(dummy, err);
 
         if (!is_good || !is_open) // no write permissions
         {
