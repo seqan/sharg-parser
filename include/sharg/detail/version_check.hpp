@@ -257,7 +257,12 @@ public:
         std::thread(call_server, command, std::move(prom)).detach();
     }
 
-    //!\brief Returns a writable path to store timestamp and version files or an empty path if none exists.
+    /*!\brief Returns a writable path to store timestamp and version files or an empty path if none exists.
+     * \details
+     * The path is `.config/seqan` in the home directory given by the environment variable `HOME` (`UserProfile` on
+     * Windows). If this variable is not set or empty, `.config/seqan` is relative to the current working directory.
+     * If `.config/seqan` cannot be created, the temporary directory is used, see std::filesystem::temp_directory_path.
+     */
     static std::filesystem::path get_path()
     {
         using namespace std::filesystem;

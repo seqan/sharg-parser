@@ -52,8 +52,9 @@ protected:
         return false;
     }
 
-    // Some tests change TMPDIR, which is restored after each test case.
+    // Some tests change TMPDIR or the current working directory, which are restored after each test case.
     std::optional<std::string> cached_tmpdir{};
+    std::filesystem::path const cached_working_directory{std::filesystem::current_path()};
 
     void SetUp() override
     {
@@ -70,6 +71,10 @@ protected:
             setenv("TMPDIR", cached_tmpdir->c_str(), 1);
         else
             unsetenv("TMPDIR");
+
+        std::error_code error{};
+        std::filesystem::current_path(cached_working_directory, error);
+        EXPECT_FALSE(error) << error.message();
     }
 
     static std::filesystem::path app_tmp_path()
@@ -578,6 +583,28 @@ TEST_F(version_check_test, existing_dummy_file)
 
     // The probe files are removed again.
     EXPECT_EQ(std::ranges::distance(std::filesystem::directory_iterator{directory}), 1);
+}
+
+// Without a home directory, the files are stored in .config/seqan relative to the current working directory.
+TEST_F(version_check_test, home_not_set_or_empty)
+{
+    std::filesystem::path const working_directory = tmp_file.get_path().parent_path() / "working_directory";
+    std::filesystem::create_directory(working_directory);
+    ASSERT_EQ(unsetenv(sharg::detail::version_checker::home_env_name), 0);
+    std::filesystem::current_path(working_directory); // Restored in TearDown.
+
+    EXPECT_EQ(app_tmp_path(), std::filesystem::path{".config"} / "seqan");
+    EXPECT_TRUE(std::filesystem::is_directory(working_directory / ".config" / "seqan"));
+
+    // The version check writes its timestamp file there.
+    auto [out, err, app_call_succeeded] = simulate_parser("-f");
+    EXPECT_FALSE(app_call_succeeded);
+    EXPECT_TRUE(app_timestamp_filename().is_relative()) << app_timestamp_filename();
+    EXPECT_TRUE(std::filesystem::exists(working_directory / app_timestamp_filename())) << app_timestamp_filename();
+
+    // An empty home directory behaves the same.
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, "", 1), 0);
+    EXPECT_EQ(app_tmp_path(), std::filesystem::path{".config"} / "seqan");
 }
 
 TEST_F(version_check_test, no_writable_directory)
