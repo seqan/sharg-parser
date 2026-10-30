@@ -538,3 +538,66 @@ TEST_F(version_check_test, wrong_version_string)
 
     EXPECT_TRUE(remove_files_from_path()); // clear files again
 }
+
+//------------------------------------------------------------------------------
+// shell quoting
+//------------------------------------------------------------------------------
+
+#if !defined(_WIN32)
+TEST_F(version_check_test, quote_argument)
+{
+    std::filesystem::path const tmp_directory = tmp_file.get_path().parent_path();
+    std::filesystem::path const out_file = tmp_directory / "quoted.out";
+    std::string const marker = (tmp_directory / "injected").string();
+
+    for (std::string const & argument : {std::string{"with space"},
+                                         std::string{"it's"},
+                                         std::string{"''"},
+                                         "a;touch " + marker + ";b",
+                                         "$(touch " + marker + ")",
+                                         "`touch " + marker + "`",
+                                         std::string{"\"double\" \\back\\slash $HOME *"},
+                                         std::string{"line\nbreak"}})
+    {
+        std::string const command = "printf '%s' " + sharg::detail::quote_argument(argument) + " > "
+                                  + sharg::detail::quote_argument(out_file.string());
+        ASSERT_EQ(std::system(command.c_str()), 0) << command;
+
+        std::ifstream file{out_file};
+        EXPECT_EQ((std::string{std::istreambuf_iterator<char>{file}, std::istreambuf_iterator<char>{}}), argument);
+    }
+
+    EXPECT_FALSE(std::filesystem::exists(marker));
+}
+#endif // !defined(_WIN32)
+
+// The path of the version file is derived from the home directory and passed to the shell.
+TEST_F(version_check_test, home_with_shell_metacharacters)
+{
+    // Without wget or curl, no command is executed and the test would pass regardless of the quoting.
+    if (std::system("/usr/bin/env -i wget --version > /dev/null 2>&1")
+        && std::system("/usr/bin/env -i curl --version > /dev/null 2>&1"))
+        GTEST_SKIP() << "Neither wget nor curl is available.";
+
+    std::filesystem::path const tmp_directory = tmp_file.get_path().parent_path();
+    std::filesystem::path const marker = tmp_directory / "injected";
+    std::filesystem::path const home = tmp_directory / ("home;touch " + marker.string() + ";x");
+
+    // The home directory must exist, otherwise the tmp directory is used.
+    std::filesystem::create_directories(home);
+    ASSERT_EQ(setenv(sharg::detail::version_checker::home_env_name, home.c_str(), 1), 0);
+    ASSERT_TRUE(app_tmp_path().string().starts_with(home.string())) << app_tmp_path();
+
+    auto [out, err, app_call_succeeded] = simulate_parser(OPTION_VERSION_CHECK, OPTION_ON, "-f");
+
+    EXPECT_EQ(out, "");
+    EXPECT_EQ(err, "");
+    EXPECT_FALSE(std::filesystem::exists(marker));
+
+    if (app_call_succeeded)
+    {
+        EXPECT_TRUE(std::filesystem::exists(app_version_filename()));
+    }
+
+    EXPECT_TRUE(remove_files_from_path()); // clear files again
+}

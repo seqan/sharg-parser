@@ -45,6 +45,43 @@ inline void call_server(std::string const & command, std::promise<bool> prom)
 }
 
 // ------------------------------------------------------------------------------------------------------------------
+// function quote_argument()
+// ------------------------------------------------------------------------------------------------------------------
+
+/*!\brief Quotes a string such that the shell executing the server call treats it as a single, literal argument.
+ * \ingroup parser
+ * \param[in] argument The string to quote.
+ * \returns The single-quoted string.
+ *
+ * Within single quotes, only the single quote itself needs to be escaped.
+ */
+inline std::string quote_argument(std::string const & argument)
+{
+#if defined(_WIN32)
+    // The argument is part of a PowerShell command, which escapes a single quote by doubling it.
+    // Windows is not supported. If it ever is, this needs to be adapted: PowerShell also treats the typographic quotes
+    // U+2018 to U+201B as single quotes, and cmd.exe, which runs the command, expands %VARIABLE% even within quotes.
+    constexpr std::string_view escaped_quote{"''"};
+#else
+    // A POSIX shell cannot escape a single quote within single quotes: close the quotes, add an escaped quote, reopen.
+    constexpr std::string_view escaped_quote{"'\\''"};
+#endif
+
+    std::string result{'\''};
+
+    for (char const c : argument)
+    {
+        if (c == '\'')
+            result.append(escaped_quote);
+        else
+            result.push_back(c);
+    }
+
+    result.push_back('\'');
+    return result;
+}
+
+// ------------------------------------------------------------------------------------------------------------------
 // version_checker
 // ------------------------------------------------------------------------------------------------------------------
 
@@ -182,12 +219,12 @@ public:
             return;
         }
 
-        // 'cookie_path' is no user input and `name` is escaped on construction of the parser.
+        // 'cookie_path' is derived from environment variables and may contain any character, e.g. spaces.
         std::filesystem::path out_file = cookie_path / (name + ".version");
 
         // build up command for server call
         std::string command = program + // no user defined input
-                              " " + out_file.string() + " "
+                              " " + quote_argument(out_file.string()) + " "
                             + std::string{"https://seqan-update.cs.uni-tuebingen.de/check/SeqAn-Sharg_"} +
 #ifdef __linux
                               "Linux" +
