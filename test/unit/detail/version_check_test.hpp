@@ -615,6 +615,8 @@ TEST_F(version_check_test, no_writable_directory)
     ASSERT_EQ(setenv("TMPDIR", missing.c_str(), 1), 0);
     ASSERT_TRUE(app_tmp_path().empty());
 
+    // version_checker::message_no_writable_directory is only printed if the terminal is interactive. The tests are
+    // not interactive because stderr is captured.
     {
         auto [out, err, app_call_succeeded] = simulate_parser("-f");
 

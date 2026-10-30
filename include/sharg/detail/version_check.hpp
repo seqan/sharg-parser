@@ -349,7 +349,8 @@ public:
      *
      * If the user explicitly uses the --version-check option (user_approval is set) it rules out all following
      * decisions. No cookie is written. However, if there is no writable directory (see get_path()), no version check
-     * is done even if the user specified --version-check true.
+     * is done even if the user specified --version-check true. If the terminal is interactive,
+     * message_no_writable_directory is printed instead.
      *
      * If none of the above apply, version check was not explicitly handled so cookie content is checked:
      * * NEVER: Do not perform the version check and do not change the cookie.
@@ -366,7 +367,13 @@ public:
             return false;
 
         if (cookie_path.empty()) // no directory to write the timestamp and version files to
+        {
+            // Like the question whether to perform the version check, the message is only shown interactively.
+            if (detail::stdin_is_terminal() && detail::stderr_is_terminal()) // LCOV_EXCL_START
+                std::cerr << message_no_writable_directory << std::flush;
+            // LCOV_EXCL_STOP
             return false;
+        }
 
         if (user_approval.has_value()) // the user explicitly enabled the version check
             return true;
@@ -480,6 +487,12 @@ public:
         "[APP VERSION INFO] :: We noticed the app version you use is newer than the one registered with us.\n"
         "[APP VERSION INFO] :: Please send us an email with the new version so we can correct it "
         "(support@seqan.de)\n\n";
+    //!\brief The message if the version check is skipped because there is no writable directory for its files.
+    static constexpr std::string_view message_no_writable_directory =
+        "[SHARG VERSION INFO] :: The version check was skipped because there is no writable directory for its files.\n"
+        "[SHARG VERSION INFO] :: For details, see "
+        "https://docs.seqan.de/sharg/main_user/about_update_notifications.html\n"
+        "[SHARG VERSION INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
     //!\brief The message directed to the user of the app if a new app version is available.
     std::string message_app_update =
         "[APP VERSION INFO] :: A new version of this application is now available.\n"

@@ -44,7 +44,8 @@ The timestamp, the user's choice, and the server's response are stored in `~/.co
 given by the environment variable `HOME` (`UserProfile` on Windows).
 If this environment variable is not set or empty, `.config/seqan` is created in the current working directory instead.
 If `.config/seqan` cannot be created, the temporary directory (e.g., `TMPDIR`) is used.
-If the chosen directory is not writable, no version check is performed.
+If the chosen directory is not writable, no version check is performed. If the terminal is interactive, a message
+informs about this.
 
 ## Privacy Implications
 
