@@ -18,8 +18,6 @@ jobs:
   autofix:
     name: Lint Autofix
     uses: seqan/actions/.github/workflows/lint_autofix.yml@main
-    with:
-      clang_format: '15' # must match ci_lint.yml
     permissions:
       contents: read
       pull-requests: read
