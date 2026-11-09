@@ -415,8 +415,7 @@ public:
     /*Will be extended if a url is given on construction of version_check.*/
 
     //!\brief The environment name of the home environment used by getenv()
-    static constexpr char const * home_env_name
-    {
+    static constexpr char const * home_env_name{
 #if defined(_WIN32)
         "UserProfile"
 #else

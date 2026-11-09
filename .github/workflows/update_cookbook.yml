@@ -25,13 +25,22 @@ jobs:
   update-cookbook:
     name: Update Cookbook
     runs-on: ubuntu-latest
+    environment: main-bot # deployment branch: main
     timeout-minutes: 15
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     steps:
+      - name: Create App token
+        id: token
+        uses: actions/create-github-app-token@v3 # locked via actions.lock
+        with:
+          client-id: ${{ vars.SEQAN_MAIN_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.SEQAN_MAIN_BOT_KEY }}
+          permission-contents: write
+
       - name: Checkout Sharg
         uses: actions/checkout@v7
         with:
-          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
+          token: ${{ steps.token.outputs.token }}
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v7

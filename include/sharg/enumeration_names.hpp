@@ -135,9 +135,8 @@ struct enumeration_names_cpo
      * `enumeration_names(std::type_identity<option_t>{})` will be called.
      */
     template <typename option_type = option_t>
-    static constexpr auto cpo_overload(sharg::detail::priority_tag<0>) noexcept(
-        noexcept(enumeration_names(option_or_type_identity<option_type>{})))
-        -> decltype(enumeration_names(option_or_type_identity<option_type>{}))
+    static constexpr auto cpo_overload(sharg::detail::priority_tag<0>) noexcept(noexcept(enumeration_names(
+        option_or_type_identity<option_type>{}))) -> decltype(enumeration_names(option_or_type_identity<option_type>{}))
     {
         return enumeration_names(option_or_type_identity<option_type>{});
     }
