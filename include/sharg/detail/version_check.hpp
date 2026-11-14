@@ -11,6 +11,8 @@
 
 #include <sharg/std/charconv>
 #include <array>
+#include <cassert>
+#include <filesystem>
 #include <fstream>
 #include <future>
 #include <iostream>
@@ -18,7 +20,6 @@
 #include <regex>
 
 #include <sharg/auxiliary.hpp>
-#include <sharg/detail/safe_filesystem_entry.hpp>
 #include <sharg/detail/terminal.hpp>
 
 namespace sharg::detail
@@ -42,6 +43,43 @@ inline void call_server(std::string const & command, std::promise<bool> prom)
         prom.set_value(false);
     else
         prom.set_value(true);
+}
+
+// ------------------------------------------------------------------------------------------------------------------
+// function quote_argument()
+// ------------------------------------------------------------------------------------------------------------------
+
+/*!\brief Quotes a string such that the shell executing the server call treats it as a single, literal argument.
+ * \ingroup parser
+ * \param[in] argument The string to quote.
+ * \returns The single-quoted string.
+ *
+ * Within single quotes, only the single quote itself needs to be escaped.
+ */
+inline std::string quote_argument(std::string const & argument)
+{
+#if defined(_WIN32)
+    // The argument is part of a PowerShell command, which escapes a single quote by doubling it.
+    // Windows is not supported. If it ever is, this needs to be adapted: PowerShell also treats the typographic quotes
+    // U+2018 to U+201B as single quotes, and cmd.exe, which runs the command, expands %VARIABLE% even within quotes.
+    constexpr std::string_view escaped_quote{"''"};
+#else
+    // A POSIX shell cannot escape a single quote within single quotes: close the quotes, add an escaped quote, reopen.
+    constexpr std::string_view escaped_quote{"'\\''"};
+#endif
+
+    std::string result{'\''};
+
+    for (char const c : argument)
+    {
+        if (c == '\'')
+            result.append(escaped_quote);
+        else
+            result.push_back(c);
+    }
+
+    result.push_back('\'');
+    return result;
 }
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -182,12 +220,12 @@ public:
             return;
         }
 
-        // 'cookie_path' is no user input and `name` is escaped on construction of the parser.
+        // 'cookie_path' is derived from environment variables and may contain any character, e.g. spaces.
         std::filesystem::path out_file = cookie_path / (name + ".version");
 
         // build up command for server call
         std::string command = program + // no user defined input
-                              " " + out_file.string() + " "
+                              " " + quote_argument(out_file.string()) + " "
                             + std::string{"https://seqan-update.cs.uni-tuebingen.de/check/SeqAn-Sharg_"} +
 #ifdef __linux
                               "Linux" +
@@ -219,7 +257,12 @@ public:
         std::thread(call_server, command, std::move(prom)).detach();
     }
 
-    //!\brief Returns a writable path to store timestamp and version files or an empty path if none exists.
+    /*!\brief Returns a writable path to store timestamp and version files or an empty path if none exists.
+     * \details
+     * The path is `.config/seqan` in the home directory given by the environment variable `HOME` (`UserProfile` on
+     * Windows). If this variable is not set or empty, `.config/seqan` is relative to the current working directory.
+     * If `.config/seqan` cannot be created, the temporary directory is used, see std::filesystem::temp_directory_path.
+     */
     static std::filesystem::path get_path()
     {
         using namespace std::filesystem;
@@ -243,17 +286,30 @@ public:
 
         // .config/seqan cannot be created, try tmp directory.
         if (err)
-            tmp_path = temp_directory_path(); // choose temp dir instead
+        {
+            tmp_path = temp_directory_path(err); // choose temp dir instead
 
-        // check if files can be written inside dir
-        path dummy = tmp_path / "dummy.txt";
-        std::ofstream file{dummy};
-        sharg::detail::safe_filesystem_entry file_guard{dummy};
+            if (err) // e.g., TMPDIR is not a directory
+            {
+                tmp_path.clear(); // empty path signals no available directory to write to
+                return tmp_path;
+            }
+        }
+
+        // Check if files can be written inside dir. An existing file, e.g., in the temporary directory, might belong to
+        // someone else and must not be opened. Hence, the probe file gets a unique name and std::ios::noreplace fails
+        // instead of opening an existing file. In the unlikely case of a name clash, the directory is not used.
+        path const dummy =
+            tmp_path
+            / ("dummy_" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".txt");
+        std::ofstream file{dummy, std::ios::out | std::ios::noreplace};
 
         bool is_open = file.is_open();
         bool is_good = file.good();
         file.close();
-        file_guard.remove_no_throw();
+
+        if (is_open) // only remove the file if it was created here
+            remove(dummy, err);
 
         if (!is_good || !is_open) // no write permissions
         {
@@ -261,6 +317,21 @@ public:
         }
 
         return tmp_path;
+    }
+
+    /*!\brief Whether the developer, the environment variable SHARG_NO_VERSION_CHECK or the user disabled the check.
+     * \param[in] developer_approval Whether the developer approved (update_notifications::on) or not
+     *                               (update_notifications::off).
+     * \param[in] user_approval      Whether the user approved (true) or not (false) or did not decide (unset optional).
+     *
+     * In contrast to decide_if_check_is_performed(), this does not need the directory for the timestamp and version
+     * files. Hence, the parser can call it before constructing the version_checker, which determines and creates this
+     * directory.
+     */
+    static bool is_disabled(update_notifications developer_approval, std::optional<bool> user_approval)
+    {
+        return developer_approval == update_notifications::off || std::getenv("SHARG_NO_VERSION_CHECK") != nullptr
+            || user_approval == false;
     }
 
     /*!\brief The central decision whether to perform the version check or not.
@@ -277,7 +348,9 @@ public:
      * No cookie is written.
      *
      * If the user explicitly uses the --version-check option (user_approval is set) it rules out all following
-     * decisions. No cookie is written.
+     * decisions. No cookie is written. However, if there is no writable directory (see get_path()), no version check
+     * is done even if the user specified --version-check true. If the terminal is interactive,
+     * message_no_writable_directory is printed instead.
      *
      * If none of the above apply, version check was not explicitly handled so cookie content is checked:
      * * NEVER: Do not perform the version check and do not change the cookie.
@@ -290,14 +363,20 @@ public:
      */
     bool decide_if_check_is_performed(update_notifications developer_approval, std::optional<bool> user_approval)
     {
-        if (developer_approval == update_notifications::off)
+        if (is_disabled(developer_approval, user_approval))
             return false;
 
-        if (std::getenv("SHARG_NO_VERSION_CHECK") != nullptr) // environment variable was set
+        if (cookie_path.empty()) // no directory to write the timestamp and version files to
+        {
+            // Like the question whether to perform the version check, the message is only shown interactively.
+            if (detail::stdin_is_terminal() && detail::stderr_is_terminal()) // LCOV_EXCL_START
+                std::cerr << message_no_writable_directory << std::flush;
+            // LCOV_EXCL_STOP
             return false;
+        }
 
-        if (user_approval.has_value())
-            return user_approval.value();
+        if (user_approval.has_value()) // the user explicitly enabled the version check
+            return true;
 
         // version check was not explicitly handled so let's check the cookie
         if (std::filesystem::exists(cookie_path))
@@ -408,6 +487,12 @@ public:
         "[APP VERSION INFO] :: We noticed the app version you use is newer than the one registered with us.\n"
         "[APP VERSION INFO] :: Please send us an email with the new version so we can correct it "
         "(support@seqan.de)\n\n";
+    //!\brief The message if the version check is skipped because there is no writable directory for its files.
+    static constexpr std::string_view message_no_writable_directory =
+        "[SHARG VERSION INFO] :: The version check was skipped because there is no writable directory for its files.\n"
+        "[SHARG VERSION INFO] :: For details, see "
+        "https://docs.seqan.de/sharg/main_user/about_update_notifications.html\n"
+        "[SHARG VERSION INFO] :: If you don't wish to receive further notifications, set --version-check false.\n\n";
     //!\brief The message directed to the user of the app if a new app version is available.
     std::string message_app_update =
         "[APP VERSION INFO] :: A new version of this application is now available.\n"
